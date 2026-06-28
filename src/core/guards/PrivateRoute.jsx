@@ -1,7 +1,7 @@
 // src/core/guards/PrivateRoute.jsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import Spinner from '../components/ui/Spinner/Spinner'
+import Spinner from '../components/ui/Spinner'
 
 function PrivateRoute() {
   const { isAuthenticated, isLoading } = useAuth()

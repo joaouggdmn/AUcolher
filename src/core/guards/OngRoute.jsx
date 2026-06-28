@@ -1,7 +1,7 @@
 // src/core/guards/OngRoute.jsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import Spinner from '../components/ui/Spinner/Spinner'
+import Spinner from '../components/ui/Spinner'
 
 // Verifica login E se o usuário tem role de ONG verificada
 function OngRoute() {

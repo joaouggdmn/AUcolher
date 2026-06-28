@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { publicRoutes } from './publicRoutes'
 import { authRoutes } from './authRoutes'
 import { protectedRoutes } from './protectedRoutes'
-import NotFoundPage from '../features/admin/pages/NotFoundPage' // ajuste se mover para core/
+import NotFoundPage from '../core/components/NotFoundPage' // ajuste se mover para core/
 import RootErrorPage from '../core/components/RootErrorPage'
 
 export const router = createBrowserRouter([

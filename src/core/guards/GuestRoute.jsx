@@ -1,7 +1,7 @@
 // src/core/guards/GuestRoute.jsx
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import Spinner from '../components/ui/Spinner/Spinner'
+import Spinner from '../components/ui/Spinner'
 
 // Impede que usuários LOGADOS acessem login/cadastro
 function GuestRoute() {
