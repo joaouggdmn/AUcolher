@@ -1,7 +1,7 @@
 import PublicLayout from '../core/components/layout/PublicLayout'
 import LoginPage from '../features/auth/pages/LoginPage'
 import RegisterPage from '../features/auth/pages/RegisterPage'
-import ForgotPasswordPage from '../features/auth/pages/ForgotPasswordPage'
+import ForgotPasswordPage from '../features/auth/pages/ForgotPassworPage'
 import OngRegisterPage from '../features/ong/pages/OngRegisterPage'
 import GuestRoute from '../core/guards/GuestRoute'
 
