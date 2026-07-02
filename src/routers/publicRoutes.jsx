@@ -1,54 +1,51 @@
 import PublicLayout from '../core/components/layout/PublicLayout'
+import PlaceholderPage from '../core/components/PlaceholderPage'
 import HomePage from '../features/home/pages/HomePage'
-import AnimaisListPage from '../features/animais/pages/AnimaisListPage'
-import AnimalDetailPage from '../features/animais/pages/AnimalDetailPage'
-import EventsListPage from '../features/eventos/pages/EventsListPage'
-import EventDetailPage from '../features/eventos/pages/EventDetailPage'
-import CampaignsListPage from '../features/doacoes/pages/CampaignsListPage'
-import CampaignDetailPage from '../features/doacoes/pages/CampaignDetailPage'
-import OngProfilePage from '../features/ong/pages/OngProfilePage'
-import PublicProfilePage from '../features/perfil/pages/PublicProfilePage'
 
 export const publicRoutes = [
   {
     element: <PublicLayout />,
     children: [
       {
-        index: true,          // Rota raiz "/"
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: 'home',
         element: <HomePage />,
       },
       {
         path: 'animais',
-        element: <AnimaisListPage />,
+        element: <PlaceholderPage title="Animais" />,
       },
       {
         path: 'animais/:id',
-        element: <AnimalDetailPage />,
+        element: <PlaceholderPage title="Detalhes do animal" />,
       },
       {
         path: 'eventos',
-        element: <EventsListPage />,
+        element: <PlaceholderPage title="Eventos" />,
       },
       {
         path: 'eventos/:id',
-        element: <EventDetailPage />,
+        element: <PlaceholderPage title="Detalhes do evento" />,
       },
       {
         path: 'campanhas',
-        element: <CampaignsListPage />,
+        element: <PlaceholderPage title="Campanhas" />,
       },
       {
         path: 'campanhas/:id',
-        element: <CampaignDetailPage />,
+        element: <PlaceholderPage title="Detalhes da campanha" />,
       },
       {
         path: 'ong/:id',
-        element: <OngProfilePage />,
+        element: <PlaceholderPage title="Perfil da ONG" />,
       },
       {
         path: 'perfil/publico/:id',
-        element: <PublicProfilePage />,
+        element: <PlaceholderPage title="Perfil publico" />,
       },
     ],
   },
-] 
+]
