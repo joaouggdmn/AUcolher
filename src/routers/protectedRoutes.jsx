@@ -5,89 +5,53 @@ import AdminRoute from '../core/guards/AdminRoute'
 import UserLayout from '../core/components/layout/UserLayout'
 import OngLayout from '../core/components/layout/OngLayout'
 import AdminLayout from '../core/components/layout/AdminLayout'
-
-// — Páginas de Usuário Comum —
-import AnimalCreatePage from '../features/animais/pages/AnimalCreatePage'
-import AnimalEditPage from '../features/animais/pages/AnimalEditPage'
-import MyAnimaisPage from '../features/animais/pages/MyAnimaisPage'
-import MyInterestsPage from '../features/adocao/pages/MyInterestsPage'
-import ReceivedInterestsPage from '../features/adocao/pages/ReceivedInterestsPage'
-import ChatPage from '../features/chat/pages/ChatPage'
-import MyReviewsPage from '../features/avaliacoes/pages/MyReviewsPage'
-import ProfilePage from '../features/perfil/pages/ProfilePage'
-
-// — Páginas de ONG —
-import OngDashboardPage from '../features/ong/pages/OngDashboardPage'
-import EventCreatePage from '../features/eventos/pages/EventCreatePage'
-import EventEditPage from '../features/eventos/pages/EventEditPage'
-import CampaignCreatePage from '../features/doacoes/pages/CampaignCreatePage'
-
-// — Páginas de Admin —
-import AdminDashboardPage from '../features/admin/pages/AdminDashboardPage'
-import OngApprovalsPage from '../features/admin/pages/OngApprovalsPage'
-import ReportsPage from '../features/admin/pages/ReportsPage'
-import StatisticsPage from '../features/admin/pages/StatisticsPage'
+import PlaceholderPage from '../core/components/PlaceholderPage'
 
 export const protectedRoutes = [
-
-  // ─────────────────────────────────────────
-  // GRUPO 1: Usuário Comum
-  // Guard → Layout → Páginas
-  // ─────────────────────────────────────────
   {
     element: <PrivateRoute />,
     children: [
       {
         element: <UserLayout />,
         children: [
-          { path: 'animais/criar',          element: <AnimalCreatePage /> },
-          { path: 'animais/editar/:id',     element: <AnimalEditPage /> },
-          { path: 'meus-anuncios',          element: <MyAnimaisPage /> },
-          { path: 'meus-interesses',        element: <MyInterestsPage /> },
-          { path: 'interesses-recebidos',   element: <ReceivedInterestsPage /> },
-          { path: 'chat',                   element: <ChatPage /> },
-          { path: 'minhas-avaliacoes',      element: <MyReviewsPage /> },
-          { path: 'perfil',                 element: <ProfilePage /> },
+          { path: 'animais/criar', element: <PlaceholderPage title="Criar animal" /> },
+          { path: 'animais/editar/:id', element: <PlaceholderPage title="Editar animal" /> },
+          { path: 'meus-anuncios', element: <PlaceholderPage title="Meus anuncios" /> },
+          { path: 'meus-interesses', element: <PlaceholderPage title="Meus interesses" /> },
+          { path: 'interesses-recebidos', element: <PlaceholderPage title="Interesses recebidos" /> },
+          { path: 'chat', element: <PlaceholderPage title="Chat" /> },
+          { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
+          { path: 'perfil', element: <PlaceholderPage title="Perfil" /> },
         ],
       },
     ],
   },
-
-  // ─────────────────────────────────────────
-  // GRUPO 2: ONG Verificada
-  // OngRoute já inclui verificação de PrivateRoute internamente
-  // ─────────────────────────────────────────
   {
     element: <OngRoute />,
     children: [
       {
         element: <OngLayout />,
         children: [
-          { path: 'ong/dashboard',          element: <OngDashboardPage /> },
-          { path: 'eventos/criar',          element: <EventCreatePage /> },
-          { path: 'eventos/editar/:id',     element: <EventEditPage /> },
-          { path: 'campanhas/criar',        element: <CampaignCreatePage /> },
+          { path: 'ong/dashboard', element: <PlaceholderPage title="Dashboard da ONG" /> },
+          { path: 'eventos/criar', element: <PlaceholderPage title="Criar evento" /> },
+          { path: 'eventos/editar/:id', element: <PlaceholderPage title="Editar evento" /> },
+          { path: 'campanhas/criar', element: <PlaceholderPage title="Criar campanha" /> },
         ],
       },
     ],
   },
-
-  // ─────────────────────────────────────────
-  // GRUPO 3: Administrador
-  // AdminRoute já inclui verificação de PrivateRoute internamente
-  // ─────────────────────────────────────────
   {
     element: <AdminRoute />,
     children: [
       {
         element: <AdminLayout />,
         children: [
-          { path: 'admin/dashboard',        element: <AdminDashboardPage /> },
-          { path: 'admin/aprovacoes',       element: <OngApprovalsPage /> },
-          { path: 'admin/denuncias',        element: <ReportsPage /> },
-          { path: 'admin/estatisticas',     element: <StatisticsPage /> },
+          { path: 'admin/dashboard', element: <PlaceholderPage title="Dashboard admin" /> },
+          { path: 'admin/aprovacoes', element: <PlaceholderPage title="Aprovacoes de ONG" /> },
+          { path: 'admin/denuncias', element: <PlaceholderPage title="Denuncias" /> },
+          { path: 'admin/estatisticas', element: <PlaceholderPage title="Estatisticas" /> },
         ],
       },
     ],
   },
-] 
+]

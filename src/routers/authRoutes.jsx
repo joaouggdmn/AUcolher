@@ -1,14 +1,9 @@
 import PublicLayout from '../core/components/layout/PublicLayout'
-import LoginPage from '../features/auth/pages/LoginPage'
-import RegisterPage from '../features/auth/pages/RegisterPage'
-import ForgotPasswordPage from '../features/auth/pages/ForgotPassworPage'
-import OngRegisterPage from '../features/ong/pages/OngRegisterPage'
+import PlaceholderPage from '../core/components/PlaceholderPage'
 import GuestRoute from '../core/guards/GuestRoute'
 
 export const authRoutes = [
   {
-    // GuestRoute: redireciona para "/" se o usuário JÁ estiver logado
-    // Evita que alguém logado acesse /login ou /cadastro manualmente
     element: <GuestRoute />,
     children: [
       {
@@ -16,22 +11,22 @@ export const authRoutes = [
         children: [
           {
             path: 'login',
-            element: <LoginPage />,
+            element: <PlaceholderPage title="Login" />,
           },
           {
             path: 'cadastro',
-            element: <RegisterPage />,
+            element: <PlaceholderPage title="Cadastro" />,
           },
           {
             path: 'recuperar-senha',
-            element: <ForgotPasswordPage />,
+            element: <PlaceholderPage title="Recuperar senha" />,
           },
           {
             path: 'cadastro-ong',
-            element: <OngRegisterPage />,
+            element: <PlaceholderPage title="Cadastro de ONG" />,
           },
         ],
       },
     ],
   },
-] 
+]
