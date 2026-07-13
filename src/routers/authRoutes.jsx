@@ -1,5 +1,6 @@
 import PublicLayout from '../core/components/layout/PublicLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
+import LoginPage from '../features/auth/pages/LoginPage'
 import GuestRoute from '../core/guards/GuestRoute'
 
 export const authRoutes = [
@@ -11,7 +12,7 @@ export const authRoutes = [
         children: [
           {
             path: 'login',
-            element: <PlaceholderPage title="Login" />,
+            element: <LoginPage />,
           },
           {
             path: 'cadastro',
