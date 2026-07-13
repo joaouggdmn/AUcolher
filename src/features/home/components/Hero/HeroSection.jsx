@@ -10,7 +10,7 @@ function HeroSection() {
         className="absolute inset-0 -z-20 bg-cover bg-center"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1800&q=80")',
+            'url("https://www.petz.com.br/blog/wp-content/uploads/2020/05/adocao-de-gatos-felinos.jpg")',
         }}
       />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-stone-50 via-stone-50/95 to-stone-50/20" />

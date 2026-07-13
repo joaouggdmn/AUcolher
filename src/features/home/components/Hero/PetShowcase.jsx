@@ -1,9 +1,6 @@
 import MatchBalloons from './MatchBalloons'
+import petImage from '../../../../assets/hero-pet.png'
 
-// 🔴 SUBSTITUA pelo caminho do seu PNG local, ex:
-// import petImage from '../../../../assets/images/hero-pet.png'
-const PET_IMAGE_PLACEHOLDER =
-  'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=900&q=80'
 
 function PetShowcase() {
   return (
@@ -13,8 +10,7 @@ function PetShowcase() {
         <div className="absolute h-56 w-56 rounded-full bg-gradient-to-br from-emerald-400 via-emerald-600 to-amber-400 opacity-90 blur-md sm:h-72 sm:w-72" />
 
         <img
-          // 🔴 Troque `src` pelo import do seu PNG (fundo transparente)
-          src={PET_IMAGE_PLACEHOLDER}
+          src={petImage}
           alt="Pet disponível para adoção"
           className="relative z-10 h-64 w-64 object-contain drop-shadow-2xl sm:h-80 sm:w-80"
         />
@@ -42,9 +38,9 @@ function PetShowcase() {
         {/* A estrela — pet com fundo transparente */}
         <img
           // 🔴 Troque `src` pelo import do seu PNG (fundo transparente)
-          src={PET_IMAGE_PLACEHOLDER}
+          src={petImage}
           alt="Pet disponível para adoção"
-          className="relative z-20 h-[460px] w-[460px] object-contain drop-shadow-[0_35px_35px_rgba(6,78,59,0.35)]"
+          className="relative z-20 h-[600px] w-[600px] object-contain drop-shadow-[0_35px_35px_rgba(6,78,59,0.35)]"
         />
 
         <MatchBalloons variant="desktop" />
