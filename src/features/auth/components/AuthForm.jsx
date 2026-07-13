@@ -1,6 +1,5 @@
 // src/features/auth/components/AuthForm.jsx
 import { Link } from 'react-router-dom'
-import { FaPaw } from 'react-icons/fa6'
 import PetRegister from '../../../assets/hero-pet.png'
 
 function AuthForm({ heading, subheading, children }) {
@@ -46,11 +45,6 @@ function AuthForm({ heading, subheading, children }) {
               alt="Pet feliz esperando adoção"
               className="relative z-10 h-60 w-60 object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)] xl:h-72 xl:w-72"
             />
-
-            <div className="absolute left-0 top-4 z-20 flex items-center gap-2 rounded-2xl bg-amber-400 px-3 py-2 text-xs font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30">
-              <FaPaw size={12} />
-              +2.400 adoções felizes
-            </div>
           </div>
         </div>
 
