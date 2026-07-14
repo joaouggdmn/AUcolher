@@ -1,6 +1,7 @@
 import PublicLayout from '../core/components/layout/PublicLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import HomePage from '../features/home/pages/HomePage'
+import AnimaisListPage from '../features/animais/pages/AnimaisListPage'
 
 export const publicRoutes = [
   {
@@ -16,7 +17,7 @@ export const publicRoutes = [
       },
       {
         path: 'animais',
-        element: <PlaceholderPage title="Animais" />,
+        element: <AnimaisListPage/>,
       },
       {
         path: 'animais/:id',
