@@ -3,35 +3,36 @@ import { FaShieldHalved, FaHeart, FaVenus, FaMars, FaLocationDot, FaArrowRight }
 
 function AnimalCard({ animal }) {
   const isFemale = animal.sex === 'F'
+  const isOng = animal.anunciante === 'ONG'
 
   const handleFavoritar = (e) => {
-    e.preventDefault() // evita qualquer navegação acidental
+    e.preventDefault()
     // 🔴 Aqui entra a chamada real: favoritarAnimal(animal.id)
     console.log('Favoritado:', animal.name)
   }
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-emerald-950/10">
-
-      {/* Foto — Link isolado aqui dentro, nunca aninhado com o botão de favoritar */}
+    <div
+      className={`group flex flex-col overflow-hidden rounded-3xl bg-white transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-950/15 ${
+        isOng ? 'shadow-lg shadow-amber-500/10 ring-2 ring-amber-400' : 'shadow-sm ring-1 ring-slate-100'
+      }`}
+    >
       <div className="relative h-56 w-full overflow-hidden">
         <Link to={`/animais/${animal.id}`}>
           <img
             src={animal.photoUrl}
             alt={`Foto de ${animal.name}`}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
           />
         </Link>
 
-        {/* Selo ONG — só renderiza se o anunciante for uma ONG */}
-        {animal.anunciante === 'ONG' && (
+        {isOng && (
           <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-md shadow-amber-500/30">
             <FaShieldHalved size={12} />
             ONG Verificada
           </span>
         )}
 
-        {/* Botão de favoritar — irmão do Link, não filho, evita nesting inválido */}
         <button
           type="button"
           onClick={handleFavoritar}
@@ -44,7 +45,6 @@ function AnimalCard({ animal }) {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 
-      {/* Informações */}
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-2">
           <div>
@@ -68,6 +68,13 @@ function AnimalCard({ animal }) {
           <FaLocationDot size={13} className="text-emerald-600" />
           {animal.city}, {animal.state}
         </div>
+
+        {isOng && animal.ongName && (
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
+            <FaShieldHalved size={11} />
+            {animal.ongName}
+          </p>
+        )}
 
         <Link
           to={`/animais/${animal.id}`}
