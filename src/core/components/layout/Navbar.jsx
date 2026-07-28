@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiMenu, FiX } from 'react-icons/fi'
-
-const NAV_LINKS = [
-  { label: 'Início', to: '/' },
-  { label: 'Animais', to: '/animais' },
-  { label: 'Eventos', to: '/eventos' },
-  { label: 'Campanhas', to: '/campanhas' },
-  { label: 'Sobre', to: '/sobre' },
-]
+import { LuSparkles } from 'react-icons/lu'
 
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -16,7 +9,7 @@ function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40)
-    handleScroll() // garante o estado certo se a página carregar já rolada
+    handleScroll()
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -29,39 +22,77 @@ function Navbar() {
           : 'bg-white/80 backdrop-blur-sm'
       }`}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      {/* relative é a âncora para o bloco central absoluto */}
+      <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center text-2xl font-black tracking-tight">
-          <span
-            className={`transition-colors duration-300 ${
-              isScrolled ? 'text-white' : 'text-emerald-900'
-            }`}
-          >
+        <Link to="/" className="flex shrink-0 items-center text-2xl font-black tracking-tight">
+          <span className={`transition-colors duration-300 ${isScrolled ? 'text-white' : 'text-emerald-900'}`}>
             AU
           </span>
           <span className="text-amber-500">colher</span>
         </Link>
 
-        {/* Links (desktop) */}
-        <ul className="hidden items-center gap-8 text-sm font-semibold md:flex">
-          {NAV_LINKS.map((link) => (
-            <li key={link.to}>
-              <Link
-                to={link.to}
-                className={`transition-colors duration-300 ${
-                  isScrolled
-                    ? 'text-emerald-50 hover:text-amber-300'
-                    : 'text-slate-700 hover:text-emerald-700'
-                }`}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+        {/* Bloco central — sai do fluxo do flex, se ancora no meio absoluto do header,
+            então o tamanho do Logo e do bloco de Auth nunca o empurram do centro */}
+        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 whitespace-nowrap md:flex">
+          <li>
+            <Link
+              to="/"
+              className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
+                isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
+              }`}
+            >
+              Início
+            </Link>
+          </li>
+
+          {/* AUmatch — o item premium, nunca um link de texto comum */}
+          <li>
+            <Link
+              to="/aumatch"
+              className="group relative mx-1 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-4 py-2 text-sm font-extrabold text-emerald-950 shadow-[0_0_0_0_rgba(217,119,6,0.5)] transition-all duration-300 hover:scale-105 hover:from-amber-300 hover:to-amber-400 animate-glow"
+            >
+              <LuSparkles size={15} className="transition-transform duration-300 group-hover:rotate-12" />
+              AUmatch
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/animais"
+              className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
+                isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
+              }`}
+            >
+              Animais
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/eventos"
+              className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
+                isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
+              }`}
+            >
+              Eventos
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/campanhas"
+              className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
+                isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
+              }`}
+            >
+              Campanhas
+            </Link>
+          </li>
         </ul>
 
         {/* Ações */}
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           <Link
             to="/login"
             className={`hidden rounded-full border px-5 py-2 text-sm font-bold transition-all duration-300 sm:inline-block ${
@@ -84,7 +115,6 @@ function Navbar() {
             Cadastrar-se
           </Link>
 
-          {/* Hambúrguer (mobile) */}
           <button
             onClick={() => setIsMenuOpen((open) => !open)}
             className={`ml-1 md:hidden ${isScrolled ? 'text-white' : 'text-emerald-900'}`}
@@ -97,26 +127,66 @@ function Navbar() {
 
       {/* Menu mobile expandido */}
       {isMenuOpen && (
-        <ul
-          className={`flex flex-col gap-1 px-6 pb-4 md:hidden ${
-            isScrolled ? 'bg-emerald-800' : 'bg-white'
-          }`}
-        >
-          {NAV_LINKS.map((link) => (
-            <li key={link.to}>
-              <Link
-                to={link.to}
-                onClick={() => setIsMenuOpen(false)}
-                className={`block rounded-lg px-3 py-2 text-sm font-semibold ${
-                  isScrolled
-                    ? 'text-emerald-50 hover:bg-emerald-700'
-                    : 'text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+        <ul className={`flex flex-col gap-1 px-6 pb-4 md:hidden ${isScrolled ? 'bg-emerald-800' : 'bg-white'}`}>
+          <li>
+            <Link
+              to="/"
+              onClick={() => setIsMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 text-sm font-semibold ${
+                isScrolled ? 'text-emerald-50 hover:bg-emerald-700' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              Início
+            </Link>
+          </li>
+
+          {/* AUmatch — destaque também no mobile, fundo dourado diferencia dos demais itens */}
+          <li>
+            <Link
+              to="/aumatch"
+              onClick={() => setIsMenuOpen(false)}
+              className="my-1 flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-2.5 text-sm font-extrabold text-emerald-950 shadow-sm"
+            >
+              <LuSparkles size={16} />
+              AUmatch
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/animais"
+              onClick={() => setIsMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 text-sm font-semibold ${
+                isScrolled ? 'text-emerald-50 hover:bg-emerald-700' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              Animais
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/eventos"
+              onClick={() => setIsMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 text-sm font-semibold ${
+                isScrolled ? 'text-emerald-50 hover:bg-emerald-700' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              Eventos
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/campanhas"
+              onClick={() => setIsMenuOpen(false)}
+              className={`block rounded-lg px-3 py-2 text-sm font-semibold ${
+                isScrolled ? 'text-emerald-50 hover:bg-emerald-700' : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              Campanhas
+            </Link>
+          </li>
         </ul>
       )}
     </header>
