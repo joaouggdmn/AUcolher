@@ -1,17 +1,17 @@
-import { FaPaw, FaHouseChimneyUser } from 'react-icons/fa6'
+import { FaPaw, FaBuildingShield } from 'react-icons/fa6'
 
 const USER_TYPES = [
   {
-    value: 'ADOTANTE',
-    title: 'Quero adotar',
-    description: 'Buscar meu novo companheiro',
+    value: 'PESSOA',
+    title: 'Para mim',
+    description: 'Quero adotar ou divulgar um animal para adoção',
     icon: FaPaw,
   },
   {
     value: 'ONG',
-    title: 'Sou ONG / Protetor',
-    description: 'Cadastrar animais para adoção',
-    icon: FaHouseChimneyUser,
+    title: 'ONG / Abrigo',
+    description: 'Conta institucional para abrigos e feiras de adoção',
+    icon: FaBuildingShield,
   },
 ]
 
