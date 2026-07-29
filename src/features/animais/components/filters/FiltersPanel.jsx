@@ -1,7 +1,7 @@
 import { FaChevronDown, FaXmark } from 'react-icons/fa6'
-import CheckboxOption from './CheckboxOption'
-import ToggleSwitch from './ToggleSwitch'
-import FilterSection from './FilterSection'
+import CheckboxOption from '../../../../core/components/ui/filters/CheckboxOption'
+import ToggleSwitch from '../../../../core/components/ui/filters/ToggleSwitch'
+import FilterSection from '../../../../core/components/ui/filters/FilterSection'
 import { ESPECIE_OPTIONS, PORTE_OPTIONS, SEXO_OPTIONS, IDADE_OPTIONS, CIDADE_OPTIONS } from './filterOptions'
 
 function FiltersPanel({
