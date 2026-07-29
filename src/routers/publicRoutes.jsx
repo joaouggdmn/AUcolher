@@ -2,6 +2,7 @@ import PublicLayout from '../core/components/layout/PublicLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import HomePage from '../features/home/pages/HomePage'
 import AnimaisListPage from '../features/animais/pages/AnimaisListPage'
+import EventsListPage from '../features/eventos/pages/EventsListPage'
 
 export const publicRoutes = [
   {
@@ -25,7 +26,7 @@ export const publicRoutes = [
       },
       {
         path: 'eventos',
-        element: <PlaceholderPage title="Eventos" />,
+        element: <EventsListPage />,
       },
       {
         path: 'eventos/:id',
