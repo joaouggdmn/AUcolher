@@ -1,9 +1,8 @@
-import { FaCircleCheck, FaShieldHalved, FaHeart } from 'react-icons/fa6'
+import { FaCircleCheck, FaShieldHalved } from 'react-icons/fa6'
 
 const badges = [
   { icon: FaCircleCheck, label: 'ONGs e protetores verificados' },
   { icon: FaShieldHalved, label: 'Processo de adoção seguro' },
-  { icon: FaHeart, label: '+500 adoções concluídas' },
 ]
 
 function TrustBadges() {
