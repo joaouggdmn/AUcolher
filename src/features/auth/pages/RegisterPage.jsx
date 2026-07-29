@@ -1,28 +1,40 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa6'
+import { FaUser, FaEnvelope, FaLock, FaBuilding, FaIdCard } from 'react-icons/fa6'
 import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
 import UserTypeSelector from '../components/UserTypeSelector'
+import { maskCNPJ } from '../../../core/utils/masks'
+
+const INITIAL_FORM = {
+  userType: 'PESSOA',
+  name: '',        // Nome completo (Pessoa) OU Nome da instituição (ONG)
+  cnpj: '',         // Só usado quando userType === 'ONG'
+  email: '',
+  password: '',
+}
 
 function RegisterPage() {
   const navigate = useNavigate()
 
-  const [formData, setFormData] = useState({
-    userType: 'ADOTANTE',
-    name: '',
-    email: '',
-    password: '',
-  })
+  const [formData, setFormData] = useState(INITIAL_FORM)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
+
+  const isOng = formData.userType === 'ONG'
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  const handleCnpjChange = (e) => {
+    setFormData((prev) => ({ ...prev, cnpj: maskCNPJ(e.target.value) }))
+  }
+
   const handleUserTypeChange = (userType) => {
-    setFormData((prev) => ({ ...prev, userType }))
+    // Zera nome e CNPJ ao trocar de tipo — evita levar "Nome completo" digitado
+    // para o campo "Nome da instituição" (ou vice-versa) por engano
+    setFormData((prev) => ({ ...prev, userType, name: '', cnpj: '' }))
   }
 
   const handleSubmit = async (e) => {
@@ -64,41 +76,89 @@ function RegisterPage() {
           <UserTypeSelector value={formData.userType} onChange={handleUserTypeChange} />
         </div>
 
-        <AuthInput
-          id="name"
-          name="name"
-          label="Nome completo"
-          type="text"
-          icon={FaUser}
-          placeholder="Como podemos te chamar?"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
+        {/* key={formData.userType} força o React a remontar este bloco ao trocar
+            de tipo, o que reinicia a animação de fade-slide-in a cada alternância */}
+        <div key={formData.userType} className="flex flex-col gap-5 animate-fade-slide-in">
+          {isOng ? (
+            <>
+              <AuthInput
+                id="name"
+                name="name"
+                label="Nome da instituição / ONG"
+                type="text"
+                icon={FaBuilding}
+                placeholder="Ex: Abrigo Amigo Fiel"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
 
-        <AuthInput
-          id="email"
-          name="email"
-          label="E-mail"
-          type="email"
-          icon={FaEnvelope}
-          placeholder="seuemail@exemplo.com"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+              <AuthInput
+                id="cnpj"
+                name="cnpj"
+                label="CNPJ"
+                type="text"
+                icon={FaIdCard}
+                placeholder="00.000.000/0000-00"
+                value={formData.cnpj}
+                onChange={handleCnpjChange}
+                inputMode="numeric"
+                maxLength={18}
+                required
+              />
 
-        <AuthInput
-          id="password"
-          name="password"
-          label="Senha"
-          type="password"
-          icon={FaLock}
-          placeholder="Mínimo 6 caracteres"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
+              <AuthInput
+                id="email"
+                name="email"
+                label="E-mail institucional"
+                type="email"
+                icon={FaEnvelope}
+                placeholder="contato@suaong.org"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </>
+          ) : (
+            <>
+              <AuthInput
+                id="name"
+                name="name"
+                label="Nome completo"
+                type="text"
+                icon={FaUser}
+                placeholder="Como podemos te chamar?"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+
+              <AuthInput
+                id="email"
+                name="email"
+                label="E-mail"
+                type="email"
+                icon={FaEnvelope}
+                placeholder="seuemail@exemplo.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </>
+          )}
+
+          <AuthInput
+            id="password"
+            name="password"
+            label="Senha"
+            type="password"
+            icon={FaLock}
+            placeholder="Mínimo 6 caracteres"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
         {error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600">
