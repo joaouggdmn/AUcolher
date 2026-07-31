@@ -3,6 +3,7 @@ import PlaceholderPage from '../core/components/PlaceholderPage'
 import HomePage from '../features/home/pages/HomePage'
 import AnimaisListPage from '../features/animais/pages/AnimaisListPage'
 import EventsListPage from '../features/eventos/pages/EventsListPage'
+import CampaingsListPage from '../features/doacoes/pages/CampaignsListPage'
 
 export const publicRoutes = [
   {
@@ -34,7 +35,7 @@ export const publicRoutes = [
       },
       {
         path: 'campanhas',
-        element: <PlaceholderPage title="Campanhas" />,
+        element: <CampaingsListPage />,
       },
       {
         path: 'campanhas/:id',
