@@ -68,5 +68,5 @@ body {
 }
 
 .animate-fade-slide-in {
-  animation: fade-slide-in 0.25s ease-out;
+  animation: fade-slide-in 0.25s ease-out both;
 }
