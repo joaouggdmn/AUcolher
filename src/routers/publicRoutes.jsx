@@ -4,6 +4,7 @@ import HomePage from '../features/home/pages/HomePage'
 import AnimaisListPage from '../features/animais/pages/AnimaisListPage'
 import EventsListPage from '../features/eventos/pages/EventsListPage'
 import CampaingsListPage from '../features/doacoes/pages/CampaignsListPage'
+import AumatchPage from '../features/aumatch/pages/AumatchPage'
 
 export const publicRoutes = [
   {
@@ -16,6 +17,10 @@ export const publicRoutes = [
       {
         path: 'home',
         element: <HomePage />,
+      },
+      {
+        path: 'aumatch',
+        element: <AumatchPage />,
       },
       {
         path: 'animais',
