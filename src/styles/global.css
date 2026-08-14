@@ -85,3 +85,15 @@ body {
 .animate-quiz-slide-backward {
   animation: quiz-slide-backward 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20%      { transform: rotate(-12deg); }
+  40%      { transform: rotate(10deg); }
+  60%      { transform: rotate(-6deg); }
+  80%      { transform: rotate(4deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 2.5s ease-in-out infinite;
+}
