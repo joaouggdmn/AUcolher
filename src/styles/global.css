@@ -70,3 +70,18 @@ body {
 .animate-fade-slide-in {
   animation: fade-slide-in 0.25s ease-out both;
 }
+
+@keyframes quiz-slide-forward {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes quiz-slide-backward {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-quiz-slide-forward {
+  animation: quiz-slide-forward 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.animate-quiz-slide-backward {
+  animation: quiz-slide-backward 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
