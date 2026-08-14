@@ -2,6 +2,7 @@ import PublicLayout from '../core/components/layout/PublicLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import HomePage from '../features/home/pages/HomePage'
 import AnimaisListPage from '../features/animais/pages/AnimaisListPage'
+import AnimalDetailPage from '../features/animais/pages/AnimalDetailPage'
 import EventsListPage from '../features/eventos/pages/EventsListPage'
 import CampaingsListPage from '../features/doacoes/pages/CampaignsListPage'
 import AumatchPage from '../features/aumatch/pages/AumatchPage'
@@ -28,7 +29,7 @@ export const publicRoutes = [
       },
       {
         path: 'animais/:id',
-        element: <PlaceholderPage title="Detalhes do animal" />,
+        element: <AnimalDetailPage />,
       },
       {
         path: 'eventos',
