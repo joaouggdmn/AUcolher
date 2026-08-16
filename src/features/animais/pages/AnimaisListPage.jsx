@@ -4,16 +4,16 @@ import SearchBar from '../components/SearchBar'
 import FiltersSidebar from '../components/filters/FiltersSidebar'
 import FiltersDrawer from '../components/filters/FiltersDrawer'
 import AnimalsGrid from '../components/AnimalsGrid'
-import { mockAnimais } from '../data/mockAnimais'
+import { useAnimals } from '../../../core/context/AnimalContext'
 
 const INITIAL_FILTERS = {
-  especies: [],
-  portes: [],
-  sexos: [],
-  idades: [],
-  necessidadesEspeciais: false,
-  cidade: '',
-  distanciaMax: 50,
+  species: [],
+  sizes: [],
+  sexes: [],
+  ageGroups: [],
+  specialNeeds: false,
+  city: '',
+  maxDistance: 50,
 }
 
 function toggleArrayValue(array, value) {
@@ -21,29 +21,28 @@ function toggleArrayValue(array, value) {
 }
 
 function AnimaisListPage() {
+  const { animals } = useAnimals()
+
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState(INITIAL_FILTERS)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-  // 🔴 Quando o backend estiver pronto, substitua as 2 linhas abaixo por:
-  // const { data: animais = [], isLoading } = useAnimais({ search, ...filters })
-  const isLoading = false
-  const animais = mockAnimais
+  const isLoading = false // 🔴 quando o backend estiver pronto: const { data: animals = [], isLoading } = useAnimalsQuery(...)
 
   const handleToggleArrayFilter = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: toggleArrayValue(prev[key], value) }))
   }
 
   const handleToggleSpecialNeeds = () => {
-    setFilters((prev) => ({ ...prev, necessidadesEspeciais: !prev.necessidadesEspeciais }))
+    setFilters((prev) => ({ ...prev, specialNeeds: !prev.specialNeeds }))
   }
 
-  const handleCidadeChange = (cidade) => {
-    setFilters((prev) => ({ ...prev, cidade }))
+  const handleCityChange = (city) => {
+    setFilters((prev) => ({ ...prev, city }))
   }
 
-  const handleDistanceChange = (distanciaMax) => {
-    setFilters((prev) => ({ ...prev, distanciaMax }))
+  const handleDistanceChange = (maxDistance) => {
+    setFilters((prev) => ({ ...prev, maxDistance }))
   }
 
   const handleClearFilters = () => {
@@ -53,69 +52,67 @@ function AnimaisListPage() {
 
   const hasActiveFilters =
     search !== '' ||
-    filters.especies.length > 0 ||
-    filters.portes.length > 0 ||
-    filters.sexos.length > 0 ||
-    filters.idades.length > 0 ||
-    filters.necessidadesEspeciais ||
-    filters.cidade !== '' ||
-    filters.distanciaMax < 50
+    filters.species.length > 0 ||
+    filters.sizes.length > 0 ||
+    filters.sexes.length > 0 ||
+    filters.ageGroups.length > 0 ||
+    filters.specialNeeds ||
+    filters.city !== '' ||
+    filters.maxDistance < 50
 
   const activeFiltersCount =
-    filters.especies.length +
-    filters.portes.length +
-    filters.sexos.length +
-    filters.idades.length +
-    (filters.necessidadesEspeciais ? 1 : 0) +
-    (filters.cidade !== '' ? 1 : 0) +
-    (filters.distanciaMax < 50 ? 1 : 0)
+    filters.species.length +
+    filters.sizes.length +
+    filters.sexes.length +
+    filters.ageGroups.length +
+    (filters.specialNeeds ? 1 : 0) +
+    (filters.city !== '' ? 1 : 0) +
+    (filters.maxDistance < 50 ? 1 : 0)
 
-  // Filtragem no front — será substituída por query params na API futuramente
-  const filteredAnimais = useMemo(() => {
-    return animais.filter((animal) => {
+  const filteredAnimals = useMemo(() => {
+    return animals.filter((animal) => {
       const term = search.toLowerCase()
       const matchesSearch =
         search === '' ||
         animal.name.toLowerCase().includes(term) ||
         animal.city.toLowerCase().includes(term)
 
-      const matchesEspecie = filters.especies.length === 0 || filters.especies.includes(animal.species)
-      const matchesPorte = filters.portes.length === 0 || filters.portes.includes(animal.size)
-      const matchesSexo = filters.sexos.length === 0 || filters.sexos.includes(animal.sex)
-      const matchesIdade = filters.idades.length === 0 || filters.idades.includes(animal.ageGroup)
-      const matchesSpecialNeeds = !filters.necessidadesEspeciais || animal.specialNeeds
-      const matchesCidade = filters.cidade === '' || animal.city === filters.cidade
-      const matchesDistance = animal.distanceKm <= filters.distanciaMax
+      const matchesSpecies = filters.species.length === 0 || filters.species.includes(animal.species)
+      const matchesSize = filters.sizes.length === 0 || filters.sizes.includes(animal.size)
+      const matchesSex = filters.sexes.length === 0 || filters.sexes.includes(animal.sex)
+      const matchesAgeGroup = filters.ageGroups.length === 0 || filters.ageGroups.includes(animal.ageGroup)
+      const matchesSpecialNeeds = !filters.specialNeeds || animal.specialNeeds
+      const matchesCity = filters.city === '' || animal.city === filters.city
+      const matchesDistance = animal.distanceKm <= filters.maxDistance
 
       return (
         matchesSearch &&
-        matchesEspecie &&
-        matchesPorte &&
-        matchesSexo &&
-        matchesIdade &&
+        matchesSpecies &&
+        matchesSize &&
+        matchesSex &&
+        matchesAgeGroup &&
         matchesSpecialNeeds &&
-        matchesCidade &&
+        matchesCity &&
         matchesDistance
       )
     })
-  }, [animais, search, filters])
+  }, [animals, search, filters])
 
   const filterPanelProps = {
     filters,
     onToggleArrayFilter: handleToggleArrayFilter,
     onToggleSpecialNeeds: handleToggleSpecialNeeds,
-    onCidadeChange: handleCidadeChange,
+    onCityChange: handleCityChange,
     onDistanceChange: handleDistanceChange,
     onClear: handleClearFilters,
     hasActiveFilters,
   }
 
   return (
-    // pt-24/lg:pt-28 compensa a Navbar fixa, que não reserva espaço próprio no layout
     <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:pt-28">
       <header className="mb-8 flex flex-col gap-2 sm:mb-10">
         <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
-          {filteredAnimais.length} {filteredAnimais.length === 1 ? 'animal encontrado' : 'animais encontrados'}
+          {filteredAnimals.length} {filteredAnimals.length === 1 ? 'animal encontrado' : 'animais encontrados'}
         </span>
         <h1 className="font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Encontre seu novo melhor amigo
@@ -147,14 +144,14 @@ function AnimaisListPage() {
             </button>
           </div>
 
-          <AnimalsGrid animais={filteredAnimais} isLoading={isLoading} onClearFilters={handleClearFilters} />
+          <AnimalsGrid animais={filteredAnimals} isLoading={isLoading} onClearFilters={handleClearFilters} />
         </div>
       </div>
 
       <FiltersDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        resultsCount={filteredAnimais.length}
+        resultsCount={filteredAnimals.length}
         {...filterPanelProps}
       />
     </div>
