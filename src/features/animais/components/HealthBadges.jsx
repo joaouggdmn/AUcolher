@@ -1,9 +1,9 @@
 import { FaSyringe, FaScissors, FaPills, FaCircleCheck } from 'react-icons/fa6'
 
 const HEALTH_ITEMS = [
-  { key: 'vacinado', label: 'Vacinado', icon: FaSyringe },
-  { key: 'castrado', label: 'Castrado', icon: FaScissors },
-  { key: 'vermifugado', label: 'Vermifugado', icon: FaPills },
+  { key: 'vaccinated', label: 'Vacinado', icon: FaSyringe },
+  { key: 'neutered', label: 'Castrado', icon: FaScissors },
+  { key: 'dewormed', label: 'Vermifugado', icon: FaPills },
 ]
 
 function HealthBadges({ animal }) {

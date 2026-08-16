@@ -3,18 +3,18 @@ import { FaShieldHalved, FaHeart, FaVenus, FaMars, FaLocationDot, FaArrowRight }
 
 function AnimalCard({ animal }) {
   const isFemale = animal.sex === 'F'
-  const isOng = animal.anunciante === 'ONG'
+  const isNgo = animal.listingType === 'NGO'
 
-  const handleFavoritar = (e) => {
+  const handleFavorite = (e) => {
     e.preventDefault()
-    // 🔴 Aqui entra a chamada real: favoritarAnimal(animal.id)
-    console.log('Favoritado:', animal.name)
+    // 🔴 Aqui entra a chamada real: favoriteAnimal(animal.id)
+    console.log('Favorited:', animal.name)
   }
 
   return (
     <div
       className={`group flex flex-col overflow-hidden rounded-3xl bg-white transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-950/15 ${
-        isOng ? 'shadow-lg shadow-amber-500/10 ring-2 ring-amber-400' : 'shadow-sm ring-1 ring-slate-100'
+        isNgo ? 'shadow-lg shadow-amber-500/10 ring-2 ring-amber-400' : 'shadow-sm ring-1 ring-slate-100'
       }`}
     >
       <div className="relative h-56 w-full overflow-hidden">
@@ -26,7 +26,7 @@ function AnimalCard({ animal }) {
           />
         </Link>
 
-        {isOng && (
+        {isNgo && (
           <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-md shadow-amber-500/30">
             <FaShieldHalved size={12} />
             ONG Verificada
@@ -35,7 +35,7 @@ function AnimalCard({ animal }) {
 
         <button
           type="button"
-          onClick={handleFavoritar}
+          onClick={handleFavorite}
           aria-label={`Favoritar ${animal.name}`}
           className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-400 backdrop-blur-sm transition-colors duration-300 hover:text-rose-500"
         >
@@ -69,10 +69,10 @@ function AnimalCard({ animal }) {
           {animal.city}, {animal.state}
         </div>
 
-        {isOng && animal.ongName && (
+        {isNgo && animal.organizationName && (
           <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
             <FaShieldHalved size={11} />
-            {animal.ongName}
+            {animal.organizationName}
           </p>
         )}
 
