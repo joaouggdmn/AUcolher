@@ -5,23 +5,22 @@ import SwipeActionButtons from '../components/SwipeActionButtons'
 import EmptyStackState from '../components/EmptyStackState'
 import MatchToast from '../components/MatchToast'
 import PetDetailModal from '../components/PetDetailModal'
-import { mockPetsAumatch } from '../data/mockPetsAumatch'
+import { useAnimals } from '../../../core/context/AnimalContext'
 import { registerLike, registerPass } from '../services/aumatchService'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
 
 function AumatchPage() {
+  const { animals: pets } = useAnimals()
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const [matchedPet, setMatchedPet] = useState(null)
   const [detailsPet, setDetailsPet] = useState(null)
   const stackRef = useRef(null)
 
-  // 🔴 Em produção isso viria de user.hasCompletedOnboarding (AuthContext),
-  // setado após o primeiro login. Por ora simulamos "primeira visita" abrindo
-  // o quiz automaticamente ao entrar na página.
+  // 🔴 Em produção isso viria de user.hasCompletedOnboarding (AuthContext)
   const [isQuizOpen, setIsQuizOpen] = useState(true)
   const [isPreparingMatches, setIsPreparingMatches] = useState(false)
 
-  const pets = mockPetsAumatch
   const visiblePets = pets.slice(currentIndex)
   const topPet = visiblePets[0]
 
@@ -34,8 +33,6 @@ function AumatchPage() {
     setTimeout(() => setIsPreparingMatches(false), 900)
   }
 
-  // UI otimista: o card avança na hora, sem esperar a resposta da API —
-  // a requisição roda em paralelo e só loga erro se falhar
   const handleSwipeLeft = () => {
     const passedPet = topPet
     setCurrentIndex((i) => i + 1)
@@ -54,7 +51,6 @@ function AumatchPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-emerald-950 px-4 pb-16 pt-24 sm:pt-28">
-      {/* Padrão de bolinhas sutil — mesma técnica usada no AuthForm e no HeroEventBanner */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{
@@ -100,7 +96,7 @@ function AumatchPage() {
           onPass={() => stackRef.current?.triggerPass()}
           onLike={() => stackRef.current?.triggerLike()}
           onInfo={() => topPet && setDetailsPet(topPet)}
-          isTopOng={topPet?.anunciante === 'ONG'}
+          isTopOng={topPet?.listingType === 'NGO'}
           disabled={!topPet || isPreparingMatches}
         />
       </div>
