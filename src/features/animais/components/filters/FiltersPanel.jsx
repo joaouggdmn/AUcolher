@@ -2,13 +2,13 @@ import { FaChevronDown, FaXmark } from 'react-icons/fa6'
 import CheckboxOption from '../../../../core/components/ui/filters/CheckboxOption'
 import ToggleSwitch from '../../../../core/components/ui/filters/ToggleSwitch'
 import FilterSection from '../../../../core/components/ui/filters/FilterSection'
-import { ESPECIE_OPTIONS, PORTE_OPTIONS, SEXO_OPTIONS, IDADE_OPTIONS, CIDADE_OPTIONS } from './filterOptions'
+import { SPECIES_OPTIONS, SIZE_OPTIONS, SEX_OPTIONS, AGE_GROUP_OPTIONS, CITY_OPTIONS } from './filterOptions'
 
 function FiltersPanel({
   filters,
   onToggleArrayFilter,
   onToggleSpecialNeeds,
-  onCidadeChange,
+  onCityChange,
   onDistanceChange,
   onClear,
   hasActiveFilters,
@@ -16,45 +16,45 @@ function FiltersPanel({
   return (
     <div className="flex flex-col">
       <FilterSection title="Espécie">
-        {ESPECIE_OPTIONS.map((opt) => (
+        {SPECIES_OPTIONS.map((opt) => (
           <CheckboxOption
             key={opt.value}
             label={opt.label}
-            checked={filters.especies.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('especies', opt.value)}
+            checked={filters.species.includes(opt.value)}
+            onChange={() => onToggleArrayFilter('species', opt.value)}
           />
         ))}
       </FilterSection>
 
       <FilterSection title="Porte">
-        {PORTE_OPTIONS.map((opt) => (
+        {SIZE_OPTIONS.map((opt) => (
           <CheckboxOption
             key={opt.value}
             label={opt.label}
-            checked={filters.portes.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('portes', opt.value)}
+            checked={filters.sizes.includes(opt.value)}
+            onChange={() => onToggleArrayFilter('sizes', opt.value)}
           />
         ))}
       </FilterSection>
 
       <FilterSection title="Sexo">
-        {SEXO_OPTIONS.map((opt) => (
+        {SEX_OPTIONS.map((opt) => (
           <CheckboxOption
             key={opt.value}
             label={opt.label}
-            checked={filters.sexos.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('sexos', opt.value)}
+            checked={filters.sexes.includes(opt.value)}
+            onChange={() => onToggleArrayFilter('sexes', opt.value)}
           />
         ))}
       </FilterSection>
 
       <FilterSection title="Idade">
-        {IDADE_OPTIONS.map((opt) => (
+        {AGE_GROUP_OPTIONS.map((opt) => (
           <CheckboxOption
             key={opt.value}
             label={opt.label}
-            checked={filters.idades.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('idades', opt.value)}
+            checked={filters.ageGroups.includes(opt.value)}
+            onChange={() => onToggleArrayFilter('ageGroups', opt.value)}
           />
         ))}
       </FilterSection>
@@ -62,7 +62,7 @@ function FiltersPanel({
       <FilterSection title="Necessidades especiais">
         <ToggleSwitch
           label="Apenas pets com necessidades especiais"
-          checked={filters.necessidadesEspeciais}
+          checked={filters.specialNeeds}
           onChange={onToggleSpecialNeeds}
         />
       </FilterSection>
@@ -70,11 +70,11 @@ function FiltersPanel({
       <FilterSection title="Cidade">
         <div className="relative">
           <select
-            value={filters.cidade}
-            onChange={(e) => onCidadeChange(e.target.value)}
+            value={filters.city}
+            onChange={(e) => onCityChange(e.target.value)}
             className="min-h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-sm font-medium text-slate-700 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
           >
-            {CIDADE_OPTIONS.map((opt) => (
+            {CITY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -89,12 +89,12 @@ function FiltersPanel({
 
       <FilterSection title="Distância máxima">
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-bold text-emerald-800">Até {filters.distanciaMax} km</span>
+          <span className="text-sm font-bold text-emerald-800">Até {filters.maxDistance} km</span>
           <input
             type="range"
             min={1}
             max={50}
-            value={filters.distanciaMax}
+            value={filters.maxDistance}
             onChange={(e) => onDistanceChange(Number(e.target.value))}
             className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-emerald-700"
           />
