@@ -9,8 +9,6 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Ao carregar a aplicação, verifica se já existe uma "sessão" mockada salva.
-  // Sem isso, um F5 na página derrubaria o usuário mesmo sem ele ter deslogado.
   useEffect(() => {
     const storedUser = localStorage.getItem(AUTH_STORAGE_KEY)
 
@@ -28,15 +26,25 @@ export function AuthProvider({ children }) {
 
   async function login(credentials) {
     // 🔴 Aqui entra a chamada real: const { data } = await api.post('/auth/login', credentials)
-    await new Promise((resolve) => setTimeout(resolve, 400)) // simula latência de rede
+    await new Promise((resolve) => setTimeout(resolve, 400))
 
-    // credentials é opcional: aceita { email, senha } vindo do LoginPage,
-    // ou nenhum argumento (mock instantâneo, usado pelo AuthRequiredModal)
     const mockUser = {
       id: 1,
       name: credentials?.name ?? 'Usuário Teste',
       email: credentials?.email ?? 'teste@aucolher.com',
       userType: credentials?.userType ?? 'PESSOA',
+      // Mock de foto para testarmos o Avatar por toda a aplicação —
+      // troque para null para simular um usuário que ainda não tem foto
+      photoUrl:
+        credentials?.photoUrl ??
+        'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&w=200&q=80',
+      telefone: '',
+      cidade: '',
+      estado: '',
+      moradia: '',
+      rotinaExercicio: '',
+      tempoSozinho: '',
+      temCriancasOuPets: null,
     }
 
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(mockUser))
@@ -52,8 +60,19 @@ export function AuthProvider({ children }) {
     setIsAuthenticated(false)
   }
 
+  // Mescla parcialmente e persiste — usado pela UserProfilePage ao salvar.
+  // Como setUser dispara novo render em qualquer componente que consome
+  // useAuth(), a Navbar reflete a mudança automaticamente, sem prop drilling.
+  function updateProfile(updates) {
+    setUser((prev) => {
+      const updatedUser = { ...prev, ...updates }
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser))
+      return updatedUser
+    })
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )
