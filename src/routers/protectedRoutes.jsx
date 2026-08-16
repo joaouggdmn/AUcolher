@@ -1,11 +1,12 @@
 import PrivateRoute from '../core/guards/PrivateRoute'
 import OngRoute from '../core/guards/OngRoute'
 import AdminRoute from '../core/guards/AdminRoute'
-
 import UserLayout from '../core/components/layout/UserLayout'
 import OngLayout from '../core/components/layout/OngLayout'
 import AdminLayout from '../core/components/layout/AdminLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
+import UserProfilePage from '../features/perfil/pages/UserProfilePage'
+import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 
 export const protectedRoutes = [
   {
@@ -14,14 +15,14 @@ export const protectedRoutes = [
       {
         element: <UserLayout />,
         children: [
-          { path: 'animais/criar', element: <PlaceholderPage title="Criar animal" /> },
+          { path: 'animais/criar', element: <CreateAnimalPage /> },
           { path: 'animais/editar/:id', element: <PlaceholderPage title="Editar animal" /> },
           { path: 'meus-anuncios', element: <PlaceholderPage title="Meus anuncios" /> },
           { path: 'meus-interesses', element: <PlaceholderPage title="Meus interesses" /> },
           { path: 'interesses-recebidos', element: <PlaceholderPage title="Interesses recebidos" /> },
           { path: 'chat', element: <PlaceholderPage title="Chat" /> },
           { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
-          { path: 'perfil', element: <PlaceholderPage title="Perfil" /> },
+          { path: 'perfil', element: <UserProfilePage /> },
         ],
       },
     ],
