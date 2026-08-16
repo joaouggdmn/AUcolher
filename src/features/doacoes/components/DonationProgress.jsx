@@ -1,4 +1,4 @@
-import { formatCurrency } from '../utils/currency'
+import { formatCurrency } from '../../../core/utils/currency'
 
 const HEIGHTS = { sm: 'h-1.5', md: 'h-2.5', lg: 'h-4' }
 
