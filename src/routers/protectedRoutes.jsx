@@ -7,6 +7,8 @@ import AdminLayout from '../core/components/layout/AdminLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
+import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
+import ChatPage from '../features/chat/pages/ChatPage'
 
 export const protectedRoutes = [
   {
@@ -19,8 +21,8 @@ export const protectedRoutes = [
           { path: 'animais/editar/:id', element: <PlaceholderPage title="Editar animal" /> },
           { path: 'meus-anuncios', element: <PlaceholderPage title="Meus anuncios" /> },
           { path: 'meus-interesses', element: <PlaceholderPage title="Meus interesses" /> },
-          { path: 'interesses-recebidos', element: <PlaceholderPage title="Interesses recebidos" /> },
-          { path: 'chat', element: <PlaceholderPage title="Chat" /> },
+          { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
+          { path: 'chat', element: <ChatPage /> },
           { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
           { path: 'perfil', element: <UserProfilePage /> },
         ],
