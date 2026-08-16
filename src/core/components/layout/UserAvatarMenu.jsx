@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaUser, FaPaw, FaArrowRightFromBracket } from 'react-icons/fa6'
+import { FaUser, FaPaw, FaInbox, FaArrowRightFromBracket } from 'react-icons/fa6'
+import { useReceivedRequests } from '../../hooks/useReceivedRequests'
 
 function UserAvatarMenu({ user, percentage, onLogout, isScrolled, onOpenChange }) {
   const [isOpen, setIsOpenState] = useState(false)
+  const { pendingCount } = useReceivedRequests()
   const initial = user?.name?.charAt(0)?.toUpperCase() ?? 'U'
 
   const setIsOpen = (value) => {
@@ -16,15 +18,11 @@ function UserAvatarMenu({ user, percentage, onLogout, isScrolled, onOpenChange }
     onLogout()
   }
 
-  // O "trilho" (parte não preenchida do anel) muda de tom conforme o fundo
-  // do navbar, para o anel continuar legível tanto sobre branco quanto verde
   const trackColor = isScrolled ? 'rgba(255,255,255,0.25)' : 'rgba(6,78,59,0.15)'
   const gapBgClass = isScrolled ? 'bg-emerald-800' : 'bg-white'
 
   return (
     <div className="relative isolate">
-      {/* Anel de progresso via conic-gradient puro em CSS — sem SVG, sem lib.
-          O "buraco" no meio (criado pelo inset absoluto) é onde a foto/inicial mora. */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -64,8 +62,6 @@ function UserAvatarMenu({ user, percentage, onLogout, isScrolled, onOpenChange }
               </div>
             </div>
 
-            {/* Mini barra também dentro do dropdown — reforça a gamificação
-                e convida a completar o perfil sem precisar sair do menu */}
             <div className="border-b border-slate-100 px-4 py-3">
               <div className="mb-1.5 flex items-center justify-between text-xs">
                 <span className="font-semibold text-slate-500">Perfil completo</span>
@@ -95,6 +91,22 @@ function UserAvatarMenu({ user, percentage, onLogout, isScrolled, onOpenChange }
             >
               <FaPaw size={14} className="text-emerald-600" />
               Cadastrar animal
+            </Link>
+
+            <Link
+              to="/interesses-recebidos"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center justify-between gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-emerald-50"
+            >
+              <span className="flex items-center gap-2.5">
+                <FaInbox size={14} className="text-emerald-600" />
+                Interesses recebidos
+              </span>
+              {pendingCount > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[11px] font-bold text-white">
+                  {pendingCount > 9 ? '9+' : pendingCount}
+                </span>
+              )}
             </Link>
 
             <button
