@@ -14,7 +14,7 @@ function PetDetailModal({ pet, onClose }) {
   if (!pet) return null
 
   const isFemale = pet.sex === 'F'
-  const isOng = pet.anunciante === 'ONG'
+  const isNgo = pet.listingType === 'NGO'
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -36,7 +36,7 @@ function PetDetailModal({ pet, onClose }) {
 
         <div className="relative h-64 w-full overflow-hidden">
           <img src={pet.photoUrl} alt={pet.name} className="h-full w-full object-cover" />
-          {isOng && (
+          {isNgo && (
             <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30">
               <FaShieldHalved size={12} />
               ONG Verificada
@@ -70,10 +70,10 @@ function PetDetailModal({ pet, onClose }) {
             </span>
           </div>
 
-          <p className="text-sm leading-relaxed text-slate-600">{pet.description}</p>
+          <p className="text-sm leading-relaxed text-slate-600">{pet.summary}</p>
 
-          {isOng && pet.ongName && (
-            <p className="text-xs font-semibold text-amber-600">Anunciado por {pet.ongName}</p>
+          {isNgo && pet.organizationName && (
+            <p className="text-xs font-semibold text-amber-600">Anunciado por {pet.organizationName}</p>
           )}
 
           <Link
