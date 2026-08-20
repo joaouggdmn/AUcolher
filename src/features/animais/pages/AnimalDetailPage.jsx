@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, useLocation, Link } from 'react-router-dom'
+import { useParams, useLocation, useNavigate, Link } from 'react-router-dom'
 import { FaVenus, FaMars, FaLocationDot, FaRulerVertical, FaCakeCandles, FaHeart, FaShieldHalved } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAnimals } from '../../../core/context/AnimalContext'
@@ -14,8 +14,9 @@ const SIZE_LABELS = { SMALL: 'Pequeno', MEDIUM: 'Médio', LARGE: 'Grande' }
 function AnimalDetailsPage() {
   const { id } = useParams()
   const location = useLocation()
-  const { isAuthenticated, login } = useAuth()
+  const { isAuthenticated } = useAuth()
   const { animals } = useAnimals()
+  const navigate = useNavigate()
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [successMessage, setSuccessMessage] = useState(
@@ -55,10 +56,10 @@ function AnimalDetailsPage() {
     setTimeout(() => setSuccessMessage(null), 3000)
   }
 
-  const handleMockLogin = async () => {
-    await login()
-    setIsAuthModalOpen(false)
-  }
+  const handleGoToLogin = () => {
+  setIsAuthModalOpen(false)
+  navigate('/login', { state: { from: location } })
+}
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
@@ -127,7 +128,7 @@ function AnimalDetailsPage() {
         <AuthRequiredModal
           message={`Para demonstrar interesse no ${animal.name}, você precisa estar conectado à sua conta.`}
           onCancel={() => setIsAuthModalOpen(false)}
-          onLogin={handleMockLogin}
+          onLogin={handleGoToLogin}
         />
       )}
 

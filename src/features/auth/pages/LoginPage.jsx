@@ -1,21 +1,28 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { FaEnvelope, FaLock } from 'react-icons/fa6'
+import { FaEnvelope, FaLock, FaCircleCheck } from 'react-icons/fa6'
 import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
+import UserTypeSelector from '../components/UserTypeSelector' // 🆕 reaproveitado do cadastro
 import { useAuth } from '../../../core/context/AuthContext'
+import { getErrorMessage } from '../../../core/utils/apiError'
 
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [formData, setFormData] = useState({ email: '', password: '' })
+  // 🆕 userType decide se o POST vai para /login/user ou /login/ong
+  const [formData, setFormData] = useState({ userType: 'PESSOA', email: '', password: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleUserTypeChange = (userType) => {
+    setFormData((prev) => ({ ...prev, userType }))
   }
 
   const handleSubmit = async (e) => {
@@ -27,8 +34,8 @@ function LoginPage() {
       await login(formData)
       const destination = location.state?.from?.pathname || '/'
       navigate(destination, { replace: true })
-    } catch {
-      setError('E-mail ou senha inválidos. Tente novamente.')
+    } catch (err) {
+      setError(getErrorMessage(err, 'E-mail ou senha inválidos. Tente novamente.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -51,7 +58,20 @@ function LoginPage() {
         </p>
       </div>
 
+      {location.state?.registered && (
+        <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-700">
+          <FaCircleCheck size={14} />
+          Conta criada com sucesso! Faça login para continuar.
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-5">
+        {/* 🆕 Seletor de tipo — define qual rota de login será chamada */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-semibold text-slate-700">Entrar como</label>
+          <UserTypeSelector value={formData.userType} onChange={handleUserTypeChange} />
+        </div>
+
         <AuthInput
           id="email"
           name="email"
@@ -94,8 +114,11 @@ function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 min-h-12 rounded-xl bg-emerald-800 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 hover:shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-1 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-800 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 hover:shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {isSubmitting && (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          )}
           {isSubmitting ? 'Entrando...' : 'Entrar'}
         </button>
       </form>

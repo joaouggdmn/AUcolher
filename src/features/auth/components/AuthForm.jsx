@@ -1,4 +1,3 @@
-// src/features/auth/components/AuthForm.jsx
 import { Link } from 'react-router-dom'
 import PetRegister from '../../../assets/hero-pet.png'
 
