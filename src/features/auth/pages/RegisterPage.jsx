@@ -6,6 +6,8 @@ import AuthInput from '../components/AuthInput'
 import UserTypeSelector from '../components/UserTypeSelector'
 import AvatarUploadInput from '../../../core/components/ui/AvatarUploadInput'
 import { maskCNPJ } from '../../../core/utils/masks'
+import { useAuth } from '../../../core/context/AuthContext'
+import { getErrorMessage } from '../../../core/utils/apiError'
 
 const INITIAL_FORM = {
   userType: 'PESSOA',
@@ -18,6 +20,7 @@ const INITIAL_FORM = {
 
 function RegisterPage() {
   const navigate = useNavigate()
+  const { register } = useAuth()
 
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -47,11 +50,10 @@ function RegisterPage() {
     setError(null)
 
     try {
-      // 🔴 Aqui entra a chamada real: authService.register(formData)
-      console.log('Cadastro:', formData)
-      navigate('/login')
-    } catch {
-      setError('Não foi possível concluir o cadastro. Tente novamente.')
+      await register(formData)
+      navigate('/login', { state: { registered: true } })
+    } catch (err) {
+      setError(getErrorMessage(err, 'Não foi possível concluir o cadastro. Tente novamente.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -73,8 +75,6 @@ function RegisterPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-5">
-        {/* Foto — independente do tipo de conta, por isso fica fora do bloco
-            com key={formData.userType} que só anima os campos condicionais */}
         <div className="flex justify-center">
           <AvatarUploadInput
             value={formData.photoUrl}
@@ -175,8 +175,11 @@ function RegisterPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 min-h-12 rounded-xl bg-emerald-800 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 hover:shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-1 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-800 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 hover:shadow-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {isSubmitting && (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          )}
           {isSubmitting ? 'Criando conta...' : 'Criar conta'}
         </button>
 
