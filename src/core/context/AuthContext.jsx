@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-
-const AUTH_STORAGE_KEY = 'aucolher_user'
+import { loginRequest, registerRequest } from '../services/authService'
+import { TOKEN_STORAGE_KEY, TOKEN_TYPE_STORAGE_KEY, USER_STORAGE_KEY } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
 
@@ -10,69 +10,65 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const storedUser = localStorage.getItem(AUTH_STORAGE_KEY)
+    const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
+    const storedUser = localStorage.getItem(USER_STORAGE_KEY)
 
-    if (storedUser) {
+    if (storedToken && storedUser) {
       try {
         setUser(JSON.parse(storedUser))
         setIsAuthenticated(true)
       } catch {
-        localStorage.removeItem(AUTH_STORAGE_KEY)
+        localStorage.removeItem(TOKEN_STORAGE_KEY)
+        localStorage.removeItem(TOKEN_TYPE_STORAGE_KEY)
+        localStorage.removeItem(USER_STORAGE_KEY)
       }
     }
 
     setIsLoading(false)
   }, [])
 
-  async function login(credentials) {
-    // 🔴 Aqui entra a chamada real: const { data } = await api.post('/auth/login', credentials)
-    await new Promise((resolve) => setTimeout(resolve, 400))
+  useEffect(() => {
+    const handleUnauthorized = () => logout()
+    window.addEventListener('auth:unauthorized', handleUnauthorized)
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
+  }, [])
 
-    const mockUser = {
-      id: 1,
-      name: credentials?.name ?? 'Usuário Teste',
-      email: credentials?.email ?? 'teste@aucolher.com',
-      userType: credentials?.userType ?? 'PESSOA',
-      // Mock de foto para testarmos o Avatar por toda a aplicação —
-      // troque para null para simular um usuário que ainda não tem foto
-      photoUrl:
-        credentials?.photoUrl ??
-        'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&w=200&q=80',
-      telefone: '',
-      cidade: '',
-      estado: '',
-      moradia: '',
-      rotinaExercicio: '',
-      tempoSozinho: '',
-      temCriancasOuPets: null,
-    }
+  // 🆕 Agora exige userType, para escolher /login/user ou /login/ong
+  async function login({ email, password, userType }) {
+    const { token, tokenType, user: loggedUser } = await loginRequest({ email, password, userType })
 
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(mockUser))
-    setUser(mockUser)
+    localStorage.setItem(TOKEN_STORAGE_KEY, token)
+    localStorage.setItem(TOKEN_TYPE_STORAGE_KEY, tokenType)
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(loggedUser))
+
+    setUser(loggedUser)
     setIsAuthenticated(true)
 
-    return mockUser
+    return loggedUser
+  }
+
+  async function register(formData) {
+    return registerRequest(formData)
   }
 
   function logout() {
-    localStorage.removeItem(AUTH_STORAGE_KEY)
+    localStorage.removeItem(TOKEN_STORAGE_KEY)
+    localStorage.removeItem(TOKEN_TYPE_STORAGE_KEY)
+    localStorage.removeItem(USER_STORAGE_KEY)
     setUser(null)
     setIsAuthenticated(false)
   }
 
-  // Mescla parcialmente e persiste — usado pela UserProfilePage ao salvar.
-  // Como setUser dispara novo render em qualquer componente que consome
-  // useAuth(), a Navbar reflete a mudança automaticamente, sem prop drilling.
   function updateProfile(updates) {
     setUser((prev) => {
       const updatedUser = { ...prev, ...updates }
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedUser))
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser))
       return updatedUser
     })
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )
@@ -80,8 +76,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider')
-  }
+  if (!context) throw new Error('useAuth deve ser usado dentro de um AuthProvider')
   return context
 }
