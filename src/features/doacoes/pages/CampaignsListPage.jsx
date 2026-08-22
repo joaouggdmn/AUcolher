@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
-import { FaFilter } from 'react-icons/fa6'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { FaFilter, FaHandHoldingHeart } from 'react-icons/fa6'
 import HeroSosBanner from '../components/HeroSosBanner'
 import CampaignsControlBar from '../components/CampaignsControlBar'
 import CampaignsGrid from '../components/CampaignsGrid'
@@ -7,8 +8,13 @@ import DonationModal from '../components/DonationModal'
 import CampaignsFiltersSidebar from '../components/filters/CampaignsFiltersSidebar'
 import CampaignsFiltersDrawer from '../components/filters/CampaignsFiltersDrawer'
 import { mockCampanhas } from '../data/mockCampanhas'
+import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
+import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
+import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+import InfoToast from '../../../core/components/ui/InfoToast'
 
 const INITIAL_FILTERS = { categorias: [], status: [] }
+const PAGE_SIZE = 12
 
 function toggleArrayValue(array, value) {
   return array.includes(value) ? array.filter((v) => v !== value) : [...array, value]
@@ -19,14 +25,17 @@ function getPercentage(raised, goal) {
 }
 
 function CampaignsListPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState(INITIAL_FILTERS)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  // Estado do modal vive AQUI, não dentro do card — evita o card (que tem
-  // `transform` no hover) virar containing block do modal `fixed`
   const [selectedCampaign, setSelectedCampaign] = useState(null)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [ongWarning, setOngWarning] = useState(null)
 
-  // 🔴 Quando o backend estiver pronto: const { data: campaigns = [] } = useCampanhas({ search, ...filters })
   const campaigns = mockCampanhas
   const emergencyCampaign = useMemo(() => campaigns.find((c) => c.isEmergency) || campaigns[0], [campaigns])
 
@@ -56,8 +65,6 @@ function CampaignsListPage() {
 
       const matchesCategoria = filters.categorias.length === 0 || filters.categorias.includes(campaign.category)
 
-      // "Quase batendo a meta" é calculado dinamicamente (>= 80%), não é um campo
-      // manual no mock — assim o status nunca fica desatualizado se o valor mudar
       const percentage = getPercentage(campaign.raisedAmount, campaign.goalAmount)
       const matchesStatus =
         filters.status.length === 0 ||
@@ -67,12 +74,29 @@ function CampaignsListPage() {
     })
   }, [campaigns, search, filters])
 
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [search, filters])
+
+  const visibleCampaigns = filteredCampaigns.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredCampaigns.length
+
   const filterPanelProps = {
     filters,
     onToggleCategoria: handleToggleCategoria,
     onToggleStatus: handleToggleStatus,
     onClear: handleClearFilters,
     hasActiveFilters,
+  }
+
+  const handleGoToLogin = () => {
+    setIsAuthModalOpen(false)
+    navigate('/login', { state: { from: location } })
+  }
+
+  const handleNeedsOng = () => {
+    setOngWarning('Apenas contas de ONG podem criar campanhas de arrecadação.')
+    setTimeout(() => setOngWarning(null), 3500)
   }
 
   return (
@@ -116,12 +140,30 @@ function CampaignsListPage() {
           </div>
 
           <CampaignsGrid
-            campaigns={filteredCampaigns}
+            campaigns={visibleCampaigns}
             onDonate={setSelectedCampaign}
             onClearFilters={handleClearFilters}
           />
+
+          {hasMore && (
+            <ShowMoreButton
+              onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              remainingCount={filteredCampaigns.length - visibleCount}
+            />
+          )}
         </div>
       </div>
+
+      <CreateEntityCta
+        icon={FaHandHoldingHeart}
+        title="Sua ONG quer arrecadar recursos?"
+        description="Crie campanhas de doação para tratamentos, alimentação ou estrutura do abrigo, com transparência total para os doadores."
+        buttonLabel="Criar campanha"
+        targetPath="/campanhas/criar"
+        requireOng
+        onNeedsLogin={() => setIsAuthModalOpen(true)}
+        onNeedsOng={handleNeedsOng}
+      />
 
       <CampaignsFiltersDrawer
         isOpen={isDrawerOpen}
@@ -129,6 +171,16 @@ function CampaignsListPage() {
         resultsCount={filteredCampaigns.length}
         {...filterPanelProps}
       />
+
+      {isAuthModalOpen && (
+        <AuthRequiredModal
+          message="Para criar uma campanha, você precisa estar conectado à sua conta."
+          onCancel={() => setIsAuthModalOpen(false)}
+          onLogin={handleGoToLogin}
+        />
+      )}
+
+      <InfoToast message={ongWarning} />
 
       {selectedCampaign && (
         <DonationModal campaign={selectedCampaign} onClose={() => setSelectedCampaign(null)} />

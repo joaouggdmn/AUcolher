@@ -1,4 +1,4 @@
-export const mockCampanhas = [
+export const baseCampanhas = [
   {
     id: 1,
     title: 'Cirurgia urgente do Rex',
@@ -60,3 +60,33 @@ export const mockCampanhas = [
     ong: { name: 'Instituto Vida Animal' },
   },
 ]
+
+const EXTRA_CAMPAIGN_TITLES = [
+  'Tratamento oncológico do Fred', 'Fraldas geriátricas para idosos',
+  'Reforma do telhado do canil', 'Ração especial para filhotes',
+  'Cirurgia de catarata da Mimi', 'Cobertores de inverno para o gatil',
+  'Vacinas para os resgatados de outubro', 'Ampliação do espaço de recuperação',
+  'Fisioterapia para o Duke', 'Kit de higiene para 40 animais',
+]
+
+function buildExtraCampanhas() {
+  return EXTRA_CAMPAIGN_TITLES.map((title, index) => {
+    const base = baseCampanhas[index % baseCampanhas.length] // reaproveita categoria/foto/ONG
+
+    // Progresso variado: alguns bem no início, outros quase batendo a meta
+    const goalAmount = 1500 + index * 350
+    const raisedAmount = Math.round(goalAmount * (0.15 + ((index * 13) % 80) / 100))
+
+    return {
+      ...base,
+      id: 300 + index,
+      title,
+      goalAmount,
+      raisedAmount,
+      isUrgent: index % 4 === 0,
+      isEmergency: false, // só a campanha original permanece como destaque do Hero SOS
+    }
+  })
+}
+
+export const mockCampanhas = [...baseCampanhas, ...buildExtraCampanhas()]
