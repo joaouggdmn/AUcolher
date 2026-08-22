@@ -3,11 +3,10 @@ import { FaLocationDot, FaCircleCheck, FaXmark } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 
 function ReceivedRequestCard({ request, onAccept, onReject, isProcessing }) {
-  const { animal, adopterMock } = request
+  const { animal, adopter } = request
 
   return (
     <div className="flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-emerald-950/5">
-      {/* Faixa do pet — contexto de qual anúncio recebeu o interesse */}
       <Link
         to={`/animais/${animal.id}`}
         className="flex items-center gap-3 border-b border-slate-100 bg-emerald-50/60 px-5 py-3 transition-colors duration-300 hover:bg-emerald-50"
@@ -19,19 +18,18 @@ function ReceivedRequestCard({ request, onAccept, onReject, isProcessing }) {
         </div>
       </Link>
 
-      {/* Perfil do adotante */}
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="flex items-start gap-3">
           <img
-            src={adopterMock.photoUrl}
-            alt={adopterMock.name}
+            src={adopter.photoUrl}
+            alt={adopter.name}
             className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-white shadow-md"
           />
           <div className="min-w-0 flex-1">
-            <p className="truncate font-serif text-base font-bold text-emerald-950">{adopterMock.name}</p>
+            <p className="truncate font-serif text-base font-bold text-emerald-950">{adopter.name}</p>
             <p className="flex items-center gap-1.5 text-xs text-slate-500">
               <FaLocationDot size={11} className="text-emerald-600" />
-              {adopterMock.city}, {adopterMock.state}
+              {adopter.city}, {adopter.state}
             </p>
           </div>
 
@@ -40,12 +38,12 @@ function ReceivedRequestCard({ request, onAccept, onReject, isProcessing }) {
             className="flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700"
           >
             <LuSparkles size={11} />
-            {adopterMock.profileCompletion}%
+            {adopter.profileCompletion}%
           </span>
         </div>
 
         <p className="rounded-xl bg-slate-50 px-3.5 py-2.5 text-xs font-medium text-slate-600">
-          {adopterMock.lifestyleSummary}
+          {adopter.lifestyleSummary}
         </p>
 
         <div className="mt-auto flex items-center gap-2.5 pt-1">
