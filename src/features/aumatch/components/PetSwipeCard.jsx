@@ -1,7 +1,12 @@
-import { useState } from 'react'
-import { FaShieldHalved, FaLocationDot, FaDna } from 'react-icons/fa6'
+import { useState } from "react";
+import { FaShieldHalved, FaLocationDot, FaDna } from "react-icons/fa6";
+import AuthorTag from "../../../core/components/ui/AuthorTag";
 
-const STACK_TRANSFORM = ['', 'translate-y-3 scale-[0.96] opacity-90', 'translate-y-6 scale-[0.92] opacity-70']
+const STACK_TRANSFORM = [
+  "",
+  "translate-y-3 scale-[0.96] opacity-90",
+  "translate-y-6 scale-[0.92] opacity-70",
+];
 
 function PetSwipeCard({
   pet,
@@ -14,34 +19,35 @@ function PetSwipeCard({
   dragDirection,
   labelOpacity = 0,
 }) {
-  const [isHovered, setIsHovered] = useState(false)
-  const isNgo = pet.listingType === 'NGO'
+  const [isHovered, setIsHovered] = useState(false);
+  const isNgo = pet.listingType === "NGO";
+  const authorName = isNgo ? pet.organizationName : pet.ownerName;
 
   if (!isFront) {
     return (
       <div
         className={`pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem] shadow-lg shadow-emerald-950/10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          isNgo ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
+          isNgo ? "ring-2 ring-amber-400" : "ring-1 ring-white/10"
         } ${STACK_TRANSFORM[stackIndex]}`}
         style={{ zIndex: 30 - stackIndex }}
       >
         <img src={pet.photoUrl} alt="" className="h-full w-full object-cover" />
       </div>
-    )
+    );
   }
 
-  const liftY = isHovered && !isDragging ? -8 : 0
+  const liftY = isHovered && !isDragging ? -8 : 0;
 
   return (
     <div
       className={`absolute inset-0 z-30 flex cursor-grab touch-none select-none flex-col overflow-hidden rounded-[2rem] shadow-xl shadow-emerald-950/20 hover:shadow-2xl hover:shadow-emerald-950/30 active:cursor-grabbing ${
-        isNgo ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
+        isNgo ? "ring-2 ring-amber-400" : "ring-1 ring-white/10"
       }`}
       style={{
         transform: `translate(${dragX}px, ${liftY}px) rotate(${rotation}deg)`,
         transition: isDragging
-          ? 'none'
-          : 'transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.5s cubic-bezier(0.4,0,0.2,1)',
+          ? "none"
+          : "transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.5s cubic-bezier(0.4,0,0.2,1)",
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -66,20 +72,24 @@ function PetSwipeCard({
       {dragDirection && (
         <div
           className={`absolute top-8 z-10 rounded-xl border-4 px-4 py-1.5 text-2xl font-black uppercase tracking-wider ${
-            dragDirection === 'right'
-              ? 'right-6 rotate-12 border-amber-400 text-amber-400'
-              : 'left-6 -rotate-12 border-slate-200 text-slate-100'
+            dragDirection === "right"
+              ? "right-6 rotate-12 border-amber-400 text-amber-400"
+              : "left-6 -rotate-12 border-slate-200 text-slate-100"
           }`}
           style={{ opacity: labelOpacity }}
         >
-          {dragDirection === 'right' ? 'Curtir' : 'Passar'}
+          {dragDirection === "right" ? "Curtir" : "Passar"}
         </div>
       )}
 
       <div className="relative z-10 mt-auto flex flex-col gap-1.5 p-6 text-white">
         <div className="flex items-baseline gap-2">
-          <h2 className="font-serif text-3xl font-black drop-shadow-sm">{pet.name}</h2>
-          <span className="text-lg font-medium text-white/80">{pet.ageLabel}</span>
+          <h2 className="font-serif text-3xl font-black drop-shadow-sm">
+            {pet.name}
+          </h2>
+          <span className="text-lg font-medium text-white/80">
+            {pet.ageLabel}
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/75">
@@ -94,9 +104,15 @@ function PetSwipeCard({
         </div>
 
         <p className="mt-1 line-clamp-3 text-sm text-white/85">{pet.summary}</p>
+        <AuthorTag
+          name={authorName}
+          isVerified={isNgo}
+          variant="dark"
+          className="mt-1"
+        />
       </div>
     </div>
-  )
+  );
 }
 
-export default PetSwipeCard
+export default PetSwipeCard;

@@ -99,7 +99,9 @@ export function useCreateAnimalForm() {
       distanceKm: 0, // 🔴 cálculo real virá de geolocalização, futuramente
       listingType: isNgo ? 'NGO' : 'USER',
       organizationName: isNgo ? user?.name : undefined,
+      ownerName: isNgo ? undefined : user?.name,
       ownerId: user?.id,
+      
     }
 
     // 🔴 Aqui entra a chamada real: await animalService.create(newAnimalPayload)
