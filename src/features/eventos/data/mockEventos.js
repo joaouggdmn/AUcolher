@@ -1,4 +1,4 @@
-export const mockEventos = [
+export const baseEventos = [
   {
     id: 1,
     title: 'Feira de Adoção de Verão',
@@ -84,3 +84,31 @@ export const mockEventos = [
     isFeatured: false,
   },
 ]
+
+const EXTRA_EVENT_TITLES = [
+  'Feira de Adoção Comunitária', 'Mutirão de Vermifugação', 'Bazar de Inverno',
+  'Workshop: Enriquecimento Ambiental', 'Feira Pet Amigo', 'Mutirão Castra Móvel',
+  'Bazar Solidário de Verão', 'Workshop: Nutrição Canina', 'Feira de Adoção no Parque',
+]
+const EXTRA_CITIES = ['Araranguá', 'Criciúma', 'Tubarão', 'Içara']
+
+function buildExtraEventos() {
+  return EXTRA_EVENT_TITLES.map((title, index) => {
+    const base = baseEventos[index % baseEventos.length] // reaproveita categoria/foto/organizador
+
+    // Datas espalhadas nos próximos ~60 dias, a partir da data mais recente do mock
+    const date = new Date('2026-07-28')
+    date.setDate(date.getDate() + (index + 1) * 4)
+
+    return {
+      ...base,
+      id: 200 + index,
+      title,
+      date: date.toISOString().slice(0, 10),
+      location: { ...base.location, city: EXTRA_CITIES[index % EXTRA_CITIES.length] },
+      isFeatured: false, // só o evento original marcado como destaque permanece no Hero
+    }
+  })
+}
+
+export const mockEventos = [...baseEventos, ...buildExtraEventos()]
