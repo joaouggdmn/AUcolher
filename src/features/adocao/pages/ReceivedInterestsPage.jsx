@@ -20,7 +20,7 @@ function ReceivedInterestsPage() {
 
     acceptRequest(requestId)
     setProcessingId(null)
-    setCelebratingAdopter(request?.adopterMock.name ?? null)
+    setCelebratingAdopter(request?.adopter.name ?? null)
     setTimeout(() => setCelebratingAdopter(null), 6000)
   }
 

@@ -13,12 +13,12 @@ function ResolvedRequestRow({ request }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3">
       <img
-        src={request.adopterMock.photoUrl}
-        alt={request.adopterMock.name}
+        src={request.adopter.photoUrl}
+        alt={request.adopter.name}
         className="h-10 w-10 shrink-0 rounded-full object-cover"
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-emerald-950">{request.adopterMock.name}</p>
+        <p className="truncate text-sm font-bold text-emerald-950">{request.adopter.name}</p>
         <p className="truncate text-xs text-slate-500">
           Interesse em{' '}
           <Link to={`/animais/${request.animal.id}`} className="font-semibold text-emerald-700 hover:underline">
