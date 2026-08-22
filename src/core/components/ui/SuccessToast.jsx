@@ -1,6 +1,21 @@
+import { useEffect } from 'react'
 import { FaCircleCheck } from 'react-icons/fa6'
 
-function SuccessToast({ message }) {
+const AUTO_DISMISS_MS = 3000
+
+function SuccessToast({ message, onClose }) {
+  useEffect(() => {
+    if (!message) return
+
+    const timer = setTimeout(() => {
+      onClose?.()
+    }, AUTO_DISMISS_MS)
+
+    // Limpa o timeout se a mensagem mudar antes dos 3s (evita fechar o
+    // toast errado) ou se o componente desmontar antes do prazo
+    return () => clearTimeout(timer)
+  }, [message, onClose])
+
   if (!message) return null
 
   return (
