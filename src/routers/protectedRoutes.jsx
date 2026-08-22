@@ -9,6 +9,8 @@ import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
 import ChatPage from '../features/chat/pages/ChatPage'
+import ChatLayout from '../core/components/layout/ChatLayout'
+
 
 export const protectedRoutes = [
   {
@@ -22,7 +24,6 @@ export const protectedRoutes = [
           { path: 'meus-anuncios', element: <PlaceholderPage title="Meus anuncios" /> },
           { path: 'meus-interesses', element: <PlaceholderPage title="Meus interesses" /> },
           { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
-          { path: 'chat', element: <ChatPage /> },
           { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
           { path: 'perfil', element: <UserProfilePage /> },
         ],
@@ -57,4 +58,15 @@ export const protectedRoutes = [
       },
     ],
   },
+  {
+  element: <PrivateRoute />,
+  children: [
+    {
+      element: <ChatLayout />,
+      children: [
+        { path: 'chat', element: <ChatPage /> },
+      ],
+    },
+  ],
+}
 ]
