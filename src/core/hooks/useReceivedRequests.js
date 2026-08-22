@@ -3,10 +3,6 @@ import { useAuth } from '../context/AuthContext'
 import { useAnimals } from '../context/AnimalContext'
 import { useAdoptionRequests } from '../context/AdoptionRequestContext'
 
-// Cruza os 3 contextos para responder "quais pedidos chegaram para os
-// animais que EU cadastrei" — nenhum contexto isolado tem essa resposta.
-// Fica em core/ (não em features/adocao/) porque o UserAvatarMenu, que
-// também consome esse hook para o badge, é um componente core.
 export function useReceivedRequests() {
   const { user } = useAuth()
   const { animals } = useAnimals()
@@ -15,13 +11,18 @@ export function useReceivedRequests() {
   const receivedRequests = useMemo(() => {
     if (!user) return []
 
-    const ownedAnimalIds = new Set(
-      animals.filter((animal) => animal.ownerId === user.id).map((animal) => animal.id)
-    )
-
     return requests
-      .filter((request) => ownedAnimalIds.has(request.animalId))
-      .map((request) => ({ ...request, animal: animals.find((animal) => animal.id === request.animalId) }))
+      .filter((request) => request.ownerId === user.id)
+      .map((request) => ({
+        ...request,
+        // animal só existe no AnimalContext desta aba (seed estático ou
+        // criado nesta sessão) — fallback evita quebrar se não encontrar
+        animal: animals.find((animal) => animal.id === request.animalId) ?? {
+          id: request.animalId,
+          name: 'Animal',
+          photoUrl: null,
+        },
+      }))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   }, [user, animals, requests])
 
