@@ -46,7 +46,6 @@ function UserProfilePage() {
     e.preventDefault()
     updateProfile(formData) // persiste no AuthContext → Navbar atualiza em tempo real
     setSuccessMessage('Perfil atualizado com sucesso!')
-    setTimeout(() => setSuccessMessage(null), 2500)
   }
 
   return (
@@ -138,7 +137,7 @@ function UserProfilePage() {
         />
       </div>
 
-      <SuccessToast message={successMessage} />
+      <SuccessToast message={successMessage} onClose={() => setSuccessMessage(null)} />
     </div>
   )
 }

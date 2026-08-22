@@ -1,27 +1,37 @@
-import { useMemo, useState } from 'react'
-import { FaFilter } from 'react-icons/fa6'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { FaCalendarDays, FaFilter } from 'react-icons/fa6'
 import HeroEventBanner from '../components/HeroEventBanner'
 import EventsControlBar from '../components/EventsControlBar'
 import EventsGrid from '../components/EventsGrid'
-import OngCtaSection from '../components/OngCtaSection'
 import EventsFiltersSidebar from '../components/filters/EventsFiltersSidebar'
 import EventsFiltersDrawer from '../components/filters/EventsFiltersDrawer'
 import { mockEventos } from '../data/mockEventos'
 import { matchesPeriod } from '../utils/dateHelpers'
+import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
+import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
+import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+import InfoToast from '../../../core/components/ui/InfoToast'
 
 const INITIAL_FILTERS = { categorias: [], periodo: '', cidade: '' }
+const PAGE_SIZE = 12
 
 function toggleArrayValue(array, value) {
   return array.includes(value) ? array.filter((v) => v !== value) : [...array, value]
 }
 
 function EventsListPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState(INITIAL_FILTERS)
   const [viewMode, setViewMode] = useState('grid')
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [ongWarning, setOngWarning] = useState(null)
 
-  // 🔴 Quando o backend estiver pronto: const { data: events = [] } = useEventos({ search, ...filters })
   const events = mockEventos
   const featuredEvent = useMemo(() => events.find((e) => e.isFeatured) || events[0], [events])
 
@@ -59,6 +69,13 @@ function EventsListPage() {
     })
   }, [events, search, filters])
 
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [search, filters])
+
+  const visibleEvents = filteredEvents.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredEvents.length
+
   const filterPanelProps = {
     filters,
     onToggleCategoria: handleToggleCategoria,
@@ -66,6 +83,16 @@ function EventsListPage() {
     onCidadeChange: handleCidadeChange,
     onClear: handleClearFilters,
     hasActiveFilters,
+  }
+
+  const handleGoToLogin = () => {
+    setIsAuthModalOpen(false)
+    navigate('/login', { state: { from: location } })
+  }
+
+  const handleNeedsOng = () => {
+    setOngWarning('Apenas contas de ONG podem cadastrar eventos. Entre com uma conta institucional para continuar.')
+    setTimeout(() => setOngWarning(null), 3500)
   }
 
   return (
@@ -110,11 +137,27 @@ function EventsListPage() {
             </button>
           </div>
 
-          <EventsGrid events={filteredEvents} viewMode={viewMode} onClearFilters={handleClearFilters} />
+          <EventsGrid events={visibleEvents} viewMode={viewMode} onClearFilters={handleClearFilters} />
+
+          {hasMore && (
+            <ShowMoreButton
+              onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+              remainingCount={filteredEvents.length - visibleCount}
+            />
+          )}
         </div>
       </div>
 
-      <OngCtaSection />
+      <CreateEntityCta
+        icon={FaCalendarDays}
+        title="Sua ONG quer realizar um evento?"
+        description="Divulgue feiras de adoção, mutirões e campanhas para milhares de adotantes cadastrados na plataforma."
+        buttonLabel="Cadastrar meu evento"
+        targetPath="/eventos/criar"
+        requireOng
+        onNeedsLogin={() => setIsAuthModalOpen(true)}
+        onNeedsOng={handleNeedsOng}
+      />
 
       <EventsFiltersDrawer
         isOpen={isDrawerOpen}
@@ -122,6 +165,16 @@ function EventsListPage() {
         resultsCount={filteredEvents.length}
         {...filterPanelProps}
       />
+
+      {isAuthModalOpen && (
+        <AuthRequiredModal
+          message="Para cadastrar um evento, você precisa estar conectado à sua conta."
+          onCancel={() => setIsAuthModalOpen(false)}
+          onLogin={handleGoToLogin}
+        />
+      )}
+
+      <InfoToast message={ongWarning} />
     </div>
   )
 }
