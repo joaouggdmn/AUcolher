@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import { FaShieldHalved, FaHeart, FaVenus, FaMars, FaLocationDot, FaArrowRight } from 'react-icons/fa6'
+import AuthorTag from '../../../core/components/ui/AuthorTag' 
+
 
 function AnimalCard({ animal }) {
   const isFemale = animal.sex === 'F'
   const isNgo = animal.listingType === 'NGO'
+  const authorName = isNgo ? animal.organizationName : animal.ownerName
 
   const handleFavorite = (e) => {
     e.preventDefault()
@@ -69,12 +72,7 @@ function AnimalCard({ animal }) {
           {animal.city}, {animal.state}
         </div>
 
-        {isNgo && animal.organizationName && (
-          <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
-            <FaShieldHalved size={11} />
-            {animal.organizationName}
-          </p>
-        )}
+         <AuthorTag name={authorName} isVerified={isNgo} />
 
         <Link
           to={`/animais/${animal.id}`}

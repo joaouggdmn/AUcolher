@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LuSparkles } from 'react-icons/lu'
 import PetCardStack from '../components/PetCardStack'
 import SwipeActionButtons from '../components/SwipeActionButtons'
@@ -6,27 +6,39 @@ import EmptyStackState from '../components/EmptyStackState'
 import MatchToast from '../components/MatchToast'
 import PetDetailModal from '../components/PetDetailModal'
 import { useAnimals } from '../../../core/context/AnimalContext'
+import { useAuth } from '../../../core/context/AuthContext'
+import { hasCompletedLifestyleProfile } from '../../../core/utils/lifestyleProfile'
 import { registerLike, registerPass } from '../services/aumatchService'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
 
 function AumatchPage() {
   const { animals: pets } = useAnimals()
+  const { user, isAuthenticated, isLoading: isAuthLoading, updateProfile } = useAuth()
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [matchedPet, setMatchedPet] = useState(null)
   const [detailsPet, setDetailsPet] = useState(null)
   const stackRef = useRef(null)
 
-  // 🔴 Em produção isso viria de user.hasCompletedOnboarding (AuthContext)
-  const [isQuizOpen, setIsQuizOpen] = useState(true)
+  const [isQuizOpen, setIsQuizOpen] = useState(false)
+  const [hasCheckedProfile, setHasCheckedProfile] = useState(false)
   const [isPreparingMatches, setIsPreparingMatches] = useState(false)
+
+  useEffect(() => {
+    if (isAuthLoading) return
+    setIsQuizOpen(!hasCompletedLifestyleProfile(user))
+    setHasCheckedProfile(true)
+  }, [isAuthLoading, user])
 
   const visiblePets = pets.slice(currentIndex)
   const topPet = visiblePets[0]
 
   const handleQuizComplete = (answers) => {
-    // 🔴 Aqui entra a chamada real: onboardingService.submitProfile(answers)
-    console.log('Perfil de onboarding pronto para o backend:', answers)
+    if (isAuthenticated) {
+      updateProfile(answers) // persiste PERMANENTEMENTE no perfil do usuário
+    } else {
+      console.log('Usuário não autenticado — respostas não persistidas:', answers)
+    }
 
     setIsQuizOpen(false)
     setIsPreparingMatches(true)
@@ -48,6 +60,15 @@ function AumatchPage() {
   }
 
   const handleReset = () => setCurrentIndex(0)
+
+  // Estado intermediário — evita "piscar" quiz -> cards antes da checagem
+  if (!hasCheckedProfile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-emerald-950">
+        <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-amber-400" />
+      </div>
+    )
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-emerald-950 px-4 pb-16 pt-24 sm:pt-28">

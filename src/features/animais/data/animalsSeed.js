@@ -1,4 +1,4 @@
-export const animalsSeed = [
+export const baseAnimals = [
   {
     id: 1,
     name: 'Thor',
@@ -54,6 +54,7 @@ export const animalsSeed = [
     ],
     photoUrl: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=80',
     listingType: 'USER',
+    ownerName: 'Fernanda Lima',
     ownerId: 2,
     vaccinated: true,
     neutered: false,
@@ -87,6 +88,7 @@ export const animalsSeed = [
     ],
     photoUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=80',
     listingType: 'USER',
+    ownerName: 'Rafael Costa',
     ownerId: 3,
     vaccinated: true,
     neutered: false,
@@ -189,6 +191,7 @@ export const animalsSeed = [
     ],
     photoUrl: 'https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=1200&q=80',
     listingType: 'USER',
+    ownerName: 'Juliana Prado',
     ownerId: 6,
     vaccinated: true,
     neutered: true,
@@ -222,6 +225,7 @@ export const animalsSeed = [
     ],
     photoUrl: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&q=80',
     listingType: 'USER',
+    ownerName: 'Eduardo Martins',
     ownerId: 7,
     vaccinated: true,
     neutered: false,
@@ -270,3 +274,36 @@ export const animalsSeed = [
     story: 'Amora é a caçula do grupo — resgatada ainda recém-nascida junto de seus irmãos. Brincalhona e sociável, já está vermifugada e pronta para conhecer sua futura família.',
   },
 ]
+
+// ─────────────────────────────────────────────────────────────
+// Geração de itens extras — reaproveita os animais "base" (fotos,
+// histórias, atributos completos) variando nome/cidade/sexo, apenas
+// para termos volume suficiente (15+) para testar a paginação
+// "Mostrar mais" sem escrever dezenas de objetos manualmente.
+// ─────────────────────────────────────────────────────────────
+const EXTRA_ANIMAL_NAMES = [
+  'Bento', 'Pipoca', 'Fred', 'Duke', 'Mimi', 'Zeca', 'Lola',
+  'Bolt', 'Sushi', 'Preta', 'Simba', 'Naomi', 'Toby', 'Fiona',
+]
+const EXTRA_CITIES = ['Araranguá', 'Criciúma', 'Tubarão', 'Florianópolis', 'Içara', 'Sombrio']
+
+function buildExtraAnimals() {
+  return EXTRA_ANIMAL_NAMES.map((name, index) => {
+    const base = baseAnimals[index % baseAnimals.length] // reaproveita fotos/história/atributos
+
+    return {
+      ...base,
+      id: 100 + index,
+      name,
+      sex: index % 2 === 0 ? 'M' : 'F',
+      city: EXTRA_CITIES[index % EXTRA_CITIES.length],
+      state: 'SC',
+      distanceKm: 2 + ((index * 3) % 40),
+      listingType: index % 3 === 0 ? 'NGO' : 'USER',
+      organizationName: index % 3 === 0 ? base.organizationName ?? 'Patinhas Carentes' : undefined,
+      summary: `${name} está esperando por um novo lar cheio de amor!`,
+    }
+  })
+}
+
+export const animalsSeed = [...baseAnimals, ...buildExtraAnimals()]

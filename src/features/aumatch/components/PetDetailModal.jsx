@@ -1,24 +1,39 @@
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { FaXmark, FaLocationDot, FaDna, FaVenus, FaMars, FaShieldHalved, FaHeart } from 'react-icons/fa6'
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaXmark,
+  FaLocationDot,
+  FaDna,
+  FaVenus,
+  FaMars,
+  FaShieldHalved,
+  FaHeart,
+} from "react-icons/fa6";
+import AuthorTag from "../../../core/components/ui/AuthorTag";
 
 function PetDetailModal({ pet, onClose }) {
+  const authorName = isNgo ? pet.organizationName : pet.ownerName;
+
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handleEscape)
-    return () => window.removeEventListener('keydown', handleEscape)
-  }, [onClose])
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [onClose]);
 
-  if (!pet) return null
+  if (!pet) return null;
 
-  const isFemale = pet.sex === 'F'
-  const isNgo = pet.listingType === 'NGO'
+  const isFemale = pet.sex === "F";
+  const isNgo = pet.listingType === "NGO";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-emerald-950/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-emerald-950/60 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
       <div
         role="dialog"
@@ -35,7 +50,11 @@ function PetDetailModal({ pet, onClose }) {
         </button>
 
         <div className="relative h-64 w-full overflow-hidden">
-          <img src={pet.photoUrl} alt={pet.name} className="h-full w-full object-cover" />
+          <img
+            src={pet.photoUrl}
+            alt={pet.name}
+            className="h-full w-full object-cover"
+          />
           {isNgo && (
             <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30">
               <FaShieldHalved size={12} />
@@ -47,12 +66,14 @@ function PetDetailModal({ pet, onClose }) {
         <div className="flex flex-col gap-4 p-6">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h2 className="font-serif text-2xl font-black text-emerald-950">{pet.name}</h2>
+              <h2 className="font-serif text-2xl font-black text-emerald-950">
+                {pet.name}
+              </h2>
               <p className="text-sm text-slate-500">{pet.ageLabel}</p>
             </div>
             <span
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
-                isFemale ? 'bg-rose-50 text-rose-500' : 'bg-sky-50 text-sky-500'
+                isFemale ? "bg-rose-50 text-rose-500" : "bg-sky-50 text-sky-500"
               }`}
             >
               {isFemale ? <FaVenus size={14} /> : <FaMars size={14} />}
@@ -70,11 +91,11 @@ function PetDetailModal({ pet, onClose }) {
             </span>
           </div>
 
-          <p className="text-sm leading-relaxed text-slate-600">{pet.summary}</p>
+          <p className="text-sm leading-relaxed text-slate-600 break-words">
+            {pet.summary}
+          </p>
 
-          {isNgo && pet.organizationName && (
-            <p className="text-xs font-semibold text-amber-600">Anunciado por {pet.organizationName}</p>
-          )}
+          <AuthorTag name={authorName} isVerified={isNgo} />
 
           <Link
             to={`/adotar/${pet.id}`}
@@ -86,7 +107,7 @@ function PetDetailModal({ pet, onClose }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default PetDetailModal
+export default PetDetailModal;
