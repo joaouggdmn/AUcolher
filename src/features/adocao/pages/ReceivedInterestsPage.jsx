@@ -1,36 +1,38 @@
-import { useState } from 'react'
-import { LuSparkles } from 'react-icons/lu'
-import { FaInbox } from 'react-icons/fa6'
-import ReceivedRequestCard from '../components/ReceivedRequestCard'
-import ResolvedRequestRow from '../components/ResolvedRequestRow'
-import MatchCelebrationToast from '../components/MatchCelebrationToast'
-import { useReceivedRequests } from '../../../core/hooks/useReceivedRequests'
+import { useState } from "react";
+import { LuSparkles } from "react-icons/lu";
+import { FaInbox } from "react-icons/fa6";
+import ReceivedRequestCard from "../components/ReceivedRequestCard";
+import ResolvedRequestRow from "../components/ResolvedRequestRow";
+import MatchCelebrationToast from "../components/MatchCelebrationToast";
+import { useReceivedRequests } from "../../../core/hooks/useReceivedRequests";
 
 function ReceivedInterestsPage() {
-  const { pendingRequests, resolvedRequests, acceptRequest, rejectRequest } = useReceivedRequests()
-  const [processingId, setProcessingId] = useState(null)
-  const [celebratingAdopter, setCelebratingAdopter] = useState(null)
+  const { pendingRequests, resolvedRequests, acceptRequest, rejectRequest } =
+    useReceivedRequests();
+  const [processingId, setProcessingId] = useState(null);
+  const [celebratingRequest, setCelebratingRequest] = useState(null);
 
   const handleAccept = async (requestId) => {
-    setProcessingId(requestId)
-    const request = pendingRequests.find((r) => r.id === requestId)
+    setProcessingId(requestId);
+    const request = pendingRequests.find((r) => r.id === requestId);
 
-    // 🔴 Aqui entra a chamada real: await adoptionService.accept(requestId)
-    await new Promise((resolve) => setTimeout(resolve, 400))
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
-    acceptRequest(requestId)
-    setProcessingId(null)
-    setCelebratingAdopter(request?.adopter.name ?? null)
-    setTimeout(() => setCelebratingAdopter(null), 6000)
-  }
+    acceptRequest(requestId);
+    setProcessingId(null);
+    setCelebratingRequest(
+      request ? { name: request.adopter.name, requestId: request.id } : null,
+    );
+    setTimeout(() => setCelebratingRequest(null), 6000);
+  };
 
   const handleReject = async (requestId) => {
-    setProcessingId(requestId)
+    setProcessingId(requestId);
     // 🔴 Aqui entra a chamada real: await adoptionService.reject(requestId)
-    await new Promise((resolve) => setTimeout(resolve, 400))
-    rejectRequest(requestId)
-    setProcessingId(null)
-  }
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    rejectRequest(requestId);
+    setProcessingId(null);
+  };
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
@@ -43,19 +45,22 @@ function ReceivedInterestsPage() {
           Quem quer adotar seus pets
         </h1>
         <p className="mt-1 text-slate-600">
-          Avalie o perfil de cada interessado e decida quem vai seguir para o chat.
+          Avalie o perfil de cada interessado e decida quem vai seguir para o
+          chat.
         </p>
       </header>
-
       {pendingRequests.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-slate-200 bg-white/60 px-6 py-20 text-center">
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
             <FaInbox size={26} />
           </span>
           <div>
-            <h3 className="font-serif text-xl font-bold text-emerald-950">Nenhum pedido pendente</h3>
+            <h3 className="font-serif text-xl font-bold text-emerald-950">
+              Nenhum pedido pendente
+            </h3>
             <p className="mt-1 max-w-sm text-sm text-slate-500">
-              Assim que alguém demonstrar interesse em um dos seus pets, o pedido aparece aqui.
+              Assim que alguém demonstrar interesse em um dos seus pets, o
+              pedido aparece aqui.
             </p>
           </div>
         </div>
@@ -72,10 +77,11 @@ function ReceivedInterestsPage() {
           ))}
         </div>
       )}
-
       {resolvedRequests.length > 0 && (
         <div className="mt-12">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-400">Histórico</h2>
+          <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-400">
+            Histórico
+          </h2>
           <div className="flex flex-col gap-3">
             {resolvedRequests.map((request) => (
               <ResolvedRequestRow key={request.id} request={request} />
@@ -83,10 +89,12 @@ function ReceivedInterestsPage() {
           </div>
         </div>
       )}
-
-      <MatchCelebrationToast adopterName={celebratingAdopter} onClose={() => setCelebratingAdopter(null)} />
+      <MatchCelebrationToast
+        request={celebratingRequest}
+        onClose={() => setCelebratingRequest(null)}
+      />{" "}
     </div>
-  )
+  );
 }
 
-export default ReceivedInterestsPage
+export default ReceivedInterestsPage;
