@@ -2,13 +2,13 @@ import { useNavigate } from 'react-router-dom'
 import { FaXmark, FaComments } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 
-function MatchCelebrationToast({ adopterName, onClose }) {
+function MatchCelebrationToast({ request, onClose }) {
   const navigate = useNavigate()
 
-  if (!adopterName) return null
+  if (!request) return null
 
   const handleGoToChat = () => {
-    navigate('/chat', { state: { adopterName } })
+    navigate('/chat', { state: { requestId: request.requestId } })
     onClose()
   }
 
@@ -21,7 +21,7 @@ function MatchCelebrationToast({ adopterName, onClose }) {
 
         <div className="flex-1">
           <p className="text-sm font-bold leading-snug">
-            Interesse aceito! O chat com <span className="text-amber-300">{adopterName}</span> está liberado.
+            Interesse aceito! O chat com <span className="text-amber-300">{request.name}</span> está liberado.
           </p>
           <button
             type="button"
