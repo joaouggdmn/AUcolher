@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { LuSparkles } from 'react-icons/lu'
 import PetCardStack from '../components/PetCardStack'
 import SwipeActionButtons from '../components/SwipeActionButtons'
@@ -7,38 +7,38 @@ import MatchToast from '../components/MatchToast'
 import PetDetailModal from '../components/PetDetailModal'
 import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAuth } from '../../../core/context/AuthContext'
-import { hasCompletedLifestyleProfile } from '../../../core/utils/lifestyleProfile'
 import { registerLike, registerPass } from '../services/aumatchService'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
+import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
 
 function AumatchPage() {
   const { animals: pets } = useAnimals()
-  const { user, isAuthenticated, isLoading: isAuthLoading, updateProfile } = useAuth()
+  const { user, updateProfile } = useAuth()
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [matchedPet, setMatchedPet] = useState(null)
   const [detailsPet, setDetailsPet] = useState(null)
   const stackRef = useRef(null)
 
-  const [isQuizOpen, setIsQuizOpen] = useState(false)
-  const [hasCheckedProfile, setHasCheckedProfile] = useState(false)
+  // Só abre o quiz se faltar alguma resposta no perfil — quem já respondeu
+  // (nesta sessão ou numa anterior) cai direto nos cards
+  const [isQuizOpen, setIsQuizOpen] = useState(() => !hasCompletedLifestyleQuiz(user))
   const [isPreparingMatches, setIsPreparingMatches] = useState(false)
 
-  useEffect(() => {
-    if (isAuthLoading) return
-    setIsQuizOpen(!hasCompletedLifestyleProfile(user))
-    setHasCheckedProfile(true)
-  }, [isAuthLoading, user])
+  // Aplica a resposta de "Qual espécie você procura?" diretamente na
+  // pilha de cards — sem isso, a resposta ficaria salva sem efeito prático
+  const eligiblePets = useMemo(() => {
+    if (!user?.speciesPreference || user.speciesPreference === 'BOTH') return pets
+    return pets.filter((pet) => pet.species === user.speciesPreference)
+  }, [pets, user?.speciesPreference])
 
-  const visiblePets = pets.slice(currentIndex)
+  const visiblePets = eligiblePets.slice(currentIndex)
   const topPet = visiblePets[0]
 
   const handleQuizComplete = (answers) => {
-    if (isAuthenticated) {
-      updateProfile(answers) // persiste PERMANENTEMENTE no perfil do usuário
-    } else {
-      console.log('Usuário não autenticado — respostas não persistidas:', answers)
-    }
+    // Persiste de verdade no AuthContext — antes disso, as respostas só
+    // eram logadas no console e nunca chegavam a ser reaproveitadas
+    updateProfile(answers)
 
     setIsQuizOpen(false)
     setIsPreparingMatches(true)
@@ -60,15 +60,6 @@ function AumatchPage() {
   }
 
   const handleReset = () => setCurrentIndex(0)
-
-  // Estado intermediário — evita "piscar" quiz -> cards antes da checagem
-  if (!hasCheckedProfile) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-emerald-950">
-        <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-amber-400" />
-      </div>
-    )
-  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-emerald-950 px-4 pb-16 pt-24 sm:pt-28">
