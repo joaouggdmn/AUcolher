@@ -38,6 +38,8 @@ function toFrontendUser(backendUser) {
     rotinaExercicio: '',
     tempoSozinho: '',
     temCriancasOuPets: null,
+    speciesPreference: null, // 🆕
+    idealPetProfile: null,   // 🆕
   }
 }
 

@@ -7,6 +7,8 @@ export function hasCompletedLifestyleProfile(user) {
     user?.rotinaExercicio &&
     user?.tempoSozinho &&
     user?.temCriancasOuPets !== null &&
-    user?.temCriancasOuPets !== undefined
+    user?.temCriancasOuPets !== undefined &&
+    user?.speciesPreference &&   // 🆕
+    user?.idealPetProfile     // 🆕
   )
 }
