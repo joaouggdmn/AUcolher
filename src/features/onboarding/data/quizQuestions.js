@@ -1,4 +1,4 @@
-import { FaBuilding, FaHouseChimney, FaTractor, FaCouch, FaPersonWalking, FaPersonRunning, FaHouseUser, FaClock, FaBriefcase, FaChildren, FaXmark } from 'react-icons/fa6'
+import { FaBuilding, FaHouseChimney, FaTractor, FaCouch, FaPersonWalking, FaPersonRunning, FaHouseUser, FaClock, FaBriefcase, FaChildren, FaXmark, FaDog, FaCat, FaPaw, FaMoon, FaBone, FaShieldHalved } from 'react-icons/fa6'
 
 export const quizQuestions = [
   {
@@ -40,4 +40,29 @@ export const quizQuestions = [
       { value: false, label: 'Não', icon: FaXmark },
     ],
   },
+  // 🆕 Pergunta 5
+  {
+    key: 'speciesPreference',
+    title: 'Qual espécie você procura?',
+    subtitle: 'Isso filtra diretamente quais pets aparecem no seu AUmatch.',
+    options: [
+      { value: 'DOG', label: 'Cachorro', icon: FaDog },
+      { value: 'CAT', label: 'Gato', icon: FaCat },
+      { value: 'BOTH', label: 'Ambos', icon: FaPaw },
+    ],
+  },
+
+  // 🆕 Pergunta 6 — ícones espelham os mesmos usados no temperamento
+  // do animal (FaMoon/FaBone/FaShieldHalved), reforçando a conexão
+  // visual entre "o que você procura" e "o que o pet é"
+  {
+    key: 'idealPetProfile',
+    title: 'Qual o seu perfil de pet ideal?',
+    subtitle: 'Usamos isso para priorizar pets com o temperamento mais compatível.',
+    options: [
+      { value: 'CALM_COMPANION', label: 'Companheiro e calmo', icon: FaMoon },
+      { value: 'PLAYFUL_ACTIVE', label: 'Brincalhão e ativo', icon: FaBone },
+      { value: 'PROTECTIVE_INDEPENDENT', label: 'Protetor e independente', icon: FaShieldHalved },
+    ],
+  }
 ]
