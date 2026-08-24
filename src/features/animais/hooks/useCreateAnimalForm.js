@@ -19,6 +19,9 @@ const INITIAL_FORM = {
   dewormed: false,
   specialNeeds: false,
   energyLevel: "",
+  temperament: "", // 🆕
+  independenceLevel: "", // 🆕
+  vocalization: "", // 🆕
   goodWithChildren: null,
   goodWithDogs: null,
   goodWithCats: null,
@@ -59,6 +62,9 @@ export function useCreateAnimalForm() {
     if (currentStep === "compatibility") {
       return (
         formData.energyLevel !== "" &&
+        formData.temperament !== "" && // 🆕
+        formData.independenceLevel !== "" && // 🆕
+        formData.vocalization !== "" && // 🆕
         formData.goodWithChildren !== null &&
         formData.goodWithDogs !== null &&
         formData.goodWithCats !== null &&

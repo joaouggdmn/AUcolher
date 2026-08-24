@@ -11,6 +11,7 @@ import PhotoGallery from '../components/PhotoGallery'
 import HealthBadges from '../components/HealthBadges'
 import InterestInfoBubble from '../components/InterestInfoBubble'
 import { buildAdopterSnapshot } from '../../adocao/utils/buildAdopterSnapshot'
+import BehaviorProfile from '../components/BehaviorProfile'
 
 const SIZE_LABELS = { SMALL: 'Pequeno', MEDIUM: 'Médio', LARGE: 'Grande' }
 
@@ -115,6 +116,7 @@ function AnimalDetailsPage() {
           )}
 
           <HealthBadges animal={animal} />
+          <BehaviorProfile animal={animal} />
 
           <div>
             <h2 className="font-serif text-lg font-bold text-emerald-950">História</h2>
