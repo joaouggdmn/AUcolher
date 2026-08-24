@@ -1,13 +1,21 @@
-import { useMemo } from 'react'
-import { hasCompletedLifestyleProfile } from '../utils/lifestyleProfile' // ← novo import
+import { useMemo } from "react";
+import { hasCompletedLifestyleProfile } from "../utils/lifestyleProfile"; // ← novo import
 
 const CHECKLIST_DEFINITIONS = [
-  { key: 'nome', label: 'Nome completo', check: (p) => !!p?.name?.trim() },
-  { key: 'email', label: 'E-mail', check: (p) => !!p?.email?.trim() },
-  { key: 'telefone', label: 'Telefone', check: (p) => !!p?.telefone?.trim() },
-  { key: 'localizacao', label: 'Localização', check: (p) => !!p?.cidade?.trim() && !!p?.estado },
-  { key: 'estiloDeVida', label: 'Perfil AUmatch', check: hasCompletedLifestyleProfile }, // ← antes tinha a lógica inline
-]
+  { key: "nome", label: "Nome completo", check: (p) => !!p?.name?.trim() },
+  { key: "email", label: "E-mail", check: (p) => !!p?.email?.trim() },
+  { key: "telefone", label: "Telefone", check: (p) => !!p?.telefone?.trim() },
+  {
+    key: "localizacao",
+    label: "Localização",
+    check: (p) => !!p?.cidade?.trim() && !!p?.estado,
+  },
+  {
+    key: "estiloDeVida",
+    label: "Perfil AUmatch",
+    check: hasCompletedLifestyleProfile,
+  }, // ← antes tinha a lógica inline
+];
 
 // ... resto do arquivo continua idêntico
 
@@ -20,12 +28,13 @@ export function useProfileCompletion(profile) {
       key: item.key,
       label: item.label,
       isComplete: item.check(profile),
-    }))
+    }));
 
     const percentage = Math.round(
-      (checklist.filter((item) => item.isComplete).length / checklist.length) * 100
-    )
+      (checklist.filter((item) => item.isComplete).length / checklist.length) *
+        100,
+    );
 
-    return { checklist, percentage }
-  }, [profile])
+    return { checklist, percentage };
+  }, [profile]);
 }
