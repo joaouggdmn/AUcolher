@@ -29,6 +29,7 @@ function CreateAnimalPage() {
     goNext,
     goBack,
     handleSubmit,
+    needsLocationInput,
   } = useCreateAnimalForm()
 
   const { title, subtitle } = STEP_CONTENT[currentStep]
@@ -56,7 +57,7 @@ function CreateAnimalPage() {
             <p className="text-sm text-slate-500">{subtitle}</p>
           </div>
 
-          {currentStep === 'basic' && <StepBasicInfo formData={formData} onChange={updateField} />}
+          {currentStep === 'basic' && <StepBasicInfo formData={formData} onChange={updateField} showLocationFields={needsLocationInput} />}
           {currentStep === 'health' && <StepHealth formData={formData} onChange={updateField} />}
           {currentStep === 'compatibility' && <StepCompatibility formData={formData} onChange={updateField} />}
           {currentStep === 'media' && (
