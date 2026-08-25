@@ -1,16 +1,15 @@
 import { Link } from 'react-router-dom'
-import { FaShieldHalved, FaHeart, FaVenus, FaMars, FaLocationDot, FaArrowRight } from 'react-icons/fa6'
-import AuthorTag from '../../../core/components/ui/AuthorTag' 
-
+import { FaShieldHalved, FaHeart, FaVenus, FaMars, FaLocationDot, FaArrowRight, FaPaw } from 'react-icons/fa6'
+import { useAuth } from '../../../core/context/AuthContext'
 
 function AnimalCard({ animal }) {
+  const { user } = useAuth()
   const isFemale = animal.sex === 'F'
   const isNgo = animal.listingType === 'NGO'
-  const authorName = isNgo ? animal.organizationName : animal.ownerName
+  const isOwner = !!user && user.id === animal.ownerId
 
   const handleFavorite = (e) => {
     e.preventDefault()
-    // 🔴 Aqui entra a chamada real: favoriteAnimal(animal.id)
     console.log('Favorited:', animal.name)
   }
 
@@ -29,12 +28,22 @@ function AnimalCard({ animal }) {
           />
         </Link>
 
-        {isNgo && (
-          <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-md shadow-amber-500/30">
-            <FaShieldHalved size={12} />
-            ONG Verificada
-          </span>
-        )}
+        {/* Badges empilhados no canto esquerdo — não colidem com o
+            botão de favoritar (canto direito) */}
+        <div className="pointer-events-none absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          {isNgo && (
+            <span className="flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-md shadow-amber-500/30">
+              <FaShieldHalved size={12} />
+              ONG Verificada
+            </span>
+          )}
+          {isOwner && (
+            <span className="flex items-center gap-1.5 rounded-full bg-slate-900/85 px-3 py-1.5 text-xs font-extrabold text-white shadow-md backdrop-blur-sm">
+              <FaPaw size={11} className="text-amber-300" />
+              Seu Pet
+            </span>
+          )}
+        </div>
 
         <button
           type="button"
@@ -72,7 +81,12 @@ function AnimalCard({ animal }) {
           {animal.city}, {animal.state}
         </div>
 
-         <AuthorTag name={authorName} isVerified={isNgo} />
+        {isNgo && animal.organizationName && (
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
+            <FaShieldHalved size={11} />
+            {animal.organizationName}
+          </p>
+        )}
 
         <Link
           to={`/animais/${animal.id}`}
