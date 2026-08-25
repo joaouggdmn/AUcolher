@@ -10,6 +10,7 @@ import { useAuth } from '../../../core/context/AuthContext'
 import { registerLike, registerPass } from '../services/aumatchService'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
 import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
+import { sortPetsByMatchScore } from '../utils/matchScore'
 
 function AumatchPage() {
   const { animals: pets } = useAnimals()
@@ -28,9 +29,17 @@ function AumatchPage() {
   // Aplica a resposta de "Qual espécie você procura?" diretamente na
   // pilha de cards — sem isso, a resposta ficaria salva sem efeito prático
   const eligiblePets = useMemo(() => {
-    if (!user?.speciesPreference || user.speciesPreference === 'BOTH') return pets
-    return pets.filter((pet) => pet.species === user.speciesPreference)
-  }, [pets, user?.speciesPreference])
+  // 1) Filtro RÍGIDO — espécie é excludente
+  const speciesFiltered =
+    !user?.speciesPreference || user.speciesPreference === 'BOTH'
+      ? pets
+      : pets.filter((pet) => pet.species === user.speciesPreference)
+
+  // 2) Ranqueamento SUAVE — reordena por compatibilidade, nunca exclui.
+  // Antes desta correção, essas respostas eram coletadas e nunca usadas.
+  if (!user) return speciesFiltered
+  return sortPetsByMatchScore(user, speciesFiltered)
+}, [pets, user])
 
   const visiblePets = eligiblePets.slice(currentIndex)
   const topPet = visiblePets[0]
