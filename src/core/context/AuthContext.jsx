@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { loginRequest, registerRequest } from '../services/authService'
-import { TOKEN_STORAGE_KEY, TOKEN_TYPE_STORAGE_KEY, USER_STORAGE_KEY } from '../utils/storageKeys'
+import { TOKEN_STORAGE_KEY, TOKEN_TYPE_STORAGE_KEY, USER_STORAGE_KEY, LIFESTYLE_PROFILE_STORAGE_KEY } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
 
@@ -37,14 +37,20 @@ export function AuthProvider({ children }) {
   async function login({ email, password, userType }) {
     const { token, tokenType, user: loggedUser } = await loginRequest({ email, password, userType })
 
+    // 🆕 Sem isso, cada novo login apagava silenciosamente as respostas do
+    // quiz que o usuário já tinha dado — o backend não devolve esses
+    // campos (toFrontendUser sempre reseta para vazio)
+    const storedLifestyle = loadStoredLifestyleProfile()
+    const mergedUser = { ...loggedUser, ...storedLifestyle }
+
     localStorage.setItem(TOKEN_STORAGE_KEY, token)
     localStorage.setItem(TOKEN_TYPE_STORAGE_KEY, tokenType)
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(loggedUser))
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mergedUser))
 
-    setUser(loggedUser)
+    setUser(mergedUser)
     setIsAuthenticated(true)
 
-    return loggedUser
+    return mergedUser
   }
 
   async function register(formData) {
@@ -60,12 +66,41 @@ export function AuthProvider({ children }) {
   }
 
   function updateProfile(updates) {
+    persistLifestyleFields(updates)
+
     setUser((prev) => {
       const updatedUser = { ...prev, ...updates }
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser))
       return updatedUser
     })
   }
+
+  // 🆕 Mesmos campos monitorados por useProfileCompletion — o backend ainda
+// não tem colunas para eles, então persistimos numa chave própria,
+// independente da sessão de autenticação
+const LIFESTYLE_FIELDS = [
+  'cidade', 'estado', 'moradia', 'rotinaExercicio', 'tempoSozinho',
+  'temCriancasOuPets', 'speciesPreference', 'idealPetProfile',
+]
+
+function loadStoredLifestyleProfile() {
+  try {
+    const stored = localStorage.getItem(LIFESTYLE_PROFILE_STORAGE_KEY)
+    if (stored) return JSON.parse(stored)
+  } catch {
+    // payload corrompido — ignora
+  }
+  return {}
+}
+
+function persistLifestyleFields(updates) {
+  const relevant = Object.fromEntries(
+    Object.entries(updates).filter(([key]) => LIFESTYLE_FIELDS.includes(key))
+  )
+  if (Object.keys(relevant).length === 0) return
+  const current = loadStoredLifestyleProfile()
+  localStorage.setItem(LIFESTYLE_PROFILE_STORAGE_KEY, JSON.stringify({ ...current, ...relevant }))
+}
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout, updateProfile }}>
