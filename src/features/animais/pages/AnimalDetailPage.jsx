@@ -9,7 +9,7 @@ import {
   FaHeart,
   FaShieldHalved,
   FaCircleCheck,
-  FaPaw
+  FaPaw,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { useAnimals } from "../../../core/context/AnimalContext";
@@ -119,13 +119,6 @@ function AnimalDetailsPage() {
               {animal.city}, {animal.state}
             </p>
           </header>
-
-          {isOwner && (
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-slate-900/90 px-3 py-1.5 text-xs font-extrabold text-white">
-              <FaPaw size={11} className="text-amber-300" />
-              Seu Pet
-            </span>
-          )}
 
           <div className="flex flex-wrap gap-2.5">
             <span className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">

@@ -28,22 +28,13 @@ function AnimalCard({ animal }) {
           />
         </Link>
 
-        {/* Badges empilhados no canto esquerdo — não colidem com o
-            botão de favoritar (canto direito) */}
-        <div className="pointer-events-none absolute left-3 top-3 flex flex-col items-start gap-1.5">
-          {isNgo && (
-            <span className="flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-md shadow-amber-500/30">
-              <FaShieldHalved size={12} />
-              ONG Verificada
-            </span>
-          )}
-          {isOwner && (
-            <span className="flex items-center gap-1.5 rounded-full bg-slate-900/85 px-3 py-1.5 text-xs font-extrabold text-white shadow-md backdrop-blur-sm">
-              <FaPaw size={11} className="text-amber-300" />
-              Seu Pet
-            </span>
-          )}
-        </div>
+        {/* 🆕 Badge "Seu Pet" removida — só resta o selo de ONG, se aplicável */}
+        {isNgo && (
+          <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-md shadow-amber-500/30">
+            <FaShieldHalved size={12} />
+            ONG Verificada
+          </span>
+        )}
 
         <button
           type="button"
@@ -88,13 +79,26 @@ function AnimalCard({ animal }) {
           </p>
         )}
 
-        <Link
-          to={`/animais/${animal.id}`}
-          className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 group-hover:bg-emerald-800 group-hover:text-white"
-        >
-          Conhecer
-          <FaArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
-        </Link>
+        {/* 🆕 Área de ação: botão condicional. O dono nunca vê o CTA de
+            "Conhecer" habilitado no seu próprio anúncio. */}
+        {isOwner ? (
+          <button
+            type="button"
+            disabled
+            className="mt-1 flex cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-gray-200 py-2.5 text-sm font-bold text-gray-500"
+          >
+            <FaPaw size={12} />
+            Seu Pet
+          </button>
+        ) : (
+          <Link
+            to={`/animais/${animal.id}`}
+            className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 group-hover:bg-emerald-800 group-hover:text-white"
+          >
+            Conhecer
+            <FaArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        )}
       </div>
     </div>
   )
