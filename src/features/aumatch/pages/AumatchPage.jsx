@@ -38,7 +38,7 @@ function AumatchPage() {
   // 2) Ranqueamento SUAVE — reordena por compatibilidade, nunca exclui.
   // Antes desta correção, essas respostas eram coletadas e nunca usadas.
   if (!user) return speciesFiltered
-  return sortPetsByMatchScore(user, speciesFiltered)
+  return sortPetsByMatchScore(user, speciesFiltered, user.id)
 }, [pets, user])
 
   const visiblePets = eligiblePets.slice(currentIndex)

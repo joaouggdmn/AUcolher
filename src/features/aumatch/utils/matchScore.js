@@ -126,8 +126,11 @@ export function computeMatchScore(user, pet) {
   return Math.min(100, Math.max(0, Math.round(score)))
 }
 
-export function sortPetsByMatchScore(user, pets) {
-  return [...pets]
+export function sortPetsByMatchScore(user, pets, currentUserId) {
+  const eligiblePets = pets.filter((pet) => pet.ownerId !== currentUserId) // 🆕 exclui os próprios animais
+
+  return eligiblePets
     .map((pet) => ({ ...pet, matchScore: computeMatchScore(user, pet) }))
     .sort((a, b) => b.matchScore - a.matchScore)
 }
+
