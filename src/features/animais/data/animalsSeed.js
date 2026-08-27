@@ -1,3 +1,15 @@
+// Coordenadas reais aproximadas das cidades usadas no seed — fonte única
+// para os animais base E para o gerador de itens extras, evitando o
+// descompasso entre "cidade exibida" e "posição usada no cálculo"
+const CITY_COORDS = {
+  Araranguá: { latitude: -28.9356, longitude: -49.4926 },
+  Criciúma: { latitude: -28.6779, longitude: -49.3697 },
+  Tubarão: { latitude: -28.4703, longitude: -49.0064 },
+  Florianópolis: { latitude: -27.5954, longitude: -48.548 },
+  Içara: { latitude: -28.7159, longitude: -49.2986 },
+  Sombrio: { latitude: -29.1122, longitude: -49.6297 },
+};
+
 const baseAnimals = [
   {
     id: 1,
@@ -13,6 +25,8 @@ const baseAnimals = [
     city: "Araranguá",
     state: "SC",
     distanceKm: 5,
+    latitude: -28.9356,
+    longitude: -49.4926, // 🆕
     images: [
       "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1517849845537-4d257902861a?auto=format&fit=crop&w=1200&q=80",
@@ -56,6 +70,8 @@ const baseAnimals = [
     city: "Criciúma",
     state: "SC",
     distanceKm: 12,
+    latitude: -28.6725,
+    longitude: -49.3652, // 🆕
     images: [
       "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=1200&q=80",
@@ -98,6 +114,8 @@ const baseAnimals = [
     city: "Tubarão",
     state: "SC",
     distanceKm: 25,
+    latitude: -28.468,
+    longitude: -49.009, // 🆕
     images: [
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&q=80",
@@ -140,6 +158,8 @@ const baseAnimals = [
     city: "Araranguá",
     state: "SC",
     distanceKm: 3,
+    latitude: -28.9401,
+    longitude: -49.488, // 🆕 mesma cidade de Thor, endereço diferente
     images: [
       "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=1200&q=80",
@@ -181,6 +201,8 @@ const baseAnimals = [
     city: "Florianópolis",
     state: "SC",
     distanceKm: 45,
+    latitude: -27.5954,
+    longitude: -48.548, // 🆕
     images: [
       "https://images.unsplash.com/photo-1517849845537-4d257902861a?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=80",
@@ -224,6 +246,8 @@ const baseAnimals = [
     city: "Içara",
     state: "SC",
     distanceKm: 18,
+    latitude: -28.7159,
+    longitude: -49.2986, // 🆕
     images: [
       "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=80",
@@ -266,6 +290,8 @@ const baseAnimals = [
     city: "Sombrio",
     state: "SC",
     distanceKm: 30,
+    latitude: -29.1122,
+    longitude: -49.6297, // 🆕
     images: [
       "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=80",
@@ -308,6 +334,8 @@ const baseAnimals = [
     city: "Araranguá",
     state: "SC",
     distanceKm: 4,
+    latitude: -28.9312,
+    longitude: -49.4977, // 🆕 terceiro ponto em Araranguá
     images: [
       "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&w=1200&q=80",
@@ -337,11 +365,6 @@ const baseAnimals = [
   },
 ];
 
-// Geração de itens extras — reaproveita os animais "base" (fotos,
-// histórias, atributos completos) variando nome/cidade/sexo, apenas
-// para termos volume suficiente (15+) para testar a paginação
-// "Mostrar mais" sem escrever dezenas de objetos manualmente.
-// ─────────────────────────────────────────────────────────────
 const EXTRA_ANIMAL_NAMES = [
   "Bento",
   "Pipoca",
@@ -369,15 +392,25 @@ const EXTRA_CITIES = [
 
 function buildExtraAnimals() {
   return EXTRA_ANIMAL_NAMES.map((name, index) => {
-    const base = baseAnimals[index % baseAnimals.length]; // reaproveita fotos/história/atributos
+    const base = baseAnimals[index % baseAnimals.length];
+    const city = EXTRA_CITIES[index % EXTRA_CITIES.length];
+    const cityCoords = CITY_COORDS[city];
+
+    // Deslocamento pequeno e determinístico (não aleatório, para os dados
+    // ficarem estáveis entre reloads) — simula endereços diferentes dentro
+    // da mesma cidade, em vez de coordenadas idênticas para todo animal
+    // que caiu na mesma cidade
+    const jitter = (index % 5) * 0.006;
 
     return {
       ...base,
       id: 100 + index,
       name,
       sex: index % 2 === 0 ? "M" : "F",
-      city: EXTRA_CITIES[index % EXTRA_CITIES.length],
+      city,
       state: "SC",
+      latitude: cityCoords.latitude + jitter, // 🆕 antes: herdava do `base`, causando descompasso com `city`
+      longitude: cityCoords.longitude - jitter, // 🆕
       distanceKm: 2 + ((index * 3) % 40),
       listingType: index % 3 === 0 ? "NGO" : "USER",
       organizationName:
