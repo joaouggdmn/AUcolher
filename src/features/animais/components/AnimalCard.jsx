@@ -1,22 +1,33 @@
-import { Link } from 'react-router-dom'
-import { FaShieldHalved, FaHeart, FaVenus, FaMars, FaLocationDot, FaArrowRight, FaPaw } from 'react-icons/fa6'
-import { useAuth } from '../../../core/context/AuthContext'
+import { Link } from "react-router-dom";
+import {
+  FaShieldHalved,
+  FaHeart,
+  FaVenus,
+  FaMars,
+  FaLocationDot,
+  FaArrowRight,
+  FaPaw,
+  FaLocationCrosshairs,
+} from "react-icons/fa6";
+import { useAuth } from "../../../core/context/AuthContext";
 
 function AnimalCard({ animal }) {
-  const { user } = useAuth()
-  const isFemale = animal.sex === 'F'
-  const isNgo = animal.listingType === 'NGO'
-  const isOwner = !!user && user.id === animal.ownerId
+  const { user } = useAuth();
+  const isFemale = animal.sex === "F";
+  const isNgo = animal.listingType === "NGO";
+  const isOwner = !!user && user.id === animal.ownerId;
 
   const handleFavorite = (e) => {
-    e.preventDefault()
-    console.log('Favorited:', animal.name)
-  }
+    e.preventDefault();
+    console.log("Favorited:", animal.name);
+  };
 
   return (
     <div
       className={`group flex flex-col overflow-hidden rounded-3xl bg-white transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-950/15 ${
-        isNgo ? 'shadow-lg shadow-amber-500/10 ring-2 ring-amber-400' : 'shadow-sm ring-1 ring-slate-100'
+        isNgo
+          ? "shadow-lg shadow-amber-500/10 ring-2 ring-amber-400"
+          : "shadow-sm ring-1 ring-slate-100"
       }`}
     >
       <div className="relative h-56 w-full overflow-hidden">
@@ -51,7 +62,9 @@ function AnimalCard({ animal }) {
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="font-serif text-lg font-bold text-emerald-950">{animal.name}</h3>
+            <h3 className="font-serif text-lg font-bold text-emerald-950">
+              {animal.name}
+            </h3>
             <p className="text-sm text-slate-500">
               {animal.breed} · {animal.ageLabel}
             </p>
@@ -59,9 +72,9 @@ function AnimalCard({ animal }) {
 
           <span
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-              isFemale ? 'bg-rose-50 text-rose-500' : 'bg-sky-50 text-sky-500'
+              isFemale ? "bg-rose-50 text-rose-500" : "bg-sky-50 text-sky-500"
             }`}
-            title={isFemale ? 'Fêmea' : 'Macho'}
+            title={isFemale ? "Fêmea" : "Macho"}
           >
             {isFemale ? <FaVenus size={13} /> : <FaMars size={13} />}
           </span>
@@ -71,6 +84,13 @@ function AnimalCard({ animal }) {
           <FaLocationDot size={13} className="text-emerald-600" />
           {animal.city}, {animal.state}
         </div>
+
+        {typeof animal.liveDistanceKm === "number" && (
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
+            <FaLocationCrosshairs size={10} />A{" "}
+            {Math.round(animal.liveDistanceKm)} km de você
+          </span>
+        )}
 
         {isNgo && animal.organizationName && (
           <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
@@ -96,12 +116,15 @@ function AnimalCard({ animal }) {
             className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 group-hover:bg-emerald-800 group-hover:text-white"
           >
             Conhecer
-            <FaArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
+            <FaArrowRight
+              size={12}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
           </Link>
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default AnimalCard
+export default AnimalCard;
