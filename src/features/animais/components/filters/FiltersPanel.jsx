@@ -1,8 +1,8 @@
-import { FaChevronDown, FaXmark } from 'react-icons/fa6'
-import FilterSection from '../../../../core/components/ui/filters/FilterSection'
-import CheckboxOption from '../../../../core/components/ui/filters/CheckboxOption'
-import ToggleSwitch from '../../../../core/components/ui/filters/ToggleSwitch'
-import CollapsibleSection from '../../../../core/components/ui/CollapsibleSection'
+import { FaChevronDown, FaXmark } from "react-icons/fa6";
+import FilterSection from "../../../../core/components/ui/filters/FilterSection";
+import CheckboxOption from "../../../../core/components/ui/filters/CheckboxOption";
+import ToggleSwitch from "../../../../core/components/ui/filters/ToggleSwitch";
+import CollapsibleSection from "../../../../core/components/ui/CollapsibleSection";
 import {
   SPECIES_OPTIONS,
   SIZE_OPTIONS,
@@ -11,7 +11,7 @@ import {
   ENERGY_LEVEL_OPTIONS,
   TEMPERAMENT_OPTIONS,
   CITY_OPTIONS,
-} from './filterOptions'
+} from "./filterOptions";
 
 function FiltersPanel({
   filters,
@@ -21,6 +21,7 @@ function FiltersPanel({
   onDistanceChange,
   onClear,
   hasActiveFilters,
+  isProximityActive, // 🆕
 }) {
   return (
     <div className="flex flex-col">
@@ -31,7 +32,7 @@ function FiltersPanel({
             key={opt.value}
             label={opt.label}
             checked={filters.species.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('species', opt.value)}
+            onChange={() => onToggleArrayFilter("species", opt.value)}
           />
         ))}
       </FilterSection>
@@ -42,7 +43,7 @@ function FiltersPanel({
             key={opt.value}
             label={opt.label}
             checked={filters.sizes.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('sizes', opt.value)}
+            onChange={() => onToggleArrayFilter("sizes", opt.value)}
           />
         ))}
       </FilterSection>
@@ -53,7 +54,7 @@ function FiltersPanel({
             key={opt.value}
             label={opt.label}
             checked={filters.sexes.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('sexes', opt.value)}
+            onChange={() => onToggleArrayFilter("sexes", opt.value)}
           />
         ))}
       </FilterSection>
@@ -64,7 +65,7 @@ function FiltersPanel({
             key={opt.value}
             label={opt.label}
             checked={filters.ageGroups.includes(opt.value)}
-            onChange={() => onToggleArrayFilter('ageGroups', opt.value)}
+            onChange={() => onToggleArrayFilter("ageGroups", opt.value)}
           />
         ))}
       </FilterSection>
@@ -78,7 +79,7 @@ function FiltersPanel({
                 key={opt.value}
                 label={opt.label}
                 checked={filters.energyLevels.includes(opt.value)}
-                onChange={() => onToggleArrayFilter('energyLevels', opt.value)}
+                onChange={() => onToggleArrayFilter("energyLevels", opt.value)}
               />
             ))}
           </FilterSection>
@@ -89,7 +90,7 @@ function FiltersPanel({
                 key={opt.value}
                 label={opt.label}
                 checked={filters.temperaments.includes(opt.value)}
-                onChange={() => onToggleArrayFilter('temperaments', opt.value)}
+                onChange={() => onToggleArrayFilter("temperaments", opt.value)}
               />
             ))}
           </FilterSection>
@@ -124,15 +125,39 @@ function FiltersPanel({
 
           <FilterSection title="Distância máxima">
             <div className="flex flex-col gap-2">
-              <span className="text-sm font-bold text-emerald-800">Até {filters.maxDistance} km</span>
+              <div className="flex items-center justify-between">
+                <span
+                  className={`text-sm font-bold ${isProximityActive ? "text-slate-400" : "text-emerald-800"}`}
+                >
+                  Até {filters.maxDistance} km
+                </span>
+                {isProximityActive && (
+                  <span className="text-[11px] font-semibold text-emerald-600">
+                    Ordenado por GPS
+                  </span>
+                )}
+              </div>
+
               <input
                 type="range"
                 min={1}
                 max={50}
                 value={filters.maxDistance}
                 onChange={(e) => onDistanceChange(Number(e.target.value))}
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-emerald-700"
+                disabled={isProximityActive}
+                className={`h-1.5 w-full appearance-none rounded-full bg-slate-200 accent-emerald-700 ${
+                  isProximityActive
+                    ? "cursor-not-allowed opacity-40"
+                    : "cursor-pointer"
+                }`}
               />
+
+              {isProximityActive && (
+                <p className="text-[11px] text-slate-400">
+                  Desativado durante a busca por proximidade — a distância real
+                  (GPS) já ordena a lista.
+                </p>
+              )}
             </div>
           </FilterSection>
         </div>
@@ -149,7 +174,7 @@ function FiltersPanel({
         </button>
       )}
     </div>
-  )
+  );
 }
 
-export default FiltersPanel
+export default FiltersPanel;

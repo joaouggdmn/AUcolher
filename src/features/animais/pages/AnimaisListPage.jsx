@@ -8,8 +8,6 @@ import AnimalsGrid from '../components/AnimalsGrid'
 import { useAnimals } from '../../../core/context/AnimalContext'
 import { calculateDistanceKm } from '../../../core/utils/distance'
 
-const PROXIMITY_RADIUS_KM = 50
-
 const INITIAL_FILTERS = {
   species: [],
   sizes: [],
@@ -26,21 +24,31 @@ function toggleArrayValue(array, value) {
   return array.includes(value) ? array.filter((v) => v !== value) : [...array, value]
 }
 
+// null (ou qualquer valor não-finito) sempre vai para o final: animais sem
+// distância calculável (sem lat/lng no cadastro) não devem ser excluídos
+// da lista, apenas posicionados por último.
+function compareByDistanceNullsLast(distA, distB) {
+  const aIsValid = Number.isFinite(distA)
+  const bIsValid = Number.isFinite(distB)
+
+  if (!aIsValid && !bIsValid) return 0
+  if (!aIsValid) return 1
+  if (!bIsValid) return -1
+  return distA - distB
+}
+
 function AnimaisListPage() {
   const { animals } = useAnimals()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  // Inicializa a busca a partir da URL (ex: chegando da Home via
-  // /animais?search=thor) — depois disso, o campo se comporta normalmente
   const [search, setSearch] = useState(() => searchParams.get('search') ?? '')
   const [filters, setFilters] = useState(INITIAL_FILTERS)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   const isLoading = false
 
-  // Sincroniza quando a URL muda EXTERNAMENTE (ex: usuário clicou de novo
-  // em "Buscar" na Home enquanto já estava nesta página) — não interfere
-  // na digitação local, pois só reage a mudanças no objeto searchParams
+  // Sincroniza quando a URL muda EXTERNAMENTE (ex: usuário voltou à Home e
+  // buscou de novo enquanto já estava nesta página)
   useEffect(() => {
     const paramSearch = searchParams.get('search')
     if (paramSearch !== null && paramSearch !== search) {
@@ -49,12 +57,28 @@ function AnimaisListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
 
-  // Coordenadas de proximidade vindas da URL (?lat=...&lng=...) — null
-  // quando ausentes ou inválidas, desligando a lógica de proximidade
+  // Coordenadas de proximidade vindas da URL (?lat=...&lng=...)
   const proximityCoords = useMemo(() => {
-    const lat = parseFloat(searchParams.get('lat'))
-    const lng = parseFloat(searchParams.get('lng'))
-    if (Number.isNaN(lat) || Number.isNaN(lng)) return null
+    const rawLat = searchParams.get('lat')
+    const rawLng = searchParams.get('lng')
+
+    console.log('1. Coordenadas cruas da URL:', { rawLat, rawLng })
+
+    if (!rawLat || !rawLng) {
+      console.log('1b. lat ou lng ausentes na URL — proximityCoords = null')
+      return null
+    }
+
+    const lat = parseFloat(rawLat)
+    const lng = parseFloat(rawLng)
+
+    console.log('1c. Coordenadas da URL após parseFloat:', { lat, lng })
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      console.log('1d. parseFloat retornou valor não-finito — proximityCoords = null')
+      return null
+    }
+
     return { lat, lng }
   }, [searchParams])
 
@@ -105,17 +129,34 @@ function AnimaisListPage() {
     (filters.maxDistance < 50 ? 1 : 0)
 
   const filteredAnimals = useMemo(() => {
-    // 1) Anexa a distância calculada (Haversine) a cada animal, se a
-    // busca por proximidade estiver ativa
-    const withDistance = animals.map((animal) => ({
-      ...animal,
-      liveDistanceKm: proximityCoords
-        ? calculateDistanceKm(proximityCoords.lat, proximityCoords.lng, animal.latitude, animal.longitude)
-        : null,
-    }))
+    // 2. Checagem do que o AnimalContext está de fato entregando — se
+    // latitude/longitude vierem undefined aqui, o problema é o cache do
+    // localStorage (aucolher_animals), não a lógica de filtragem/sort
+    console.log('2. Exemplo de animal em memória (animals[0]):', {
+      name: animals[0]?.name,
+      latitude: animals[0]?.latitude,
+      longitude: animals[0]?.longitude,
+    })
 
-    // 2) Aplica todos os filtros, incluindo o raio de proximidade
-    const matched = withDistance.filter((animal) => {
+    const withDistance = animals.map((animal) => {
+      const liveDistanceKm = proximityCoords
+        ? calculateDistanceKm(proximityCoords.lat, proximityCoords.lng, animal.latitude, animal.longitude)
+        : null
+
+      return { ...animal, liveDistanceKm }
+    })
+
+    // 3. Teste do Haversine para o primeiro animal do array
+    if (proximityCoords) {
+      console.log('3. Distância calculada para o 1º animal:', {
+        name: withDistance[0]?.name,
+        lat_animal: withDistance[0]?.latitude,
+        lng_animal: withDistance[0]?.longitude,
+        liveDistanceKm: withDistance[0]?.liveDistanceKm,
+      })
+    }
+
+    const filtered = withDistance.filter((animal) => {
       const term = search.toLowerCase()
       const matchesSearch =
         search === '' ||
@@ -132,12 +173,9 @@ function AnimaisListPage() {
       const matchesTemperament = filters.temperaments.length === 0 || filters.temperaments.includes(animal.temperament)
       const matchesSpecialNeeds = !filters.specialNeeds || animal.specialNeeds
       const matchesCity = filters.city === '' || animal.city === filters.city
-      const matchesDistance = animal.distanceKm <= filters.maxDistance
 
-      // Só entra em jogo quando a URL trouxe lat/lng — exige coordenada
-      // resolvida E dentro do raio de 50km
-      const matchesProximity =
-        !proximityCoords || (animal.liveDistanceKm !== null && animal.liveDistanceKm <= PROXIMITY_RADIUS_KM)
+      // Com GPS ativo, o slider manual de distância é 100% ignorado
+      const matchesSliderDistance = proximityCoords ? true : animal.distanceKm <= filters.maxDistance
 
       return (
         matchesSearch &&
@@ -149,17 +187,29 @@ function AnimaisListPage() {
         matchesTemperament &&
         matchesSpecialNeeds &&
         matchesCity &&
-        matchesDistance &&
-        matchesProximity
+        matchesSliderDistance
       )
     })
 
-    // 3) Busca por proximidade ativa → mais próximos primeiro
-    if (proximityCoords) {
-      return [...matched].sort((a, b) => (a.liveDistanceKm ?? Infinity) - (b.liveDistanceKm ?? Infinity))
+    if (!proximityCoords) {
+      console.log('4. Modo GPS INATIVO — sort() nem é chamado (early return)')
+      return filtered
     }
 
-    return matched
+    // 4. Confirma que o sort realmente roda, mostrando ANTES e DEPOIS
+    console.log(
+      '4a. ANTES do sort:',
+      filtered.map((a) => ({ name: a.name, liveDistanceKm: a.liveDistanceKm }))
+    )
+
+    const sorted = [...filtered].sort((a, b) => compareByDistanceNullsLast(a.liveDistanceKm, b.liveDistanceKm))
+
+    console.log(
+      '4b. DEPOIS do sort:',
+      sorted.map((a) => ({ name: a.name, liveDistanceKm: a.liveDistanceKm }))
+    )
+
+    return sorted
   }, [animals, search, filters, proximityCoords])
 
   const filterPanelProps = {
@@ -170,6 +220,7 @@ function AnimaisListPage() {
     onDistanceChange: handleDistanceChange,
     onClear: handleClearFilters,
     hasActiveFilters,
+    isProximityActive: !!proximityCoords,
   }
 
   return (

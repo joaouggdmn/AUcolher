@@ -85,10 +85,10 @@ function AnimalCard({ animal }) {
           {animal.city}, {animal.state}
         </div>
 
-        {typeof animal.liveDistanceKm === "number" && (
+        {Number.isFinite(animal.liveDistanceKm) && (
           <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
             <FaLocationCrosshairs size={10} />A{" "}
-            {Math.round(animal.liveDistanceKm)} km de você
+            {Math.round(animal.liveDistanceKm)} km de distância
           </span>
         )}
 
