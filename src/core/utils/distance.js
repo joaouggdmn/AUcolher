@@ -4,23 +4,25 @@ function toRadians(degrees) {
   return (degrees * Math.PI) / 180
 }
 
-// Calcula a distância em linha reta (km) entre duas coordenadas geográficas.
-// Retorna null se qualquer coordenada for inválida — assim o chamador
-// decide como tratar animais sem geolocalização, em vez de o cálculo
-// falhar silenciosamente com NaN.
 export function calculateDistanceKm(lat1, lng1, lat2, lng2) {
-  if ([lat1, lng1, lat2, lng2].some((v) => v === null || v === undefined || Number.isNaN(v))) {
+  const nLat1 = Number(lat1)
+  const nLng1 = Number(lng1)
+  const nLat2 = Number(lat2)
+  const nLng2 = Number(lng2)
+
+  if (![nLat1, nLng1, nLat2, nLng2].every(Number.isFinite)) {
     return null
   }
 
-  const dLat = toRadians(lat2 - lat1)
-  const dLng = toRadians(lng2 - lng1)
+  const dLat = toRadians(nLat2 - nLat1)
+  const dLng = toRadians(nLng2 - nLng1)
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLng / 2) ** 2
+    Math.cos(toRadians(nLat1)) * Math.cos(toRadians(nLat2)) * Math.sin(dLng / 2) ** 2
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const distance = EARTH_RADIUS_KM * c
 
-  return EARTH_RADIUS_KM * c
+  return Number.isFinite(distance) ? distance : null
 }
