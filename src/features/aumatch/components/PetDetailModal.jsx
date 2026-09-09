@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FaXmark, FaLocationDot, FaDna, FaVenus, FaMars, FaShieldHalved, FaHeart, FaPaw } from 'react-icons/fa6'
+import { FaXmark, FaLocationDot, FaDna, FaVenus, FaMars, FaShieldHalved, FaArrowRight, FaPaw } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 
 function PetDetailModal({ pet, onClose }) {
@@ -16,8 +16,6 @@ function PetDetailModal({ pet, onClose }) {
 
   if (!pet) return null
 
-  // ⚠️ Declaradas ANTES de qualquer uso no JSX — mesma lição do bug de
-  // temporal dead zone corrigido anteriormente
   const isFemale = pet.sex === 'F'
   const isNgo = pet.listingType === 'NGO'
   const isOwner = !!user && user.id === pet.ownerId
@@ -76,15 +74,17 @@ function PetDetailModal({ pet, onClose }) {
               Este é um dos seus animais cadastrados.
             </p>
           ) : (
-            // 🔴 Também corrigido: apontava para /adotar/:id, uma rota sem
-            // implementação real. O fluxo de interesse de verdade vive em
-            // AnimalDetailsPage — o link agora leva para lá.
+            // 🆕 "Ver anúncio": apenas navegação, sem NENHUM efeito colateral
+            // de match/interesse. O registro real de interesse (curtir) já
+            // acontece exclusivamente no botão de coração do card de swipe —
+            // este link só leva à página de detalhes para o usuário
+            // conferir mais informações antes de decidir.
             <Link
               to={`/animais/${pet.id}`}
               className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
             >
-              <FaHeart size={14} />
-              Tenho interesse em adotar
+              Ver anúncio
+              <FaArrowRight size={13} />
             </Link>
           )}
         </div>
