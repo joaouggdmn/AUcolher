@@ -79,8 +79,9 @@ export function AuthProvider({ children }) {
 // não tem colunas para eles, então persistimos numa chave própria,
 // independente da sessão de autenticação
 const LIFESTYLE_FIELDS = [
-  'cidade', 'estado', 'moradia', 'rotinaExercicio', 'tempoSozinho',
-  'temCriancasOuPets', 'speciesPreference', 'idealPetProfile',
+  'cidade', 'estado', 'cep', 'latitude', 'longitude',
+  'moradia', 'rotinaExercicio', 'tempoForaCasa',
+  'temCriancasOuPets', 'speciesPreference', 'idealPetProfile', 'portePreferido',
 ]
 
 function loadStoredLifestyleProfile() {
