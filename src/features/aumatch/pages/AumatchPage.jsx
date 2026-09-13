@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { LuSparkles } from 'react-icons/lu'
 import PetCardStack from '../components/PetCardStack'
 import SwipeActionButtons from '../components/SwipeActionButtons'
@@ -8,47 +9,46 @@ import PetDetailModal from '../components/PetDetailModal'
 import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAuth } from '../../../core/context/AuthContext'
 import { registerLike, registerPass } from '../services/aumatchService'
+import { sortPetsByMatchScore } from '../utils/matchScore' 
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
 import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
-import { sortPetsByMatchScore } from '../utils/matchScore'
+import QuizOptionCard from '../../onboarding/components/QuizOptionCard'
+import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 
 function AumatchPage() {
   const { animals: pets } = useAnimals()
-  const { user, updateProfile } = useAuth()
+  const { user, isAuthenticated, updateProfile } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [matchedPet, setMatchedPet] = useState(null)
   const [detailsPet, setDetailsPet] = useState(null)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const stackRef = useRef(null)
 
-  // Só abre o quiz se faltar alguma resposta no perfil — quem já respondeu
-  // (nesta sessão ou numa anterior) cai direto nos cards
-  const [isQuizOpen, setIsQuizOpen] = useState(() => !hasCompletedLifestyleQuiz(user))
+  // Só abre o quiz automaticamente para quem já está logado — para
+  // visitantes anônimos não há perfil algum para salvar as respostas
+  const [isQuizOpen, setIsQuizOpen] = useState(() => isAuthenticated && !hasCompletedLifestyleQuiz(user))
   const [isPreparingMatches, setIsPreparingMatches] = useState(false)
 
-  // Aplica a resposta de "Qual espécie você procura?" diretamente na
-  // pilha de cards — sem isso, a resposta ficaria salva sem efeito prático
   const eligiblePets = useMemo(() => {
-  // 1) Filtro RÍGIDO — espécie é excludente
-  const speciesFiltered =
-    !user?.speciesPreference || user.speciesPreference === 'BOTH'
-      ? pets
-      : pets.filter((pet) => pet.species === user.speciesPreference)
+    const speciesFiltered =
+      !user?.speciesPreference || user.speciesPreference === 'BOTH'
+        ? pets
+        : pets.filter((pet) => pet.species === user.speciesPreference)
 
-  // 2) Ranqueamento SUAVE — reordena por compatibilidade, nunca exclui.
-  // Antes desta correção, essas respostas eram coletadas e nunca usadas.
-  if (!user) return speciesFiltered
-  return sortPetsByMatchScore(user, speciesFiltered, user.id)
-}, [pets, user])
+    if (!user) return speciesFiltered
+
+    // sortPetsByMatchScore já exclui os próprios animais do usuário logado
+    return sortPetsByMatchScore(user, speciesFiltered, user.id)
+  }, [pets, user])
 
   const visiblePets = eligiblePets.slice(currentIndex)
   const topPet = visiblePets[0]
 
   const handleQuizComplete = (answers) => {
-    // Persiste de verdade no AuthContext — antes disso, as respostas só
-    // eram logadas no console e nunca chegavam a ser reaproveitadas
     updateProfile(answers)
-
     setIsQuizOpen(false)
     setIsPreparingMatches(true)
     setTimeout(() => setIsPreparingMatches(false), 900)
@@ -69,6 +69,11 @@ function AumatchPage() {
   }
 
   const handleReset = () => setCurrentIndex(0)
+
+  const handleGoToLogin = () => {
+    setIsAuthModalOpen(false)
+    navigate('/login', { state: { from: location } })
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-emerald-950 px-4 pb-16 pt-24 sm:pt-28">
@@ -106,6 +111,8 @@ function AumatchPage() {
             pets={visiblePets}
             onSwipeLeft={handleSwipeLeft}
             onSwipeRight={handleSwipeRight}
+            isInteractionAllowed={isAuthenticated}
+            onBlockedInteraction={() => setIsAuthModalOpen(true)}
           />
         ) : (
           <EmptyStackState onReset={handleReset} />
@@ -127,6 +134,14 @@ function AumatchPage() {
       {detailsPet && <PetDetailModal pet={detailsPet} onClose={() => setDetailsPet(null)} />}
 
       <OnboardingQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} onComplete={handleQuizComplete} />
+
+      {isAuthModalOpen && (
+        <AuthRequiredModal
+          message="Para curtir ou passar animais no AUmatch, você precisa estar conectado à sua conta."
+          onCancel={() => setIsAuthModalOpen(false)}
+          onLogin={handleGoToLogin}
+        />
+      )}
     </div>
   )
 }
