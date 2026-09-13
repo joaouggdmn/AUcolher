@@ -1,28 +1,40 @@
-import QuizOptionCard from './QuizOptionCard'
+import { FaCheck } from 'react-icons/fa6'
 
-function QuizQuestionCard({ question, selectedValue, onSelect }) {
-  const gridCols = question.options.length <= 2 ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'
-
+function QuizOptionCard({ label, description, icon: Icon, isSelected, onClick }) {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 text-center">
-        <h2 className="font-serif text-xl font-black text-emerald-950 sm:text-2xl">{question.title}</h2>
-        <p className="text-sm text-slate-500">{question.subtitle}</p>
-      </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative flex flex-col items-center gap-3 rounded-2xl border-2 p-6 text-center transition-all duration-300 ${
+        isSelected
+          ? 'border-amber-400 bg-emerald-50 shadow-md shadow-emerald-900/5'
+          : 'border-slate-200 bg-white hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-900/5'
+      }`}
+    >
+      {isSelected && (
+        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-emerald-950">
+          <FaCheck size={10} />
+        </span>
+      )}
 
-      <div className={`grid gap-3 ${gridCols}`}>
-        {question.options.map((option) => (
-          <QuizOptionCard
-            key={String(option.value)}
-            label={option.label}
-            icon={option.icon}
-            isSelected={selectedValue === option.value}
-            onClick={() => onSelect(option.value)}
-          />
-        ))}
+      <span
+        className={`flex h-14 w-14 items-center justify-center rounded-full text-2xl transition-colors duration-300 ${
+          isSelected ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100'
+        }`}
+      >
+        <Icon size={24} />
+      </span>
+
+      <div>
+        <span className={`block text-sm font-bold ${isSelected ? 'text-emerald-950' : 'text-slate-700'}`}>
+          {label}
+        </span>
+        {description && (
+          <span className="mt-0.5 block text-[11px] font-medium text-slate-400">{description}</span>
+        )}
       </div>
-    </div>
+    </button>
   )
 }
 
-export default QuizQuestionCard
+export default QuizOptionCard

@@ -1,8 +1,18 @@
-import { FaBuilding, FaHouseChimney, FaTractor, FaCouch, FaPersonWalking, FaPersonRunning, FaHouseUser, FaClock, FaBriefcase, FaChildren, FaXmark, FaDog, FaCat, FaPaw, FaMoon, FaBone, FaShieldHalved } from 'react-icons/fa6'
+import {
+  FaBuilding, FaHouseChimney, FaTractor,
+  FaCouch, FaPersonWalking, FaPersonRunning,
+  FaHouseUser, FaBriefcase, FaBusinessTime,
+  FaChildren, FaXmark,
+  FaDog, FaCat, FaPaw,
+  FaMoon, FaBone, FaShieldHalved,
+  FaFeatherPointed,
+} from 'react-icons/fa6'
 
 export const quizQuestions = [
+  // ───────────── Seção 1: Seu Estilo de Vida & Ambiente ─────────────
   {
     key: 'moradia',
+    section: 'estiloDeVida',
     title: 'Onde você mora?',
     subtitle: 'Isso nos ajuda a indicar pets que se adaptam bem ao seu espaço.',
     options: [
@@ -13,6 +23,7 @@ export const quizQuestions = [
   },
   {
     key: 'rotinaExercicio',
+    section: 'estiloDeVida',
     title: 'Como é a sua rotina de exercícios?',
     subtitle: 'Pets também têm níveis de energia diferentes — vamos parear com o seu.',
     options: [
@@ -22,17 +33,19 @@ export const quizQuestions = [
     ],
   },
   {
-    key: 'tempoSozinho',
-    title: 'Quanto tempo o pet ficará sozinho?',
-    subtitle: 'Alguns animais lidam melhor com longos períodos sozinhos que outros.',
+    key: 'tempoForaCasa',
+    section: 'estiloDeVida',
+    title: 'Quanto tempo você passa fora de casa no seu dia a dia?',
+    subtitle: 'Isso nos ajuda a sugerir pets com o nível de independência adequado.',
     options: [
-      { value: 'QUASE_NUNCA', label: 'Quase nunca', icon: FaHouseUser },
-      { value: 'MEIO_PERIODO', label: 'Meio período', icon: FaClock },
-      { value: 'DIA_TODO', label: 'O dia todo', icon: FaBriefcase },
+      { value: 'POUCO_TEMPO', label: 'Pouco tempo', description: 'Até 4h / Home office', icon: FaHouseUser },
+      { value: 'PERIODO_NORMAL', label: 'Período normal', description: '4h a 8h / Trabalho presencial', icon: FaBriefcase },
+      { value: 'LONGO_PERIODO', label: 'Longo período', description: 'Mais de 8h / Rotina intensa', icon: FaBusinessTime },
     ],
   },
   {
     key: 'temCriancasOuPets',
+    section: 'estiloDeVida',
     title: 'Tem crianças ou outros pets em casa?',
     subtitle: 'Vamos priorizar animais com o temperamento certo para conviver bem.',
     options: [
@@ -40,9 +53,11 @@ export const quizQuestions = [
       { value: false, label: 'Não', icon: FaXmark },
     ],
   },
-  // 🆕 Pergunta 5
+
+  // ───────────── Seção 2: Suas Preferências para o Pet Ideal ─────────────
   {
     key: 'speciesPreference',
+    section: 'preferenciasPet',
     title: 'Qual espécie você procura?',
     subtitle: 'Isso filtra diretamente quais pets aparecem no seu AUmatch.',
     options: [
@@ -51,12 +66,9 @@ export const quizQuestions = [
       { value: 'BOTH', label: 'Ambos', icon: FaPaw },
     ],
   },
-
-  // 🆕 Pergunta 6 — ícones espelham os mesmos usados no temperamento
-  // do animal (FaMoon/FaBone/FaShieldHalved), reforçando a conexão
-  // visual entre "o que você procura" e "o que o pet é"
   {
     key: 'idealPetProfile',
+    section: 'preferenciasPet',
     title: 'Qual o seu perfil de pet ideal?',
     subtitle: 'Usamos isso para priorizar pets com o temperamento mais compatível.',
     options: [
@@ -64,5 +76,19 @@ export const quizQuestions = [
       { value: 'PLAYFUL_ACTIVE', label: 'Brincalhão e ativo', icon: FaBone },
       { value: 'PROTECTIVE_INDEPENDENT', label: 'Protetor e independente', icon: FaShieldHalved },
     ],
-  }
+  },
+  {
+    key: 'portePreferido',
+    section: 'preferenciasPet',
+    title: 'Qual porte você prefere?',
+    subtitle: 'Considere o espaço disponível e a facilidade de manejo no dia a dia.',
+    options: [
+      { value: 'PEQUENO', label: 'Pequeno', icon: FaFeatherPointed },
+      { value: 'MEDIO', label: 'Médio', icon: FaPaw },
+      { value: 'GRANDE', label: 'Grande', icon: FaDog },
+    ],
+  },
+  // 🆕 Pergunta de "Pelagem" removida — nenhum animal do modelo de dados
+  // possui esse atributo hoje, então o filtro não teria efeito prático
+  // nenhum sobre os resultados do AUmatch.
 ]
