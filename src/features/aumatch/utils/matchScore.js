@@ -47,10 +47,10 @@ const ROUTINE_TO_ENERGY_RULES = [
   ['MODERATE', ['ATIVO']],
 ]
 
-const ALONE_TIME_TO_INDEPENDENCE_RULES = [
-  ['LOW', ['QUASE_NUNCA']],
-  ['HIGH', ['DIA_TODO']],
-  ['MODERATE', ['MEIO_PERIODO']],
+const TIME_AWAY_TO_INDEPENDENCE_RULES = [
+  ['LOW', ['POUCO_TEMPO']],
+  ['HIGH', ['LONGO_PERIODO']],
+  ['MODERATE', ['PERIODO_NORMAL']],
 ]
 
 const IDEAL_PROFILE_RULES = [
@@ -108,7 +108,7 @@ export function computeMatchScore(user, pet) {
   score += scoreLevelProximity(desiredEnergy, petEnergy, 25)
 
   // Tempo sozinho × independência do pet — 20 pts
-  const desiredIndependence = resolveCanonical(user.tempoSozinho, ALONE_TIME_TO_INDEPENDENCE_RULES)
+  const desiredIndependence = resolveCanonical(user.tempoForaCasa, TIME_AWAY_TO_INDEPENDENCE_RULES)
   const petIndependence = resolveCanonical(pet.independenceLevel, LEVEL_RULES)
   score += scoreLevelProximity(desiredIndependence, petIndependence, 20)
 
