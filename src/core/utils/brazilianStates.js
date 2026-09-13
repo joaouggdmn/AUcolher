@@ -27,3 +27,21 @@ export const BRAZILIAN_STATES = [
   { value: 'SE', label: 'Sergipe' },
   { value: 'TO', label: 'Tocantins' },
 ]
+// Nominatim retorna o nome completo do estado (ex: "Santa Catarina"), não a
+// sigla — esta função converte de volta para o formato que o <select> de
+// Estado já usa em todo o app (ex: "SC")
+export function stateNameToUf(stateName) {
+  if (!stateName) return ''
+
+  const normalize = (text) =>
+    text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
+
+  const normalizedInput = normalize(stateName)
+
+  const match = BRAZILIAN_STATES.find((uf) => {
+    const normalizedLabel = normalize(uf.label)
+    return normalizedInput.includes(normalizedLabel) || normalizedLabel.includes(normalizedInput)
+  })
+
+  return match?.value ?? ''
+}
