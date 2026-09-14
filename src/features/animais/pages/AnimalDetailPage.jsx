@@ -9,7 +9,6 @@ import {
   FaHeart,
   FaShieldHalved,
   FaCircleCheck,
-  FaPaw,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { useAnimals } from "../../../core/context/AnimalContext";
@@ -70,7 +69,7 @@ function AnimalDetailsPage() {
     requests.some(
       (r) =>
         r.animalId === animal.id &&
-        r.adopter?.userId === user.id &&
+        r.adopter?.userId === user.id &&  
         r.status !== "REJECTED",
     );
 
