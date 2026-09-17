@@ -20,5 +20,14 @@ export function buildAdopterSnapshot(user, profileCompletion) {
     state: user.estado || '--',
     profileCompletion,
     lifestyleSummary: lifestyleParts.length > 0 ? lifestyleParts.join(' · ') : 'Perfil ainda incompleto',
+
+    // 🆕 Campos brutos — sem isso, computeMatchScore() na tela do doador
+    // nunca teria dado real para calcular, e caía nos "defaults generosos"
+    // do algoritmo (ver explicação acima), sempre inflando o percentual.
+    moradia: user.moradia,
+    rotinaExercicio: user.rotinaExercicio,
+    tempoForaCasa: user.tempoForaCasa,
+    temCriancasOuPets: user.temCriancasOuPets,
+    idealPetProfile: user.idealPetProfile,
   }
 }
