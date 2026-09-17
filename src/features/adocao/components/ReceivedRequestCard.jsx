@@ -1,9 +1,16 @@
 import { Link } from 'react-router-dom'
-import { FaLocationDot, FaCircleCheck, FaXmark } from 'react-icons/fa6'
+import { FaLocationDot, FaCircleCheck, FaXmark, FaUser } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
+import { computeMatchScore } from '../../aumatch/utils/matchScore'
 
 function ReceivedRequestCard({ request, onAccept, onReject, isProcessing }) {
   const { animal, adopter } = request
+
+  // Chamada em tempo de execução, na própria renderização — mesma função
+  // pura usada em sortPetsByMatchScore (AumatchPage). Sem estado extra,
+  // sem persistência, sem tocar no banco: o resultado é sempre
+  // recalculado a partir de animal + adopter contidos no pedido.
+  const matchScore = computeMatchScore(adopter, animal)
 
   return (
     <div className="flex flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-emerald-950/5">
@@ -11,11 +18,19 @@ function ReceivedRequestCard({ request, onAccept, onReject, isProcessing }) {
         to={`/animais/${animal.id}`}
         className="flex items-center gap-3 border-b border-slate-100 bg-emerald-50/60 px-5 py-3 transition-colors duration-300 hover:bg-emerald-50"
       >
-        <img src={animal.photoUrl} alt={animal.name} className="h-10 w-10 rounded-xl object-cover" />
-        <div className="min-w-0">
+        <img src={animal.photoUrl} alt={animal.name} className="h-10 w-10 shrink-0 rounded-xl object-cover" />
+        <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-600">Interesse em</p>
           <p className="truncate text-sm font-bold text-emerald-950">{animal.name}</p>
         </div>
+
+        <span
+          title="Compatibilidade calculada pelo AUmatch"
+          className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-800 px-3 py-1.5 text-xs font-extrabold text-white shadow-sm"
+        >
+          <LuSparkles size={12} className="text-amber-300" />
+          {matchScore}% Match
+        </span>
       </Link>
 
       <div className="flex flex-1 flex-col gap-4 p-5">
@@ -33,11 +48,15 @@ function ReceivedRequestCard({ request, onAccept, onReject, isProcessing }) {
             </p>
           </div>
 
+          {/* Completude de PERFIL do adotante — métrica diferente do match
+              acima. Ícone/cor propositalmente distintos para nunca mais
+              serem confundidos visualmente (essa troca foi a causa
+              original do bug). */}
           <span
             title="Completude do perfil do adotante"
-            className="flex shrink-0 items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700"
+            className="flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500"
           >
-            <LuSparkles size={11} />
+            <FaUser size={10} />
             {adopter.profileCompletion}%
           </span>
         </div>
