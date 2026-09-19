@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { FaUser, FaLocationDot, FaLocationCrosshairs, FaHeartCircleCheck, FaFloppyDisk, FaPaw, FaStar, FaHandHoldingHeart } from 'react-icons/fa6'
+import { Link } from 'react-router-dom'
+import { FaUser, FaLocationDot, FaLocationCrosshairs, FaHeartCircleCheck, FaFloppyDisk, FaPaw, FaStar, FaHandHoldingHeart, FaEye } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 import { useLocationCapture } from '../../../core/hooks/useLocationCapture'
@@ -114,9 +115,20 @@ function UserProfilePage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
-      <header className="mb-8">
-        <h1 className="font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">Minha conta</h1>
-        <p className="mt-1 text-slate-600">Mantenha seus dados atualizados para melhorar suas recomendações.</p>
+      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">Minha conta</h1>
+          <p className="mt-1 text-slate-600">Mantenha seus dados atualizados para melhorar suas recomendações.</p>
+        </div>
+        {user?.id != null && (
+          <Link
+            to={`/perfil/publico/${user.id}`}
+            className="flex shrink-0 items-center justify-center gap-2 self-start rounded-full border border-emerald-200 bg-white px-5 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50 sm:self-auto"
+          >
+            <FaEye size={14} />
+            Ver perfil público
+          </Link>
+        )}
       </header>
 
       <div className="mb-8">
