@@ -9,6 +9,7 @@ import {
   FaHeart,
   FaShieldHalved,
   FaCircleCheck,
+  FaArrowRight,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { useAnimals } from "../../../core/context/AnimalContext";
@@ -35,7 +36,7 @@ function AnimalDetailsPage() {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
-    location.state?.justCreated ? "Pet cadastrado com sucesso! 🎉" : null,
+    location.state?.justCreated ? "Pet cadastrado com sucesso!" : null,
   );
 
   const animal = animals.find((item) => String(item.id) === id);
@@ -61,6 +62,9 @@ function AnimalDetailsPage() {
 
   const isFemale = animal.sex === "F";
   const isNgo = animal.listingType === "NGO";
+  const ownerDisplayName = isNgo
+    ? (animal.organizationName ?? animal.ownerName)
+    : animal.ownerName;
   const isOwner = isAuthenticated && animal.ownerId === user?.id;
 
   // Evita pedidos duplicados enquanto testamos o fluxo com contas reais
@@ -134,11 +138,45 @@ function AnimalDetailsPage() {
             </span>
           </div>
 
-          {isNgo && (
-            <p className="flex items-center gap-1.5 text-sm font-semibold text-amber-600">
-              <FaShieldHalved size={13} />
-              Anunciado por {animal.organizationName}
-            </p>
+          {animal.ownerId != null && (
+            <Link
+              to={`/perfil/publico/${animal.ownerId}`}
+              className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-emerald-950/5"
+            >
+              <span
+                className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden bg-emerald-700 text-sm font-black text-white ${
+                  isNgo ? "rounded-xl" : "rounded-full"
+                }`}
+              >
+                {animal.ownerPhotoUrl ? (
+                  <img
+                    src={animal.ownerPhotoUrl}
+                    alt={ownerDisplayName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  ownerDisplayName?.charAt(0)?.toUpperCase()
+                )}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                  Anunciado por
+                </p>
+                <p className="flex items-center gap-1.5 truncate text-sm font-bold text-emerald-950">
+                  {ownerDisplayName}
+                  {isNgo && (
+                    <FaShieldHalved size={12} className="shrink-0 text-amber-500" />
+                  )}
+                </p>
+              </div>
+              <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-emerald-700">
+                Ver perfil
+                <FaArrowRight
+                  size={10}
+                  className="transition-transform duration-300 group-hover:translate-x-0.5"
+                />
+              </span>
+            </Link>
           )}
 
           <HealthBadges animal={animal} />
