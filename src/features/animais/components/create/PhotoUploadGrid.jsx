@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { FaCamera, FaXmark } from 'react-icons/fa6'
+import { compressImage } from '../../../../core/utils/compressImage'
 
 const MAX_PHOTOS = 4
 
@@ -12,11 +13,11 @@ function PhotoUploadGrid({ images, onChange }) {
 
     files.slice(0, remainingSlots).forEach((file) => {
       if (!file.type.startsWith('image/')) return
-      const reader = new FileReader()
-      // Atualização funcional: evita que arquivos lidos fora de ordem
-      // (FileReader é assíncrono) sobrescrevam uns aos outros
-      reader.onload = () => onChange((prev) => [...prev, reader.result])
-      reader.readAsDataURL(file)
+      // Atualização funcional: evita que imagens processadas fora de ordem
+      // (a compressão é assíncrona) sobrescrevam umas às outras
+      compressImage(file)
+        .then((dataUrl) => onChange((prev) => (prev.length < MAX_PHOTOS ? [...prev, dataUrl] : prev)))
+        .catch((error) => console.warn(error.message))
     })
 
     e.target.value = '' // permite re-selecionar o mesmo arquivo depois de removê-lo
