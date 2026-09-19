@@ -20,7 +20,13 @@ export function AnimalProvider({ children }) {
   // Persiste toda alteração — o localStorage funciona como "banco de
   // dados" mockado, compartilhado entre abas do mesmo navegador
   useEffect(() => {
-    localStorage.setItem(ANIMALS_STORAGE_KEY, JSON.stringify(animals))
+    // Sem o try/catch, estourar a cota do localStorage lança um erro acima
+    // do roteador e desmonta o app inteiro (tela branca)
+    try {
+      localStorage.setItem(ANIMALS_STORAGE_KEY, JSON.stringify(animals))
+    } catch (error) {
+      console.warn('Não foi possível salvar os animais no localStorage (armazenamento cheio?)', error)
+    }
   }, [animals])
 
   // Sincroniza em tempo real quando OUTRA aba cadastra um animal novo
