@@ -1,123 +1,134 @@
-import { useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { LuSparkles } from "react-icons/lu";
-import PetCardStack from "../components/PetCardStack";
-import SwipeActionButtons from "../components/SwipeActionButtons";
-import EmptyStackState from "../components/EmptyStackState";
-import MatchToast from "../components/MatchToast";
-import PetDetailModal from "../components/PetDetailModal";
-import { useAnimals } from "../../../core/context/AnimalContext";
-import { useAuth } from "../../../core/context/AuthContext";
-import { registerLike, registerPass } from "../services/aumatchService";
-import { sortPetsByMatchScore } from "../utils/matchScore";
-import OnboardingQuiz from "../../onboarding/components/OnboardingQuiz";
-import { hasCompletedLifestyleQuiz } from "../../onboarding/utils/quizStatus";
-import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
-
-import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContext";
-import { useProfileCompletion } from "../../../core/hooks/useProfileCompletion";
-import { buildAdopterSnapshot } from "../../adocao/utils/buildAdopterSnapshot";
+import { useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { LuSparkles } from 'react-icons/lu'
+import PetCardStack from '../components/PetCardStack'
+import SwipeActionButtons from '../components/SwipeActionButtons'
+import EmptyStackState from '../components/EmptyStackState'
+import MatchToast from '../components/MatchToast'
+import PetDetailModal from '../components/PetDetailModal'
+import { useAnimals } from '../../../core/context/AnimalContext'
+import { useAuth } from '../../../core/context/AuthContext'
+import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
+import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
+import { buildAdopterSnapshot } from '../../adocao/utils/buildAdopterSnapshot'
+import { registerPass } from '../services/aumatchService'
+import { sortPetsByMatchScore } from '../utils/matchScore'
+import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
+import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
+import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 
 function AumatchPage() {
-  const { animals: pets } = useAnimals();
-  const { user, isAuthenticated, updateProfile } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { animals: pets } = useAnimals()
+  const { user, isAuthenticated, updateProfile } = useAuth()
+  const { requests, createRequest } = useAdoptionRequests()
+  const { percentage: profileCompletion } = useProfileCompletion(user)
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const { requests, createRequest } = useAdoptionRequests();
-  const { percentage: profileCompletion } = useProfileCompletion(user);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [matchedPet, setMatchedPet] = useState(null);
-  const [detailsPet, setDetailsPet] = useState(null);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const stackRef = useRef(null);
+  // 🆕 Set de IDs "resolvidos" nesta sessão (curtidos ou passados), não um
+  // índice numérico. Isso é o que evita o bug do "pulo silencioso":
+  // eligiblePets pode encolher a qualquer momento (assim que um like vira
+  // pedido, o próprio pet curtido some da lista) — com um índice fixo,
+  // isso saltaria o próximo pet sem nunca mostrá-lo. Filtrar por
+  // identidade (Set.has) é imune a essa mudança de tamanho.
+  const [swipedIds, setSwipedIds] = useState(() => new Set())
+  const [matchedPet, setMatchedPet] = useState(null)
+  const [detailsPet, setDetailsPet] = useState(null)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const stackRef = useRef(null)
 
   // Só abre o quiz automaticamente para quem já está logado — para
   // visitantes anônimos não há perfil algum para salvar as respostas
-  const [isQuizOpen, setIsQuizOpen] = useState(
-    () => isAuthenticated && !hasCompletedLifestyleQuiz(user),
-  );
-  const [isPreparingMatches, setIsPreparingMatches] = useState(false);
+  const [isQuizOpen, setIsQuizOpen] = useState(() => isAuthenticated && !hasCompletedLifestyleQuiz(user))
+  const [isPreparingMatches, setIsPreparingMatches] = useState(false)
 
   const eligiblePets = useMemo(() => {
-    // 1. Mapeia os IDs dos pets que o usuário logado já solicitou
+    // 1. IDs de pets que o usuário logado já solicitou — um pedido
+    // recusado (REJECTED) libera o pet de volta no deck; qualquer outro
+    // status (PENDING, ACCEPTED, CONCLUDED) mantém o pet oculto
     const requestedAnimalIds = isAuthenticated
       ? requests
-          .filter(
-            (r) => r.adopter?.userId === user?.id && r.status !== "REJECTED",
-          )
+          .filter((r) => r.adopter?.userId === user?.id && r.status !== 'REJECTED')
           .map((r) => r.animalId)
-      : [];
+      : []
 
-    // 2. Filtra a lista base (remove os já solicitados e aplica filtro de espécie)
+    // 2. Filtro base: espécie preferida + já solicitados + já adotados.
+    // 🆕 O filtro de ADOTADO não depende de QUEM pediu — uma vez que o
+    // pet foi adotado por qualquer pessoa, ele nunca mais aparece no
+    // deck de ninguém.
     const baseFiltered = pets.filter((pet) => {
-      if (requestedAnimalIds.includes(pet.id)) return false; // Some da tela!
+      if (requestedAnimalIds.includes(pet.id)) return false
+      if (pet.status === 'ADOTADO') return false
 
-      if (user?.speciesPreference && user.speciesPreference !== "BOTH") {
-        return pet.species === user.speciesPreference;
+      if (user?.speciesPreference && user.speciesPreference !== 'BOTH') {
+        return pet.species === user.speciesPreference
       }
-      return true;
-    });
+      return true
+    })
 
-    if (!user) return baseFiltered;
+    if (!user) return baseFiltered
 
     // 3. Aplica o algoritmo de match e oculta os próprios animais do doador
-    return sortPetsByMatchScore(user, baseFiltered, user.id);
-  }, [pets, user, isAuthenticated, requests]);
-  // Importante: 'requests' adicionado como dependência para a tela atualizar na hora!
+    return sortPetsByMatchScore(user, baseFiltered, user.id)
+  }, [pets, user, isAuthenticated, requests])
 
-  const visiblePets = eligiblePets.slice(currentIndex);
-  const topPet = visiblePets[0];
+  // 🆕 Filtragem por ID — imune a eligiblePets mudar de tamanho no meio da sessão
+  const visiblePets = useMemo(
+    () => eligiblePets.filter((pet) => !swipedIds.has(pet.id)),
+    [eligiblePets, swipedIds]
+  )
+
+  const topPet = visiblePets[0]
 
   const handleQuizComplete = (answers) => {
-    updateProfile(answers);
-    setIsQuizOpen(false);
-    setIsPreparingMatches(true);
-    setTimeout(() => setIsPreparingMatches(false), 900);
-  };
+    updateProfile(answers)
+    setIsQuizOpen(false)
+    setIsPreparingMatches(true)
+    setTimeout(() => setIsPreparingMatches(false), 900)
+  }
+
+  const markAsSwiped = (petId) => {
+    setSwipedIds((prev) => {
+      const next = new Set(prev)
+      next.add(petId)
+      return next
+    })
+  }
 
   const handleSwipeLeft = () => {
-    const passedPet = topPet;
-    setCurrentIndex((i) => i + 1);
-    registerPass(passedPet.id).catch((err) =>
-      console.error("Falha ao registrar pass:", err),
-    );
-  };
+    const passedPet = topPet
+    markAsSwiped(passedPet.id)
+    registerPass(passedPet.id).catch((err) => console.error('Falha ao registrar pass:', err))
+  }
 
   const handleSwipeRight = () => {
-    const likedPet = topPet;
-    setCurrentIndex((i) => i + 1);
+    const likedPet = topPet
+    markAsSwiped(likedPet.id)
 
-    setMatchedPet(likedPet);
-    setTimeout(() => setMatchedPet(null), 1800);
+    setMatchedPet(likedPet)
+    setTimeout(() => setMatchedPet(null), 1800)
 
-    // A mágica acontece aqui: conecta o swipe ao sistema de adoção
     createRequest({
       animalId: likedPet.id,
       ownerId: likedPet.ownerId,
       adopter: buildAdopterSnapshot(user, profileCompletion),
-    });
+    })
+  }
 
-    // Se você ainda tiver o registerLike pro backend registrar métricas, pode deixar:
-    // registerLike(likedPet.id).catch(err => console.error(err))
-  };
-
-  const handleReset = () => setCurrentIndex(0);
+  const handleReset = () => setSwipedIds(new Set())
 
   const handleGoToLogin = () => {
-    setIsAuthModalOpen(false);
-    navigate("/login", { state: { from: location } });
-  };
+    setIsAuthModalOpen(false)
+    navigate('/login', { state: { from: location } })
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-emerald-950 px-4 pb-16 pt-24 sm:pt-28">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, white 1.5px, transparent 1.5px)",
-          backgroundSize: "28px 28px",
+          backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)',
+          backgroundSize: '28px 28px',
         }}
       />
       <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
@@ -139,9 +150,7 @@ function AumatchPage() {
             <span className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-amber-400/20 text-amber-300">
               <LuSparkles size={24} />
             </span>
-            <p className="text-sm font-semibold text-emerald-100">
-              Calculando seus melhores matches...
-            </p>
+            <p className="text-sm font-semibold text-emerald-100">Calculando seus melhores matches...</p>
           </div>
         ) : topPet ? (
           <PetCardStack
@@ -162,22 +171,16 @@ function AumatchPage() {
           onPass={() => stackRef.current?.triggerPass()}
           onLike={() => stackRef.current?.triggerLike()}
           onInfo={() => topPet && setDetailsPet(topPet)}
-          isTopOng={topPet?.listingType === "NGO"}
+          isTopOng={topPet?.listingType === 'NGO'}
           disabled={!topPet || isPreparingMatches}
         />
       </div>
 
       <MatchToast pet={matchedPet} />
 
-      {detailsPet && (
-        <PetDetailModal pet={detailsPet} onClose={() => setDetailsPet(null)} />
-      )}
+      {detailsPet && <PetDetailModal pet={detailsPet} onClose={() => setDetailsPet(null)} />}
 
-      <OnboardingQuiz
-        isOpen={isQuizOpen}
-        onClose={() => setIsQuizOpen(false)}
-        onComplete={handleQuizComplete}
-      />
+      <OnboardingQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} onComplete={handleQuizComplete} />
 
       {isAuthModalOpen && (
         <AuthRequiredModal
@@ -187,7 +190,7 @@ function AumatchPage() {
         />
       )}
     </div>
-  );
+  )
 }
 
-export default AumatchPage;
+export default AumatchPage
