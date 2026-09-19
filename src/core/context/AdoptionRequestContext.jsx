@@ -1,8 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { adoptionRequestsSeed } from "../../features/adocao/data/adoptionRequestsSeed";
 import { ADOPTION_REQUESTS_STORAGE_KEY } from "../utils/storageKeys";
+import { useAnimals } from "./AnimalContext";
 
 const AdoptionRequestContext = createContext(null);
+
+// Cada pedido CONCLUDED guarda no máximo 1 avaliação por lado, indexada
+// pelo papel de quem escreveu: reviews.adopter avalia o doador,
+// reviews.owner avalia o adotante
+const REVIEW_AUTHOR_ROLES = ["adopter", "owner"];
 
 function loadInitialRequests() {
   try {
@@ -16,6 +22,7 @@ function loadInitialRequests() {
 
 export function AdoptionRequestProvider({ children }) {
   const [requests, setRequests] = useState(loadInitialRequests);
+  const { markAnimalAsAdopted } = useAnimals();
 
   // Persiste toda alteração — o localStorage funciona como um "banco de
   // dados" mockado, compartilhado entre abas do mesmo navegador
@@ -86,15 +93,16 @@ export function AdoptionRequestProvider({ children }) {
     );
   }
 
-  function concludeRequest(requestId, animalId) {
-    setRequests((prev) => {
-      const target = prev.find((r) => r.id === requestId);
-      // Guarda defensiva: só conclui pedidos que já passaram pelo passo 1
-      // do handshake (AWAITING_DELIVERY) — protege contra duplo-clique ou
-      // qualquer chamada fora de ordem corromper o estado
-      if (!target || target.status !== "AWAITING_DELIVERY") return prev;
+  // Passo 2 do handshake: o adotante confirma o recebimento. Concluir,
+  // cancelar os pedidos concorrentes e tirar o animal das buscas públicas
+  // acontecem sempre juntos aqui, para nenhum chamador esquecer um deles.
+  // Retorna false se o pedido não estava em AWAITING_DELIVERY
+  function concludeRequest(requestId) {
+    const target = requests.find((r) => r.id === requestId);
+    if (!target || target.status !== "AWAITING_DELIVERY") return false;
 
-      return prev.map((request) => {
+    setRequests((prev) =>
+      prev.map((request) => {
         if (request.id === requestId) {
           return { ...request, status: "CONCLUDED" };
         }
@@ -102,15 +110,57 @@ export function AdoptionRequestProvider({ children }) {
         // ainda não tinha sido recusado vira CANCELLED — o animal não
         // está mais disponível, então esse pedido nunca mais avança
         if (
-          request.animalId === animalId &&
-          request.id !== requestId &&
+          request.animalId === target.animalId &&
           request.status !== "REJECTED"
         ) {
           return { ...request, status: "CANCELLED" };
         }
         return request;
-      });
-    });
+      }),
+    );
+    markAnimalAsAdopted(target.animalId);
+    return true;
+  }
+
+  function saveReview(requestId, authorRole, { rating, comment, author }) {
+    if (!REVIEW_AUTHOR_ROLES.includes(authorRole)) return;
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) return;
+
+    const now = new Date().toISOString();
+    setRequests((prev) =>
+      prev.map((request) => {
+        if (request.id !== requestId || request.status !== "CONCLUDED") {
+          return request;
+        }
+        const previous = request.reviews?.[authorRole];
+        return {
+          ...request,
+          reviews: {
+            ...request.reviews,
+            [authorRole]: {
+              rating,
+              comment: comment?.trim() ?? "",
+              authorId: author.id,
+              authorName: author.name,
+              authorPhotoUrl: author.photoUrl ?? null,
+              authorIsOng: author.isOng,
+              createdAt: previous?.createdAt ?? now,
+              updatedAt: previous ? now : null,
+            },
+          },
+        };
+      }),
+    );
+  }
+
+  function deleteReview(requestId, authorRole) {
+    setRequests((prev) =>
+      prev.map((request) =>
+        request.id === requestId && request.reviews?.[authorRole]
+          ? { ...request, reviews: { ...request.reviews, [authorRole]: null } }
+          : request,
+      ),
+    );
   }
 
   return (
@@ -122,6 +172,8 @@ export function AdoptionRequestProvider({ children }) {
         rejectRequest,
         requestDeliveryConfirmation,
         concludeRequest,
+        saveReview,
+        deleteReview,
       }}
     >
       {children}
