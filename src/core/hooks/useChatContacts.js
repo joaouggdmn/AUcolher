@@ -1,52 +1,64 @@
-import { useMemo } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { useAnimals } from '../context/AnimalContext'
-import { useAdoptionRequests } from '../context/AdoptionRequestContext'
+import { useMemo } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useAnimals } from "../context/AnimalContext";
+import { useAdoptionRequests } from "../context/AdoptionRequestContext";
 
-// Deriva a lista de "contatos liberados" a partir dos pedidos ACCEPTED.
-// Não existe uma tabela de usuários no mock — por isso os dados do doador
-// vêm do próprio animal (ownerName/ownerPhotoUrl, capturados no cadastro),
-// e os dados do adotante vêm do snapshot salvo no próprio pedido.
 export function useChatContacts() {
-  const { user } = useAuth()
-  const { animals } = useAnimals()
-  const { requests } = useAdoptionRequests()
+  const { user } = useAuth();
+  const { animals } = useAnimals();
+  const { requests } = useAdoptionRequests();
 
   const contacts = useMemo(() => {
-    if (!user) return []
+    if (!user) return [];
 
-    return requests
-      .filter((request) => request.status === 'ACCEPTED')
-      .map((request) => {
-        const animal = animals.find((a) => a.id === request.animalId)
-        const isOwner = request.ownerId === user.id
-        const isAdopter = request.adopter?.userId === user.id
+    return (
+      requests
+        // 🆕 AWAITING_DELIVERY e CONCLUDED também aparecem — a conversa (e
+        // as mensagens de sistema do handshake) continua visível depois da
+        // confirmação do doador, só travada para novas mensagens
+        .filter(
+          (request) =>
+            request.status === "ACCEPTED" ||
+            request.status === "AWAITING_DELIVERY" ||
+            request.status === "CONCLUDED",
+        )
+        .map((request) => {
+          const animal = animals.find((a) => a.id === request.animalId);
+          const isOwner = request.ownerId === user.id;
+          const isAdopter =
+            request.adopterId === user.id ||
+            request.adopter?.userId === user.id;
 
-        if (!isOwner && !isAdopter) return null // pedido não envolve o usuário atual
+          if (!isOwner && !isAdopter) return null;
 
-        if (isOwner) {
-          // Eu sou o doador — o contato é quem demonstrou interesse
-          return {
+          const base = {
             id: `request-${request.id}`,
             requestId: request.id,
-            name: request.adopter.name,
-            photoUrl: request.adopter.photoUrl,
-            animalName: animal?.name ?? 'Animal',
+            animalId: request.animalId, // 🆕 necessário para concludeAdoption
+            animalName: animal?.name ?? "Animal",
+            status: request.status, // 🆕 controla o estado travado do header
+            isOwnerView: isOwner, // 🆕 só o doador vê o botão "Confirmar Entrega"
+            reviews: request.reviews ?? {},
+          };
+
+          if (isOwner) {
+            return {
+              ...base,
+              name: request.adopter.name,
+              photoUrl: request.adopter.photoUrl,
+            };
           }
-        }
 
-        // Eu sou o adotante — o contato é o doador do animal
-        return {
-          id: `request-${request.id}`,
-          requestId: request.id,
-          name: animal?.ownerName ?? animal?.organizationName ?? 'Doador(a)',
-          photoUrl: animal?.ownerPhotoUrl ?? null,
-          animalName: animal?.name ?? 'Animal',
-        }
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.requestId - a.requestId) // mais recentes primeiro
-  }, [user, animals, requests])
+          return {
+            ...base,
+            name: animal?.ownerName ?? animal?.organizationName ?? "Doador(a)",
+            photoUrl: animal?.ownerPhotoUrl ?? null,
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.requestId - a.requestId)
+    );
+  }, [user, animals, requests]);
 
-  return { contacts }
+  return { contacts };
 }
