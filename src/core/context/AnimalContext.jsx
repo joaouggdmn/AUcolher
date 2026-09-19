@@ -48,7 +48,13 @@ export function AnimalProvider({ children }) {
     return newAnimal
   }
 
-  return <AnimalContext.Provider value={{ animals, addAnimal }}>{children}</AnimalContext.Provider>
+  function markAnimalAsAdopted(animalId) {
+  setAnimals((prev) =>
+    prev.map((animal) => (animal.id === animalId ? { ...animal, status: 'ADOTADO' } : animal))
+  )
+}
+
+  return <AnimalContext.Provider value={{ animals, addAnimal, markAnimalAsAdopted }}>{children}</AnimalContext.Provider>
 }
 
 export function useAnimals() {
