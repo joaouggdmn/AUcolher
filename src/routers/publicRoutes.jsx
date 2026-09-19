@@ -6,6 +6,7 @@ import AnimalDetailPage from '../features/animais/pages/AnimalDetailPage'
 import EventsListPage from '../features/eventos/pages/EventsListPage'
 import CampaingsListPage from '../features/doacoes/pages/CampaignsListPage'
 import AumatchPage from '../features/aumatch/pages/AumatchPage'
+import PublicProfilePage from '../features/perfil/pages/PublicProfilePage'
 
 export const publicRoutes = [
   {
@@ -49,11 +50,11 @@ export const publicRoutes = [
       },
       {
         path: 'ong/:id',
-        element: <PlaceholderPage title="Perfil da ONG" />,
+        element: <PublicProfilePage />,
       },
       {
         path: 'perfil/publico/:id',
-        element: <PlaceholderPage title="Perfil publico" />,
+        element: <PublicProfilePage />,
       },
     ],
   },
