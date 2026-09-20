@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
 import PetRegister from '../../../assets/hero-pet.png'
 
-function AuthForm({ heading, subheading, children }) {
+// wide: formulários longos (cadastro de ONG) ganham mais largura útil
+function AuthForm({ heading, subheading, wide = false, children }) {
   return (
     <div className="flex min-h-screen w-full bg-white">
 
-      {/* ═══ Lado visual — 50%, só aparece no desktop (lg+) ═══ */}
-      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 lg:flex lg:w-1/2 lg:flex-col lg:justify-between lg:p-12 xl:p-16">
+      {/* ═══ Lado visual — 50%, só aparece no desktop (lg+) ═══
+          Sticky: fica parado enquanto formulários longos rolam ao lado */}
+      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 lg:sticky lg:top-0 lg:flex lg:h-screen lg:min-h-fit lg:w-1/2 lg:flex-col lg:justify-between lg:self-start lg:p-12 xl:p-16">
 
         {/* Padrão geométrico sutil: dot grid */}
         <div
@@ -55,8 +57,12 @@ function AuthForm({ heading, subheading, children }) {
       {/* ═══ Lado do formulário — 50% desktop, 100% mobile ═══
           Padding generoso e crescente (px-6 → xl:px-24) garante respiro
           real ao redor do card, mesmo em monitores bem largos */}
-      <main className="flex w-full flex-1 items-center justify-center bg-stone-50 px-6 py-10 sm:px-10 lg:w-1/2 lg:bg-white lg:px-12 lg:py-16 xl:px-24">
-        <div className="w-full max-w-md">
+      <main
+        className={`flex w-full flex-1 items-center justify-center bg-stone-50 px-6 py-10 sm:px-10 lg:w-1/2 lg:bg-white lg:px-12 lg:py-16 ${
+          wide ? 'xl:px-16' : 'xl:px-24'
+        }`}
+      >
+        <div className={`w-full transition-[max-width] duration-300 ${wide ? 'max-w-xl' : 'max-w-md'}`}>
           {/* Logo — só aparece no mobile, já que o lado visual está escondido */}
           <Link
             to="/"
