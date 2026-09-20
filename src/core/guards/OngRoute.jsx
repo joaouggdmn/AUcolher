@@ -14,8 +14,8 @@ function OngRoute() {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  // user.role vem do seu backend (ex: "ONG", "USER", "ADMIN")
-  if (user?.role !== 'ONG') {
+  // userType vem de usuario.tipoUsuario no payload do login (PESSOA | ONG | ADMIN)
+  if (user?.userType !== 'ONG') {
     return <Navigate to="/" replace />
   }
 
