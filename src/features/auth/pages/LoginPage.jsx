@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FaEnvelope, FaLock, FaCircleCheck } from 'react-icons/fa6'
 import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
-import UserTypeSelector from '../components/UserTypeSelector' // 🆕 reaproveitado do cadastro
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 
@@ -12,17 +11,14 @@ function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // 🆕 userType decide se o POST vai para /login/user ou /login/ong
-  const [formData, setFormData] = useState({ userType: 'PESSOA', email: '', password: '' })
+  // Só e-mail e senha: o papel (PESSOA/ONG) vem do payload da API após autenticar.
+  // Vindo do cadastro, o e-mail recém-criado já chega preenchido
+  const [formData, setFormData] = useState({ email: location.state?.email ?? '', password: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
-
-  const handleUserTypeChange = (userType) => {
-    setFormData((prev) => ({ ...prev, userType }))
   }
 
   const handleSubmit = async (e) => {
@@ -66,12 +62,6 @@ function LoginPage() {
       )}
 
       <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-5">
-        {/* 🆕 Seletor de tipo — define qual rota de login será chamada */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-slate-700">Entrar como</label>
-          <UserTypeSelector value={formData.userType} onChange={handleUserTypeChange} />
-        </div>
-
         <AuthInput
           id="email"
           name="email"
@@ -81,6 +71,7 @@ function LoginPage() {
           placeholder="seuemail@exemplo.com"
           value={formData.email}
           onChange={handleChange}
+          autoComplete="email"
           required
         />
 
@@ -93,6 +84,7 @@ function LoginPage() {
           placeholder="••••••••"
           value={formData.password}
           onChange={handleChange}
+          autoComplete="current-password"
           required
         />
 
