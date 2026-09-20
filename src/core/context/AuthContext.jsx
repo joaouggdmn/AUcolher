@@ -33,9 +33,9 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
-  // 🆕 Agora exige userType, para escolher /login/user ou /login/ong
-  async function login({ email, password, userType }) {
-    const { token, tokenType, user: loggedUser } = await loginRequest({ email, password, userType })
+  // Só e-mail e senha — o papel (userType) vem do payload da API
+  async function login({ email, password }) {
+    const { token, tokenType, user: loggedUser } = await loginRequest({ email, password })
 
     // 🆕 Sem isso, cada novo login apagava silenciosamente as respostas do
     // quiz que o usuário já tinha dado — o backend não devolve esses
