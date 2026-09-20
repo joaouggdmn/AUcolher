@@ -17,11 +17,15 @@ function buildLocalProfile(profileId, { user, animals, requests }) {
       userType: user.userType === 'ONG' ? 'ONG' : 'PESSOA',
       name: user.name,
       photoUrl: user.photoUrl ?? null,
-      city: user.cidade,
-      state: user.estado,
+      city: user.cidade || user.address?.city,
+      state: user.estado || user.address?.state,
       bio: user.bio ?? '',
-      // ONG só consegue logar e anunciar depois de aprovada pelo admin
-      isVerified: user.userType === 'ONG',
+      // ONG: redes sociais e endereço vêm do backend (toFrontendUser)
+      socialLinks: user.socialLinks,
+      address: user.address,
+      // Selo real do backend (is_verificado) — sem a etapa de aprovação do
+      // admin, ONG recém-cadastrada ainda não é verificada
+      isVerified: Boolean(user.isVerified),
     }
   }
 
