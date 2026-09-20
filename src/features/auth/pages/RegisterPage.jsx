@@ -1,57 +1,99 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FaUser, FaEnvelope, FaLock, FaBuilding, FaIdCard } from 'react-icons/fa6'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa6'
 import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
 import UserTypeSelector from '../components/UserTypeSelector'
+import OngRegisterFields from '../components/OngRegisterFields'
 import AvatarUploadInput from '../../../core/components/ui/AvatarUploadInput'
-import { maskCNPJ } from '../../../core/utils/masks'
+import { isValidCNPJ } from '../../../core/utils/cnpj'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
+
+const INITIAL_ONG_FIELDS = {
+  cnpj: '',
+  cep: '',
+  street: '',
+  number: '',
+  complement: '',
+  district: '',
+  city: '',
+  uf: '',
+  instagram: '',
+  twitter: '',
+  facebook: '',
+  bio: '',
+}
 
 const INITIAL_FORM = {
   userType: 'PESSOA',
   photoUrl: null,
   name: '',
-  cnpj: '',
   email: '',
   password: '',
+  ...INITIAL_ONG_FIELDS,
+}
+
+const HERO_COPY = {
+  PESSOA: {
+    heading: 'Seu novo melhor amigo está a um match de distância.',
+    subheading: 'Crie sua conta e comece a receber recomendações feitas sob medida para o seu estilo de vida.',
+  },
+  ONG: {
+    heading: 'Mais visibilidade para quem espera por um lar.',
+    subheading: 'Cadastre sua ONG e divulgue animais, eventos e campanhas para quem está pronto para adotar.',
+  },
 }
 
 function RegisterPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { register } = useAuth()
 
-  const [formData, setFormData] = useState(INITIAL_FORM)
+  // CTAs "Sou ONG" da home e o link /cadastro-ong já abrem na aba certa
+  const [formData, setFormData] = useState(() => ({
+    ...INITIAL_FORM,
+    userType: location.state?.preselectUserType === 'ONG' ? 'ONG' : 'PESSOA',
+  }))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
 
   const isOng = formData.userType === 'ONG'
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleFieldsChange = (patch) => {
+    setFormData((prev) => ({ ...prev, ...patch }))
   }
 
-  const handleCnpjChange = (e) => {
-    setFormData((prev) => ({ ...prev, cnpj: maskCNPJ(e.target.value) }))
+  const handleChange = (e) => {
+    handleFieldsChange({ [e.target.name]: e.target.value })
   }
 
   const handlePhotoChange = (dataUrl) => {
-    setFormData((prev) => ({ ...prev, photoUrl: dataUrl }))
+    handleFieldsChange({ photoUrl: dataUrl })
   }
 
   const handleUserTypeChange = (userType) => {
-    setFormData((prev) => ({ ...prev, userType, name: '', cnpj: '' }))
+    if (userType === formData.userType) return
+    setError(null)
+    setFormData((prev) => ({ ...prev, ...INITIAL_ONG_FIELDS, userType, name: '' }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
     setError(null)
+
+    if (isOng && !isValidCNPJ(formData.cnpj)) {
+      setError('Informe um CNPJ válido para continuar.')
+      return
+    }
+
+    setIsSubmitting(true)
 
     try {
       await register(formData)
-      navigate('/login', { state: { registered: true } })
+      // Fluxo temporário: sem etapa PENDENTE de aprovação pelo admin — a ONG
+      // já nasce ativa e segue para o login como qualquer outra conta
+      navigate('/login', { state: { registered: true, email: formData.email } })
     } catch (err) {
       setError(getErrorMessage(err, 'Não foi possível concluir o cadastro. Tente novamente.'))
     } finally {
@@ -60,10 +102,7 @@ function RegisterPage() {
   }
 
   return (
-    <AuthForm
-      heading="Seu novo melhor amigo está a um match de distância."
-      subheading="Crie sua conta e comece a receber recomendações feitas sob medida para o seu estilo de vida."
-    >
+    <AuthForm {...HERO_COPY[formData.userType]} wide={isOng}>
       <div className="flex flex-col gap-2">
         <h2 className="font-serif text-2xl font-black text-emerald-950 sm:text-3xl">Crie sua conta</h2>
         <p className="text-sm text-slate-500">
@@ -89,47 +128,11 @@ function RegisterPage() {
           <UserTypeSelector value={formData.userType} onChange={handleUserTypeChange} />
         </div>
 
-        <div key={formData.userType} className="flex flex-col gap-5 animate-fade-slide-in">
+        <div key={formData.userType} className="mt-2 animate-fade-slide-in">
           {isOng ? (
-            <>
-              <AuthInput
-                id="name"
-                name="name"
-                label="Nome da instituição / ONG"
-                type="text"
-                icon={FaBuilding}
-                placeholder="Ex: Abrigo Amigo Fiel"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-              <AuthInput
-                id="cnpj"
-                name="cnpj"
-                label="CNPJ"
-                type="text"
-                icon={FaIdCard}
-                placeholder="00.000.000/0000-00"
-                value={formData.cnpj}
-                onChange={handleCnpjChange}
-                inputMode="numeric"
-                maxLength={18}
-                required
-              />
-              <AuthInput
-                id="email"
-                name="email"
-                label="E-mail institucional"
-                type="email"
-                icon={FaEnvelope}
-                placeholder="contato@suaong.org"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </>
+            <OngRegisterFields values={formData} onFieldsChange={handleFieldsChange} />
           ) : (
-            <>
+            <div className="flex flex-col gap-5">
               <AuthInput
                 id="name"
                 name="name"
@@ -139,6 +142,7 @@ function RegisterPage() {
                 placeholder="Como podemos te chamar?"
                 value={formData.name}
                 onChange={handleChange}
+                autoComplete="name"
                 required
               />
               <AuthInput
@@ -150,22 +154,24 @@ function RegisterPage() {
                 placeholder="seuemail@exemplo.com"
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="email"
                 required
               />
-            </>
+              <AuthInput
+                id="password"
+                name="password"
+                label="Senha"
+                type="password"
+                icon={FaLock}
+                placeholder="Mínimo 6 caracteres"
+                value={formData.password}
+                onChange={handleChange}
+                autoComplete="new-password"
+                minLength={6}
+                required
+              />
+            </div>
           )}
-
-          <AuthInput
-            id="password"
-            name="password"
-            label="Senha"
-            type="password"
-            icon={FaLock}
-            placeholder="Mínimo 6 caracteres"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
         </div>
 
         {error && (
@@ -180,7 +186,7 @@ function RegisterPage() {
           {isSubmitting && (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
           )}
-          {isSubmitting ? 'Criando conta...' : 'Criar conta'}
+          {isSubmitting ? 'Criando conta...' : isOng ? 'Cadastrar ONG' : 'Criar conta'}
         </button>
 
         <p className="text-center text-xs text-slate-400">
