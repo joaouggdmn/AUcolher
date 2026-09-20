@@ -1,3 +1,4 @@
+import { Navigate } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import LoginPage from '../features/auth/pages/LoginPage'
@@ -24,8 +25,9 @@ export const authRoutes = [
             element: <PlaceholderPage title="Recuperar senha" />,
           },
           {
+            // Link do rodapé: o cadastro de ONG é a aba ONG do /cadastro
             path: 'cadastro-ong',
-            element: <PlaceholderPage title="Cadastro de ONG" />,
+            element: <Navigate to="/cadastro" state={{ preselectUserType: 'ONG' }} replace />,
           },
         ],
       },
