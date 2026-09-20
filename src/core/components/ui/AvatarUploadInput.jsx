@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { FaCamera, FaUser } from 'react-icons/fa6'
+import { compressImage } from '../../utils/compressImage'
 
 const SIZE_CLASSES = { md: 'h-20 w-20', lg: 'h-28 w-28' }
 
@@ -10,12 +11,13 @@ function AvatarUploadInput({ value, onChange, fallbackInitial, size = 'lg' }) {
     const file = e.target.files?.[0]
     if (!file || !file.type.startsWith('image/')) return
 
-    // 🔴 Mock: converte para base64 e mantém em memória/localStorage.
-    // Em produção, isso faria upload para object storage (S3, Cloudinary etc.)
-    // e o backend retornaria uma URL pública para salvar no perfil.
-    const reader = new FileReader()
-    reader.onload = () => onChange(reader.result)
-    reader.readAsDataURL(file)
+    // 🔴 Vai como data URL no fotoUrl do cadastro (coluna foto_url) e volta
+    // em toda resposta de login — por isso reduzido a um avatar leve
+    // (~400px, dezenas de KB). Com upload próprio (S3, Cloudinary etc.), o
+    // backend passaria a guardar só a URL pública
+    compressImage(file, { maxSize: 400, quality: 0.8 })
+      .then(onChange)
+      .catch(() => {}) // arquivo que o navegador não consegue decodificar: ignora
   }
 
   return (
