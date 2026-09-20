@@ -7,7 +7,9 @@ export function getErrorMessage(error, fallback = 'Algo deu errado. Tente novame
   const { status, data } = error.response
 
   // Prioriza a mensagem que o próprio backend enviar, se houver
+  // (o ErroResponseDTO do Spring Boot usa o campo `mensagem`)
   if (data?.message) return data.message
+  if (data?.mensagem) return data.mensagem
   if (typeof data === 'string' && data.trim() !== '') return data
 
   switch (status) {
