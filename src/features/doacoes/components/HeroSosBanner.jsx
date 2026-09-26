@@ -19,7 +19,7 @@ function HeroSosBanner({ campaign, onDonate }) {
           CAMPANHA SOS · URGENTE
         </span>
 
-        <h2 className="font-serif text-2xl font-black leading-tight text-white sm:text-3xl lg:text-4xl">
+        <h2 className="text-2xl font-black tracking-tight leading-tight text-white sm:text-3xl lg:text-4xl">
           {campaign.title}
         </h2>
 

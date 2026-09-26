@@ -31,7 +31,7 @@ function ConfirmAdoptionModal({ mode = 'request-delivery', animalName, onConfirm
           </span>
 
           <div>
-            <h3 className="font-serif text-lg font-bold text-emerald-950">{content.title}</h3>
+            <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{content.title}</h3>
             <p className="mt-1.5 text-sm text-slate-500">{content.getDescription(animalName)}</p>
           </div>
 

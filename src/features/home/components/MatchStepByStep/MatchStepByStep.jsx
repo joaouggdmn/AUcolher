@@ -12,7 +12,7 @@ function MatchStepByStep() {
             <LuSparkles size={16} />
             Como funciona
           </span>
-          <h2 className="mt-5 font-serif text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl lg:text-4xl">
+          <h2 className="mt-5 text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl lg:text-4xl">
             Três passos até o seu match perfeito
           </h2>
           <p className="mt-4 text-base text-slate-600 sm:text-lg">

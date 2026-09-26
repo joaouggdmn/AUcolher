@@ -37,7 +37,7 @@ function LifestyleForm({ values, onChange }) {
                 <SectionIcon size={15} />
               </span>
               <div>
-                <h3 className="font-serif text-base font-bold text-emerald-950">{section.title}</h3>
+                <h3 className="text-base font-extrabold tracking-tight text-emerald-950">{section.title}</h3>
                 <p className="text-xs text-slate-500">{section.description}</p>
               </div>
             </div>

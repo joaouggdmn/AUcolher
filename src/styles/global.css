@@ -1,11 +1,13 @@
 /* src/styles/globals.css */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 @import "tailwindcss";
 
+/* Fonte única na plataforma inteira: o contraste entre logo, títulos e corpo
+   vem só do peso (font-normal → font-black) e do tracking, nunca de uma
+   segunda família tipográfica */
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
-  --font-serif: 'Fraunces', serif;
 }
 
 /* Customizações globais */

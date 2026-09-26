@@ -92,38 +92,138 @@ function scoreLevelProximity(levelA, levelB, fullPoints) {
   return 0
 }
 
-export function computeMatchScore(user, pet) {
-  if (!user || !pet) return 0
+// Rótulos usados só nas explicações do "Por que deu match?" — o cálculo
+// em si continua trabalhando com os enums canônicos
+const ENERGY_WORDS = { LOW: 'baixa', MODERATE: 'moderada', HIGH: 'alta' }
+const INDEPENDENCE_WORDS = { LOW: 'baixa', MODERATE: 'média', HIGH: 'alta' }
+const IDEAL_PROFILE_WORDS = {
+  CALM_COMPANION: 'companheiro e calmo',
+  PLAYFUL_ACTIVE: 'brincalhão e ativo',
+  PROTECTIVE_INDEPENDENT: 'protetor e independente',
+}
 
-  let score = 0
+// ─────────────────────────────────────────────────────────────
+// Fonte única dos critérios: computeMatchScore soma os pontos e
+// explainMatchScore mostra o porquê. Qualquer ajuste de peso ou de regra
+// acontece aqui uma vez só — os dois lados nunca saem de sincronia.
+// ─────────────────────────────────────────────────────────────
+export function buildMatchCriteria(user, pet) {
+  if (!user || !pet) return []
 
   // Moradia × ambiente do pet — 20 pts
   const housing = resolveCanonical(user.moradia, HOUSING_RULES)
   const petApartmentFriendly = resolveBoolean(pet.apartmentFriendly)
-  score += housing === 'APARTMENT' ? (petApartmentFriendly ? 20 : 0) : 20
+  const housingPoints = housing === 'APARTMENT' ? (petApartmentFriendly ? 20 : 0) : 20
 
   // Rotina de exercício × energia do pet — 25 pts
   const desiredEnergy = resolveCanonical(user.rotinaExercicio, ROUTINE_TO_ENERGY_RULES)
   const petEnergy = resolveCanonical(pet.energyLevel, LEVEL_RULES)
-  score += scoreLevelProximity(desiredEnergy, petEnergy, 25)
 
   // Tempo sozinho × independência do pet — 20 pts
   const desiredIndependence = resolveCanonical(user.tempoForaCasa, TIME_AWAY_TO_INDEPENDENCE_RULES)
   const petIndependence = resolveCanonical(pet.independenceLevel, LEVEL_RULES)
-  score += scoreLevelProximity(desiredIndependence, petIndependence, 20)
 
   // Crianças/outros pets em casa × sociabilidade — 15 pts
   const hasKidsOrPets = resolveBoolean(user.temCriancasOuPets)
   const petGoodWithChildren = resolveBoolean(pet.goodWithChildren)
-  score += hasKidsOrPets ? (petGoodWithChildren ? 15 : 0) : 15
+  const livingPoints = hasKidsOrPets ? (petGoodWithChildren ? 15 : 0) : 15
 
   // Perfil de pet ideal × temperamento real — 20 pts
   const desiredProfile = resolveCanonical(user.idealPetProfile, IDEAL_PROFILE_RULES)
   const petTemperament = resolveCanonical(pet.temperament, TEMPERAMENT_RULES)
   const desiredTemperaments = TEMPERAMENTS_BY_IDEAL_PROFILE[desiredProfile] ?? []
-  score += desiredTemperaments.includes(petTemperament) ? 20 : 0
+
+  return [
+    {
+      key: 'housing',
+      label: 'Espaço da sua moradia',
+      maxPoints: 20,
+      points: housingPoints,
+      isAnswered: !!housing,
+      detail: !housing
+        ? 'Você ainda não informou onde mora — sem restrição de espaço no cálculo.'
+        : housing === 'APARTMENT'
+          ? petApartmentFriendly
+            ? 'Combina com apartamento, exatamente como a sua moradia.'
+            : 'Precisa de mais espaço do que um apartamento oferece.'
+          : 'Sua casa comporta qualquer porte e nível de energia.',
+    },
+    {
+      key: 'energy',
+      label: 'Ritmo do dia a dia',
+      maxPoints: 25,
+      points: scoreLevelProximity(desiredEnergy, petEnergy, 25),
+      isAnswered: !!desiredEnergy,
+      detail: !desiredEnergy
+        ? 'Responda sobre sua rotina de exercícios para pontuar este item.'
+        : !petEnergy
+          ? 'Este anúncio não informou o nível de energia do pet.'
+          : desiredEnergy === petEnergy
+            ? `Energia ${ENERGY_WORDS[petEnergy]}, no mesmo ritmo que você descreveu.`
+            : `Energia ${ENERGY_WORDS[petEnergy]} — perto, mas não idêntica à sua rotina.`,
+    },
+    {
+      key: 'independence',
+      label: 'Tempo sozinho em casa',
+      maxPoints: 20,
+      points: scoreLevelProximity(desiredIndependence, petIndependence, 20),
+      isAnswered: !!desiredIndependence,
+      detail: !desiredIndependence
+        ? 'Responda quanto tempo passa fora de casa para pontuar este item.'
+        : !petIndependence
+          ? 'Este anúncio não informou o nível de independência do pet.'
+          : desiredIndependence === petIndependence
+            ? `Independência ${INDEPENDENCE_WORDS[petIndependence]}, ideal para o tempo que você informou.`
+            : `Independência ${INDEPENDENCE_WORDS[petIndependence]} — exige um pouco mais de atenção que a sua rotina permite.`,
+    },
+    {
+      key: 'living',
+      label: 'Convivência em casa',
+      maxPoints: 15,
+      points: livingPoints,
+      isAnswered: hasKidsOrPets !== null,
+      detail:
+        hasKidsOrPets === null
+          ? 'Você ainda não informou se há crianças ou outros pets em casa.'
+          : hasKidsOrPets
+            ? petGoodWithChildren
+              ? 'Sociável: convive bem com crianças e outros animais.'
+              : 'Pode não se adaptar à convivência com crianças ou outros pets.'
+            : 'Sem crianças ou outros pets em casa, a convivência não limita a escolha.',
+    },
+    {
+      key: 'temperament',
+      label: 'Temperamento desejado',
+      maxPoints: 20,
+      points: desiredTemperaments.includes(petTemperament) ? 20 : 0,
+      isAnswered: !!desiredProfile,
+      detail: !desiredProfile
+        ? 'Responda qual o seu pet ideal para pontuar este item.'
+        : desiredTemperaments.includes(petTemperament)
+          ? `É o perfil ${IDEAL_PROFILE_WORDS[desiredProfile]} que você procura.`
+          : `O temperamento não é o perfil ${IDEAL_PROFILE_WORDS[desiredProfile]} que você marcou.`,
+    },
+  ]
+}
+
+export function computeMatchScore(user, pet) {
+  if (!user || !pet) return 0
+
+  const score = buildMatchCriteria(user, pet).reduce((total, criterion) => total + criterion.points, 0)
 
   return Math.min(100, Math.max(0, Math.round(score)))
+}
+
+// Os critérios mais decisivos primeiro (maior aproveitamento dos pontos),
+// que é a ordem em que o modal "Por que deu match?" os lista
+export function explainMatchScore(user, pet) {
+  const criteria = buildMatchCriteria(user, pet)
+
+  return {
+    score: computeMatchScore(user, pet),
+    criteria: [...criteria].sort((a, b) => b.points / b.maxPoints - a.points / a.maxPoints),
+    hasPendingAnswers: criteria.some((criterion) => !criterion.isAnswered),
+  }
 }
 
 export function sortPetsByMatchScore(user, pets, currentUserId) {
@@ -133,4 +233,3 @@ export function sortPetsByMatchScore(user, pets, currentUserId) {
     .map((pet) => ({ ...pet, matchScore: computeMatchScore(user, pet) }))
     .sort((a, b) => b.matchScore - a.matchScore)
 }
-

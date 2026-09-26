@@ -41,7 +41,7 @@ function CreateAnimalPage() {
           <LuSparkles size={15} />
           Cadastrar animal para adoção
         </span>
-        <h1 className="font-serif text-2xl font-black text-emerald-950 sm:text-3xl">
+        <h1 className="text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl">
           Vamos encontrar uma família para esse pet
         </h1>
       </div>
@@ -53,7 +53,7 @@ function CreateAnimalPage() {
 
         <div key={currentStep} className="animate-fade-slide-in">
           <div className="mb-6">
-            <h2 className="font-serif text-lg font-bold text-emerald-950">{title}</h2>
+            <h2 className="text-lg font-extrabold tracking-tight text-emerald-950">{title}</h2>
             <p className="text-sm text-slate-500">{subtitle}</p>
           </div>
 

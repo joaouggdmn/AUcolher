@@ -1,7 +1,7 @@
 import { FaCircleCheck, FaTriangleExclamation } from 'react-icons/fa6'
 import { maskCEP } from '../../utils/masks'
 
-function CepField({ cep, status, errorMessage, onChange, label = 'CEP' }) {
+function CepField({ cep, status, errorMessage, onChange, label = 'CEP', required = false }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-sm font-semibold text-slate-700">{label}</label>
@@ -14,6 +14,7 @@ function CepField({ cep, status, errorMessage, onChange, label = 'CEP' }) {
           onChange={(e) => onChange(e.target.value)}
           placeholder="00000-000"
           maxLength={9}
+          required={required}
           className={`min-h-12 w-full rounded-xl border bg-white px-4 pr-10 text-sm text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:ring-4 ${
             status === 'error'
               ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/10'

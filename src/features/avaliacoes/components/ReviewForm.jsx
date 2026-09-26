@@ -39,7 +39,7 @@ function ReviewForm({ targetName, initialReview, onSubmit, onDelete, onCancel })
           </span>
 
           <div>
-            <h3 id="review-form-title" className="font-serif text-lg font-bold text-emerald-950">
+            <h3 id="review-form-title" className="text-lg font-extrabold tracking-tight text-emerald-950">
               {isEditing ? 'Editar avaliação' : `Avaliar ${targetName}`}
             </h3>
             <p className="mt-1.5 text-sm text-slate-500">

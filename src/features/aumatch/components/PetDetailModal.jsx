@@ -50,7 +50,7 @@ function PetDetailModal({ pet, onClose }) {
         <div className="flex flex-col gap-4 p-6">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h2 className="font-serif text-2xl font-black text-emerald-950">{pet.name}</h2>
+              <h2 className="text-2xl font-black tracking-tight text-emerald-950">{pet.name}</h2>
               <p className="text-sm text-slate-500">{pet.ageLabel}</p>
             </div>
             <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${isFemale ? 'bg-rose-50 text-rose-500' : 'bg-sky-50 text-sky-500'}`}>

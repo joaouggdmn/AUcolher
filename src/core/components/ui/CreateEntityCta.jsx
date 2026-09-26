@@ -25,7 +25,7 @@ function CreateEntityCta({ icon: Icon, title, description, buttonLabel, targetPa
       </span>
 
       <div>
-        <h3 className="font-serif text-2xl font-black text-emerald-950">{title}</h3>
+        <h3 className="text-2xl font-black tracking-tight text-emerald-950">{title}</h3>
         <p className="mx-auto mt-2 max-w-md text-slate-600">{description}</p>
       </div>
 

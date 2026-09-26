@@ -11,7 +11,7 @@ function ChatSidebar({ contacts, selectedContactId, onSelectContact }) {
       }`}
     >
       <div className="shrink-0 border-b border-slate-100 px-5 py-4">
-        <h1 className="font-serif text-lg font-bold text-emerald-950">Conversas</h1>
+        <h1 className="text-lg font-extrabold tracking-tight text-emerald-950">Conversas</h1>
         <p className="text-xs text-slate-400">
           {contacts.length === 0
             ? 'Nenhuma conversa liberada ainda'

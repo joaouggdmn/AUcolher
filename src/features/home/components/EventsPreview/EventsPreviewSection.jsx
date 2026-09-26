@@ -22,7 +22,7 @@ function EventsPreviewSection() {
         <RevealOnScroll className="mb-10 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <span className="text-sm font-semibold uppercase tracking-wide text-amber-400">Acontecendo agora</span>
-            <h2 className="mt-2 font-serif text-3xl font-black tracking-tight text-white sm:text-4xl">
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">
               Feiras e mutirões de adoção
             </h2>
             <p className="mt-3 max-w-lg text-emerald-100/70">
