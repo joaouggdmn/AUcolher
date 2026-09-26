@@ -14,7 +14,7 @@ function StepCard({ number, icon: Icon, title, description }) {
       </div>
 
       <div className="rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-sm">
-        <h3 className="font-serif text-lg font-bold text-emerald-950">{title}</h3>
+        <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{title}</h3>
         <p className="mt-2 text-sm text-slate-600">{description}</p>
       </div>
     </div>

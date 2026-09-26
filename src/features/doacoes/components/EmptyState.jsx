@@ -8,7 +8,7 @@ function EmptyState({ onClearFilters }) {
         <FaHandHoldingHeart size={26} />
       </span>
       <div>
-        <h3 className="font-serif text-xl font-bold text-emerald-950">Nenhuma campanha encontrada</h3>
+        <h3 className="text-xl font-extrabold tracking-tight text-emerald-950">Nenhuma campanha encontrada</h3>
         <p className="mt-1 max-w-sm text-sm text-slate-500">
           Não encontramos campanhas com esses filtros. Tente ajustar a busca ou os filtros selecionados.
         </p>

@@ -105,7 +105,7 @@ function EventsListPage() {
         <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
           {filteredEvents.length} {filteredEvents.length === 1 ? 'evento encontrado' : 'eventos encontrados'}
         </span>
-        <h1 className="font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+        <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Eventos e feiras de adoção
         </h1>
       </header>

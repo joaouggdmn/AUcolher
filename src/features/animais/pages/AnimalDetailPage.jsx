@@ -44,7 +44,7 @@ function AnimalDetailsPage() {
   if (!animal) {
     return (
       <div className="mx-auto max-w-3xl px-4 pb-16 pt-32 text-center">
-        <h1 className="font-serif text-2xl font-bold text-emerald-950">
+        <h1 className="text-2xl font-extrabold tracking-tight text-emerald-950">
           Animal não encontrado
         </h1>
         <p className="mt-2 text-slate-500">
@@ -112,7 +112,7 @@ function AnimalDetailsPage() {
 
         <div className="flex flex-col gap-6">
           <header>
-            <h1 className="font-serif text-3xl font-black text-emerald-950 sm:text-4xl">
+            <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
               {animal.name}
             </h1>
             <p className="mt-1 flex items-center gap-1.5 text-slate-500">
@@ -141,7 +141,7 @@ function AnimalDetailsPage() {
           {animal.ownerId != null && (
             <Link
               to={`/perfil/publico/${animal.ownerId}`}
-              className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-emerald-950/5"
+              className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-emerald-950/5"
             >
               <span
                 className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden bg-emerald-700 text-sm font-black text-white ${
@@ -183,7 +183,7 @@ function AnimalDetailsPage() {
           <BehaviorProfile animal={animal} />
 
           <div>
-            <h2 className="font-serif text-lg font-bold text-emerald-950">
+            <h2 className="text-lg font-extrabold tracking-tight text-emerald-950">
               História
             </h2>
             <p className="mt-2 leading-relaxed text-slate-600 break-words">

@@ -35,7 +35,7 @@ function ChatPage() {
           <span className="text-emerald-950">AU</span>
           <span className="text-amber-500">colher</span>
         </span>
-        <span className="ml-2 hidden font-serif text-sm font-semibold text-slate-400 sm:inline">Chat</span>
+        <span className="ml-2 hidden text-sm font-semibold text-slate-400 sm:inline">Chat</span>
       </header>
 
       <main className="flex min-h-0 flex-1 overflow-hidden">
