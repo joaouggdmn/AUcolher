@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { FaShieldHalved, FaLocationDot, FaDna, FaPaw } from 'react-icons/fa6'
-import { LuSparkles } from 'react-icons/lu'
+import { LuSparkles, LuLightbulb } from 'react-icons/lu'
 import { useAuth } from '../../../core/context/AuthContext'
+import FavoriteButton from '../../../core/components/ui/FavoriteButton'
 
 const STACK_TRANSFORM = ['', 'translate-y-3 scale-[0.96] opacity-90', 'translate-y-6 scale-[0.92] opacity-70']
 
@@ -15,6 +16,7 @@ function PetSwipeCard({
   isDragging,
   dragDirection,
   labelOpacity = 0,
+  onExplainMatch,
 }) {
   const { user } = useAuth()
   const [isHovered, setIsHovered] = useState(false)
@@ -62,9 +64,13 @@ function PetSwipeCard({
 
       <div className="absolute left-5 top-5 z-10 flex flex-col items-start gap-2">
         {isNgo && (
-          <span className="flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30">
-            <FaShieldHalved size={12} />
-            ONG Verificada
+          <span
+            role="img"
+            aria-label="ONG Verificada"
+            title="ONG Verificada"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-400 text-emerald-950 shadow-lg shadow-amber-500/30"
+          >
+            <FaShieldHalved size={14} />
           </span>
         )}
         {isOwner && (
@@ -88,16 +94,39 @@ function PetSwipeCard({
         </div>
       )}
 
-      {typeof pet.matchScore === 'number' && !dragDirection && (
-        <span className="absolute right-5 top-5 z-10 flex items-center gap-1.5 rounded-full bg-emerald-800/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg shadow-emerald-950/30 backdrop-blur-sm">
-          <LuSparkles size={12} className="text-amber-300" />
-          {pet.matchScore}% match
-        </span>
+      {/* Ações flutuantes do card. O stopPropagation no mousedown/touchstart
+          é o que impede que tocar no coração ou no selo comece a arrastar o
+          card — o gesto nasce nesses eventos, não no click */}
+      {!dragDirection && (
+        <div
+          className="absolute right-5 top-5 z-20 flex items-center gap-2"
+          onMouseDown={(event) => event.stopPropagation()}
+          onTouchStart={(event) => event.stopPropagation()}
+        >
+          {typeof pet.matchScore === 'number' && (
+            <button
+              type="button"
+              onClick={onExplainMatch}
+              aria-label={`Match de ${pet.matchScore}% — ver por que deu match`}
+              className="flex items-center gap-1.5 rounded-full bg-emerald-800/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg shadow-emerald-950/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+            >
+              <LuSparkles size={12} className="text-amber-300" />
+              {pet.matchScore}% match
+              <LuLightbulb size={13} className="text-amber-300" />
+            </button>
+          )}
+
+          <FavoriteButton
+            animalId={pet.id}
+            animalName={pet.name}
+            className="h-9 w-9 shadow-lg shadow-emerald-950/25"
+          />
+        </div>
       )}
 
       <div className="relative z-10 mt-auto flex flex-col gap-1.5 p-6 text-white">
         <div className="flex items-baseline gap-2">
-          <h2 className="font-serif text-3xl font-black drop-shadow-sm">{pet.name}</h2>
+          <h2 className="text-3xl font-black tracking-tight drop-shadow-sm">{pet.name}</h2>
           <span className="text-lg font-medium text-white/80">{pet.ageLabel}</span>
         </div>
 
