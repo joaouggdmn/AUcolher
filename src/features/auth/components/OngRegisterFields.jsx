@@ -2,6 +2,7 @@ import { useId } from 'react'
 import {
   FaIdCard,
   FaBuilding,
+  FaCalendarDays,
   FaEnvelope,
   FaLock,
   FaInstagram,
@@ -16,6 +17,7 @@ import { useCnpjLookup } from '../hooks/useCnpjLookup'
 import { maskCEP, maskCNPJ } from '../../../core/utils/masks'
 import { BRAZILIAN_STATES } from '../../../core/utils/brazilianStates'
 import { FACEBOOK_URL_PATTERN, sanitizeInstagramHandle, sanitizeXHandle } from '../../../core/utils/socialLinks'
+import { FOUNDED_YEAR_MIN, getCurrentYear } from '../../../core/utils/foundedYear'
 
 const BIO_MAX_LENGTH = 500
 
@@ -115,6 +117,22 @@ function OngRegisterFields({ values, onFieldsChange }) {
           onChange={handleChange}
           hint="Preenchido com a razão social do CNPJ. Você pode ajustar se preferir."
           required
+        />
+
+        <AuthInput
+          id="foundedYear"
+          name="foundedYear"
+          label="Ano de fundação"
+          type="number"
+          icon={FaCalendarDays}
+          placeholder="Ex: 2016"
+          value={values.foundedYear}
+          onChange={handleChange}
+          inputMode="numeric"
+          min={FOUNDED_YEAR_MIN}
+          max={getCurrentYear()}
+          step={1}
+          hint={'Opcional. Aparece no perfil como "Fundada em [ano]" e pode ser preenchido depois em Minha conta.'}
         />
       </FormSection>
 
