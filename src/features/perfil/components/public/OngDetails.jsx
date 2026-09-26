@@ -47,7 +47,7 @@ function OngDetails({ profile }) {
               <FaShieldHalved size={16} />
             </span>
             <div>
-              <p className="font-serif text-base font-bold text-emerald-950">Instituição verificada</p>
+              <p className="text-base font-extrabold tracking-tight text-emerald-950">Instituição verificada</p>
               <p className="mt-0.5 text-xs leading-relaxed text-amber-800">
                 CNPJ ativo na Receita Federal e cadastro analisado e aprovado pela equipe AUcolher.
               </p>
@@ -62,6 +62,7 @@ function OngDetails({ profile }) {
                 <div className="text-sm text-slate-600">
                   <p className="font-semibold text-emerald-950">
                     {address.street}, {address.number}
+                    {address.complement && ` - ${address.complement}`}
                   </p>
                   <p>
                     {address.district} · {address.city}, {address.state}

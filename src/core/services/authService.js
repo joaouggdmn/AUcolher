@@ -1,6 +1,7 @@
 import api from "./api";
 import { instagramUrl, normalizeFacebookUrl, xUrl } from "../utils/socialLinks";
 import { maskCEP } from "../utils/masks";
+import { parseFoundedYear } from "../utils/foundedYear";
 
 function buildRegisterEndpoint(userType) {
   return userType === "ONG" ? "/auth/register/ong" : "/auth/register/user";
@@ -37,6 +38,7 @@ function toRegisterPayload(formData) {
     instagram: emptyToNull(formData.instagram),
     twitter: emptyToNull(formData.twitter),
     facebook: emptyToNull(normalizeFacebookUrl(formData.facebook)),
+    anoFundacao: parseFoundedYear(formData.foundedYear),
     cep: emptyToNull(formData.cep),
     logradouro: emptyToNull(formData.street),
     numero: emptyToNull(formData.number),
@@ -62,12 +64,17 @@ function toFrontendAddress(backendUser) {
   };
 }
 
-function toFrontendUser(backendUser) {
+// Tudo o que o banco guarda, já no formato do frontend — é também o que o
+// PUT /usuarios/me devolve depois de salvar "Minha conta"
+export function toFrontendProfile(backendUser) {
   return {
     id: backendUser.id,
     name: backendUser.nome,
     email: backendUser.email,
     userType: normalizeUserType(backendUser.tipoUsuario),
+    // "Membro desde [ano]" (pessoa) e "Fundada em [ano]" (ONG) no perfil
+    memberSince: backendUser.dataCriacao ?? null,
+    foundedYear: backendUser.anoFundacao ?? null,
     photoUrl: backendUser.fotoUrl ?? null,
     bio: backendUser.bio ?? "",
     isVerified: backendUser.isVerificado ?? false,
@@ -80,9 +87,20 @@ function toFrontendUser(backendUser) {
       facebook: backendUser.facebook ?? null,
     },
     address: toFrontendAddress(backendUser),
+    // Mesmo formato das linhas do RowsEditor (função vazia vira '', não null)
+    team: (backendUser.equipe ?? []).map((member) => ({ name: member.nome, role: member.funcao ?? '' })),
+    visitingHours: (backendUser.horariosVisita ?? []).map((slot) => ({ days: slot.dias, hours: slot.horario })),
     cidade: backendUser.cidade ?? '',
     estado: backendUser.estado ?? '',
     cep: backendUser.cep ?? '',           // 🆕
+  }
+}
+
+function toFrontendUser(backendUser) {
+  return {
+    ...toFrontendProfile(backendUser),
+    // Ainda sem coluna no banco: começam vazios e o AuthContext reaplica o
+    // que está salvo localmente (coordenadas e respostas do Perfil AUmatch)
     latitude: backendUser.latitude ?? null,   // 🆕
     longitude: backendUser.longitude ?? null, // 🆕
     moradia: '',
