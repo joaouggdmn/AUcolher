@@ -233,7 +233,7 @@ function AnimaisListPage() {
         <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
           {filteredAnimals.length} {filteredAnimals.length === 1 ? 'animal encontrado' : 'animais encontrados'}
         </span>
-        <h1 className="font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+        <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Encontre seu novo melhor amigo
         </h1>
         <p className="max-w-xl text-slate-600">

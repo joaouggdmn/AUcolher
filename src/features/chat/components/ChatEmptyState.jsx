@@ -7,7 +7,7 @@ function ChatEmptyState({ hasContacts }) {
         <LuSparkles size={26} />
       </span>
       <div>
-        <h2 className="font-serif text-xl font-bold text-emerald-950">
+        <h2 className="text-xl font-extrabold tracking-tight text-emerald-950">
           {hasContacts ? 'Selecione uma conversa para começar' : 'Nenhuma conversa por aqui ainda'}
         </h2>
         <p className="mt-1 max-w-sm text-sm text-slate-500">

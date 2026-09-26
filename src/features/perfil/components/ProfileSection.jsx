@@ -6,7 +6,7 @@ function ProfileSection({ icon: Icon, title, description, children }) {
           <Icon size={16} />
         </span>
         <div>
-          <h2 className="font-serif text-lg font-bold text-emerald-950">{title}</h2>
+          <h2 className="text-lg font-extrabold tracking-tight text-emerald-950">{title}</h2>
           {description && <p className="text-sm text-slate-500">{description}</p>}
         </div>
       </div>

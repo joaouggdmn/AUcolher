@@ -68,7 +68,7 @@ function ReceivedInterestsPage() {
           <LuSparkles size={15} />
           Interesses recebidos
         </span>
-        <h1 className="mt-3 font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+        <h1 className="mt-3 text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Quem quer adotar seus pets
         </h1>
         <p className="mt-1 text-slate-600">
@@ -82,7 +82,7 @@ function ReceivedInterestsPage() {
             <FaInbox size={26} />
           </span>
           <div>
-            <h3 className="font-serif text-xl font-bold text-emerald-950">Nenhum pedido por aqui ainda</h3>
+            <h3 className="text-xl font-extrabold tracking-tight text-emerald-950">Nenhum pedido por aqui ainda</h3>
             <p className="mt-1 max-w-sm text-sm text-slate-500">
               Assim que alguém demonstrar interesse em um dos seus pets, o pedido aparece aqui.
             </p>

@@ -43,7 +43,7 @@ function LoginPage() {
       subheading="Milhares de pets esperando por um match perfeito. Entre e continue sua jornada de adoção."
     >
       <div className="flex flex-col gap-2">
-        <h2 className="font-serif text-2xl font-black text-emerald-950 sm:text-3xl">
+        <h2 className="text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl">
           Bem-vindo de volta
         </h2>
         <p className="text-sm text-slate-500">
