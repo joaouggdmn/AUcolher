@@ -1,40 +1,35 @@
-import { FaCheck } from 'react-icons/fa6'
+import QuizOptionCard from './QuizOptionCard'
 
-function QuizOptionCard({ label, description, icon: Icon, isSelected, onClick }) {
+// Uma pergunta do quiz: enunciado + grade de opções. Recebe a pergunta
+// inteira do OnboardingQuiz e delega cada alternativa ao QuizOptionCard
+function QuizQuestionCard({ question, selectedValue, onSelect }) {
+  if (!question) return null
+
+  // Perguntas de 2 alternativas (sim/não) ficam melhor em 2 colunas fixas
+  const gridCols = question.options.length <= 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group relative flex flex-col items-center gap-3 rounded-2xl border-2 p-6 text-center transition-all duration-300 ${
-        isSelected
-          ? 'border-amber-400 bg-emerald-50 shadow-md shadow-emerald-900/5'
-          : 'border-slate-200 bg-white hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-900/5'
-      }`}
-    >
-      {isSelected && (
-        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-emerald-950">
-          <FaCheck size={10} />
-        </span>
-      )}
-
-      <span
-        className={`flex h-14 w-14 items-center justify-center rounded-full text-2xl transition-colors duration-300 ${
-          isSelected ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100'
-        }`}
-      >
-        <Icon size={24} />
-      </span>
-
+    <div className="flex flex-col gap-4">
       <div>
-        <span className={`block text-sm font-bold ${isSelected ? 'text-emerald-950' : 'text-slate-700'}`}>
-          {label}
-        </span>
-        {description && (
-          <span className="mt-0.5 block text-[11px] font-medium text-slate-400">{description}</span>
-        )}
+        <h2 className="text-xl font-extrabold tracking-tight text-emerald-950">{question.title}</h2>
+        {question.subtitle && <p className="mt-1 text-sm text-slate-500">{question.subtitle}</p>}
       </div>
-    </button>
+
+      <div className={`grid gap-3 ${gridCols}`}>
+        {question.options.map((option) => (
+          <QuizOptionCard
+            // Alternativas booleanas (true/false) precisam de key em string
+            key={String(option.value)}
+            label={option.label}
+            description={option.description}
+            icon={option.icon}
+            isSelected={selectedValue === option.value}
+            onClick={() => onSelect(option.value)}
+          />
+        ))}
+      </div>
+    </div>
   )
 }
 
-export default QuizOptionCard
+export default QuizQuestionCard
