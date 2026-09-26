@@ -12,6 +12,7 @@ import {
 import { useAuth } from "../../../core/context/AuthContext";
 import { useChatMessages } from "../hooks/useChatMessages";
 import { useConcludeAdoption } from "../../../core/hooks/useConcludeAdoption";
+import { markConversationSeen } from "../../../core/utils/chatReadState";
 import ConfirmAdoptionModal from "../../adocao/components/ConfirmAdoptionModal";
 import AdoptionConcludedPanel from "./AdoptionConcludedPanel";
 
@@ -35,6 +36,12 @@ function ChatConversationPanel({ contact, onBack }) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
+
+  // Conversa aberta = tudo o que chegou até agora foi visto; zera o
+  // contador dela no badge da sidebar
+  useEffect(() => {
+    markConversationSeen(user?.id, contact.requestId);
+  }, [user?.id, contact.requestId, messages.length]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
