@@ -8,7 +8,7 @@ function CampaignCard({ campaign, onDonate }) {
   const CategoriaIcon = categoria.icon
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-lg shadow-amber-500/10 ring-2 ring-amber-400 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-950/20">
+    <div className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-lg shadow-amber-500/10 ring-2 ring-amber-400 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-2xl hover:shadow-emerald-950/20">
       <div className="relative h-48 w-full overflow-hidden">
         <img
           src={coverUrl}
@@ -33,7 +33,7 @@ function CampaignCard({ campaign, onDonate }) {
 
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div>
-          <h3 className="font-serif text-lg font-bold text-emerald-950">{title}</h3>
+          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{title}</h3>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
             <FaShieldHalved size={12} className="text-amber-500" />
             {ong.name}
@@ -45,7 +45,7 @@ function CampaignCard({ campaign, onDonate }) {
         <button
           type="button"
           onClick={() => onDonate(campaign)}
-          className="mt-1 flex items-center justify-center gap-2 rounded-xl bg-emerald-800 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-emerald-800 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           <FaHandHoldingHeart size={14} />
           Fazer doação

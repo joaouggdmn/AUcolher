@@ -12,6 +12,7 @@ import { getErrorMessage } from '../../../core/utils/apiError'
 
 const INITIAL_ONG_FIELDS = {
   cnpj: '',
+  foundedYear: '',
   cep: '',
   street: '',
   number: '',
@@ -104,7 +105,7 @@ function RegisterPage() {
   return (
     <AuthForm {...HERO_COPY[formData.userType]} wide={isOng}>
       <div className="flex flex-col gap-2">
-        <h2 className="font-serif text-2xl font-black text-emerald-950 sm:text-3xl">Crie sua conta</h2>
+        <h2 className="text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl">Crie sua conta</h2>
         <p className="text-sm text-slate-500">
           Já tem conta?{' '}
           <Link to="/login" className="font-semibold text-emerald-700 hover:text-emerald-900">

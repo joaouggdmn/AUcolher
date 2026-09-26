@@ -16,7 +16,7 @@ function ProfileSplitCta() {
               <FaPaw size={22} />
             </span>
 
-            <h3 className="font-serif text-2xl font-black text-white sm:text-3xl">
+            <h3 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
               Quer adotar ou divulgar um resgate?
             </h3>
             <p className="max-w-sm text-emerald-100/80">
@@ -42,7 +42,7 @@ function ProfileSplitCta() {
               <FaCircleCheck size={16} className="absolute -right-1 -top-1 rounded-full bg-white text-emerald-700" />
             </span>
 
-            <h3 className="font-serif text-2xl font-black text-emerald-950 sm:text-3xl">
+            <h3 className="text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl">
               Representa uma ONG?
             </h3>
             <p className="max-w-sm text-emerald-950/70">

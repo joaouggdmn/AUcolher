@@ -8,7 +8,7 @@ function EmptyState({ onClearFilters }) {
         <FaCalendarDays size={26} />
       </span>
       <div>
-        <h3 className="font-serif text-xl font-bold text-emerald-950">Nenhum evento encontrado</h3>
+        <h3 className="text-xl font-extrabold tracking-tight text-emerald-950">Nenhum evento encontrado</h3>
         <p className="mt-1 max-w-sm text-sm text-slate-500">
           Não encontramos eventos com esses filtros. Tente ajustar a busca ou o período selecionado.
         </p>

@@ -3,7 +3,7 @@ import PetSwipeCard from './PetSwipeCard'
 import { useDraggableCard } from '../hooks/useDraggableCard'
 
 const PetCardStack = forwardRef(function PetCardStack(
-  { pets, onSwipeLeft, onSwipeRight, isInteractionAllowed = true, onBlockedInteraction },
+  { pets, onSwipeLeft, onSwipeRight, isInteractionAllowed = true, onBlockedInteraction, onExplainMatch },
   ref
 ) {
   const { bind, dragX, rotation, isDragging, dragDirection, labelOpacity, triggerLike, triggerPass } =
@@ -56,6 +56,7 @@ const PetCardStack = forwardRef(function PetCardStack(
           isDragging={isDragging}
           dragDirection={dragDirection}
           labelOpacity={labelOpacity}
+          onExplainMatch={onExplainMatch}
         />
       ))}
     </div>

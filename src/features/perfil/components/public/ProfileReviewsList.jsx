@@ -21,7 +21,7 @@ function ProfileReviewsList({ reviews, average, count, distribution }) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-5 rounded-2xl bg-emerald-50/70 p-5 sm:flex-row sm:items-center sm:gap-8">
         <div className="flex items-center gap-4 sm:flex-col sm:gap-1 sm:text-center">
-          <span className="font-serif text-5xl font-black text-emerald-900">{average.toFixed(1).replace('.', ',')}</span>
+          <span className="text-5xl font-black text-emerald-900">{average.toFixed(1).replace('.', ',')}</span>
           <div className="flex flex-col gap-1 sm:items-center">
             <RatingStars value={Math.round(average)} size={16} />
             <p className="text-xs font-semibold text-emerald-700">

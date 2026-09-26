@@ -42,7 +42,7 @@ function AdoptionConcludedPanel({ contact }) {
           <FaHeart size={17} />
         </span>
         <div className="min-w-0">
-          <p className="font-serif text-base font-bold text-emerald-950">Parabéns pela adoção!</p>
+          <p className="text-base font-extrabold tracking-tight text-emerald-950">Parabéns pela adoção!</p>
           <p className="text-xs text-slate-500">{contact.animalName} agora faz parte de uma nova família.</p>
         </div>
       </div>

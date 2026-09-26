@@ -31,7 +31,7 @@ function AuthForm({ heading, subheading, wide = false, children }) {
 
         {/* Conteúdo institucional */}
         <div className="relative z-10 flex flex-col gap-8">
-          <h1 className="max-w-md font-serif text-4xl font-black leading-[1.15] text-white xl:text-5xl">
+          <h1 className="max-w-md text-4xl font-black tracking-tight leading-[1.15] text-white xl:text-5xl">
             {heading}
           </h1>
           <p className="max-w-sm text-lg text-emerald-100/80">{subheading}</p>

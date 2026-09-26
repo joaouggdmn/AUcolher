@@ -109,7 +109,7 @@ function CampaignsListPage() {
         <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
           {filteredCampaigns.length} {filteredCampaigns.length === 1 ? 'campanha encontrada' : 'campanhas encontradas'}
         </span>
-        <h1 className="font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+        <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Campanhas de arrecadação
         </h1>
         <p className="max-w-xl text-slate-600">

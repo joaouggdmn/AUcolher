@@ -52,7 +52,7 @@ function PublicProfilePage() {
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
           <FaUserSlash size={20} />
         </span>
-        <h1 className="mt-4 font-serif text-2xl font-bold text-emerald-950">Perfil não encontrado</h1>
+        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-emerald-950">Perfil não encontrado</h1>
         <p className="mt-2 text-slate-500">Essa conta pode ter sido removida ou o link está incorreto.</p>
         <Link
           to="/animais"

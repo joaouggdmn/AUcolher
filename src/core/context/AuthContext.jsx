@@ -1,6 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { loginRequest, registerRequest } from '../services/authService'
-import { TOKEN_STORAGE_KEY, TOKEN_TYPE_STORAGE_KEY, USER_STORAGE_KEY, LIFESTYLE_PROFILE_STORAGE_KEY } from '../utils/storageKeys'
+import {
+  TOKEN_STORAGE_KEY,
+  TOKEN_TYPE_STORAGE_KEY,
+  USER_STORAGE_KEY,
+  LIFESTYLE_PROFILE_STORAGE_KEY,
+} from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
 
@@ -40,6 +45,8 @@ export function AuthProvider({ children }) {
     // 🆕 Sem isso, cada novo login apagava silenciosamente as respostas do
     // quiz que o usuário já tinha dado — o backend não devolve esses
     // campos (toFrontendUser sempre reseta para vazio)
+    // O perfil público (bio, redes, endereço, equipe...) vem inteiro da API:
+    // "Minha conta" salva pelo PUT /usuarios/me
     const storedLifestyle = loadStoredLifestyleProfile()
     const mergedUser = { ...loggedUser, ...storedLifestyle }
 
@@ -65,6 +72,8 @@ export function AuthProvider({ children }) {
     setIsAuthenticated(false)
   }
 
+  // Só atualiza a sessão local — quem precisa gravar no banco chama a API
+  // antes (ver useAccountForm, que usa o PUT /usuarios/me)
   function updateProfile(updates) {
     persistLifestyleFields(updates)
 

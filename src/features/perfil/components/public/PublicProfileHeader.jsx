@@ -11,6 +11,7 @@ import {
   FaCircleCheck,
 } from 'react-icons/fa6'
 import VerifiedBadge from '../../../ong/components/VerifiedBadge'
+import { getYearFromIsoDate } from '../../../../core/utils/formatDate'
 
 const SOCIAL_NETWORKS = [
   { key: 'instagram', label: 'Instagram', icon: FaInstagram },
@@ -18,22 +19,18 @@ const SOCIAL_NETWORKS = [
   { key: 'x', label: 'X', icon: FaXTwitter },
 ]
 
-function formatMonthYear(isoDate) {
-  return new Date(isoDate).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-}
-
 function pluralize(count, singular, plural) {
   return `${count} ${count === 1 ? singular : plural}`
 }
 
-function StatTile({ icon: Icon, value, label }) {
+function StatTile({ icon: Icon, value, label, className = '' }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-emerald-50/70 p-4">
+    <div className={`flex items-center gap-3 rounded-2xl bg-emerald-50/70 p-4 ${className}`}>
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm">
         <Icon size={16} />
       </span>
       <div className="min-w-0">
-        <p className="font-serif text-xl font-black leading-tight text-emerald-950">{value}</p>
+        <p className="text-xl font-black tracking-tight leading-tight text-emerald-950">{value}</p>
         <p className="truncate text-xs font-semibold text-emerald-700">{label}</p>
       </div>
     </div>
@@ -62,6 +59,7 @@ function PublicProfileHeader({ profile, stats }) {
   const socialLinks = SOCIAL_NETWORKS.filter((network) => profile.socialLinks?.[network.key])
   const { average, count: reviewCount } = stats.rating
   const ratingLabel = reviewCount > 0 ? average.toFixed(1).replace('.', ',') : '—'
+  const memberSinceYear = getYearFromIsoDate(profile.memberSince)
 
   return (
     <section className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
@@ -83,7 +81,7 @@ function PublicProfileHeader({ profile, stats }) {
         <div className="flex items-end justify-between gap-4">
           <div className="relative -mt-14 shrink-0 sm:-mt-16">
             <span
-              className={`flex h-28 w-28 items-center justify-center overflow-hidden bg-emerald-700 font-serif text-4xl font-black text-white shadow-xl shadow-emerald-950/20 ring-4 ring-white sm:h-32 sm:w-32 ${
+              className={`flex h-28 w-28 items-center justify-center overflow-hidden bg-emerald-700 text-4xl font-black text-white shadow-xl shadow-emerald-950/20 ring-4 ring-white sm:h-32 sm:w-32 ${
                 isOng ? 'rounded-3xl' : 'rounded-full'
               }`}
             >
@@ -130,7 +128,7 @@ function PublicProfileHeader({ profile, stats }) {
             {isVerifiedOng && <VerifiedBadge />}
           </div>
 
-          <h1 className="break-words font-serif text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+          <h1 className="break-words text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
             {profile.name}
           </h1>
 
@@ -141,10 +139,18 @@ function PublicProfileHeader({ profile, stats }) {
                 {profile.city}, {profile.state}
               </span>
             )}
-            {profile.memberSince && (
+            {/* ONG mostra a própria história (ano de fundação); pessoa, o tempo
+                de casa na plataforma. Sem ano de fundação, a ONG simplesmente omite */}
+            {isOng && profile.foundedYear && (
+              <span className="flex items-center gap-1.5">
+                <FaCalendarDays size={12} className="text-emerald-600" />
+                Fundada em {profile.foundedYear}
+              </span>
+            )}
+            {!isOng && memberSinceYear && (
               <span className="flex items-center gap-1.5">
                 <FaCalendarCheck size={12} className="text-emerald-600" />
-                Na AUcolher desde {formatMonthYear(profile.memberSince)}
+                Membro desde {memberSinceYear}
               </span>
             )}
           </div>
@@ -159,11 +165,15 @@ function PublicProfileHeader({ profile, stats }) {
         </div>
 
         {isOng ? (
-          <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
             <StatTile icon={FaHandHoldingHeart} value={stats.adoptionsCount} label="Adoções realizadas" />
             <StatTile icon={FaPaw} value={stats.availableAnimalsCount} label="Animais disponíveis" />
-            <StatTile icon={FaStar} value={ratingLabel} label={pluralize(reviewCount, 'avaliação', 'avaliações')} />
-            <StatTile icon={FaCalendarDays} value={profile.foundedYear ?? '—'} label="Ano de fundação" />
+            <StatTile
+              icon={FaStar}
+              value={ratingLabel}
+              label={pluralize(reviewCount, 'avaliação', 'avaliações')}
+              className="col-span-2 lg:col-span-1"
+            />
           </div>
         ) : (
           <div className="mt-5 flex flex-wrap gap-2">

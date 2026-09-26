@@ -1,7 +1,11 @@
 import { FaCircleCheck } from 'react-icons/fa6'
 import { LuSparkles, LuCircle } from 'react-icons/lu'
 
-function ProfileCompletionBar({ checklist, percentage }) {
+function ProfileCompletionBar({
+  checklist,
+  percentage,
+  description = 'Complete seu perfil para o AUmatch encontrar o pet ideal mais rápido!',
+}) {
   return (
     <div className="rounded-3xl bg-gradient-to-br from-emerald-800 to-emerald-900 p-6 text-white shadow-lg shadow-emerald-900/20 sm:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -10,11 +14,9 @@ function ProfileCompletionBar({ checklist, percentage }) {
             <LuSparkles size={13} />
             Completude do perfil
           </span>
-          <p className="mt-2 max-w-md text-sm text-emerald-100/80">
-            Complete seu perfil para o AUmatch encontrar o pet ideal mais rápido!
-          </p>
+          <p className="mt-2 max-w-md text-sm text-emerald-100/80">{description}</p>
         </div>
-        <span className="font-serif text-4xl font-black text-amber-300">{percentage}%</span>
+        <span className="text-4xl font-black text-amber-300">{percentage}%</span>
       </div>
 
       <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-white/15">

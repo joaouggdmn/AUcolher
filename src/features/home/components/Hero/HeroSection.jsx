@@ -18,7 +18,7 @@ function HeroSection() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 lg:grid-cols-2 lg:items-center lg:gap-16">
         <div className="flex flex-col items-start gap-7 pb-16 pt-36 sm:pt-44">
 
-          <h1 className="max-w-xl font-serif text-4xl font-black leading-[1.1] tracking-tight text-emerald-950 sm:text-5xl lg:text-[3.4rem]">
+          <h1 className="max-w-xl text-4xl font-black leading-[1.1] tracking-tight text-emerald-950 sm:text-5xl lg:text-[3.4rem]">
             Encontre seu novo <span className="text-emerald-500">AU</span><span className="text-amber-500">migo</span>!
           </h1>
 

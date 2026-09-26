@@ -49,7 +49,7 @@ function DonationModal({ campaign, onClose }) {
 
         <div className="flex flex-col items-center gap-1 pr-6 text-center">
           <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">Você está ajudando</span>
-          <h3 className="font-serif text-lg font-bold text-emerald-950">{campaign.title}</h3>
+          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{campaign.title}</h3>
         </div>
 
         {/* Placeholder de QR Code — futuramente gerado dinamicamente (ex: lib qrcode.react)

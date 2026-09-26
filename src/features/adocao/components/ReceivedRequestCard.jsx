@@ -68,12 +68,12 @@ function ReceivedRequestCard({
               <Link
                 to={`/perfil/publico/${adopter.userId}`}
                 title="Ver perfil e avaliações do adotante"
-                className="block truncate font-serif text-base font-bold text-emerald-950 underline-offset-2 transition-colors duration-300 hover:text-emerald-700 hover:underline"
+                className="block truncate text-base font-extrabold tracking-tight text-emerald-950 underline-offset-2 transition-colors duration-300 hover:text-emerald-700 hover:underline"
               >
                 {adopter.name}
               </Link>
             ) : (
-              <p className="truncate font-serif text-base font-bold text-emerald-950">
+              <p className="truncate text-base font-extrabold tracking-tight text-emerald-950">
                 {adopter.name}
               </p>
             )}
