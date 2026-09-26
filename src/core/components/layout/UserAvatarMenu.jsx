@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  FaUser,
-  FaPaw,
-  FaInbox,
-  FaComments,
-  FaArrowRightFromBracket,
-} from "react-icons/fa6";
-import { useReceivedRequests } from "../../hooks/useReceivedRequests";
+import { FaUser, FaEye, FaArrowRightFromBracket } from "react-icons/fa6";
 
 function UserAvatarMenu({
   user,
@@ -17,7 +10,6 @@ function UserAvatarMenu({
   onOpenChange,
 }) {
   const [isOpen, setIsOpenState] = useState(false);
-  const { pendingCount } = useReceivedRequests();
   const initial = user?.name?.charAt(0)?.toUpperCase() ?? "U";
 
   const setIsOpen = (value) => {
@@ -117,44 +109,23 @@ function UserAvatarMenu({
               Minha conta
             </Link>
 
-            <Link
-              to="/animais/criar"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-emerald-50"
-            >
-              <FaPaw size={14} className="text-emerald-600" />
-              Cadastrar animal
-            </Link>
+            {user?.id != null && (
+              <Link
+                to={`/perfil/publico/${user.id}`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-emerald-50"
+              >
+                <FaEye size={14} className="text-emerald-600" />
+                Meu perfil público
+              </Link>
+            )}
 
-            <Link
-              to="/interesses-recebidos"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center justify-between gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-emerald-50"
-            >
-              <span className="flex items-center gap-2.5">
-                <FaInbox size={14} className="text-emerald-600" />
-                Interesses recebidos
-              </span>
-              {pendingCount > 0 && (
-                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[11px] font-bold text-white">
-                  {pendingCount > 9 ? "9+" : pendingCount}
-                </span>
-              )}
-            </Link>
-
-            <Link
-              to="/chat"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-emerald-50"
-            >
-              <FaComments size={14} className="text-emerald-600" />
-              Chat
-            </Link>
-
+            {/* Favoritos, cadastro de animal, interesses e chat moram na
+                PlatformSidebar — aqui fica só o que é da conta */}
             <button
               type="button"
               onClick={handleLogoutClick}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-rose-600 transition-colors duration-200 hover:bg-rose-50"
+              className="mt-1 flex border-t border-slate-100 w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-rose-600 transition-colors duration-200 hover:bg-rose-50"
             >
               <FaArrowRightFromBracket size={14} />
               Sair
