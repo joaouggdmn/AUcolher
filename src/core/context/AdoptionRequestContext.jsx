@@ -104,7 +104,8 @@ export function AdoptionRequestProvider({ children }) {
     setRequests((prev) =>
       prev.map((request) => {
         if (request.id === requestId) {
-          return { ...request, status: "CONCLUDED" };
+          // concludedAt data a linha do tempo de "Meu impacto" em Minha conta
+          return { ...request, status: "CONCLUDED", concludedAt: new Date().toISOString() };
         }
         // Exclusão mútua: qualquer OUTRO pedido para o MESMO animal que
         // ainda não tinha sido recusado vira CANCELLED — o animal não
