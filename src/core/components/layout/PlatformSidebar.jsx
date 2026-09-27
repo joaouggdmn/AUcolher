@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { FiX } from 'react-icons/fi'
-import { FaHeart, FaPaw, FaInbox, FaComments } from 'react-icons/fa6'
+import { FaHeart, FaPaw, FaInbox, FaComments, FaBuildingNgo } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 
 // Links principais só aparecem aqui no mobile — no desktop eles já estão
@@ -20,10 +20,12 @@ function formatBadge(count) {
 
 // Ações do dia a dia na plataforma. O menu do avatar ficou só com o que é
 // da conta em si (perfil e sair).
-function PlatformSidebar({ isOpen, onClose, totalFavoritos, pendingCount, unreadChatCount }) {
+function PlatformSidebar({ isOpen, onClose, isOng, totalFavoritos, pendingCount, unreadChatCount }) {
   const closeButtonRef = useRef(null)
 
   const shortcuts = [
+    // Eventos (e, depois, campanhas) da instituição ficam no painel
+    ...(isOng ? [{ label: 'Painel da ONG', to: '/ong/dashboard', icon: FaBuildingNgo, iconClass: 'text-amber-500' }] : []),
     {
       label: 'Meus favoritos',
       to: '/favoritos',

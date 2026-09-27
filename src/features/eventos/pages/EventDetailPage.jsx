@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -8,6 +8,7 @@ import {
   FaLocationDot,
   FaMapLocationDot,
   FaPen,
+  FaTrashCan,
   FaUserGroup,
 } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
@@ -18,6 +19,7 @@ import SuccessToast from '../../../core/components/ui/SuccessToast'
 import VerifiedBadge from '../../ong/components/VerifiedBadge'
 import AttendanceButton from '../components/AttendanceButton'
 import CalendarDateBadge from '../components/CalendarDateBadge'
+import DeleteEventDialog from '../components/DeleteEventDialog'
 import EventCover from '../components/EventCover'
 import EventUnavailableState from '../components/EventUnavailableState'
 import SaveToCalendarMenu from '../components/SaveToCalendarMenu'
@@ -78,7 +80,9 @@ function EventDetailPage() {
   const location = useLocation()
   const { user } = useAuth()
   const { data: event, isLoading, isError, error, refetch } = useEvent(id)
+  const navigate = useNavigate()
   const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   // "Evento publicado!" / "Evento atualizado!" vindo do formulário
   const [flashMessage, setFlashMessage] = useState(location.state?.flash ?? null)
   const clearFlashMessage = useCallback(() => setFlashMessage(null), [])
@@ -189,19 +193,38 @@ function EventDetailPage() {
             </div>
 
             {isOwner && !event.isPast && (
-              <Link
-                to={`/eventos/editar/${event.id}`}
-                className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 py-3 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
-              >
-                <FaPen size={12} />
-                Editar evento
-              </Link>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  to={`/eventos/editar/${event.id}`}
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 py-3 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+                >
+                  <FaPen size={12} />
+                  Editar evento
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteOpen(true)}
+                  className="flex items-center justify-center gap-2 rounded-2xl border border-rose-200 py-3 text-sm font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50"
+                >
+                  <FaTrashCan size={12} />
+                  Excluir
+                </button>
+              </div>
             )}
           </div>
 
           <OrganizerCard organizer={event.organizer} />
         </aside>
       </div>
+
+      {isDeleteOpen && (
+        <DeleteEventDialog
+          event={event}
+          onClose={() => setIsDeleteOpen(false)}
+          // A página do evento deixa de existir: volta para o painel com o aviso
+          onDeleted={(message) => navigate('/ong/dashboard', { state: { flash: message } })}
+        />
+      )}
 
       <SuccessToast message={flashMessage} onClose={clearFlashMessage} />
     </div>

@@ -98,10 +98,20 @@ export function useUpdateEvent() {
 }
 
 export function useDeleteEvent() {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
   const invalidateEvents = useInvalidateEvents()
+
   return useMutation({
     mutationFn: (id) => deleteEvent(id),
-    onSuccess: invalidateEvents,
+    onSuccess: (_, id) => {
+      // Some do painel na hora. Sem await na nova busca: quem excluiu pela
+      // página do evento sai dela antes de o detalhe virar 404
+      queryClient.setQueryData(queryKeys.eventos.mine(user?.id ?? null), (list) =>
+        list?.filter((item) => String(item.id) !== String(id))
+      )
+      invalidateEvents()
+    },
   })
 }
 

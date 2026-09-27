@@ -12,6 +12,7 @@ import ChatPage from '../features/chat/pages/ChatPage'
 import FavoritosPage from '../features/favoritos/pages/FavoritosPage'
 import EventCreatePage from '../features/eventos/pages/EventCreatePage'
 import EventEditPage from '../features/eventos/pages/EventEditPage'
+import OngDashboardPage from '../features/ong/pages/OngDashboardPage'
 import ChatLayout from '../core/components/layout/ChatLayout'
 
 
@@ -40,7 +41,7 @@ export const protectedRoutes = [
       {
         element: <OngLayout />,
         children: [
-          { path: 'ong/dashboard', element: <PlaceholderPage title="Dashboard da ONG" /> },
+          { path: 'ong/dashboard', element: <OngDashboardPage /> },
           { path: 'eventos/criar', element: <EventCreatePage /> },
           { path: 'eventos/editar/:id', element: <EventEditPage /> },
           { path: 'campanhas/criar', element: <PlaceholderPage title="Criar campanha" /> },
