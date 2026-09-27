@@ -10,6 +10,8 @@ import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
 import ChatPage from '../features/chat/pages/ChatPage'
 import FavoritosPage from '../features/favoritos/pages/FavoritosPage'
+import EventCreatePage from '../features/eventos/pages/EventCreatePage'
+import EventEditPage from '../features/eventos/pages/EventEditPage'
 import ChatLayout from '../core/components/layout/ChatLayout'
 
 
@@ -39,8 +41,8 @@ export const protectedRoutes = [
         element: <OngLayout />,
         children: [
           { path: 'ong/dashboard', element: <PlaceholderPage title="Dashboard da ONG" /> },
-          { path: 'eventos/criar', element: <PlaceholderPage title="Criar evento" /> },
-          { path: 'eventos/editar/:id', element: <PlaceholderPage title="Editar evento" /> },
+          { path: 'eventos/criar', element: <EventCreatePage /> },
+          { path: 'eventos/editar/:id', element: <EventEditPage /> },
           { path: 'campanhas/criar', element: <PlaceholderPage title="Criar campanha" /> },
         ],
       },
