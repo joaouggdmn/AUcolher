@@ -9,6 +9,21 @@ export function getDateParts(dateStr) {
   }
 }
 
+// "2026-10-03" → "sábado, 3 de outubro"
+export function formatLongDate(dateStr) {
+  return new Date(`${dateStr}T00:00:00`).toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+}
+
+// Sem término cadastrado, o evento só tem hora de começar
+export function formatTimeRange(startTime, endTime) {
+  if (!startTime) return ''
+  return endTime ? `${startTime} às ${endTime}` : `A partir das ${startTime}`
+}
+
 function startOfDay(date) {
   const d = new Date(date)
   d.setHours(0, 0, 0, 0)

@@ -2,20 +2,18 @@ import { useMemo } from 'react'
 import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
-import { useEventAttendance } from '../../eventos/hooks/useEventAttendance'
-import { mockEventos } from '../../eventos/data/mockEventos'
+import { useMyAttendance } from '../../eventos/hooks/useEventos'
 import { mockUserDonations } from '../data/mockUserDonations'
 
 const IN_PROGRESS_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
+const NO_EVENTS = []
 
 function isSameId(a, b) {
   return a != null && b != null && String(a) === String(b)
 }
 
-function startOfToday() {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return today
+function byDateAsc(a, b) {
+  return a.date.localeCompare(b.date) || (a.startTime ?? '').localeCompare(b.startTime ?? '')
 }
 
 // Status do anúncio do ponto de vista do dono: "em processo" quando já
@@ -31,12 +29,13 @@ function deriveListingStatus(animal, requests) {
 // Tudo o que as quatro seções inferiores de "Minha conta" mostram, a partir
 // das mesmas fontes do perfil público — os números batem entre as páginas.
 // 🔴 Com a API real, cada bloco vira uma chamada: /usuarios/{id}/animais,
-// /avaliacoes, /adocoes, /doacoes e /eventos
+// /avaliacoes, /adocoes e /doacoes. Os eventos já vêm de
+// GET /usuarios/me/presencas (mock ou API, ver eventoService)
 export function useAccountActivity(user) {
   const { animals } = useAnimals()
   const { requests } = useAdoptionRequests()
   const reviews = useUserReviews(user?.id)
-  const { attendedIds } = useEventAttendance()
+  const { data: attendedEvents = NO_EVENTS } = useMyAttendance()
   const isOng = user?.userType === 'ONG'
 
   const activity = useMemo(() => {
@@ -82,17 +81,16 @@ export function useAccountActivity(user) {
       timeline: [...adoptions, ...donations].sort((a, b) => new Date(b.date) - new Date(a.date)),
     }
 
-    const today = startOfToday()
-    const attendedEvents = mockEventos.filter((event) => attendedIds.includes(String(event.id)))
-    const isPast = (event) => new Date(`${event.date}T00:00:00`) < today
-
+    // Cancelado = a ONG excluiu o evento depois que a pessoa confirmou
+    const activeEvents = attendedEvents.filter((event) => event.status !== 'CANCELADO')
     const events = {
-      upcoming: attendedEvents.filter((event) => !isPast(event)).sort((a, b) => a.date.localeCompare(b.date)),
-      past: attendedEvents.filter(isPast).sort((a, b) => b.date.localeCompare(a.date)),
+      upcoming: activeEvents.filter((event) => !event.isPast).sort(byDateAsc),
+      past: activeEvents.filter((event) => event.isPast).sort((a, b) => byDateAsc(b, a)),
+      cancelled: attendedEvents.filter((event) => event.status === 'CANCELADO').sort(byDateAsc),
     }
 
     return { animals: myAnimals, impact, events }
-  }, [user?.id, isOng, animals, requests, attendedIds])
+  }, [user?.id, isOng, animals, requests, attendedEvents])
 
   return { ...activity, reviews }
 }
