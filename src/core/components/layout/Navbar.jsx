@@ -259,6 +259,7 @@ function Navbar() {
         <PlatformSidebar
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
+          isOng={user?.userType === 'ONG'}
           totalFavoritos={totalFavoritos}
           pendingCount={pendingCount}
           unreadChatCount={unreadChatCount}
