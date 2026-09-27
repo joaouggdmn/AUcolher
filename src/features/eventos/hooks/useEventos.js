@@ -107,16 +107,25 @@ export function useDeleteEvent() {
 
 // { eventId, attending: true | false } — confirma ou cancela a presença
 export function useSetAttendance() {
+  const { user } = useAuth()
   const queryClient = useQueryClient()
   const invalidateEvents = useInvalidateEvents()
 
   return useMutation({
     mutationFn: ({ eventId, attending }) => (attending ? confirmAttendance(eventId) : cancelAttendance(eventId)),
-    onSuccess: (event) => {
-      // O backend devolve o evento com o contador novo: o detalhe já atualiza
-      // sem esperar a nova busca
+    onSuccess: (event, { attending }) => {
+      // O backend devolve o evento com o contador novo: botão, contador e
+      // Minha conta mudam na hora, sem esperar a nova busca
+      const replaceEvent = (list) => list?.map((item) => (item.id === event.id ? event : item))
       queryClient.setQueryData(queryKeys.eventos.detail(event.id), event)
-      return invalidateEvents()
+      queryClient.setQueriesData({ queryKey: [...queryKeys.eventos.all, 'list'] }, replaceEvent)
+      queryClient.setQueryData(queryKeys.eventos.myAttendance(user?.id ?? null), (list) => {
+        if (!list) return list
+        const others = list.filter((item) => item.id !== event.id)
+        return attending ? [...others, event] : others
+      })
+      // Sem await: a confirmação já terminou; a nova busca só confere o resto
+      invalidateEvents()
     },
   })
 }

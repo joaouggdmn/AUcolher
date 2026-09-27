@@ -27,8 +27,3 @@ export function favoritesStorageKey(userId) {
 export function chatLastSeenStorageKey(userId) {
   return `aucolher_chat_last_seen_${userId}`
 }
-
-// Eventos em que a conta confirmou presença (seção "Eventos participados")
-export function eventAttendanceStorageKey(userId) {
-  return `aucolher_event_attendance_${userId}`
-}

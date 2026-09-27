@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FaCalendarDays, FaFilter } from 'react-icons/fa6'
 import HeroEventBanner from '../components/HeroEventBanner'
@@ -6,15 +6,19 @@ import EventsControlBar from '../components/EventsControlBar'
 import EventsGrid from '../components/EventsGrid'
 import EventsFiltersSidebar from '../components/filters/EventsFiltersSidebar'
 import EventsFiltersDrawer from '../components/filters/EventsFiltersDrawer'
-import { mockEventos } from '../data/mockEventos'
+import { buildCidadeOptions } from '../components/filters/filterOptions'
+import { useEvents } from '../hooks/useEventos'
 import { matchesPeriod } from '../utils/dateHelpers'
+import { getErrorMessage } from '../../../core/utils/apiError'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
 import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 import InfoToast from '../../../core/components/ui/InfoToast'
+import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 
 const INITIAL_FILTERS = { categorias: [], periodo: '', cidade: '' }
 const PAGE_SIZE = 12
+const NO_EVENTS = []
 
 function toggleArrayValue(array, value) {
   return array.includes(value) ? array.filter((v) => v !== value) : [...array, value]
@@ -23,6 +27,7 @@ function toggleArrayValue(array, value) {
 function EventsListPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { data: events = NO_EVENTS, isLoading, isError, error, refetch } = useEvents()
 
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState(INITIAL_FILTERS)
@@ -32,19 +37,31 @@ function EventsListPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [ongWarning, setOngWarning] = useState(null)
 
-  const events = mockEventos
-  const featuredEvent = useMemo(() => events.find((e) => e.isFeatured) || events[0], [events])
+  // A API devolve só eventos de hoje em diante, já em ordem de data
+  const nextEvent = events[0] ?? null
+  const cidadeOptions = useMemo(() => buildCidadeOptions(events), [events])
 
-  const handleToggleCategoria = (value) => {
-    setFilters((prev) => ({ ...prev, categorias: toggleArrayValue(prev.categorias, value) }))
+  // Toda mudança de busca/filtro volta para a primeira página
+  const updateFilters = (updater) => {
+    setFilters(updater)
+    setVisibleCount(PAGE_SIZE)
   }
 
-  const handlePeriodoChange = (periodo) => setFilters((prev) => ({ ...prev, periodo }))
-  const handleCidadeChange = (cidade) => setFilters((prev) => ({ ...prev, cidade }))
+  const handleSearchChange = (value) => {
+    setSearch(value)
+    setVisibleCount(PAGE_SIZE)
+  }
+
+  const handleToggleCategoria = (value) => {
+    updateFilters((prev) => ({ ...prev, categorias: toggleArrayValue(prev.categorias, value) }))
+  }
+
+  const handlePeriodoChange = (periodo) => updateFilters((prev) => ({ ...prev, periodo }))
+  const handleCidadeChange = (cidade) => updateFilters((prev) => ({ ...prev, cidade }))
 
   const handleClearFilters = () => {
     setSearch('')
-    setFilters(INITIAL_FILTERS)
+    updateFilters(INITIAL_FILTERS)
   }
 
   const hasActiveFilters =
@@ -69,15 +86,12 @@ function EventsListPage() {
     })
   }, [events, search, filters])
 
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE)
-  }, [search, filters])
-
   const visibleEvents = filteredEvents.slice(0, visibleCount)
   const hasMore = visibleCount < filteredEvents.length
 
   const filterPanelProps = {
     filters,
+    cidadeOptions,
     onToggleCategoria: handleToggleCategoria,
     onPeriodoChange: handlePeriodoChange,
     onCidadeChange: handleCidadeChange,
@@ -97,13 +111,17 @@ function EventsListPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:pt-28">
-      <div className="mb-10">
-        <HeroEventBanner event={featuredEvent} />
-      </div>
+      {nextEvent && (
+        <div className="mb-10">
+          <HeroEventBanner event={nextEvent} />
+        </div>
+      )}
 
       <header className="mb-6 flex flex-col gap-2">
         <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
-          {filteredEvents.length} {filteredEvents.length === 1 ? 'evento encontrado' : 'eventos encontrados'}
+          {isLoading
+            ? 'Carregando eventos...'
+            : `${filteredEvents.length} ${filteredEvents.length === 1 ? 'evento encontrado' : 'eventos encontrados'}`}
         </span>
         <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Eventos e feiras de adoção
@@ -117,7 +135,7 @@ function EventsListPage() {
           <div className="mb-6 flex items-center gap-3">
             <EventsControlBar
               search={search}
-              onSearchChange={setSearch}
+              onSearchChange={handleSearchChange}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
@@ -137,7 +155,21 @@ function EventsListPage() {
             </button>
           </div>
 
-          <EventsGrid events={visibleEvents} viewMode={viewMode} onClearFilters={handleClearFilters} />
+          {isError ? (
+            <LoadErrorState
+              title="Não foi possível carregar os eventos"
+              message={getErrorMessage(error)}
+              onRetry={() => refetch()}
+            />
+          ) : (
+            <EventsGrid
+              events={visibleEvents}
+              viewMode={viewMode}
+              isLoading={isLoading}
+              hasActiveFilters={hasActiveFilters}
+              onClearFilters={handleClearFilters}
+            />
+          )}
 
           {hasMore && (
             <ShowMoreButton
