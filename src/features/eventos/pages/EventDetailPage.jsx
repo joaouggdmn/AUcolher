@@ -1,22 +1,25 @@
-import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useCallback, useState } from 'react'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import {
   FaArrowLeft,
   FaArrowRight,
   FaCalendarDays,
-  FaCalendarXmark,
   FaClock,
   FaLocationDot,
   FaMapLocationDot,
+  FaPen,
   FaUserGroup,
 } from 'react-icons/fa6'
+import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import Spinner from '../../../core/components/ui/Spinner'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
+import SuccessToast from '../../../core/components/ui/SuccessToast'
 import VerifiedBadge from '../../ong/components/VerifiedBadge'
 import AttendanceButton from '../components/AttendanceButton'
 import CalendarDateBadge from '../components/CalendarDateBadge'
 import EventCover from '../components/EventCover'
+import EventUnavailableState from '../components/EventUnavailableState'
 import SaveToCalendarMenu from '../components/SaveToCalendarMenu'
 import { getCategoriaMeta } from '../components/filters/filterOptions'
 import { useEvent } from '../hooks/useEventos'
@@ -27,24 +30,6 @@ const SUMMARY_TONES = {
   neutral: 'text-slate-600',
   few: 'text-amber-600',
   full: 'text-rose-600',
-}
-
-function EventNotFound() {
-  return (
-    <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pb-16 pt-32 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-        <FaCalendarXmark size={20} />
-      </span>
-      <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-emerald-950">Evento não encontrado</h1>
-      <p className="mt-2 text-slate-500">Esse evento pode ter sido cancelado pela ONG ou o link está incorreto.</p>
-      <Link
-        to="/eventos"
-        className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
-      >
-        Ver outros eventos
-      </Link>
-    </div>
-  )
 }
 
 function InfoRow({ icon: Icon, children }) {
@@ -90,8 +75,13 @@ function OrganizerCard({ organizer }) {
 
 function EventDetailPage() {
   const { id } = useParams()
+  const location = useLocation()
+  const { user } = useAuth()
   const { data: event, isLoading, isError, error, refetch } = useEvent(id)
   const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false)
+  // "Evento publicado!" / "Evento atualizado!" vindo do formulário
+  const [flashMessage, setFlashMessage] = useState(location.state?.flash ?? null)
+  const clearFlashMessage = useCallback(() => setFlashMessage(null), [])
 
   if (isLoading) {
     return (
@@ -103,7 +93,7 @@ function EventDetailPage() {
 
   if (isError) {
     // 404 = não existe ou foi cancelado (exclusão lógica)
-    if (error?.response?.status === 404) return <EventNotFound />
+    if (error?.response?.status === 404) return <EventUnavailableState />
 
     return (
       <div className="mx-auto max-w-3xl px-4 pb-16 pt-32">
@@ -120,6 +110,7 @@ function EventDetailPage() {
   const CategoriaIcon = categoria.icon
   const summary = getAttendanceSummary(event)
   const address = formatEventAddress(event.location)
+  const isOwner = user != null && String(user.id) === String(event.organizer.id)
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
@@ -196,11 +187,23 @@ function EventDetailPage() {
               <AttendanceButton event={event} size="lg" className="flex-1" />
               <SaveToCalendarMenu event={event} isOpen={isCalendarMenuOpen} onToggle={setIsCalendarMenuOpen} />
             </div>
+
+            {isOwner && !event.isPast && (
+              <Link
+                to={`/eventos/editar/${event.id}`}
+                className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 py-3 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+              >
+                <FaPen size={12} />
+                Editar evento
+              </Link>
+            )}
           </div>
 
           <OrganizerCard organizer={event.organizer} />
         </aside>
       </div>
+
+      <SuccessToast message={flashMessage} onClose={clearFlashMessage} />
     </div>
   )
 }
