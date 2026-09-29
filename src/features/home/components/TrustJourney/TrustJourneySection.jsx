@@ -3,6 +3,7 @@ import { LuLightbulb } from 'react-icons/lu'
 import SectionHeader from '../shared/SectionHeader'
 import HomeReveal from '../shared/HomeReveal'
 import NgoShield from '../shared/NgoShield'
+import ActionLink from '../shared/ActionLink'
 import { JOURNEY_STEPS } from '../../data/journeySteps'
 
 // Réplicas em miniatura dos elementos do AUmatch (mesmas cores e ícones do
@@ -11,13 +12,11 @@ const SIGNALS = [
   {
     key: 'ngo',
     title: 'ONG verificada',
-    description: 'Anel e escudo dourados no card do pet.',
     replica: <NgoShield size="sm" decorative />,
   },
   {
     key: 'score',
-    title: 'Percentual de match',
-    description: 'Toque nele para ver o porquê de cada ponto.',
+    title: 'Toque no % para ver o porquê',
     replica: (
       <span className="flex items-center gap-1 rounded-full bg-emerald-800 px-2 py-1 text-[10px] font-extrabold text-white">
         %
@@ -27,8 +26,7 @@ const SIGNALS = [
   },
   {
     key: 'like',
-    title: 'Curtir',
-    description: 'Envia seu interesse para quem cuida do pet.',
+    title: 'Curtir envia seu interesse',
     replica: (
       <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-emerald-950 shadow-md shadow-amber-500/30">
         <FaHeart size={13} />
@@ -37,8 +35,7 @@ const SIGNALS = [
   },
   {
     key: 'pass',
-    title: 'Passar',
-    description: 'Segue para o próximo, sem compromisso.',
+    title: 'Passar, sem compromisso',
     replica: (
       <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-rose-400 shadow-md shadow-emerald-950/10 ring-1 ring-black/5">
         <FaXmark size={14} />
@@ -84,7 +81,7 @@ function TrustJourneySection({ persona }) {
             align="center"
             eyebrow="Adoção segura"
             title="Do primeiro like ao “bem-vindo em casa”."
-            subtitle="O AUmatch aproxima. A decisão é sempre de quem adota e de quem cuida — e tudo acontece dentro do AUcolher."
+            subtitle="A decisão é sempre de quem adota e de quem cuida — tudo dentro do AUcolher."
           />
         </HomeReveal>
 
@@ -106,7 +103,7 @@ function TrustJourneySection({ persona }) {
                   <StepBadge step={step} />
                   <div className="flex-1 rounded-3xl bg-white p-5 shadow-sm shadow-emerald-950/5 ring-1 ring-slate-200/70 lg:w-full lg:p-6 lg:text-center">
                     <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{step.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
                       {isOng && step.ongDescription ? step.ongDescription : step.description}
                     </p>
                   </div>
@@ -116,26 +113,37 @@ function TrustJourneySection({ persona }) {
           </ol>
         </div>
 
-        <HomeReveal className="mt-16">
-          <h3 className="text-center text-sm font-semibold uppercase tracking-wide text-amber-700">
-            Sinais que você vai ver no AUmatch
-          </h3>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {SIGNALS.map((signal) => (
-              <li
-                key={signal.key}
-                className="flex items-center gap-3.5 rounded-2xl bg-white p-4 ring-1 ring-slate-200/70"
-              >
-                <span aria-hidden="true" className="flex w-12 shrink-0 justify-center">
-                  {signal.replica}
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-bold text-emerald-950">{signal.title}</span>
-                  <span className="block text-xs leading-relaxed text-slate-500">{signal.description}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
+        <HomeReveal className="mt-14 flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center gap-4">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-amber-700">
+              Sinais que você vai ver no AUmatch
+            </h3>
+            <ul className="flex flex-wrap justify-center gap-2.5">
+              {SIGNALS.map((signal) => (
+                <li
+                  key={signal.key}
+                  className="flex items-center gap-2.5 rounded-full bg-white py-1.5 pl-1.5 pr-4 text-sm font-semibold text-emerald-950 ring-1 ring-slate-200/70"
+                >
+                  <span aria-hidden="true" className="flex min-w-8 justify-center">
+                    {signal.replica}
+                  </span>
+                  {signal.title}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Atalho para o próximo passo real: o deck (ou, para a ONG, os pedidos) */}
+          <ActionLink
+            action={
+              isOng
+                ? { label: 'Ver interesses recebidos', to: '/interesses-recebidos', badge: persona.pendingCount }
+                : { label: 'Ir para o AUmatch', to: '/aumatch' }
+            }
+            variant="outline"
+            size="md"
+            showArrow
+          />
         </HomeReveal>
       </div>
     </section>

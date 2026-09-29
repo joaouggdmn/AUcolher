@@ -12,17 +12,13 @@ const DOT_PATTERN = {
   backgroundSize: '28px 28px',
 }
 
-function getHeaderCopy({ kind, firstName, quizProgress }, eligibleCount) {
+function getHeaderCopy({ kind, firstName, quizProgress }) {
   if (kind === 'pending') {
     const { missing } = quizProgress
     return {
       eyebrow: 'Prévia com as suas respostas',
       title: 'Veja seus matches antes de terminar o quiz.',
-      subtitle: `Usamos o que você já respondeu e um exemplo ${plural(
-        missing,
-        'na pergunta que falta',
-        `nas ${missing} perguntas que faltam`
-      )}. Para valer no seu deck, termine o quiz no AUmatch.`,
+      subtitle: `${plural(missing, 'A pergunta que falta usa', `As ${missing} que faltam usam`)} um exemplo.`,
     }
   }
 
@@ -30,11 +26,7 @@ function getHeaderCopy({ kind, firstName, quizProgress }, eligibleCount) {
     return {
       eyebrow: firstName ? `Seus matches, ${firstName}` : 'Seus matches',
       title: 'Os pets que mais combinam com a sua rotina hoje.',
-      subtitle: `Calculado com as suas respostas sobre ${eligibleCount} ${plural(
-        eligibleCount,
-        'pet disponível',
-        'pets disponíveis'
-      )}. Quer testar outra rotina? Mude uma resposta — é só uma simulação, seu perfil não muda.`,
+      subtitle: 'Mude uma resposta para testar outra rotina — seu perfil não muda.',
     }
   }
 
@@ -42,15 +34,14 @@ function getHeaderCopy({ kind, firstName, quizProgress }, eligibleCount) {
     return {
       eyebrow: 'Para ONGs',
       title: 'Veja seus anúncios pelos olhos de quem adota.',
-      subtitle:
-        'Simule a rotina de um adotante e veja em que posição seus animais aparecem. Quanto mais completo o comportamento informado no cadastro, mais preciso o match.',
+      subtitle: 'Simule a rotina de um adotante e veja em que posição seus animais aparecem.',
     }
   }
 
   return {
     eyebrow: 'Teste agora, sem cadastro',
     title: 'Monte sua rotina e veja quem dá match.',
-    subtitle: 'Mesmo cálculo do AUmatch, com os pets disponíveis agora. Suas respostas ficam só nesta tela: nada é salvo.',
+    subtitle: 'Mesmo cálculo do AUmatch. Nada do que você marcar aqui é salvo.',
   }
 }
 
@@ -58,7 +49,7 @@ function getHeaderCopy({ kind, firstName, quizProgress }, eligibleCount) {
 // resultado e do chip do mobile. Os brilhos ficam numa camada própria recortada
 function MatchPlaygroundSection({ persona, sim }) {
   const { kind } = persona
-  const { ranked, eligibleCount } = useRankedPets(sim.profile, {
+  const { ranked } = useRankedPets(sim.profile, {
     excludeRequested: kind === 'matched' || kind === 'pending',
     excludeOwn: kind !== 'ong',
   })
@@ -69,7 +60,7 @@ function MatchPlaygroundSection({ persona, sim }) {
   const topPets = ranked.slice(0, 3)
   const best = topPets[0] ?? null
   const selected = topPets.find((pet) => pet.id === selectedId) ?? best
-  const header = getHeaderCopy(persona, eligibleCount)
+  const header = getHeaderCopy(persona)
 
   return (
     <section
@@ -82,6 +73,10 @@ function MatchPlaygroundSection({ persona, sim }) {
         <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
         <div className="absolute -left-32 bottom-0 h-96 w-96 rounded-full bg-emerald-500/20 blur-[120px]" />
       </div>
+
+      {/* "Como funciona o match" do rodapé aponta para /#match: agora quem
+          explica o match é o simulador, então a âncora mora aqui */}
+      <span id="match" aria-hidden="true" className="absolute top-0 scroll-mt-28" />
 
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         <HomeReveal>

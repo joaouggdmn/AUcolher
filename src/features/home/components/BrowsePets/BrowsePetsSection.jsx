@@ -19,7 +19,7 @@ function getHeaderCopy(isMatchedList, availableCount, cityCount) {
     return {
       eyebrow: 'Calculado para você',
       title: 'Mais pets que combinam com você',
-      subtitle: 'Na sequência do seu deck, ordenados pela compatibilidade com as respostas do seu quiz.',
+      subtitle: 'Na sequência do seu deck no AUmatch.',
     }
   }
 
@@ -30,7 +30,7 @@ function getHeaderCopy(isMatchedList, availableCount, cityCount) {
       cityCount,
       'cidade',
       'cidades'
-    )}. Na lista completa você filtra por espécie, porte e sexo — ou vê primeiro quem está mais perto de você.`,
+    )}.`,
   }
 }
 
@@ -63,7 +63,7 @@ function BrowsePetsSection({ persona, sim }) {
   const header = getHeaderCopy(isMatchedList, availableCount, cityCount)
 
   return (
-    <section aria-labelledby="browse-title" className="bg-white py-20 lg:py-28">
+    <section aria-labelledby="browse-title" className="bg-stone-50 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         <HomeReveal className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeader id="browse-title" {...header} />
@@ -100,7 +100,7 @@ function BrowsePetsSection({ persona, sim }) {
                 <li key={pet.id} className="w-[78%] shrink-0 snap-start sm:w-auto">
                   {isMatchedList ? (
                     <div className="relative h-full pt-4">
-                      <span className="absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white ring-4 ring-white">
+                      <span className="absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white ring-4 ring-stone-50">
                         <LuSparkles aria-hidden="true" size={11} className="text-amber-300" />
                         {pet.matchScore}% match
                       </span>

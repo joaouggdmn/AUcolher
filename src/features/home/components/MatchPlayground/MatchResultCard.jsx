@@ -7,7 +7,6 @@ import NgoShield from '../shared/NgoShield'
 import PetPhoto from '../shared/PetPhoto'
 import ScoreSquare from '../shared/ScoreSquare'
 import { explainMatchScore } from '../../../aumatch/utils/matchScore'
-import { quizQuestions } from '../../../onboarding/data/quizQuestions'
 import { getPersonaActions } from '../../data/personaActions'
 import { healthTags } from '../../utils/homePets'
 
@@ -73,11 +72,6 @@ function ResultActions({ persona }) {
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       <ActionLink action={actions.primary} size="md" />
       {persona.kind === 'ong' && <ActionLink action={actions.secondary} variant="outline" size="md" />}
-      {persona.kind === 'visitor' && (
-        <p className="text-xs leading-relaxed text-slate-500 sm:max-w-[16rem]">
-          Conta grátis. No quiz completo ({quizQuestions.length} perguntas), suas respostas ficam salvas no seu perfil.
-        </p>
-      )}
     </div>
   )
 }
@@ -140,13 +134,13 @@ function MatchResultCard({ persona, profile, isOwnAnswers, topPets, selected, on
                 Por que deu match?
               </h3>
               <p className="mt-0.5 text-sm text-slate-500">
-                Como {selected.name} se encaixa {isOwnAnswers ? 'nas suas respostas' : 'no perfil de teste'}.
+                {isOwnAnswers ? 'Com as suas respostas' : 'Com o perfil de teste'}
               </p>
             </div>
           </div>
 
           <div className="mt-5">
-            <MatchBreakdown criteria={criteria} variant="full" />
+            <MatchBreakdown criteria={criteria} variant="bars" />
           </div>
 
           <div className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-5">
