@@ -15,7 +15,7 @@ function CityChips({ cities, className = '' }) {
         <Link
           key={name}
           to={`/animais?search=${encodeURIComponent(name)}`}
-          className="inline-flex items-center gap-1.5 rounded-full bg-stone-50 px-4 py-2 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-100 transition-colors duration-300 hover:bg-emerald-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-100 transition-colors duration-300 hover:bg-emerald-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
         >
           {name}
           <span className="text-xs font-bold tabular-nums opacity-60">

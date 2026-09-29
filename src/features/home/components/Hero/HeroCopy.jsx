@@ -1,8 +1,7 @@
 import { LuSparkles } from 'react-icons/lu'
 import ActionLink, { ActionSkeleton } from '../shared/ActionLink'
 import { getPersonaActions } from '../../data/personaActions'
-import { CRITERIA_GUIDE } from '../../data/criteriaGuide'
-import { quizQuestions } from '../../../onboarding/data/quizQuestions'
+import { CRITERIA_COUNT } from '../../data/criteriaGuide'
 import { plural } from '../../utils/homePets'
 
 // "AU" + "migo" nas cores do logo. emerald-600 e amber-600 só passam no
@@ -63,7 +62,7 @@ function getCopy({ kind, firstName, quizProgress }, { pets, eligibleCount }) {
   return {
     eyebrow: 'AUmatch · compatibilidade que se explica',
     title: PERSON_TITLE,
-    subtitle: `O AUmatch compara ${CRITERIA_GUIDE.length} critérios do seu dia a dia com o jeito de cada pet e mostra, ponto a ponto, por que vocês dão match.`,
+    subtitle: `O AUmatch compara ${CRITERIA_COUNT} critérios do seu dia a dia com o jeito de cada pet e mostra, ponto a ponto, por que vocês dão match.`,
   }
 }
 
@@ -136,11 +135,6 @@ function HeroCopy({ persona, featured }) {
         )}
       </div>
 
-      {kind === 'visitor' && (
-        <p className="-mt-2 text-xs font-medium text-slate-500">
-          Conta grátis · {quizQuestions.length} perguntas · o porquê de cada match à vista
-        </p>
-      )}
     </>
   )
 }

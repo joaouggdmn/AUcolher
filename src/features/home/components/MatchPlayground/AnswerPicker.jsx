@@ -1,7 +1,6 @@
 import { FaArrowRotateLeft } from 'react-icons/fa6'
 import { quizQuestions } from '../../../onboarding/data/quizQuestions'
 import { EXAMPLE_PROFILE, SIM_KEYS } from '../../data/exampleProfile'
-import { CRITERION_BY_QUESTION_KEY } from '../../data/criteriaGuide'
 
 // As perguntas reais do quiz (títulos, opções e ícones), menos o porte,
 // que não entra no cálculo
@@ -15,23 +14,6 @@ const STATUS = {
 }
 
 const TAG = 'rounded-full px-2.5 py-0.5 text-[11px] font-bold'
-
-function QuestionTags({ questionKey, showExampleTag }) {
-  const criterion = CRITERION_BY_QUESTION_KEY[questionKey]
-
-  return (
-    <span className="flex flex-wrap gap-1.5">
-      {criterion ? (
-        <span className={`${TAG} bg-white/5 text-emerald-200 ring-1 ring-white/10`}>
-          {criterion.label} · {criterion.maxPoints} pts
-        </span>
-      ) : (
-        <span className={`${TAG} border border-dashed border-white/25 text-emerald-200`}>Filtro · não soma pontos</span>
-      )}
-      {showExampleTag && <span className={`${TAG} bg-amber-400/15 text-amber-300`}>exemplo</span>}
-    </span>
-  )
-}
 
 // Radios nativos com o input escondido (peer): setas do teclado trocam a
 // opção como em qualquer grupo de rádio. O label é relative para o input
@@ -109,9 +91,9 @@ function AnswerPicker({ persona, sim }) {
             <div key={question.key} className="border-t border-white/10 py-5 first:border-t-0 last:pb-0">
               <fieldset>
                 <legend className="w-full">
-                  <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  <span className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <span className="text-sm font-bold text-white">{question.title}</span>
-                    <QuestionTags questionKey={question.key} showExampleTag={isExampleAnswer} />
+                    {isExampleAnswer && <span className={`${TAG} bg-amber-400/15 text-amber-300`}>exemplo</span>}
                   </span>
                 </legend>
 

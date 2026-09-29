@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
 import { useAnimals } from '../../../core/context/AnimalContext'
 import { quizQuestions } from '../../onboarding/data/quizQuestions'
-import { CRITERIA_GUIDE, TOTAL_POINTS } from '../data/criteriaGuide'
 
 // Todo número exibido na home sai daqui: contagem real dos anúncios ou fato
-// do produto (perguntas do quiz, critérios e pontos do algoritmo). Nada de
+// do produto (perguntas do quiz). Nada de
 // estatística escrita à mão
 export function usePlatformStats() {
   const { animals } = useAnimals()
@@ -30,8 +29,6 @@ export function usePlatformStats() {
       ngoCount,
       cities,
       cityCount: cities.length,
-      criteriaCount: CRITERIA_GUIDE.length,
-      totalPoints: TOTAL_POINTS,
       questionCount: quizQuestions.length,
     }
   }, [animals])

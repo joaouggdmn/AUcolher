@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom'
-import { FaArrowRight, FaCircleCheck } from 'react-icons/fa6'
+import { FaCircleCheck } from 'react-icons/fa6'
 import { LuLightbulb } from 'react-icons/lu'
 import MatchBreakdown from '../shared/MatchBreakdown'
 import { explainMatchScore } from '../../../aumatch/utils/matchScore'
@@ -51,18 +50,6 @@ function HeroReceipt({ pet, profile, titleRef, className = '' }) {
           </ul>
         </div>
       )}
-
-      <Link
-        to="#match"
-        className="group mt-4 inline-flex items-center gap-1.5 rounded-full text-xs font-bold text-emerald-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
-      >
-        Como o cálculo funciona
-        <FaArrowRight
-          aria-hidden="true"
-          size={10}
-          className="transition-transform duration-300 group-hover:translate-x-0.5"
-        />
-      </Link>
     </div>
   )
 }

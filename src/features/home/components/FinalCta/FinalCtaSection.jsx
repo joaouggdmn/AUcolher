@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom'
-import { FaArrowRight, FaBuildingShield, FaCalendarDays, FaCircleCheck, FaHandHoldingHeart, FaPaw, FaUserPen } from 'react-icons/fa6'
+import { FaArrowRight, FaCalendarDays, FaCircleCheck, FaHandHoldingHeart, FaPaw, FaUserPen } from 'react-icons/fa6'
 import ActionLink from '../shared/ActionLink'
 import HomeReveal from '../shared/HomeReveal'
-import MoreWaysToHelp from './MoreWaysToHelp'
 import { useRankedPets } from '../../hooks/useRankedPets'
 import { getPersonaActions } from '../../data/personaActions'
 import { isAnswered } from '../../data/exampleProfile'
@@ -46,7 +45,7 @@ function getCopy({ kind, quizProgress }, eligibleCount) {
     return {
       eyebrow: 'Quase lá',
       title: `${plural(missing, 'Falta', 'Faltam')} ${missing} ${plural(missing, 'pergunta', 'perguntas')} para os seus matches.`,
-      subtitle: 'Termine o quiz no AUmatch e veja todos os pets ordenados pela compatibilidade com a sua rotina — sempre com o porquê.',
+      subtitle: 'Termine o quiz e veja todos os pets ordenados para você.',
     }
   }
 
@@ -77,7 +76,7 @@ function getCopy({ kind, quizProgress }, eligibleCount) {
     eyebrow: 'Seu match começa aqui',
     title: `${questionCount} perguntas separam você do seu AUmigo.`,
     subtitle:
-      'Crie sua conta grátis, responda o quiz e veja os pets ordenados pela compatibilidade com a sua rotina — sempre com o porquê.',
+      'Responda o quiz e veja os pets ordenados pela compatibilidade com a sua rotina.',
   }
 }
 
@@ -212,32 +211,6 @@ function SidePanel({ persona }) {
   }
 }
 
-function NgoInviteStrip() {
-  return (
-    <div className="mt-6 flex flex-col gap-5 rounded-3xl bg-white p-6 ring-1 ring-slate-200/70 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-      <div className="flex items-start gap-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
-          <FaBuildingShield aria-hidden="true" size={20} />
-        </span>
-        <div>
-          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">Representa uma ONG?</h3>
-          <p className="mt-1 max-w-xl text-sm leading-relaxed text-slate-600">
-            Cadastre sua instituição: seus animais entram no AUmatch com o selo de verificada, e você gerencia pedidos,
-            campanhas e eventos em um só lugar.
-          </p>
-        </div>
-      </div>
-      <ActionLink
-        action={{ label: 'Cadastrar instituição', to: '/cadastro', state: { preselectUserType: 'ONG' } }}
-        variant="emerald"
-        size="md"
-        showArrow
-        className="shrink-0"
-      />
-    </div>
-  )
-}
-
 function FinalCtaSection({ persona }) {
   const { kind, user } = persona
   const { eligibleCount } = useRankedPets(kind === 'matched' ? user : null, { excludeRequested: true })
@@ -245,7 +218,7 @@ function FinalCtaSection({ persona }) {
   const actions = getActions(persona)
 
   return (
-    <section aria-labelledby="final-title" className="bg-stone-50 py-20 lg:py-28">
+    <section aria-labelledby="final-title" className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         <HomeReveal>
           <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-emerald-900 p-6 shadow-2xl shadow-emerald-950/20 sm:p-12 lg:p-14">
@@ -288,16 +261,6 @@ function FinalCtaSection({ persona }) {
               </div>
             </div>
           </div>
-        </HomeReveal>
-
-        {kind === 'visitor' && (
-          <HomeReveal>
-            <NgoInviteStrip />
-          </HomeReveal>
-        )}
-
-        <HomeReveal>
-          <MoreWaysToHelp className="mt-12" />
         </HomeReveal>
       </div>
     </section>
