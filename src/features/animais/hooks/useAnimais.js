@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
 import {
   changeAnimalStatus,
@@ -36,6 +36,9 @@ export function useAnimalsList({ search = '', filters = {} } = {}) {
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.page + 1 : undefined),
     staleTime: ANIMALS_STALE_TIME,
+    // Ao trocar um filtro, os cards atuais ficam na tela até a resposta nova
+    // chegar, em vez de piscar o esqueleto de carregamento a cada clique
+    placeholderData: keepPreviousData,
   })
 }
 
