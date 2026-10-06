@@ -45,6 +45,8 @@ export function useAnimal(id) {
     queryFn: () => getAnimal(id),
     staleTime: ANIMALS_STALE_TIME,
     enabled: id != null,
+    // 404 é resposta definitiva (não existe ou saiu do ar): tentar de novo só atrasa a tela
+    retry: (failureCount, error) => error.response?.status !== 404 && failureCount < 1,
   })
 }
 

@@ -3,6 +3,8 @@ import PillToggleGroup from '../../../../core/components/ui/filters/PillToggleGr
 import { BRAZILIAN_STATES } from '../../../../core/utils/brazilianStates'
 import { useCepLookup } from '../../../../core/hooks/useCepLookup' // 🆕
 import CepField from '../../../../core/components/ui/CepField' // 🆕
+import { AGE_RULE_HINT, isValidAge } from '../../utils/ageHelpers'
+import { BREED_MAX_LENGTH, NAME_MAX_LENGTH } from '../../hooks/useCreateAnimalForm'
 
 const SPECIES_OPTIONS = [
   { value: 'DOG', label: 'Cão' }, { value: 'CAT', label: 'Gato' }, { value: 'OTHER', label: 'Outro' },
@@ -22,23 +24,31 @@ function StepBasicInfo({ formData, onChange, showLocationFields }) {
     onChange('state', address.state)
   })
 
+  // Só acusa depois que algo foi digitado — campo vazio já trava o "Próximo"
+  const showAgeError = formData.ageValue !== '' && !isValidAge(formData.ageValue, formData.ageUnit)
+
   return (
     <div className="flex flex-col gap-6">
-      <FormField label="Nome do pet" value={formData.name} onChange={(e) => onChange('name', e.target.value)} placeholder="Ex: Thor" />
+      <FormField label="Nome do pet" value={formData.name} onChange={(e) => onChange('name', e.target.value)} placeholder="Ex: Thor" maxLength={NAME_MAX_LENGTH} />
 
       <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold text-slate-700">Espécie</label>
         <PillToggleGroup options={SPECIES_OPTIONS} value={formData.species} onChange={(v) => onChange('species', v)} />
       </div>
 
-      <FormField label="Raça" value={formData.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="Ex: Vira-lata" />
+      <FormField label="Raça" value={formData.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="Ex: Vira-lata" maxLength={BREED_MAX_LENGTH} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <FormField label="Idade" type="number" min="0" value={formData.ageValue} onChange={(e) => onChange('ageValue', e.target.value)} placeholder="Ex: 2" />
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-slate-700">Unidade</label>
-          <PillToggleGroup options={AGE_UNIT_OPTIONS} value={formData.ageUnit} onChange={(v) => onChange('ageUnit', v)} />
+      <div className="flex flex-col gap-1.5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FormField label="Idade" type="number" min="0" max={formData.ageUnit === 'MONTHS' ? 11 : 30} value={formData.ageValue} onChange={(e) => onChange('ageValue', e.target.value)} placeholder="Ex: 2" />
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-slate-700">Unidade</label>
+            <PillToggleGroup options={AGE_UNIT_OPTIONS} value={formData.ageUnit} onChange={(v) => onChange('ageUnit', v)} />
+          </div>
         </div>
+        <p className={`text-xs ${showAgeError ? 'font-semibold text-rose-500' : 'text-slate-400'}`}>
+          {showAgeError ? `Idade inválida: ${AGE_RULE_HINT.toLowerCase()}` : AGE_RULE_HINT}
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">

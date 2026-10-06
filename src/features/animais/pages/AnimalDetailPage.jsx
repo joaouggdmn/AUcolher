@@ -12,7 +12,8 @@ import {
   FaArrowRight,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
-import { useAnimals } from "../../../core/context/AnimalContext";
+import { getErrorMessage } from "../../../core/utils/apiError";
+import Spinner from "../../../core/components/ui/Spinner";
 import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContext";
 import { useProfileCompletion } from "../../../core/hooks/useProfileCompletion";
 import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
@@ -22,6 +23,7 @@ import HealthBadges from "../components/HealthBadges";
 import InterestInfoBubble from "../components/InterestInfoBubble";
 import { buildAdopterSnapshot } from "../../adocao/utils/buildAdopterSnapshot";
 import BehaviorProfile from "../components/BehaviorProfile";
+import { useAnimal } from "../hooks/useAnimais";
 
 const SIZE_LABELS = { SMALL: "Pequeno", MEDIUM: "Médio", LARGE: "Grande" };
 
@@ -30,7 +32,7 @@ function AnimalDetailsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const { animals } = useAnimals();
+  const { data: animal, isLoading, error } = useAnimal(id);
   const { requests, createRequest } = useAdoptionRequests();
   const { percentage: profileCompletion } = useProfileCompletion(user);
 
@@ -39,7 +41,26 @@ function AnimalDetailsPage() {
     location.state?.justCreated ? "Pet cadastrado com sucesso!" : null,
   );
 
-  const animal = animals.find((item) => String(item.id) === id);
+  if (isLoading) {
+    return (
+      <div className="pt-32">
+        <Spinner />
+      </div>
+    );
+  }
+
+  // 404 (inexistente, ou tirado do ar por outra pessoa) cai no "não encontrado"
+  // abaixo; qualquer outro erro é de conexão/servidor e merece outra mensagem
+  if (error && error.response?.status !== 404) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 pb-16 pt-32 text-center">
+        <h1 className="text-2xl font-extrabold tracking-tight text-emerald-950">
+          Não foi possível carregar este animal
+        </h1>
+        <p className="mt-2 text-slate-500">{getErrorMessage(error)}</p>
+      </div>
+    );
+  }
 
   if (!animal) {
     return (
