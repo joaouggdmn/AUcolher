@@ -20,7 +20,11 @@ export function AuthProvider({ children }) {
 
     if (storedToken && storedUser) {
       try {
-        setUser(JSON.parse(storedUser))
+        const parsedUser = JSON.parse(storedUser)
+        // Sessão salva antes da API em inglês (usuário com `cidade`/`estado`):
+        // descarta e pede um novo login, que traz o perfil no formato atual
+        if ('cidade' in parsedUser) throw new Error('sessão em formato antigo')
+        setUser(parsedUser)
         setIsAuthenticated(true)
       } catch {
         localStorage.removeItem(TOKEN_STORAGE_KEY)
@@ -45,8 +49,8 @@ export function AuthProvider({ children }) {
     // 🆕 Sem isso, cada novo login apagava silenciosamente as respostas do
     // quiz que o usuário já tinha dado — o backend não devolve esses
     // campos (toFrontendUser sempre reseta para vazio)
-    // O perfil público (bio, redes, endereço, equipe...) vem inteiro da API:
-    // "Minha conta" salva pelo PUT /usuarios/me
+    // O perfil público (bio, redes, endereço, cidade/UF, equipe...) vem
+    // inteiro da API: "Minha conta" salva pelo PUT /users/me
     const storedLifestyle = loadStoredLifestyleProfile()
     const mergedUser = { ...loggedUser, ...storedLifestyle }
 
@@ -73,7 +77,7 @@ export function AuthProvider({ children }) {
   }
 
   // Só atualiza a sessão local — quem precisa gravar no banco chama a API
-  // antes (ver useAccountForm, que usa o PUT /usuarios/me)
+  // antes (ver useAccountForm, que usa o PUT /users/me)
   function updateProfile(updates) {
     persistLifestyleFields(updates)
 
@@ -84,19 +88,25 @@ export function AuthProvider({ children }) {
     })
   }
 
-  // 🆕 Mesmos campos monitorados por useProfileCompletion — o backend ainda
-// não tem colunas para eles, então persistimos numa chave própria,
-// independente da sessão de autenticação
+  // 🆕 Campos que o backend ainda não guarda (coordenadas e Perfil AUmatch),
+// persistidos numa chave própria, independente da sessão de autenticação.
+// Cidade, UF e CEP NÃO entram aqui: eles têm coluna no banco, e uma cópia
+// local sobrescreveria no login o que a API acabou de devolver
 const LIFESTYLE_FIELDS = [
-  'cidade', 'estado', 'cep', 'latitude', 'longitude',
+  'latitude', 'longitude',
   'moradia', 'rotinaExercicio', 'tempoForaCasa',
   'temCriancasOuPets', 'speciesPreference', 'idealPetProfile', 'portePreferido',
 ]
 
+// Só devolve os campos da lista acima — descarta chaves que versões antigas
+// guardaram aqui (cidade, estado, cep) e que agora vêm do banco
 function loadStoredLifestyleProfile() {
   try {
     const stored = localStorage.getItem(LIFESTYLE_PROFILE_STORAGE_KEY)
-    if (stored) return JSON.parse(stored)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      return Object.fromEntries(Object.entries(parsed).filter(([key]) => LIFESTYLE_FIELDS.includes(key)))
+    }
   } catch {
     // payload corrompido — ignora
   }

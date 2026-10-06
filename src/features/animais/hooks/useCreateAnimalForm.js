@@ -39,7 +39,7 @@ export function useCreateAnimalForm() {
 
   // Calculado UMA vez na montagem — não deve "sumir" o campo se algo mudar
   // no meio do preenchimento (mesmo princípio do isQuizOpen no AumatchPage)
-  const [needsLocationInput] = useState(() => !user?.cidade || !user?.estado)
+  const [needsLocationInput] = useState(() => !user?.city || !user?.state)
 
   const [stepIndex, setStepIndex] = useState(0)
   const [formData, setFormData] = useState(INITIAL_FORM)
@@ -100,8 +100,8 @@ export function useCreateAnimalForm() {
     setIsSubmitting(true)
 
     const isNgo = user?.userType === 'ONG'
-    const city = needsLocationInput ? formData.city : user?.cidade
-    const state = needsLocationInput ? formData.state : user?.estado
+    const city = needsLocationInput ? formData.city : user?.city
+    const state = needsLocationInput ? formData.state : user?.state
 
     const newAnimalPayload = {
       ...formData,
@@ -129,7 +129,7 @@ export function useCreateAnimalForm() {
     // (updateProfile(answers)) — a localização informada aqui passa a
     // valer permanentemente no perfil, não só neste anúncio
     if (needsLocationInput) {
-      updateProfile({ cidade: formData.city, estado: formData.state })
+      updateProfile({ city: formData.city, state: formData.state })
     }
 
     setIsSubmitting(false)

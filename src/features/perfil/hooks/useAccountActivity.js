@@ -30,7 +30,7 @@ function deriveListingStatus(animal, requests) {
 
 // Tudo o que as quatro seções inferiores de "Minha conta" mostram, a partir
 // das mesmas fontes do perfil público — os números batem entre as páginas.
-// 🔴 Com a API real, cada bloco vira uma chamada: /usuarios/{id}/animais,
+// 🔴 Com a API real, cada bloco vira uma chamada: /users/{id}/animals,
 // /avaliacoes, /adocoes, /doacoes e /eventos
 export function useAccountActivity(user) {
   const { animals } = useAnimals()
