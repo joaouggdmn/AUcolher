@@ -29,7 +29,7 @@ function AccountActivity({ user }) {
   const { animals, reviews, impact, events } = useAccountActivity(user)
   const [activeKey, setActiveKey] = useState('animais')
 
-  const availableCount = animals.filter((animal) => animal.listingStatus === 'DISPONIVEL').length
+  const availableCount = animals.filter((animal) => animal.listingStatus === 'AVAILABLE').length
 
   const sections = [
     {

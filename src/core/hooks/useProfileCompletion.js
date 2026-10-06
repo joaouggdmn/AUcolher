@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 const PERSON_CHECKLIST = [
   { key: 'nome', label: 'Nome completo', check: (p) => !!p?.name?.trim() },
   { key: 'email', label: 'E-mail', check: (p) => !!p?.email?.trim() },
-  { key: 'localizacao', label: 'Localização', check: (p) => !!p?.cidade?.trim() && !!p?.estado },
+  { key: 'localizacao', label: 'Localização', check: (p) => !!p?.city?.trim() && !!p?.state },
   {
     key: 'estiloDeVida',
     label: 'Perfil AUmatch',

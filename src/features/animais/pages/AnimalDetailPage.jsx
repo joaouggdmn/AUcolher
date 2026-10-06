@@ -10,9 +10,11 @@ import {
   FaShieldHalved,
   FaCircleCheck,
   FaArrowRight,
+  FaHouseChimney,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
-import { useAnimals } from "../../../core/context/AnimalContext";
+import { getErrorMessage } from "../../../core/utils/apiError";
+import Spinner from "../../../core/components/ui/Spinner";
 import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContext";
 import { useProfileCompletion } from "../../../core/hooks/useProfileCompletion";
 import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
@@ -22,6 +24,8 @@ import HealthBadges from "../components/HealthBadges";
 import InterestInfoBubble from "../components/InterestInfoBubble";
 import { buildAdopterSnapshot } from "../../adocao/utils/buildAdopterSnapshot";
 import BehaviorProfile from "../components/BehaviorProfile";
+import OwnerListingPanel from "../components/OwnerListingPanel";
+import { useAnimal } from "../hooks/useAnimais";
 
 const SIZE_LABELS = { SMALL: "Pequeno", MEDIUM: "Médio", LARGE: "Grande" };
 
@@ -30,7 +34,7 @@ function AnimalDetailsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const { animals } = useAnimals();
+  const { data: animal, isLoading, error } = useAnimal(id);
   const { requests, createRequest } = useAdoptionRequests();
   const { percentage: profileCompletion } = useProfileCompletion(user);
 
@@ -39,7 +43,26 @@ function AnimalDetailsPage() {
     location.state?.justCreated ? "Pet cadastrado com sucesso!" : null,
   );
 
-  const animal = animals.find((item) => String(item.id) === id);
+  if (isLoading) {
+    return (
+      <div className="pt-32">
+        <Spinner />
+      </div>
+    );
+  }
+
+  // 404 (inexistente, ou tirado do ar por outra pessoa) cai no "não encontrado"
+  // abaixo; qualquer outro erro é de conexão/servidor e merece outra mensagem
+  if (error && error.response?.status !== 404) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 pb-16 pt-32 text-center">
+        <h1 className="text-2xl font-extrabold tracking-tight text-emerald-950">
+          Não foi possível carregar este animal
+        </h1>
+        <p className="mt-2 text-slate-500">{getErrorMessage(error)}</p>
+      </div>
+    );
+  }
 
   if (!animal) {
     return (
@@ -60,12 +83,13 @@ function AnimalDetailsPage() {
     );
   }
 
-  const isFemale = animal.sex === "F";
+  const isFemale = animal.sex === "FEMALE";
   const isNgo = animal.listingType === "NGO";
   const ownerDisplayName = isNgo
     ? (animal.organizationName ?? animal.ownerName)
     : animal.ownerName;
   const isOwner = isAuthenticated && animal.ownerId === user?.id;
+  const isAdopted = animal.status === "ADOPTED";
 
   // Evita pedidos duplicados enquanto testamos o fluxo com contas reais
   const alreadyRequested =
@@ -112,9 +136,17 @@ function AnimalDetailsPage() {
 
         <div className="flex flex-col gap-6">
           <header>
-            <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
-              {animal.name}
-            </h1>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+                {animal.name}
+              </h1>
+              {isAdopted && (
+                <span className="flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
+                  <FaHouseChimney size={11} />
+                  {isFemale ? "Adotada" : "Adotado"}
+                </span>
+              )}
+            </div>
             <p className="mt-1 flex items-center gap-1.5 text-slate-500">
               {animal.breed}
               <span className="text-slate-300">·</span>
@@ -193,9 +225,25 @@ function AnimalDetailsPage() {
 
           <div className="mt-2 flex flex-col gap-3">
             {isOwner ? (
-              <p className="rounded-xl bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-500">
-                Este é um dos seus animais cadastrados.
-              </p>
+              <OwnerListingPanel
+                animal={animal}
+                onStatusChanged={setSuccessMessage}
+              />
+            ) : isAdopted ? (
+              <div className="rounded-2xl bg-amber-50 px-5 py-4 text-center">
+                <p className="text-sm font-bold text-amber-900">
+                  {animal.name} já encontrou um lar!
+                </p>
+                <p className="mt-1 text-sm text-amber-800/80">
+                  Este anúncio não recebe mais pedidos de interesse.
+                </p>
+                <Link
+                  to="/animais"
+                  className="mt-3 inline-block rounded-full bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+                >
+                  Ver outros animais
+                </Link>
+              </div>
             ) : (
               <>
                 <InterestInfoBubble />

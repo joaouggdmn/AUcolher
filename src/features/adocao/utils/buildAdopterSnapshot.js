@@ -16,8 +16,8 @@ export function buildAdopterSnapshot(user, profileCompletion) {
     userId: user.id,
     name: user.name,
     photoUrl: user.photoUrl,
-    city: user.cidade || 'Não informado',
-    state: user.estado || '--',
+    city: user.city || 'Não informado',
+    state: user.state || '--',
     profileCompletion,
     lifestyleSummary: lifestyleParts.length > 0 ? lifestyleParts.join(' · ') : 'Perfil ainda incompleto',
 
