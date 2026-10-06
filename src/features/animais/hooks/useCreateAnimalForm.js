@@ -11,7 +11,7 @@ const INITIAL_FORM = {
   species: '',
   breed: '',
   ageValue: '',
-  ageUnit: 'ANOS',
+  ageUnit: 'YEARS',
   sex: '',
   size: '',
   city: '',   // 🆕 só usado quando o usuário ainda não tem localização no perfil

@@ -159,7 +159,7 @@ function AnimaisListPage() {
     const filtered = withDistance.filter((animal) => {
       // 🆕 Animal já adotado nunca aparece na busca, independente dos
       // demais filtros — o mesmo critério usado pelo AUmatch
-      if (animal.status === 'ADOTADO') return false
+      if (animal.status === 'ADOPTED') return false
 
       const term = search.toLowerCase()
       const matchesSearch =
