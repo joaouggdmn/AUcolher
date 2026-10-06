@@ -14,13 +14,6 @@ export function chatMessagesStorageKey(requestId) {
   return `chat_messages_${requestId}`
 }
 
-// 🆕 Favoritos são uma lista pessoal e privada (seção 6.3 das regras de
-// negócio): cada usuário tem a própria chave, para que dois logins no mesmo
-// navegador não compartilhem — nem sobrescrevam — a lista do outro
-export function favoritesStorageKey(userId) {
-  return `aucolher_favorites_${userId}`
-}
-
 // Última leitura de cada conversa (requestId → ISO timestamp), por conta —
 // é o que permite contar mensagens não lidas no badge da sidebar
 export function chatLastSeenStorageKey(userId) {

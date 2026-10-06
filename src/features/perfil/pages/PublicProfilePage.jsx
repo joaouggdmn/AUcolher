@@ -2,10 +2,10 @@ import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import Spinner from '../../../core/components/ui/Spinner'
 import AnimalCard from '../../animais/components/AnimalCard'
+import { useUserAnimals } from '../../animais/hooks/useAnimais'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
 import { usePublicProfile } from '../hooks/usePublicProfile'
 import ProfileTabs from '../components/ProfileTabs'
@@ -16,16 +16,12 @@ import ProfileReviewsList from '../components/public/ProfileReviewsList'
 function PublicProfilePage() {
   const { id } = useParams()
   const { user } = useAuth()
-  const { animals } = useAnimals()
   const { requests } = useAdoptionRequests()
   const { profile, isLoading } = usePublicProfile(id)
   const reviewsData = useUserReviews(id)
 
-  // 🔴 Com a API real: GET /users/{id}/animals
-  const availableAnimals = useMemo(
-    () => animals.filter((animal) => String(animal.ownerId) === id && animal.status !== 'ADOPTED'),
-    [animals, id],
-  )
+  // GET /users/{id}/animals: a API já devolve só os disponíveis
+  const { data: availableAnimals = [] } = useUserAnimals(id)
 
   const liveConcludedAdoptions = useMemo(
     () =>
