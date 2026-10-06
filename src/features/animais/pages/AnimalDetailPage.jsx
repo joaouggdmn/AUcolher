@@ -60,7 +60,7 @@ function AnimalDetailsPage() {
     );
   }
 
-  const isFemale = animal.sex === "F";
+  const isFemale = animal.sex === "FEMALE";
   const isNgo = animal.listingType === "NGO";
   const ownerDisplayName = isNgo
     ? (animal.organizationName ?? animal.ownerName)

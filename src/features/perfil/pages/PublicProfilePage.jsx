@@ -23,7 +23,7 @@ function PublicProfilePage() {
 
   // 🔴 Com a API real: GET /users/{id}/animals
   const availableAnimals = useMemo(
-    () => animals.filter((animal) => String(animal.ownerId) === id && animal.status !== 'ADOTADO'),
+    () => animals.filter((animal) => String(animal.ownerId) === id && animal.status !== 'ADOPTED'),
     [animals, id],
   )
 

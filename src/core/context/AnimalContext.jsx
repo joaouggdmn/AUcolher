@@ -56,7 +56,7 @@ export function AnimalProvider({ children }) {
 
   function markAnimalAsAdopted(animalId) {
   setAnimals((prev) =>
-    prev.map((animal) => (animal.id === animalId ? { ...animal, status: 'ADOTADO' } : animal))
+    prev.map((animal) => (animal.id === animalId ? { ...animal, status: 'ADOPTED' } : animal))
   )
 }
 

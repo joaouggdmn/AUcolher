@@ -7,11 +7,11 @@ import CepField from '../../../../core/components/ui/CepField' // 🆕
 const SPECIES_OPTIONS = [
   { value: 'DOG', label: 'Cão' }, { value: 'CAT', label: 'Gato' }, { value: 'OTHER', label: 'Outro' },
 ]
-const SEX_OPTIONS = [{ value: 'M', label: 'Macho' }, { value: 'F', label: 'Fêmea' }]
+const SEX_OPTIONS = [{ value: 'MALE', label: 'Macho' }, { value: 'FEMALE', label: 'Fêmea' }]
 const SIZE_OPTIONS = [
   { value: 'SMALL', label: 'Pequeno' }, { value: 'MEDIUM', label: 'Médio' }, { value: 'LARGE', label: 'Grande' },
 ]
-const AGE_UNIT_OPTIONS = [{ value: 'ANOS', label: 'Anos' }, { value: 'MESES', label: 'Meses' }]
+const AGE_UNIT_OPTIONS = [{ value: 'YEARS', label: 'Anos' }, { value: 'MONTHS', label: 'Meses' }]
 
 function StepBasicInfo({ formData, onChange, showLocationFields }) {
   // 🆕 Preenche cidade/estado automaticamente assim que o CEP é resolvido —

@@ -2,7 +2,9 @@ export const TOKEN_STORAGE_KEY = 'aucolher_token'
 export const TOKEN_TYPE_STORAGE_KEY = 'aucolher_token_type'
 export const USER_STORAGE_KEY = 'aucolher_user'
 export const ADOPTION_REQUESTS_STORAGE_KEY = 'aucolher_adoption_requests'
-export const ANIMALS_STORAGE_KEY = 'aucolher_animals'
+// _v2: os animais salvos pela versão anterior usavam M/F, ANOS/MESES e ADOTADO;
+// com a chave nova eles são descartados e o mock recomeça do seed atual
+export const ANIMALS_STORAGE_KEY = 'aucolher_animals_v2'
 export const LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile' // 🆕
 
 // Chave dinâmica: cada conversa (match aceito) tem seu próprio histórico

@@ -21,11 +21,11 @@ function startOfToday() {
 // Status do anúncio do ponto de vista do dono: "em processo" quando já
 // existe um pedido aceito caminhando para a entrega
 function deriveListingStatus(animal, requests) {
-  if (animal.status === 'ADOTADO') return 'ADOTADO'
+  if (animal.status === 'ADOPTED') return 'ADOPTED'
   const hasActiveAdoption = requests.some(
     (request) => request.animalId === animal.id && IN_PROGRESS_STATUSES.includes(request.status)
   )
-  return hasActiveAdoption ? 'EM_PROCESSO' : 'DISPONIVEL'
+  return hasActiveAdoption ? 'IN_PROGRESS' : 'AVAILABLE'
 }
 
 // Tudo o que as quatro seções inferiores de "Minha conta" mostram, a partir
