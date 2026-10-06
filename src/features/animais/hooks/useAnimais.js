@@ -104,12 +104,17 @@ export function useUpdateAnimal() {
   })
 }
 
-// Marcar como adotado, tirar do ar ou reativar
+// Marcar como adotado, tirar do ar ou reativar. A resposta já é o animal
+// atualizado: entra direto no cache do detalhe, e a tela muda sem esperar o refetch
 export function useChangeAnimalStatus() {
+  const queryClient = useQueryClient()
   const invalidate = useInvalidateAnimals()
   return useMutation({
     mutationFn: ({ id, status }) => changeAnimalStatus(id, status),
-    onSuccess: invalidate,
+    onSuccess: (animal, { id }) => {
+      queryClient.setQueryData(animalKeys.detail(id), animal)
+      invalidate()
+    },
   })
 }
 
