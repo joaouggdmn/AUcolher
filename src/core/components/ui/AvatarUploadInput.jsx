@@ -11,7 +11,7 @@ function AvatarUploadInput({ value, onChange, fallbackInitial, size = 'lg' }) {
     const file = e.target.files?.[0]
     if (!file || !file.type.startsWith('image/')) return
 
-    // 🔴 Vai como data URL no fotoUrl do cadastro (coluna foto_url) e volta
+    // 🔴 Vai como data URL no photoUrl do cadastro (coluna photo_url) e volta
     // em toda resposta de login — por isso reduzido a um avatar leve
     // (~400px, dezenas de KB). Com upload próprio (S3, Cloudinary etc.), o
     // backend passaria a guardar só a URL pública

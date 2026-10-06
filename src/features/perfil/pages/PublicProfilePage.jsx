@@ -21,7 +21,7 @@ function PublicProfilePage() {
   const { profile, isLoading } = usePublicProfile(id)
   const reviewsData = useUserReviews(id)
 
-  // 🔴 Com a API real: GET /usuarios/{id}/animais?status=DISPONIVEL
+  // 🔴 Com a API real: GET /users/{id}/animals
   const availableAnimals = useMemo(
     () => animals.filter((animal) => String(animal.ownerId) === id && animal.status !== 'ADOTADO'),
     [animals, id],
