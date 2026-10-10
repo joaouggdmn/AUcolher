@@ -9,7 +9,7 @@ const TIMELINE_META = {
 }
 
 function formatDate(date) {
-  // Datas do mock vêm como 'YYYY-MM-DD'; as de adoção, como ISO completo
+  // 'YYYY-MM-DD' vira meia-noite local; datas com hora (adoção, doação) vão direto
   const parsed = date.length === 10 ? new Date(`${date}T00:00:00`) : new Date(date)
   return parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
@@ -32,7 +32,8 @@ function ImpactPanel({ impact, isOng }) {
   const tiles = [
     { key: 'adocoes', value: impact.adoptionsCount, label: isOng ? 'Adoções realizadas' : 'Adoções concluídas' },
     { key: 'andamento', value: impact.inProgressCount, label: 'Adoções em andamento' },
-    ...(isOng ? [] : [{ key: 'doado', value: formatCurrency(impact.totalDonated), label: 'Total doado', tone: 'amber' }]),
+    // ONG também doa para campanhas de outras ONGs
+    { key: 'doado', value: formatCurrency(impact.totalDonated), label: 'Total doado', tone: 'amber' },
   ]
 
   return (
@@ -49,7 +50,7 @@ function ImpactPanel({ impact, isOng }) {
           title="Seu histórico de impacto aparecerá aqui."
           description={
             isOng
-              ? 'Cada adoção concluída pela instituição entra nesta linha do tempo.'
+              ? 'Cada adoção concluída pela instituição e cada doação para outras campanhas entram nesta linha do tempo.'
               : 'Adoções concluídas e doações para campanhas entram nesta linha do tempo.'
           }
         />

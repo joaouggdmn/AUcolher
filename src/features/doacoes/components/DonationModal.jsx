@@ -1,11 +1,21 @@
 import { useEffect, useState } from 'react'
-import { FaXmark, FaQrcode, FaRegCopy, FaCheck, FaHeart } from 'react-icons/fa6'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { FaXmark } from 'react-icons/fa6'
+import { useAuth } from '../../../core/context/AuthContext'
+import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+import DonationForm from './DonationForm'
+import DonationStatusStep from './DonationStatusStep'
 
-// 🔴 Em produção: cada ONG teria sua própria chave PIX vinda do backend (campaign.pixKey)
-const PIX_KEY = 'aucolher.doacoes@pix.org.br'
-
+// Doação por PIX em etapas, todas derivadas do estado (sem effect trocando
+// de passo): sem login → convite; sem doação → valor; com doação → status
+// (QR e polling enquanto PENDING, depois sucesso / expirado / cancelado)
 function DonationModal({ campaign, onClose }) {
-  const [isCopied, setIsCopied] = useState(false)
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [donationId, setDonationId] = useState(null)
+  // Valor da última tentativa: "Gerar novo PIX" volta com ele preenchido
+  const [lastAmount, setLastAmount] = useState(null)
 
   // Fecha com Esc — pequeno cuidado de acessibilidade
   useEffect(() => {
@@ -18,14 +28,19 @@ function DonationModal({ campaign, onClose }) {
 
   if (!campaign) return null
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(PIX_KEY)
-      setIsCopied(true)
-      setTimeout(() => setIsCopied(false), 2000)
-    } catch {
-      console.error('Não foi possível copiar a chave PIX.')
-    }
+  if (!user) {
+    return (
+      <AuthRequiredModal
+        message="Para doar, entre na sua conta: assim a doação fica registrada no seu histórico."
+        onCancel={onClose}
+        onLogin={() => navigate('/login', { state: { from: location } })}
+      />
+    )
+  }
+
+  const handleCreated = (id, amount) => {
+    setLastAmount(amount)
+    setDonationId(id)
   }
 
   return (
@@ -36,7 +51,8 @@ function DonationModal({ campaign, onClose }) {
       <div
         role="dialog"
         aria-modal="true"
-        className="relative z-10 w-full max-w-sm animate-fade-slide-in rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+        aria-labelledby="donation-modal-title"
+        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-md animate-fade-slide-in overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
       >
         <button
           type="button"
@@ -47,40 +63,19 @@ function DonationModal({ campaign, onClose }) {
           <FaXmark size={16} />
         </button>
 
-        <div className="flex flex-col items-center gap-1 pr-6 text-center">
+        <div className="flex flex-col items-center gap-1 px-6 text-center">
           <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">Você está ajudando</span>
-          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{campaign.title}</h3>
+          <h3 id="donation-modal-title" className="text-lg font-extrabold tracking-tight text-emerald-950">
+            {campaign.title}
+          </h3>
+          <p className="text-sm text-slate-500">{campaign.ong.name}</p>
         </div>
 
-        {/* Placeholder de QR Code — futuramente gerado dinamicamente (ex: lib qrcode.react)
-            a partir da chave PIX real da ONG responsável pela campanha */}
-        <div className="mx-auto mt-6 flex h-48 w-48 items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
-          <FaQrcode size={96} className="text-slate-300" />
-        </div>
-
-        <div className="mt-6 flex flex-col gap-2">
-          <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">Chave PIX (aleatória)</label>
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2 pl-4">
-            <span className="flex-1 truncate text-sm font-medium text-slate-700">{PIX_KEY}</span>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all duration-300 ${
-                isCopied
-                  ? 'bg-emerald-700 text-white'
-                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-800 hover:text-white'
-              }`}
-            >
-              {isCopied ? <FaCheck size={12} /> : <FaRegCopy size={12} />}
-              {isCopied ? 'Copiado' : 'Copiar'}
-            </button>
-          </div>
-        </div>
-
-        <p className="mt-6 flex items-center justify-center gap-2 text-center text-sm text-slate-500">
-          <FaHeart size={13} className="text-rose-500" />
-          Cada doação, de qualquer valor, transforma uma vida. Obrigado!
-        </p>
+        {donationId == null ? (
+          <DonationForm campaign={campaign} initialAmount={lastAmount} onCreated={handleCreated} />
+        ) : (
+          <DonationStatusStep donationId={donationId} onRetry={() => setDonationId(null)} onClose={onClose} />
+        )}
       </div>
     </div>
   )

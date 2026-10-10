@@ -60,11 +60,9 @@ function AccountActivity({ user }) {
       label: 'Meu impacto',
       visibility: 'private',
       value: impact.adoptionsCount,
-      caption: isOng
-        ? plural(impact.adoptionsCount, 'adoção realizada', 'adoções realizadas')
-        : `${plural(impact.adoptionsCount, 'adoção', 'adoções')} · ${formatCurrency(impact.totalDonated)} doados`,
+      caption: `${plural(impact.adoptionsCount, isOng ? 'adoção realizada' : 'adoção', isOng ? 'adoções realizadas' : 'adoções')} · ${formatCurrency(impact.totalDonated)} doados`,
       description: isOng
-        ? 'Adoções concluídas pela instituição. O total aparece no perfil público; o histórico fica só aqui.'
+        ? 'Adoções concluídas pela instituição e doações para outras campanhas. O total de adoções aparece no perfil público; o histórico fica só aqui.'
         : 'Adoções concluídas e doações para campanhas. O número de adoções aparece no seu perfil; o histórico fica só aqui.',
       actions: isOng
         ? [{ to: '/interesses-recebidos', label: 'Interesses recebidos' }]

@@ -3,11 +3,12 @@ import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
 import { useMyAttendance } from '../../eventos/hooks/useEventos'
-import { mockUserDonations } from '../data/mockUserDonations'
+import { useMyDonations } from '../../doacoes/hooks/useDoacoes'
 import { useMyAnimals } from '../../animais/hooks/useAnimais'
 
 const IN_PROGRESS_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
 const NO_EVENTS = []
+const NO_DONATIONS = []
 
 function isSameId(a, b) {
   return a != null && b != null && String(a) === String(b)
@@ -29,17 +30,17 @@ function deriveListingStatus(animal, requests) {
 
 // Tudo o que as quatro seções inferiores de "Minha conta" mostram, a partir
 // das mesmas fontes do perfil público — os números batem entre as páginas.
-// Os animais já vêm da API (GET /animals/mine, em qualquer status) e os
-// eventos do eventoService (mock ou API, ver USE_MOCK_EVENTOS).
-// 🔴 Com a API real, os outros blocos viram uma chamada cada: /avaliacoes,
-// /adocoes e /doacoes
+// Os animais já vêm da API (GET /animals/mine, em qualquer status); eventos e
+// doações, dos seus serviços (mock ou API, ver USE_MOCK_EVENTOS/_CAMPANHAS).
+// 🔴 Com a API real, os outros blocos viram uma chamada cada: /avaliacoes e
+// /adocoes
 export function useAccountActivity(user) {
   const { animals } = useAnimals()
   const { data: myApiAnimals = [] } = useMyAnimals()
   const { requests } = useAdoptionRequests()
   const reviews = useUserReviews(user?.id)
   const { data: attendedEvents = NO_EVENTS } = useMyAttendance()
-  const isOng = user?.userType === 'ONG'
+  const { data: myDonations = NO_DONATIONS } = useMyDonations()
 
   const activity = useMemo(() => {
     const userId = user?.id
@@ -72,8 +73,20 @@ export function useAccountActivity(user) {
         }
       })
 
-    // ONG recebe doações pelas campanhas, não doa — o histórico dela é de adoções
-    const donations = isOng ? [] : mockUserDonations.map((donation) => ({ ...donation, type: 'DOACAO' }))
+    // Só doações pagas entram no impacto; PIX expirado/cancelado não conta.
+    // ONG também doa (para campanhas de outras ONGs)
+    const donations = myDonations
+      .filter((donation) => donation.status === 'APPROVED')
+      .map((donation) => ({
+        id: `doacao-${donation.id}`,
+        type: 'DOACAO',
+        title: donation.campaign.title,
+        subtitle: donation.campaign.isRemoved
+          ? `${donation.campaign.ngoName} · campanha encerrada pela ONG`
+          : donation.campaign.ngoName,
+        amount: donation.amount,
+        date: donation.approvedAt ?? donation.createdAt,
+      }))
 
     const impact = {
       adoptionsCount: adoptions.length,
@@ -91,7 +104,7 @@ export function useAccountActivity(user) {
     }
 
     return { animals: myAnimals, impact, events }
-  }, [user?.id, isOng, animals, myApiAnimals, requests, attendedEvents])
+  }, [user?.id, animals, myApiAnimals, requests, attendedEvents, myDonations])
 
   return { ...activity, reviews }
 }
