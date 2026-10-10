@@ -14,7 +14,7 @@ import ToggleSwitch from '../../../core/components/ui/filters/ToggleSwitch'
 import ProfileSection from '../../perfil/components/ProfileSection'
 import TextAreaField from '../../perfil/components/account/TextAreaField'
 import { CATEGORIA_OPTIONS } from './filters/filterOptions'
-import { EVENTO_LIMITS } from '../utils/eventoRules'
+import { EVENT_LIMITS } from '../utils/eventoRules'
 import { EVENT_FORM_FIELDS, eventFieldId, getEventFormErrors } from '../utils/eventForm'
 
 function FieldError({ message }) {
@@ -96,7 +96,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
             value={values.title}
             onChange={(e) => setField('title', e.target.value)}
             placeholder="Ex: Feira de Adoção de Primavera"
-            maxLength={EVENTO_LIMITS.titulo.max}
+            maxLength={EVENT_LIMITS.title.max}
             {...fieldProps('title')}
           />
 
@@ -111,7 +111,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
             value={values.description}
             onChange={(value) => setField('description', value)}
             rows={6}
-            maxLength={EVENTO_LIMITS.descricao}
+            maxLength={EVENT_LIMITS.description}
             placeholder="Conte o que as pessoas vão encontrar, se precisam levar algo e como participar."
             {...fieldProps('description')}
           />
@@ -154,7 +154,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               value={values.location.venue}
               onChange={(e) => setLocationField('venue', e.target.value)}
               placeholder="Ex: Parque Centenário, Sede da ONG"
-              maxLength={EVENTO_LIMITS.localNome}
+              maxLength={EVENT_LIMITS.venueName}
               {...fieldProps('venue')}
             />
           </div>
@@ -174,7 +174,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               value={values.location.number}
               onChange={(e) => setLocationField('number', e.target.value)}
               placeholder="Opcional"
-              maxLength={EVENTO_LIMITS.numero}
+              maxLength={EVENT_LIMITS.number}
               {...fieldProps('number')}
             />
           </div>
@@ -184,7 +184,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               value={values.location.street}
               onChange={(e) => setLocationField('street', e.target.value)}
               placeholder="Rua, avenida, praça..."
-              maxLength={EVENTO_LIMITS.logradouro}
+              maxLength={EVENT_LIMITS.street}
               {...fieldProps('street')}
             />
           </div>
@@ -194,7 +194,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               value={values.location.district}
               onChange={(e) => setLocationField('district', e.target.value)}
               placeholder="Opcional"
-              maxLength={EVENTO_LIMITS.bairro}
+              maxLength={EVENT_LIMITS.district}
               {...fieldProps('district')}
             />
           </div>
@@ -204,7 +204,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               value={values.location.complement}
               onChange={(e) => setLocationField('complement', e.target.value)}
               placeholder="Opcional"
-              maxLength={EVENTO_LIMITS.complemento}
+              maxLength={EVENT_LIMITS.complement}
               {...fieldProps('complement')}
             />
           </div>
@@ -213,7 +213,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               label="Cidade"
               value={values.location.city}
               onChange={(e) => setLocationField('city', e.target.value)}
-              maxLength={EVENTO_LIMITS.cidade}
+              maxLength={EVENT_LIMITS.city}
               {...fieldProps('city')}
             />
           </div>

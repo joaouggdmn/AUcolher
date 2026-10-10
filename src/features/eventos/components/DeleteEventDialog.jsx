@@ -5,7 +5,7 @@ import { useDeleteEvent } from '../hooks/useEventos'
 
 // Excluir sempre é permitido, mas o efeito depende de quem já confirmou
 // (regras §10): sem confirmados o evento some de vez; com confirmados ele
-// vira CANCELADO e continua em Minha conta de quem ia participar.
+// vira CANCELLED e continua em Minha conta de quem ia participar.
 // `onDeleted(message)` recebe o texto do toast
 function DeleteEventDialog({ event, onClose, onDeleted }) {
   const deleteEvent = useDeleteEvent()

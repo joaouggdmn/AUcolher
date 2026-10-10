@@ -10,40 +10,41 @@ import {
 import { MOCK_EVENTOS_STORE_KEY } from '../../../core/utils/storageKeys'
 import { addDaysIso, nowLocalIso, todayLocalIso } from '../../../core/utils/localDate'
 import { buildSeedEventos, DEMO_ATTENDANCE_EVENT_IDS } from '../data/seedEventos'
-import { getEventoPayloadErrors } from '../utils/eventoRules'
+import { getEventPayloadErrors } from '../utils/eventoRules'
 
 // 🔴 Servidor falso de eventos: mesmas funções de eventosApi.js e mesmas
 // regras, DTOs e erros do contrato (docs/api-campanhas-eventos.md). Cada
 // função espera o "tempo de rede" e depois lê, altera e grava o localStorage
-// num bloco síncrono, para duas chamadas nunca se atropelarem
-const store = createMockStore({ key: MOCK_EVENTOS_STORE_KEY, version: 1, seed: buildSeedEventos })
+// num bloco síncrono, para duas chamadas nunca se atropelarem.
+// Versão 2: contrato em inglês — os dados da versão 1 são descartados
+const store = createMockStore({ key: MOCK_EVENTOS_STORE_KEY, version: 2, seed: buildSeedEventos })
 
 const PAYLOAD_FIELDS = [
-  'titulo', 'descricao', 'categoria', 'data', 'horaInicio', 'horaFim', 'localNome', 'cep',
-  'logradouro', 'numero', 'complemento', 'bairro', 'cidade', 'estado', 'vagas', 'capaUrl',
+  'title', 'description', 'category', 'date', 'startTime', 'endTime', 'venueName', 'cep',
+  'street', 'number', 'complement', 'district', 'city', 'state', 'capacity', 'coverUrl',
 ]
 
 // ---------- helpers do "backend" ----------
 
-function countConfirmed(db, eventoId) {
-  return db.presencas.filter((presenca) => isSameId(presenca.eventoId, eventoId)).length
+function countConfirmed(db, eventId) {
+  return db.attendances.filter((attendance) => isSameId(attendance.eventId, eventId)).length
 }
 
 // A linha guardada já é o DTO, menos o total — calculado na leitura, como um COUNT
 function toDto(db, row) {
-  return { ...row, totalConfirmados: countConfirmed(db, row.id) }
+  return { ...row, attendeesCount: countConfirmed(db, row.id) }
 }
 
 function byDateAsc(a, b) {
-  return a.data.localeCompare(b.data) || a.horaInicio.localeCompare(b.horaInicio)
+  return a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime)
 }
 
 function isPast(row) {
-  return row.data < todayLocalIso()
+  return row.date < todayLocalIso()
 }
 
-function hasAttendance(db, eventoId, userId) {
-  return db.presencas.some((presenca) => isSameId(presenca.eventoId, eventoId) && isSameId(presenca.usuario.id, userId))
+function hasAttendance(db, eventId, userId) {
+  return db.attendances.some((attendance) => isSameId(attendance.eventId, eventId) && isSameId(attendance.user.id, userId))
 }
 
 function requireSession() {
@@ -57,30 +58,30 @@ function requireOng(user) {
 }
 
 function requireOwner(row, user) {
-  if (!isSameId(row.ong.id, user.id)) throw mockHttpError(403, 'Só a ONG que criou o evento pode fazer isso.')
+  if (!isSameId(row.ngo.id, user.id)) throw mockHttpError(403, 'Só a ONG que criou o evento pode fazer isso.')
 }
 
 // Cancelado é a exclusão lógica: para as rotas comuns ele "não existe" mais
 function findActiveRow(db, id) {
-  const row = db.eventos.find((evento) => isSameId(evento.id, id))
-  if (!row || row.status === 'CANCELADO') throw mockHttpError(404, 'Evento não encontrado.')
+  const row = db.events.find((event) => isSameId(event.id, id))
+  if (!row || row.status === 'CANCELLED') throw mockHttpError(404, 'Evento não encontrado.')
   return row
 }
 
 // Nas rotas de presença, cancelado vira 400 com o motivo — quem tinha
 // confirmado entende por que não consegue mais mexer
 function findRowForAttendance(db, id, user) {
-  const row = db.eventos.find((evento) => isSameId(evento.id, id))
+  const row = db.events.find((event) => isSameId(event.id, id))
   if (!row) throw mockHttpError(404, 'Evento não encontrado.')
-  if (row.status === 'CANCELADO') throw mockHttpError(400, 'Este evento foi cancelado.')
+  if (row.status === 'CANCELLED') throw mockHttpError(400, 'Este evento foi cancelado.')
   if (isPast(row)) throw mockHttpError(400, 'Este evento já aconteceu.')
-  if (isSameId(row.ong.id, user.id)) {
+  if (isSameId(row.ngo.id, user.id)) {
     throw mockHttpError(400, 'Você não pode confirmar presença no seu próprio evento.')
   }
   return row
 }
 
-// Igual ao Sanitizador do backend: texto aparado, vazio vira null, CEP só com dígitos
+// Igual ao Sanitizer do backend: texto aparado, vazio vira null, CEP só com dígitos
 function normalizePayload(payload = {}) {
   const normalized = Object.fromEntries(
     PAYLOAD_FIELDS.map((field) => {
@@ -95,16 +96,16 @@ function normalizePayload(payload = {}) {
 }
 
 function validate(payload) {
-  const [firstError] = Object.values(getEventoPayloadErrors(payload, todayLocalIso()))
+  const [firstError] = Object.values(getEventPayloadErrors(payload, todayLocalIso()))
   if (firstError) throw mockHttpError(400, firstError)
 }
 
-function ongSnapshot(user) {
-  return { id: user.id, nome: user.name, isVerificado: Boolean(user.isVerified), fotoUrl: httpUrlOrNull(user.photoUrl) }
+function ngoSnapshot(user) {
+  return { id: user.id, name: user.name, isVerified: Boolean(user.isVerified), photoUrl: httpUrlOrNull(user.photoUrl) }
 }
 
 function userSnapshot(user) {
-  return { id: user.id, nome: user.name, fotoUrl: httpUrlOrNull(user.photoUrl) }
+  return { id: user.id, name: user.name, photoUrl: httpUrlOrNull(user.photoUrl) }
 }
 
 // 🔴 Só do mock: na primeira leitura de cada conta, ela ganha presença nos
@@ -112,14 +113,14 @@ function userSnapshot(user) {
 function withDemoAttendance(db, user) {
   if (db.demoAttendanceUserIds.some((id) => isSameId(id, user.id))) return db
 
-  const demoRows = db.eventos
+  const demoRows = db.events
     .filter((row) => DEMO_ATTENDANCE_EVENT_IDS.includes(row.id))
-    .filter((row) => !isSameId(row.ong.id, user.id) && !hasAttendance(db, row.id, user.id))
-    .map((row) => ({ eventoId: row.id, usuario: userSnapshot(user), dataConfirmacao: `${addDaysIso(row.data, -2)}T10:00:00` }))
+    .filter((row) => !isSameId(row.ngo.id, user.id) && !hasAttendance(db, row.id, user.id))
+    .map((row) => ({ eventId: row.id, user: userSnapshot(user), confirmedAt: `${addDaysIso(row.date, -2)}T10:00:00` }))
 
   const next = {
     ...db,
-    presencas: [...db.presencas, ...demoRows],
+    attendances: [...db.attendances, ...demoRows],
     demoAttendanceUserIds: [...db.demoAttendanceUserIds, user.id],
   }
   store.write(next)
@@ -128,27 +129,27 @@ function withDemoAttendance(db, user) {
 
 // ---------- rotas ----------
 
-// GET /api/eventos?ongId= — só ativos de hoje em diante
-export async function listEvents({ ongId } = {}) {
+// GET /api/events?ngoId= — só ativos de hoje em diante
+export async function listEvents({ ngoId } = {}) {
   await mockDelay()
   const db = store.read()
   const today = todayLocalIso()
 
-  return db.eventos
-    .filter((row) => row.status === 'ATIVO' && row.data >= today)
-    .filter((row) => ongId == null || isSameId(row.ong.id, ongId))
+  return db.events
+    .filter((row) => row.status === 'ACTIVE' && row.date >= today)
+    .filter((row) => ngoId == null || isSameId(row.ngo.id, ngoId))
     .sort(byDateAsc)
     .map((row) => toDto(db, row))
 }
 
-// GET /api/eventos/{id} — evento passado abre normalmente
+// GET /api/events/{id} — evento passado abre normalmente
 export async function getEvent(id) {
   await mockDelay()
   const db = store.read()
   return toDto(db, findActiveRow(db, id))
 }
 
-// POST /api/eventos
+// POST /api/events
 export async function createEvent(payload) {
   await mockDelay()
   const user = requireSession()
@@ -157,12 +158,12 @@ export async function createEvent(payload) {
   validate(fields)
 
   const db = store.read()
-  const row = { id: nextId(db.eventos), ...fields, status: 'ATIVO', dataCriacao: nowLocalIso(), ong: ongSnapshot(user) }
-  store.write({ ...db, eventos: [...db.eventos, row] })
+  const row = { id: nextId(db.events), ...fields, status: 'ACTIVE', createdAt: nowLocalIso(), ngo: ngoSnapshot(user) }
+  store.write({ ...db, events: [...db.events, row] })
   return toDto(db, row)
 }
 
-// PUT /api/eventos/{id}
+// PUT /api/events/{id}
 export async function updateEvent(id, payload) {
   await mockDelay()
   const user = requireSession()
@@ -174,17 +175,17 @@ export async function updateEvent(id, payload) {
   const fields = normalizePayload(payload)
   validate(fields)
   const confirmed = countConfirmed(db, row.id)
-  if (fields.vagas != null && fields.vagas < confirmed) {
+  if (fields.capacity != null && fields.capacity < confirmed) {
     throw mockHttpError(400, `Já existem ${confirmed} presenças confirmadas: as vagas não podem ficar abaixo disso.`)
   }
 
-  const updated = { ...row, ...fields, ong: ongSnapshot(user) }
-  store.write({ ...db, eventos: db.eventos.map((evento) => (evento.id === row.id ? updated : evento)) })
+  const updated = { ...row, ...fields, ngo: ngoSnapshot(user) }
+  store.write({ ...db, events: db.events.map((event) => (event.id === row.id ? updated : event)) })
   return toDto(db, updated)
 }
 
-// DELETE /api/eventos/{id} — real sem confirmados; com confirmados vira
-// CANCELADO, e quem confirmou ainda vê o evento em Minha conta
+// DELETE /api/events/{id} — real sem confirmados; com confirmados vira
+// CANCELLED, e quem confirmou ainda vê o evento em Minha conta
 export async function deleteEvent(id) {
   await mockDelay()
   const user = requireSession()
@@ -193,27 +194,27 @@ export async function deleteEvent(id) {
   requireOwner(row, user)
   if (isPast(row)) throw mockHttpError(400, 'Eventos que já aconteceram não podem ser excluídos.')
 
-  const eventos =
+  const events =
     countConfirmed(db, row.id) === 0
-      ? db.eventos.filter((evento) => evento.id !== row.id)
-      : db.eventos.map((evento) => (evento.id === row.id ? { ...evento, status: 'CANCELADO' } : evento))
-  store.write({ ...db, eventos })
+      ? db.events.filter((event) => event.id !== row.id)
+      : db.events.map((event) => (event.id === row.id ? { ...event, status: 'CANCELLED' } : event))
+  store.write({ ...db, events })
 }
 
-// GET /api/usuarios/me/eventos
+// GET /api/events/mine
 export async function listMyEvents() {
   await mockDelay()
   const user = requireSession()
   requireOng(user)
   const db = store.read()
 
-  return db.eventos
-    .filter((row) => row.status === 'ATIVO' && isSameId(row.ong.id, user.id))
+  return db.events
+    .filter((row) => row.status === 'ACTIVE' && isSameId(row.ngo.id, user.id))
     .sort(byDateAsc)
     .map((row) => toDto(db, row))
 }
 
-// POST /api/eventos/{id}/presencas — idempotente
+// POST /api/events/{id}/attendance — idempotente
 export async function confirmAttendance(id) {
   await mockDelay()
   const user = requireSession()
@@ -221,19 +222,19 @@ export async function confirmAttendance(id) {
   const row = findRowForAttendance(db, id, user)
   if (hasAttendance(db, row.id, user.id)) return toDto(db, row)
 
-  if (row.vagas != null && countConfirmed(db, row.id) >= row.vagas) {
+  if (row.capacity != null && countConfirmed(db, row.id) >= row.capacity) {
     throw mockHttpError(400, 'Vagas esgotadas para este evento.')
   }
 
   const next = {
     ...db,
-    presencas: [...db.presencas, { eventoId: row.id, usuario: userSnapshot(user), dataConfirmacao: nowLocalIso() }],
+    attendances: [...db.attendances, { eventId: row.id, user: userSnapshot(user), confirmedAt: nowLocalIso() }],
   }
   store.write(next)
   return toDto(next, row)
 }
 
-// DELETE /api/eventos/{id}/presencas — idempotente
+// DELETE /api/events/{id}/attendance — idempotente
 export async function cancelAttendance(id) {
   await mockDelay()
   const user = requireSession()
@@ -242,15 +243,15 @@ export async function cancelAttendance(id) {
 
   const next = {
     ...db,
-    presencas: db.presencas.filter(
-      (presenca) => !(isSameId(presenca.eventoId, row.id) && isSameId(presenca.usuario.id, user.id))
+    attendances: db.attendances.filter(
+      (attendance) => !(isSameId(attendance.eventId, row.id) && isSameId(attendance.user.id, user.id))
     ),
   }
   store.write(next)
   return toDto(next, row)
 }
 
-// GET /api/eventos/{id}/presencas — só a ONG dona
+// GET /api/events/{id}/attendees — só a ONG dona
 export async function listParticipants(id) {
   await mockDelay()
   const user = requireSession()
@@ -258,19 +259,19 @@ export async function listParticipants(id) {
   const row = findActiveRow(db, id)
   requireOwner(row, user)
 
-  return db.presencas
-    .filter((presenca) => isSameId(presenca.eventoId, row.id))
-    .sort((a, b) => a.dataConfirmacao.localeCompare(b.dataConfirmacao))
-    .map(({ usuario, dataConfirmacao }) => ({ usuario, dataConfirmacao }))
+  return db.attendances
+    .filter((attendance) => isSameId(attendance.eventId, row.id))
+    .sort((a, b) => a.confirmedAt.localeCompare(b.confirmedAt))
+    .map(({ user: attendee, confirmedAt }) => ({ user: attendee, confirmedAt }))
 }
 
-// GET /api/usuarios/me/presencas — inclui passados e cancelados
+// GET /api/events/attending — inclui passados e cancelados
 export async function listMyAttendance() {
   await mockDelay()
   const user = requireSession()
   const db = withDemoAttendance(store.read(), user)
 
-  return db.eventos
+  return db.events
     .filter((row) => hasAttendance(db, row.id, user.id))
     .sort(byDateAsc)
     .map((row) => toDto(db, row))

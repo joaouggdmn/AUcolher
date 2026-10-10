@@ -5,8 +5,8 @@ import * as eventosApi from './eventosApi'
 import * as eventosMock from './eventosMock'
 
 // Fachada do módulo: os componentes só conhecem estas funções e o modelo do
-// frontend (nomes em inglês). Quem fala com o "servidor" é o adaptador — API
-// real ou mock, os dois com as mesmas funções e os mesmos DTOs
+// frontend. Quem fala com o "servidor" é o adaptador — API real ou mock, os
+// dois com as mesmas funções e os mesmos DTOs
 const adapter = USE_MOCK_EVENTOS ? eventosMock : eventosApi
 
 // ---------- mappers DTO ↔ modelo ----------
@@ -17,42 +17,42 @@ function toTime(value) {
 }
 
 export function toFrontendEvent(dto) {
-  const capacity = dto.vagas ?? null
-  const confirmedCount = dto.totalConfirmados ?? 0
+  const capacity = dto.capacity ?? null
+  const confirmedCount = dto.attendeesCount ?? 0
   const spotsLeft = capacity == null ? null : Math.max(capacity - confirmedCount, 0)
 
   return {
     id: dto.id,
-    title: dto.titulo,
-    description: dto.descricao ?? '',
-    category: dto.categoria,
-    date: dto.data,
-    startTime: toTime(dto.horaInicio),
-    endTime: toTime(dto.horaFim),
+    title: dto.title,
+    description: dto.description ?? '',
+    category: dto.category,
+    date: dto.date,
+    startTime: toTime(dto.startTime),
+    endTime: toTime(dto.endTime),
     location: {
-      venue: dto.localNome ?? '',
+      venue: dto.venueName ?? '',
       cep: maskCEP(dto.cep ?? ''),
-      street: dto.logradouro ?? '',
-      number: dto.numero ?? '',
-      complement: dto.complemento ?? '',
-      district: dto.bairro ?? '',
-      city: dto.cidade ?? '',
-      state: dto.estado ?? '',
+      street: dto.street ?? '',
+      number: dto.number ?? '',
+      complement: dto.complement ?? '',
+      district: dto.district ?? '',
+      city: dto.city ?? '',
+      state: dto.state ?? '',
     },
     capacity,
     confirmedCount,
     spotsLeft,
     isFull: spotsLeft === 0,
-    isPast: dto.data < todayLocalIso(),
+    isPast: dto.date < todayLocalIso(),
     status: dto.status,
     // null = sem capa; a tela escolhe a imagem padrão da categoria
-    coverUrl: dto.capaUrl ?? null,
-    createdAt: dto.dataCriacao ?? null,
+    coverUrl: dto.coverUrl ?? null,
+    createdAt: dto.createdAt ?? null,
     organizer: {
-      id: dto.ong?.id ?? null,
-      name: dto.ong?.nome ?? '',
-      isVerified: Boolean(dto.ong?.isVerificado),
-      photoUrl: dto.ong?.fotoUrl ?? null,
+      id: dto.ngo?.id ?? null,
+      name: dto.ngo?.name ?? '',
+      isVerified: Boolean(dto.ngo?.isVerified),
+      photoUrl: dto.ngo?.photoUrl ?? null,
     },
   }
 }
@@ -63,41 +63,42 @@ function textOrNull(value) {
 }
 
 // Valores do formulário (mesmo formato do modelo) → corpo de POST/PUT
-export function toEventoPayload(values) {
+export function toEventPayload(values) {
   const location = values.location ?? {}
   const capacity = textOrNull(values.capacity)
 
   return {
-    titulo: textOrNull(values.title),
-    descricao: textOrNull(values.description),
-    categoria: values.category || null,
-    data: values.date || null,
-    horaInicio: values.startTime || null,
-    horaFim: values.endTime || null,
-    localNome: textOrNull(location.venue),
+    title: textOrNull(values.title),
+    description: textOrNull(values.description),
+    category: values.category || null,
+    date: values.date || null,
+    startTime: values.startTime || null,
+    endTime: values.endTime || null,
+    venueName: textOrNull(location.venue),
     cep: textOrNull(String(location.cep ?? '').replace(/\D/g, '')),
-    logradouro: textOrNull(location.street),
-    numero: textOrNull(location.number),
-    complemento: textOrNull(location.complement),
-    bairro: textOrNull(location.district),
-    cidade: textOrNull(location.city),
-    estado: textOrNull(location.state)?.toUpperCase() ?? null,
-    vagas: capacity == null ? null : Number(capacity),
-    capaUrl: values.coverUrl || null,
+    street: textOrNull(location.street),
+    number: textOrNull(location.number),
+    complement: textOrNull(location.complement),
+    district: textOrNull(location.district),
+    city: textOrNull(location.city),
+    state: textOrNull(location.state)?.toUpperCase() ?? null,
+    capacity: capacity == null ? null : Number(capacity),
+    coverUrl: values.coverUrl || null,
   }
 }
 
 function toFrontendParticipant(dto) {
   return {
-    user: { id: dto.usuario.id, name: dto.usuario.nome, photoUrl: dto.usuario.fotoUrl ?? null },
-    confirmedAt: dto.dataConfirmacao,
+    user: { id: dto.user.id, name: dto.user.name, photoUrl: dto.user.photoUrl ?? null },
+    confirmedAt: dto.confirmedAt,
   }
 }
 
 // ---------- operações ----------
 
+// As telas falam em ONG (`ongId`); a API, em inglês (`ngoId`)
 export async function listEvents({ ongId } = {}) {
-  const dtos = await adapter.listEvents({ ongId })
+  const dtos = await adapter.listEvents({ ngoId: ongId })
   return dtos.map(toFrontendEvent)
 }
 
@@ -106,11 +107,11 @@ export async function getEvent(id) {
 }
 
 export async function createEvent(values) {
-  return toFrontendEvent(await adapter.createEvent(toEventoPayload(values)))
+  return toFrontendEvent(await adapter.createEvent(toEventPayload(values)))
 }
 
 export async function updateEvent(id, values) {
-  return toFrontendEvent(await adapter.updateEvent(id, toEventoPayload(values)))
+  return toFrontendEvent(await adapter.updateEvent(id, toEventPayload(values)))
 }
 
 export async function deleteEvent(id) {

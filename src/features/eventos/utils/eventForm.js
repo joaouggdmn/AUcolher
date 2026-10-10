@@ -1,9 +1,9 @@
 import { todayLocalIso } from '../../../core/utils/localDate'
-import { toEventoPayload } from '../services/eventoService'
-import { getEventoPayloadErrors } from './eventoRules'
+import { toEventPayload } from '../services/eventoService'
+import { getEventPayloadErrors } from './eventoRules'
 
 // Estado do formulário de evento: mesmo formato do modelo (é o que
-// toEventoPayload espera), mais `limitCapacity`, que só existe na tela
+// toEventPayload espera), mais `limitCapacity`, que só existe na tela
 const EMPTY_LOCATION = { venue: '', cep: '', street: '', number: '', complement: '', district: '', city: '', state: '' }
 
 // Evento novo já nasce na cidade da ONG — é onde a maioria acontece
@@ -41,24 +41,24 @@ export function buildEventForm(event) {
   }
 }
 
-// Chave do DTO → campo do formulário
+// Chave do DTO → campo do formulário (a maioria tem o mesmo nome)
 const FIELD_BY_PAYLOAD_KEY = {
-  titulo: 'title',
-  categoria: 'category',
-  descricao: 'description',
-  data: 'date',
-  horaInicio: 'startTime',
-  horaFim: 'endTime',
-  localNome: 'venue',
+  title: 'title',
+  category: 'category',
+  description: 'description',
+  date: 'date',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  venueName: 'venue',
   cep: 'cep',
-  numero: 'number',
-  logradouro: 'street',
-  bairro: 'district',
-  complemento: 'complement',
-  cidade: 'city',
-  estado: 'state',
-  capaUrl: 'coverUrl',
-  vagas: 'capacity',
+  number: 'number',
+  street: 'street',
+  district: 'district',
+  complement: 'complement',
+  city: 'city',
+  state: 'state',
+  coverUrl: 'coverUrl',
+  capacity: 'capacity',
 }
 
 // Ordem visual dos campos: o primeiro com erro recebe o foco
@@ -72,7 +72,7 @@ export function eventFieldId(field) {
 // as que só o formulário conhece: vagas ligadas sem número e, na edição,
 // vagas abaixo de quem já confirmou
 export function getEventFormErrors(values, { minCapacity = 0 } = {}) {
-  const payloadErrors = getEventoPayloadErrors(toEventoPayload(values), todayLocalIso())
+  const payloadErrors = getEventPayloadErrors(toEventPayload(values), todayLocalIso())
   const errors = Object.fromEntries(
     Object.entries(payloadErrors).map(([key, message]) => [FIELD_BY_PAYLOAD_KEY[key], message])
   )

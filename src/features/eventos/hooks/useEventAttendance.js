@@ -3,7 +3,7 @@ import { useAuth } from '../../../core/context/AuthContext'
 import { useMyAttendance, useSetAttendance } from './useEventos'
 
 // Presença da conta logada nos eventos. Uma única query
-// (GET /usuarios/me/presencas) alimenta todos os botões da tela e
+// (GET /events/attending) alimenta todos os botões da tela e
 // "Eventos participados"; cada botão tem a própria mutation, então só o
 // evento clicado mostra "salvando"
 export function useEventAttendance() {

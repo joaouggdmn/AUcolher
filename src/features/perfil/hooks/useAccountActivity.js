@@ -83,11 +83,11 @@ export function useAccountActivity(user) {
     }
 
     // Cancelado = a ONG excluiu o evento depois que a pessoa confirmou
-    const activeEvents = attendedEvents.filter((event) => event.status !== 'CANCELADO')
+    const activeEvents = attendedEvents.filter((event) => event.status !== 'CANCELLED')
     const events = {
       upcoming: activeEvents.filter((event) => !event.isPast).sort(byDateAsc),
       past: activeEvents.filter((event) => event.isPast).sort((a, b) => byDateAsc(b, a)),
-      cancelled: attendedEvents.filter((event) => event.status === 'CANCELADO').sort(byDateAsc),
+      cancelled: attendedEvents.filter((event) => event.status === 'CANCELLED').sort(byDateAsc),
     }
 
     return { animals: myAnimals, impact, events }
