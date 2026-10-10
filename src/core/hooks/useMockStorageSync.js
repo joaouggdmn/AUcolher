@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '../services/queryKeys'
-import { MOCK_EVENTOS_STORE_KEY } from '../utils/storageKeys'
+import { MOCK_CAMPANHAS_STORE_KEY, MOCK_EVENTOS_STORE_KEY } from '../utils/storageKeys'
 
 // Chave do banco falso → queries que dependem dele
 const MOCK_STORE_QUERIES = {
-  [MOCK_EVENTOS_STORE_KEY]: queryKeys.eventos.all,
+  [MOCK_EVENTOS_STORE_KEY]: [queryKeys.eventos.all],
+  [MOCK_CAMPANHAS_STORE_KEY]: [queryKeys.campanhas.all, queryKeys.doacoes.all],
 }
 
 // Só importa no modo mock: quando outra aba grava no banco falso, o evento
@@ -18,7 +19,7 @@ export function useMockStorageSync() {
     function handleStorage(event) {
       // key null = localStorage.clear() em outra aba: tudo mudou
       const queryKeysToRefresh =
-        event.key === null ? Object.values(MOCK_STORE_QUERIES) : [MOCK_STORE_QUERIES[event.key]].filter(Boolean)
+        event.key === null ? Object.values(MOCK_STORE_QUERIES).flat() : (MOCK_STORE_QUERIES[event.key] ?? [])
 
       queryKeysToRefresh.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }))
     }

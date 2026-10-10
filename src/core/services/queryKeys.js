@@ -11,4 +11,18 @@ export const queryKeys = {
     mine: (userId) => ['eventos', 'mine', String(userId)],
     myAttendance: (userId) => ['eventos', 'my-attendance', String(userId)],
   },
+  campanhas: {
+    all: ['campanhas'],
+    list: (filters) => ['campanhas', 'list', filters],
+    detail: (id) => ['campanhas', 'detail', String(id)],
+    mine: (userId) => ['campanhas', 'mine', String(userId)],
+  },
+  // Separado de campanhas: o polling de uma doação não deve ser derrubado
+  // a cada escrita numa campanha (e vice-versa, quem aprova invalida os dois)
+  doacoes: {
+    all: ['doacoes'],
+    detail: (id) => ['doacoes', 'detail', String(id)],
+    mine: (userId) => ['doacoes', 'mine', String(userId)],
+    received: (userId) => ['doacoes', 'received', String(userId)],
+  },
 }

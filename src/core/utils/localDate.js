@@ -13,9 +13,19 @@ export function todayLocalIso() {
   return toLocalIsoDate(new Date())
 }
 
+export function toLocalIsoDateTime(date) {
+  return `${toLocalIsoDate(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
+
 export function nowLocalIso() {
-  const now = new Date()
-  return `${toLocalIsoDate(now)}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+  return toLocalIsoDateTime(new Date())
+}
+
+// "2026-09-27T14:00:00" + 30 → "2026-09-27T14:30:00" (sem fuso, como o Spring)
+export function addMinutesLocalIso(isoDateTime, minutes) {
+  const date = new Date(isoDateTime)
+  date.setMinutes(date.getMinutes() + minutes)
+  return toLocalIsoDateTime(date)
 }
 
 // "2026-09-27" + 3 → "2026-09-30"
