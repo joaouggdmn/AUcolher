@@ -39,11 +39,11 @@ export function mockDelay(ms = 300) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-// Mesmo formato do erro do axios: getErrorMessage (core/utils/apiError.js)
-// lê a `mensagem` igual nos dois modos
-export function mockHttpError(status, mensagem) {
-  const error = new Error(mensagem)
-  error.response = { status, data: { mensagem } }
+// Mesmo formato do erro do axios + ErrorResponseDTO: getErrorMessage
+// (core/utils/apiError.js) lê a `message` igual nos dois modos
+export function mockHttpError(status, message) {
+  const error = new Error(message)
+  error.response = { status, data: { message } }
   return error
 }
 
