@@ -44,7 +44,8 @@ function OngPanelLayout() {
   }, [isDrawerOpen, closeDrawer])
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    // --fixed-left-offset: largura da barra lateral, para barras fixas das páginas não passarem por cima
+    <div className="flex h-screen overflow-hidden bg-slate-50 lg:[--fixed-left-offset:16rem]">
       <aside className="hidden w-64 shrink-0 lg:flex">
         <PanelSidebar stats={dashboard.stats} />
       </aside>

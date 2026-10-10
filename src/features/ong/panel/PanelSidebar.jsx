@@ -2,6 +2,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { FiX } from 'react-icons/fi'
 import {
   FaArrowLeft,
+  FaBuildingNgo,
   FaShieldHalved,
   FaCalendarDays,
   FaComments,
@@ -10,6 +11,7 @@ import {
   FaHandHoldingHeart,
   FaInbox,
   FaPaw,
+  FaStar,
   FaTableCellsLarge,
 } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
@@ -34,6 +36,13 @@ const NAV_GROUPS = [
       { to: PANEL_PATHS.events, label: 'Eventos', icon: FaCalendarDays },
       { to: PANEL_PATHS.campaigns, label: 'Campanhas', icon: FaHandHoldingHeart },
       { to: PANEL_PATHS.donations, label: 'Doações', icon: FaHandHoldingDollar },
+    ],
+  },
+  {
+    title: 'Instituição',
+    items: [
+      { to: PANEL_PATHS.reviews, label: 'Avaliações', icon: FaStar },
+      { to: PANEL_PATHS.profile, label: 'Perfil da ONG', icon: FaBuildingNgo },
     ],
   },
 ]
