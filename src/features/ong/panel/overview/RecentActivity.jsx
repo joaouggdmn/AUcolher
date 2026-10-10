@@ -17,7 +17,18 @@ function formatDayMonth(isoDate) {
   return new Date(`${isoDate}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
 }
 
+function listNames(animals) {
+  const names = animals.map((animal) => animal.name)
+  if (names.length <= 3) return `${names.slice(0, -1).join(', ')} e ${names.at(-1)}`
+  return `${names.slice(0, 3).join(', ')} e mais ${names.length - 3}`
+}
+
 const TIMELINE_META = {
+  ANIMAIS: {
+    icon: FaPaw,
+    className: 'bg-emerald-100 text-emerald-700',
+    describe: ({ animals }) => ({ title: `${animals.length} animais entraram para adoção`, subtitle: listNames(animals) }),
+  },
   ANIMAL: {
     icon: FaPaw,
     className: 'bg-emerald-100 text-emerald-700',

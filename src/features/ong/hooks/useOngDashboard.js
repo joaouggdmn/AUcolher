@@ -24,6 +24,22 @@ function countWhere(items, predicate) {
   return items.filter(predicate).length
 }
 
+// Vários animais cadastrados no mesmo dia (um lote) viram um item só
+function animalTimelineItems(animals) {
+  const byDay = new Map()
+  for (const animal of animals.filter((item) => item.createdAt)) {
+    const day = animal.createdAt.slice(0, 10)
+    byDay.set(day, [...(byDay.get(day) ?? []), animal])
+  }
+
+  return [...byDay.entries()].map(([day, group]) => {
+    const latest = group.reduce((a, b) => (timeOf(b.createdAt) > timeOf(a.createdAt) ? b : a))
+    return group.length === 1
+      ? { id: `animal-${latest.id}`, type: 'ANIMAL', animal: latest, date: latest.createdAt }
+      : { id: `animais-${day}`, type: 'ANIMAIS', animals: group, date: latest.createdAt }
+  })
+}
+
 function previewOf(message, userId) {
   if (!message) return null
   if (message.senderId === 'system' || !isSameId(message.senderId, userId)) return message.text
@@ -83,7 +99,7 @@ export function useOngDashboard() {
     }
 
     const timeline = [
-      ...animals.map((animal) => ({ id: `animal-${animal.id}`, type: 'ANIMAL', animal, date: animal.createdAt })),
+      ...animalTimelineItems(animals),
       ...requests.map((request) => ({ id: `pedido-${request.id}`, type: 'PEDIDO', request, date: request.createdAt })),
       ...requests
         .filter((request) => request.status === 'CONCLUDED')
