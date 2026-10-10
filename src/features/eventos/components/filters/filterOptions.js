@@ -1,9 +1,9 @@
 import { FaPaw, FaSyringe, FaBagShopping, FaChalkboardUser, FaCalendarDays } from 'react-icons/fa6'
 
 export const CATEGORIA_OPTIONS = [
-  { value: 'FEIRA', label: 'Feira de Adoção' },
-  { value: 'SAUDE', label: 'Mutirão de Saúde' },
-  { value: 'BAZAR', label: 'Bazar Beneficente' },
+  { value: 'ADOPTION_FAIR', label: 'Feira de Adoção' },
+  { value: 'HEALTH', label: 'Mutirão de Saúde' },
+  { value: 'BAZAAR', label: 'Bazar Beneficente' },
   { value: 'WORKSHOP', label: 'Workshop' },
 ]
 
@@ -24,9 +24,9 @@ export function buildCidadeOptions(events) {
 
 // Badge + ícone por categoria (card, detalhe, Minha conta)
 const CATEGORIA_META = {
-  FEIRA: { label: 'Feira de Adoção', icon: FaPaw, className: 'bg-emerald-50 text-emerald-700' },
-  SAUDE: { label: 'Mutirão de Saúde', icon: FaSyringe, className: 'bg-rose-50 text-rose-600' },
-  BAZAR: { label: 'Bazar Beneficente', icon: FaBagShopping, className: 'bg-amber-50 text-amber-700' },
+  ADOPTION_FAIR: { label: 'Feira de Adoção', icon: FaPaw, className: 'bg-emerald-50 text-emerald-700' },
+  HEALTH: { label: 'Mutirão de Saúde', icon: FaSyringe, className: 'bg-rose-50 text-rose-600' },
+  BAZAAR: { label: 'Bazar Beneficente', icon: FaBagShopping, className: 'bg-amber-50 text-amber-700' },
   WORKSHOP: { label: 'Workshop', icon: FaChalkboardUser, className: 'bg-sky-50 text-sky-700' },
 }
 
