@@ -10,6 +10,7 @@ import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmpt
 import { CHART_MONTHS, monthlyDonationColumns } from '../../utils/panelCharts'
 import ChartCard from './charts/ChartCard'
 import ColumnChart from './charts/ColumnChart'
+import { PANEL_PATHS } from '../../panel/panelPaths'
 
 const PAGE_SIZE = 20
 
@@ -51,7 +52,7 @@ function OngDonationsPanel({ donations, isLoading, error, onRetry }) {
         icon={FaHandHoldingDollar}
         title="Nenhuma doação recebida ainda."
         description="Cada PIX confirmado nas campanhas da sua ONG aparece aqui, com quem doou e para qual campanha."
-        action={{ to: '/campanhas/criar', label: 'Criar campanha', icon: FaHandHoldingDollar }}
+        action={{ to: PANEL_PATHS.campaignNew, label: 'Criar campanha', icon: FaHandHoldingDollar }}
       />
     )
   }

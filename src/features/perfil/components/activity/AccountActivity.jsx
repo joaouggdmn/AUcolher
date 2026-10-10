@@ -17,6 +17,7 @@ import VisibilityChip from '../account/VisibilityChip'
 import MyAnimalsPanel from './MyAnimalsPanel'
 import ImpactPanel from './ImpactPanel'
 import AttendedEventsPanel from './AttendedEventsPanel'
+import { PANEL_PATHS } from '../../../ong/panel/panelPaths'
 
 function plural(count, singular, pluralForm) {
   return count === 1 ? singular : pluralForm
@@ -81,7 +82,7 @@ function AccountActivity({ user }) {
           : plural(events.past.length, 'evento', 'eventos'),
       description: 'Eventos em que você confirmou presença: os próximos e os que já aconteceram. Só você vê esta lista.',
       actions: [
-        ...(isOng ? [{ to: '/eventos/criar', label: 'Criar evento', icon: FaPlus }] : []),
+        ...(isOng ? [{ to: PANEL_PATHS.eventNew, label: 'Criar evento', icon: FaPlus }] : []),
         { to: '/eventos', label: 'Explorar eventos' },
       ],
       content: <AttendedEventsPanel events={events} />,
