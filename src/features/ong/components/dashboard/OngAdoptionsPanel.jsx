@@ -1,18 +1,11 @@
 import { Link } from 'react-router-dom'
 import { FaComments, FaInbox, FaPaw, FaReply } from 'react-icons/fa6'
+import { animalDisplayName } from '../../../adocao/utils/requestAnimal'
 import { REQUEST_STATUS_META } from '../../../adocao/utils/requestStatus'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
+import { adoptionFunnel } from '../../utils/panelCharts'
 import BarList from './charts/BarList'
 import ChartCard from './charts/ChartCard'
-
-// Etapas em ordem: um tom só, escurecendo a cada passo (rampa conferida para
-// contraste). Cada etapa conta quem chegou nela ou passou dela
-const FUNNEL_STAGES = [
-  { key: 'received', label: 'Pedidos recebidos', statuses: null, colorClass: 'bg-emerald-500' },
-  { key: 'accepted', label: 'Aceitos', statuses: ['ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED'], colorClass: 'bg-emerald-600' },
-  { key: 'delivery', label: 'Entrega confirmada', statuses: ['AWAITING_DELIVERY', 'CONCLUDED'], colorClass: 'bg-emerald-700' },
-  { key: 'concluded', label: 'Adoções concluídas', statuses: ['CONCLUDED'], colorClass: 'bg-emerald-800' },
-]
 
 const ACTION_CLASSES =
   'flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300'
@@ -57,7 +50,7 @@ function RequestRow({ request }) {
     <li className="flex items-center gap-3 px-4 py-3">
       <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-50 text-emerald-600">
         {animal.photoUrl ? (
-          <img src={animal.photoUrl} alt={animal.name ?? ''} className="h-full w-full object-cover" />
+          <img src={animal.photoUrl} alt={animalDisplayName(animal)} className="h-full w-full object-cover" />
         ) : (
           <FaPaw size={16} />
         )}
@@ -65,7 +58,7 @@ function RequestRow({ request }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
           <p className={`truncate text-sm font-bold ${animal.name ? 'text-emerald-950' : 'text-slate-400'}`}>
-            {animal.name ?? 'Animal não encontrado'}
+            {animalDisplayName(animal)}
           </p>
           <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${status.className}`}>{status.label}</span>
         </div>
@@ -113,15 +106,11 @@ function OngAdoptionsPanel({ requests }) {
     { title: 'Concluídas', requests: byStatus('CONCLUDED') },
   ]
   const closedCount = byStatus('REJECTED', 'CANCELLED').length
-  const funnel = FUNNEL_STAGES.map(({ statuses, ...stage }) => {
-    const value = statuses ? byStatus(...statuses).length : requests.length
-    return { ...stage, value, note: `${Math.round((value / requests.length) * 100)}%` }
-  })
 
   return (
     <div className="flex flex-col gap-8">
       <ChartCard title="Do pedido à adoção" subtitle="Quantos pedidos chegaram a cada etapa, em relação ao total recebido">
-        <BarList items={funnel} />
+        <BarList items={adoptionFunnel(requests)} />
       </ChartCard>
 
       {groups.every((group) => group.requests.length === 0) && (
