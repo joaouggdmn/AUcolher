@@ -29,6 +29,7 @@ function CreateAnimalPage() {
     goNext,
     goBack,
     handleSubmit,
+    submitError,
     needsLocationInput,
   } = useCreateAnimalForm()
 
@@ -64,6 +65,12 @@ function CreateAnimalPage() {
             <StepMedia formData={formData} onChange={updateField} images={images} setImages={setImages} />
           )}
         </div>
+
+        {submitError && (
+          <p role="alert" className="mt-6 rounded-xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600">
+            {submitError}
+          </p>
+        )}
 
         <div className="mt-8">
           <CreateAnimalFormNav

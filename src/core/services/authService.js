@@ -4,13 +4,14 @@ import { maskCEP } from "../utils/masks";
 import { parseFoundedYear } from "../utils/foundedYear";
 
 function buildRegisterEndpoint(userType) {
-  return userType === "ONG" ? "/auth/register/ong" : "/auth/register/user";
+  return userType === "ONG" ? "/auth/register/ngo" : "/auth/register/person";
 }
 
-// Backend usa ONG | USUARIO_COMUM; o frontend trabalha com PESSOA | ONG | ADMIN
+// Backend usa NGO | PERSON; o frontend trabalha com PESSOA | ONG | ADMIN
 // (docs/regras-de-negocio.md, seção 2)
-function normalizeUserType(tipoUsuario) {
-  return tipoUsuario === "ONG" || tipoUsuario === "ADMIN" ? tipoUsuario : "PESSOA";
+function normalizeUserType(apiUserType) {
+  if (apiUserType === "NGO") return "ONG";
+  return apiUserType === "ADMIN" ? "ADMIN" : "PESSOA";
 }
 
 function emptyToNull(value) {
@@ -20,17 +21,17 @@ function emptyToNull(value) {
 
 function toRegisterPayload(formData) {
   const basePayload = {
-    nome: formData.name,
+    name: formData.name,
     email: formData.email,
-    senha: formData.password,
-    fotoUrl: formData.photoUrl ?? null,
+    password: formData.password,
+    photoUrl: formData.photoUrl ?? null,
   };
 
   if (formData.userType !== "ONG") {
     return basePayload;
   }
 
-  // Espelha o CadastroOngDTO — o backend limpa máscaras (CNPJ/CEP) e o @
+  // Espelha o NgoRegistrationDTO — o backend limpa máscaras (CNPJ/CEP) e o @
   return {
     ...basePayload,
     cnpj: formData.cnpj,
@@ -38,49 +39,50 @@ function toRegisterPayload(formData) {
     instagram: emptyToNull(formData.instagram),
     twitter: emptyToNull(formData.twitter),
     facebook: emptyToNull(normalizeFacebookUrl(formData.facebook)),
-    anoFundacao: parseFoundedYear(formData.foundedYear),
+    foundedYear: parseFoundedYear(formData.foundedYear),
     cep: emptyToNull(formData.cep),
-    logradouro: emptyToNull(formData.street),
-    numero: emptyToNull(formData.number),
-    complemento: emptyToNull(formData.complement),
-    bairro: emptyToNull(formData.district),
-    cidade: emptyToNull(formData.city),
-    estado: emptyToNull(formData.uf),
+    street: emptyToNull(formData.street),
+    number: emptyToNull(formData.number),
+    complement: emptyToNull(formData.complement),
+    district: emptyToNull(formData.district),
+    city: emptyToNull(formData.city),
+    state: emptyToNull(formData.uf),
   };
 }
 
-// Mesmo formato de endereço do perfil público (OngDetails)
+// Mesmo formato de endereço do perfil público (OngDetails): a API manda o
+// endereço solto, a tela usa um objeto `address`
 function toFrontendAddress(backendUser) {
-  if (!backendUser.logradouro) return null;
+  if (!backendUser.street) return null;
 
   return {
-    street: backendUser.logradouro,
-    number: backendUser.numero ?? "",
-    complement: backendUser.complemento ?? "",
-    district: backendUser.bairro ?? "",
-    city: backendUser.cidade ?? "",
-    state: backendUser.estado ?? "",
+    street: backendUser.street,
+    number: backendUser.number ?? "",
+    complement: backendUser.complement ?? "",
+    district: backendUser.district ?? "",
+    city: backendUser.city ?? "",
+    state: backendUser.state ?? "",
     cep: maskCEP(backendUser.cep ?? ""),
   };
 }
 
 // Tudo o que o banco guarda, já no formato do frontend — é também o que o
-// PUT /usuarios/me devolve depois de salvar "Minha conta"
+// PUT /users/me devolve depois de salvar "Minha conta"
 export function toFrontendProfile(backendUser) {
   return {
     id: backendUser.id,
-    name: backendUser.nome,
+    name: backendUser.name,
     email: backendUser.email,
-    userType: normalizeUserType(backendUser.tipoUsuario),
+    userType: normalizeUserType(backendUser.userType),
     // "Membro desde [ano]" (pessoa) e "Fundada em [ano]" (ONG) no perfil
-    memberSince: backendUser.dataCriacao ?? null,
-    foundedYear: backendUser.anoFundacao ?? null,
-    photoUrl: backendUser.fotoUrl ?? null,
+    memberSince: backendUser.createdAt ?? null,
+    foundedYear: backendUser.foundedYear ?? null,
+    photoUrl: backendUser.photoUrl ?? null,
     bio: backendUser.bio ?? "",
-    isVerified: backendUser.isVerificado ?? false,
+    isVerified: backendUser.isVerified ?? false,
     // Perfil de ONG — socialLinks/address no formato do perfil público
     cnpj: backendUser.cnpj ?? null,
-    institutionalEmail: backendUser.emailInstitucional ?? null,
+    institutionalEmail: backendUser.institutionalEmail ?? null,
     socialLinks: {
       instagram: instagramUrl(backendUser.instagram),
       x: xUrl(backendUser.twitter),
@@ -88,11 +90,11 @@ export function toFrontendProfile(backendUser) {
     },
     address: toFrontendAddress(backendUser),
     // Mesmo formato das linhas do RowsEditor (função vazia vira '', não null)
-    team: (backendUser.equipe ?? []).map((member) => ({ name: member.nome, role: member.funcao ?? '' })),
-    visitingHours: (backendUser.horariosVisita ?? []).map((slot) => ({ days: slot.dias, hours: slot.horario })),
-    cidade: backendUser.cidade ?? '',
-    estado: backendUser.estado ?? '',
-    cep: backendUser.cep ?? '',           // 🆕
+    team: (backendUser.team ?? []).map((member) => ({ name: member.name, role: member.role ?? '' })),
+    visitingHours: backendUser.visitingHours ?? [],
+    city: backendUser.city ?? '',
+    state: backendUser.state ?? '',
+    cep: backendUser.cep ?? '',
   }
 }
 
@@ -115,15 +117,15 @@ function toFrontendUser(backendUser) {
   }
 }
 
-// Rota única para qualquer tipo de conta — o papel vem em usuario.tipoUsuario
+// Rota única para qualquer tipo de conta — o papel vem em user.userType
 export async function loginRequest({ email, password }) {
-  const { data } = await api.post("/auth/login", { email, senha: password });
+  const { data } = await api.post("/auth/login", { email, password });
 
-  // Formato confirmado da sua API: { token, tipo, usuario }
+  // Formato da API: { token, type, user }
   return {
     token: data.token,
-    tokenType: data.tipo ?? "Bearer",
-    user: toFrontendUser(data.usuario),
+    tokenType: data.type ?? "Bearer",
+    user: toFrontendUser(data.user),
   };
 }
 
@@ -133,9 +135,5 @@ export async function registerRequest(formData) {
 
   const { data } = await api.post(endpoint, payload);
 
-  const rawUser =
-    data?.usuario ??
-    data?.user ??
-    (data && typeof data === "object" ? data : null);
-  return rawUser ? toFrontendUser(rawUser) : null;
+  return data?.user ? toFrontendUser(data.user) : null;
 }

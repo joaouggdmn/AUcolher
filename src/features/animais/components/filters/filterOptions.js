@@ -13,8 +13,8 @@ export const SIZE_OPTIONS = [
 ]
 
 export const SEX_OPTIONS = [
-  { value: 'M', label: 'Macho' },
-  { value: 'F', label: 'Fêmea' },
+  { value: 'MALE', label: 'Macho' },
+  { value: 'FEMALE', label: 'Fêmea' },
 ]
 
 export const AGE_GROUP_OPTIONS = [

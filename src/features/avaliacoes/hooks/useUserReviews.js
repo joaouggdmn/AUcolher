@@ -36,7 +36,7 @@ function collectAdoptionReviews(profileId, requests, animals) {
   return collected
 }
 
-// 🔴 Com a API real, vira uma única chamada: GET /usuarios/{id}/avaliacoes
+// 🔴 Com a API real, vira uma única chamada: GET /users/{id}/reviews
 export function useUserReviews(profileId) {
   const { animals } = useAnimals()
   const { requests } = useAdoptionRequests()

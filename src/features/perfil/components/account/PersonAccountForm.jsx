@@ -27,8 +27,8 @@ function PersonAccountForm() {
   // (ex: forwardGeocode falhou, mas já tínhamos um lat/lng bom do GPS).
   const handleLocationResolved = (location) => {
     setFields((prev) => ({
-      cidade: location.city || prev.cidade,
-      estado: location.state || prev.estado,
+      city: location.city || prev.city,
+      state: location.state || prev.state,
       latitude: location.latitude ?? prev.latitude,
       longitude: location.longitude ?? prev.longitude,
     }))
@@ -136,15 +136,15 @@ function PersonAccountForm() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField
                 label="Cidade"
-                value={formData.cidade}
-                onChange={(e) => handleManualLocationChange('cidade', e.target.value)}
+                value={formData.city}
+                onChange={(e) => handleManualLocationChange('city', e.target.value)}
                 placeholder="Preenchido automaticamente pelo CEP ou GPS"
               />
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-slate-700">Estado</label>
                 <select
-                  value={formData.estado}
-                  onChange={(e) => handleManualLocationChange('estado', e.target.value)}
+                  value={formData.state}
+                  onChange={(e) => handleManualLocationChange('state', e.target.value)}
                   className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                 >
                   <option value="">Selecione</option>

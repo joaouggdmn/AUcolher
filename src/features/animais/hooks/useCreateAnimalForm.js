@@ -1,17 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAnimals } from '../../../core/context/AnimalContext'
-import { buildAgeLabel, deriveAgeGroup } from '../utils/ageHelpers'
+import { getErrorMessage } from '../../../core/utils/apiError'
+import { updateMyProfile } from '../../perfil/services/userService'
+import {
+  buildOngForm,
+  buildPersonForm,
+  toApiPayload,
+  toOngUpdates,
+  toPersonUpdates,
+} from '../../perfil/utils/accountForm'
+import { isValidAge } from '../utils/ageHelpers'
+import { useCreateAnimal } from './useAnimais'
 
 const STEPS = ['basic', 'health', 'compatibility', 'media']
+
+// Mesmos limites da API (AnimalRequestDTO)
+export const NAME_MAX_LENGTH = 60
+export const BREED_MAX_LENGTH = 60
+export const STORY_MAX_LENGTH = 3000
 
 const INITIAL_FORM = {
   name: '',
   species: '',
   breed: '',
   ageValue: '',
-  ageUnit: 'ANOS',
+  ageUnit: 'YEARS',
   sex: '',
   size: '',
   city: '',   // 🆕 só usado quando o usuário ainda não tem localização no perfil
@@ -32,19 +46,38 @@ const INITIAL_FORM = {
   story: '',
 }
 
+// A API tira a cidade/UF do anúncio do perfil de quem anuncia. Sem elas no
+// banco o cadastro é recusado, então gravamos antes pelo PUT /users/me — que
+// substitui o perfil inteiro: o corpo sai do usuário completo, como em
+// "Minha conta", senão bio, foto e o resto seriam apagados
+async function saveLocationToProfile(user, city, state) {
+  let updates
+  if (user.userType === 'ONG') {
+    const ongUpdates = toOngUpdates(buildOngForm(user))
+    updates = { ...ongUpdates, city, state }
+    if (ongUpdates.address) updates.address = { ...ongUpdates.address, city, state }
+  } else {
+    updates = { ...toPersonUpdates(buildPersonForm(user)), city, state }
+  }
+
+  const savedProfile = await updateMyProfile(toApiPayload({ ...user, ...updates }, user.userType))
+  return { ...updates, ...savedProfile }
+}
+
 export function useCreateAnimalForm() {
   const navigate = useNavigate()
   const { user, updateProfile } = useAuth()
-  const { addAnimal } = useAnimals()
+  const { mutateAsync: createAnimal } = useCreateAnimal()
 
   // Calculado UMA vez na montagem — não deve "sumir" o campo se algo mudar
   // no meio do preenchimento (mesmo princípio do isQuizOpen no AumatchPage)
-  const [needsLocationInput] = useState(() => !user?.cidade || !user?.estado)
+  const [needsLocationInput] = useState(() => !user?.city || !user?.state)
 
   const [stepIndex, setStepIndex] = useState(0)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [images, setImages] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
 
   const currentStep = STEPS[stepIndex]
   const isFirstStep = stepIndex === 0
@@ -60,7 +93,7 @@ export function useCreateAnimalForm() {
         formData.name.trim() !== '' &&
         formData.species !== '' &&
         formData.breed.trim() !== '' &&
-        formData.ageValue !== '' &&
+        isValidAge(formData.ageValue, formData.ageUnit) &&
         formData.sex !== '' &&
         formData.size !== ''
 
@@ -98,47 +131,26 @@ export function useCreateAnimalForm() {
   const handleSubmit = async () => {
     if (!isStepValid()) return
     setIsSubmitting(true)
+    setSubmitError(null)
 
-    const isNgo = user?.userType === 'ONG'
-    const city = needsLocationInput ? formData.city : user?.cidade
-    const state = needsLocationInput ? formData.state : user?.estado
+    try {
+      // A localização informada aqui passa a valer no perfil, não só neste
+      // anúncio — e precisa estar no banco antes do POST
+      if (needsLocationInput) {
+        updateProfile(await saveLocationToProfile(user, formData.city.trim(), formData.state))
+      }
 
-    const newAnimalPayload = {
-      ...formData,
-      ageValue: Number(formData.ageValue),
-      ageLabel: buildAgeLabel(Number(formData.ageValue), formData.ageUnit),
-      ageGroup: deriveAgeGroup(Number(formData.ageValue), formData.ageUnit),
-      images,
-      photoUrl: images[0],
-      city: city || 'Não informado',
-      state: state || '--',
-      distanceKm: 0,
-      listingType: isNgo ? 'NGO' : 'USER',
-      organizationName: isNgo ? user?.name : undefined,
-      ownerName: user?.name,
-      ownerPhotoUrl: user?.photoUrl ?? null,
-      ownerId: user?.id,
+      const createdAnimal = await createAnimal({ form: formData, photos: images })
+      navigate(`/animais/${createdAnimal.id}`, { state: { justCreated: true } })
+    } catch (error) {
+      setSubmitError(getErrorMessage(error, 'Não foi possível cadastrar o animal. Tente novamente.'))
+      setIsSubmitting(false)
     }
-
-    // 🔴 Aqui entra a chamada real: await animalService.create(newAnimalPayload)
-    await new Promise((resolve) => setTimeout(resolve, 600))
-
-    const createdAnimal = addAnimal(newAnimalPayload)
-
-    // 🆕 Mesma lógica de sincronização usada em handleQuizComplete
-    // (updateProfile(answers)) — a localização informada aqui passa a
-    // valer permanentemente no perfil, não só neste anúncio
-    if (needsLocationInput) {
-      updateProfile({ cidade: formData.city, estado: formData.state })
-    }
-
-    setIsSubmitting(false)
-    navigate(`/animais/${createdAnimal.id}`, { state: { justCreated: true } })
   }
 
   return {
     stepIndex, currentStep, isFirstStep, isLastStep, formData, images, setImages,
-    updateField, isStepValid: isStepValid(), isSubmitting, needsLocationInput,
+    updateField, isStepValid: isStepValid(), isSubmitting, submitError, needsLocationInput,
     goNext, goBack, handleSubmit,
   }
 }

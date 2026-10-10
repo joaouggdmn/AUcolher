@@ -73,12 +73,12 @@ function AumatchPage() {
       : []
 
     // 2. Filtro base: espécie preferida + já solicitados + já adotados.
-    // 🆕 O filtro de ADOTADO não depende de QUEM pediu — uma vez que o
+    // 🆕 O filtro de ADOPTED não depende de QUEM pediu — uma vez que o
     // pet foi adotado por qualquer pessoa, ele nunca mais aparece no
     // deck de ninguém.
     const baseFiltered = pets.filter((pet) => {
       if (requestedAnimalIds.includes(pet.id)) return false
-      if (pet.status === 'ADOTADO') return false
+      if (pet.status === 'ADOPTED') return false
 
       if (user?.speciesPreference && user.speciesPreference !== 'BOTH') {
         return pet.species === user.speciesPreference

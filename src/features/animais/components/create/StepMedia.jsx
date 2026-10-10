@@ -1,4 +1,5 @@
 import PhotoUploadGrid from './PhotoUploadGrid'
+import { STORY_MAX_LENGTH } from '../../hooks/useCreateAnimalForm'
 
 const SUMMARY_MAX_LENGTH = 100
 
@@ -29,10 +30,15 @@ function StepMedia({ formData, onChange, images, setImages }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-semibold text-slate-700">História completa</label>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-semibold text-slate-700">História completa</label>
+          <span className="text-xs font-semibold text-slate-400">
+            {formData.story.length}/{STORY_MAX_LENGTH}
+          </span>
+        </div>
         <textarea
           value={formData.story}
-          onChange={(e) => onChange('story', e.target.value)}
+          onChange={(e) => onChange('story', e.target.value.slice(0, STORY_MAX_LENGTH))}
           rows={6}
           placeholder="Conte a história desse pet: como foi resgatado, seu temperamento, cuidados que precisa..."
           className="w-full resize-none rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
