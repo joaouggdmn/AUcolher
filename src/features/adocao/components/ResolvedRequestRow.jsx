@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaXmark, FaBan } from "react-icons/fa6";
+import Avatar from "../../../core/components/ui/Avatar";
 import { animalDisplayName } from "../utils/requestAnimal";
 
 const STATUS_META = {
@@ -21,11 +22,7 @@ function ResolvedRequestRow({ request }) {
 
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3">
-      <img
-        src={request.adopter.photoUrl}
-        alt={request.adopter.name}
-        className="h-10 w-10 shrink-0 rounded-full object-cover"
-      />
+      <Avatar name={request.adopter.name} photoUrl={request.adopter.photoUrl} className="h-10 w-10 text-sm" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold text-emerald-950">
           {request.adopter.name}
