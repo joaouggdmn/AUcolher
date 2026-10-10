@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useCallback, useState } from 'react'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -8,6 +8,7 @@ import {
   FaHandHoldingHeart,
   FaLocationDot,
   FaLock,
+  FaPen,
   FaTriangleExclamation,
   FaUserGroup,
 } from 'react-icons/fa6'
@@ -16,6 +17,7 @@ import { getErrorMessage } from '../../../core/utils/apiError'
 import { formatCurrency } from '../../../core/utils/currency'
 import Spinner from '../../../core/components/ui/Spinner'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
+import SuccessToast from '../../../core/components/ui/SuccessToast'
 import VerifiedBadge from '../../ong/components/VerifiedBadge'
 import CampaignCover from '../components/CampaignCover'
 import CampaignUnavailableState from '../components/CampaignUnavailableState'
@@ -80,15 +82,29 @@ function OngCard({ ong }) {
   )
 }
 
-// Ação principal do painel lateral: doar, aviso de encerrada ou aviso de dona
-function MainAction({ campaign, isOwner, onDonate }) {
-  if (isOwner) {
-    return (
+// Ações da ONG dona: editar enquanto a campanha está aberta
+function OwnerActions({ campaign }) {
+  return (
+    <div className="flex flex-col gap-2">
       <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-800">
-        Esta campanha é da sua ONG. As doações aparecem aqui assim que o PIX é confirmado.
+        Esta campanha é da sua ONG. As doações entram no total assim que o PIX é confirmado.
       </p>
-    )
-  }
+      {!campaign.isClosed && (
+        <Link
+          to={`/campanhas/editar/${campaign.id}`}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 py-3 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+        >
+          <FaPen size={12} />
+          Editar campanha
+        </Link>
+      )}
+    </div>
+  )
+}
+
+// Ação principal do painel lateral: doar, aviso de encerrada ou ações da dona
+function MainAction({ campaign, isOwner, onDonate }) {
+  if (isOwner) return <OwnerActions campaign={campaign} />
 
   if (campaign.isClosed) {
     return (
@@ -113,9 +129,13 @@ function MainAction({ campaign, isOwner, onDonate }) {
 
 function CampaignDetailPage() {
   const { id } = useParams()
+  const location = useLocation()
   const { user } = useAuth()
   const { data: campaign, isLoading, isError, error, refetch } = useCampaign(id)
   const [isDonationOpen, setIsDonationOpen] = useState(false)
+  // "Campanha publicada!" / "Campanha atualizada!" vindo do formulário
+  const [flashMessage, setFlashMessage] = useState(location.state?.flash ?? null)
+  const clearFlashMessage = useCallback(() => setFlashMessage(null), [])
 
   if (isLoading) {
     return (
@@ -225,6 +245,8 @@ function CampaignDetailPage() {
       </div>
 
       {isDonationOpen && <DonationModal campaign={campaign} onClose={() => setIsDonationOpen(false)} />}
+
+      <SuccessToast message={flashMessage} onClose={clearFlashMessage} />
     </div>
   )
 }
