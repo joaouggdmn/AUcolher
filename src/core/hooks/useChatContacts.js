@@ -1,11 +1,10 @@
 import { useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useAnimals } from "../context/AnimalContext";
 import { useAdoptionRequests } from "../context/AdoptionRequestContext";
+import { animalDisplayName } from "../../features/adocao/utils/requestAnimal";
 
 export function useChatContacts() {
   const { user } = useAuth();
-  const { animals } = useAnimals();
   const { requests } = useAdoptionRequests();
 
   const contacts = useMemo(() => {
@@ -23,7 +22,7 @@ export function useChatContacts() {
             request.status === "CONCLUDED",
         )
         .map((request) => {
-          const animal = animals.find((a) => a.id === request.animalId);
+          const { animal } = request;
           const isOwner = request.ownerId === user.id;
           const isAdopter =
             request.adopterId === user.id ||
@@ -35,7 +34,7 @@ export function useChatContacts() {
             id: `request-${request.id}`,
             requestId: request.id,
             animalId: request.animalId, // 🆕 necessário para concludeAdoption
-            animalName: animal?.name ?? "Animal",
+            animalName: animalDisplayName(animal),
             status: request.status, // 🆕 controla o estado travado do header
             isOwnerView: isOwner, // 🆕 só o doador vê o botão "Confirmar Entrega"
             reviews: request.reviews ?? {},
@@ -51,14 +50,14 @@ export function useChatContacts() {
 
           return {
             ...base,
-            name: animal?.ownerName ?? animal?.organizationName ?? "Doador(a)",
-            photoUrl: animal?.ownerPhotoUrl ?? null,
+            name: animal.ownerName || animal.organizationName || "Doador(a)",
+            photoUrl: animal.ownerPhotoUrl ?? null,
           };
         })
         .filter(Boolean)
         .sort((a, b) => b.requestId - a.requestId)
     );
-  }, [user, animals, requests]);
+  }, [user, requests]);
 
   return { contacts };
 }

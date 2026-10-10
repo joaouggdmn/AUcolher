@@ -1,28 +1,20 @@
 import { useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useAnimals } from "../context/AnimalContext";
 import { useAdoptionRequests } from "../context/AdoptionRequestContext";
+import { isSameId } from "../utils/ids";
 
 export function useReceivedRequests() {
   const { user } = useAuth();
-  const { animals } = useAnimals();
   const { requests, acceptRequest, rejectRequest } = useAdoptionRequests();
 
   const receivedRequests = useMemo(() => {
     if (!user) return [];
 
+    // `animal` já vem resolvido pelo AdoptionRequestProvider
     return requests
-      .filter((request) => request.ownerId === user.id)
-      .map((request) => ({
-        ...request,
-        animal: animals.find((animal) => animal.id === request.animalId) ?? {
-          id: request.animalId,
-          name: "Animal",
-          photoUrl: null,
-        },
-      }))
+      .filter((request) => isSameId(request.ownerId, user.id))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [user, animals, requests]);
+  }, [user, requests]);
 
   const pendingRequests = receivedRequests.filter(
     (r) => r.status === "PENDING",

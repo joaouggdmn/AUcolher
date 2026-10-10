@@ -17,6 +17,7 @@ import VisibilityChip from '../account/VisibilityChip'
 import MyAnimalsPanel from './MyAnimalsPanel'
 import ImpactPanel from './ImpactPanel'
 import AttendedEventsPanel from './AttendedEventsPanel'
+import { PANEL_PATHS } from '../../../ong/panel/panelPaths'
 
 function plural(count, singular, pluralForm) {
   return count === 1 ? singular : pluralForm
@@ -60,11 +61,9 @@ function AccountActivity({ user }) {
       label: 'Meu impacto',
       visibility: 'private',
       value: impact.adoptionsCount,
-      caption: isOng
-        ? plural(impact.adoptionsCount, 'adoção realizada', 'adoções realizadas')
-        : `${plural(impact.adoptionsCount, 'adoção', 'adoções')} · ${formatCurrency(impact.totalDonated)} doados`,
+      caption: `${plural(impact.adoptionsCount, isOng ? 'adoção realizada' : 'adoção', isOng ? 'adoções realizadas' : 'adoções')} · ${formatCurrency(impact.totalDonated)} doados`,
       description: isOng
-        ? 'Adoções concluídas pela instituição. O total aparece no perfil público; o histórico fica só aqui.'
+        ? 'Adoções concluídas pela instituição e doações para outras campanhas. O total de adoções aparece no perfil público; o histórico fica só aqui.'
         : 'Adoções concluídas e doações para campanhas. O número de adoções aparece no seu perfil; o histórico fica só aqui.',
       actions: isOng
         ? [{ to: '/interesses-recebidos', label: 'Interesses recebidos' }]
@@ -83,7 +82,7 @@ function AccountActivity({ user }) {
           : plural(events.past.length, 'evento', 'eventos'),
       description: 'Eventos em que você confirmou presença: os próximos e os que já aconteceram. Só você vê esta lista.',
       actions: [
-        ...(isOng ? [{ to: '/eventos/criar', label: 'Criar evento', icon: FaPlus }] : []),
+        ...(isOng ? [{ to: PANEL_PATHS.eventNew, label: 'Criar evento', icon: FaPlus }] : []),
         { to: '/eventos', label: 'Explorar eventos' },
       ],
       content: <AttendedEventsPanel events={events} />,

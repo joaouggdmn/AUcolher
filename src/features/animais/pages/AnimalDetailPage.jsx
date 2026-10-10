@@ -23,6 +23,7 @@ import PhotoGallery from "../components/PhotoGallery";
 import HealthBadges from "../components/HealthBadges";
 import InterestInfoBubble from "../components/InterestInfoBubble";
 import { buildAdopterSnapshot } from "../../adocao/utils/buildAdopterSnapshot";
+import { buildAnimalSnapshot } from "../../adocao/utils/requestAnimal";
 import BehaviorProfile from "../components/BehaviorProfile";
 import OwnerListingPanel from "../components/OwnerListingPanel";
 import { useAnimal } from "../hooks/useAnimais";
@@ -96,6 +97,7 @@ function AnimalDetailsPage() {
     isAuthenticated &&
     requests.some(
       (r) =>
+        r.animalSource === "api" &&
         r.animalId === animal.id &&
         r.adopter?.userId === user.id &&  
         r.status !== "REJECTED",
@@ -111,6 +113,7 @@ function AnimalDetailsPage() {
       animalId: animal.id,
       ownerId: animal.ownerId,
       adopter: buildAdopterSnapshot(user, profileCompletion),
+      animal: buildAnimalSnapshot(animal, "api"),
     });
 
     setSuccessMessage(

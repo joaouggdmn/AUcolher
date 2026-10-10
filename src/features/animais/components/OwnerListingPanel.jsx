@@ -1,7 +1,10 @@
 import { useState } from 'react'
-import { FaCircleCheck, FaEye, FaEyeSlash } from 'react-icons/fa6'
+import { Link } from 'react-router-dom'
+import { FaCircleCheck, FaEye, FaEyeSlash, FaPen } from 'react-icons/fa6'
 import ConfirmModal from '../../../core/components/ui/ConfirmModal'
+import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
+import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 import { useChangeAnimalStatus } from '../hooks/useAnimais'
 
 // Mesmos rótulos e cores do "Meus animais" em Minha conta
@@ -39,6 +42,7 @@ const SECONDARY_BUTTON =
 // Ações do dono na página de detalhes. Tirar do ar e voltar ao ar são
 // reversíveis; marcar como adotado é definitivo na API, então pede confirmação
 function OwnerListingPanel({ animal, onStatusChanged }) {
+  const { user } = useAuth()
   const { mutate: changeStatus, isPending, variables } = useChangeAnimalStatus()
   const [isConfirmingAdoption, setIsConfirmingAdoption] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
@@ -122,6 +126,17 @@ function OwnerListingPanel({ animal, onStatusChanged }) {
           </button>
           {adoptButton(SECONDARY_BUTTON)}
         </div>
+      )}
+
+      {/* Edição existe só no painel da ONG; pessoa física ainda não edita anúncios */}
+      {user?.userType === 'ONG' && animal.status !== 'ADOPTED' && (
+        <Link
+          to={PANEL_PATHS.animalEdit(animal.id)}
+          className="mt-3 flex w-fit items-center gap-1.5 text-sm font-bold text-emerald-700 hover:underline"
+        >
+          <FaPen size={11} />
+          Editar no painel da ONG
+        </Link>
       )}
 
       {errorMessage && (

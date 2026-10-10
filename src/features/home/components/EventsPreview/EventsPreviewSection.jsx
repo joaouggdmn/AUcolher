@@ -1,11 +1,16 @@
 import { Link } from 'react-router-dom'
 import { FaArrowRight } from 'react-icons/fa6'
 import EventCard from '../../../eventos/components/EventCard'
-import { mockEventos } from '../../../eventos/data/mockEventos'
+import EventCardSkeleton from '../../../eventos/components/EventCardSkeleton'
+import { useEvents } from '../../../eventos/hooks/useEventos'
 import RevealOnScroll from '../../../../core/components/ui/RevealOnScroll'
 
+const PREVIEW_SIZE = 3
+
 function EventsPreviewSection() {
-  const upcomingEvents = mockEventos.slice(0, 3)
+  // Mesma query da página /eventos: abrir uma deixa a outra já carregada
+  const { data: events, isLoading, isError } = useEvents()
+  const upcomingEvents = (events ?? []).slice(0, PREVIEW_SIZE)
 
   return (
     <section className="relative overflow-hidden bg-emerald-950 px-4 py-20 sm:px-6 lg:py-28">
@@ -39,13 +44,28 @@ function EventsPreviewSection() {
           </Link>
         </RevealOnScroll>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((event, index) => (
-            <RevealOnScroll key={event.id} delay={index * 120}>
-              <EventCard event={event} layout="grid" />
-            </RevealOnScroll>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: PREVIEW_SIZE }, (_, index) => (
+              <EventCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : upcomingEvents.length === 0 ? (
+          // Erro ou agenda vazia: a home não mostra erro técnico, só convida a acompanhar
+          <p className="rounded-3xl border border-dashed border-white/15 px-6 py-12 text-center text-emerald-100/70">
+            {isError
+              ? 'Não foi possível carregar os eventos agora. Tente novamente em instantes.'
+              : 'Nenhum evento agendado no momento. Volte em breve para conferir as próximas feiras!'}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {upcomingEvents.map((event, index) => (
+              <RevealOnScroll key={event.id} delay={index * 120}>
+                <EventCard event={event} layout="grid" />
+              </RevealOnScroll>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

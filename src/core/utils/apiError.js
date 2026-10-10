@@ -1,6 +1,9 @@
 export function getErrorMessage(error, fallback = 'Algo deu errado. Tente novamente.') {
-  // Requisição foi enviada, mas nenhuma resposta chegou (rede caiu, CORS bloqueado, etc.)
   if (!error.response) {
+    // Sem `request` nem chegou a haver chamada: é erro do próprio código (ou
+    // do mock no localStorage), e culpar a internet só despista
+    if (!error.request) return fallback
+    // Requisição foi enviada, mas nenhuma resposta chegou (rede caiu, CORS bloqueado, etc.)
     return 'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.'
   }
 

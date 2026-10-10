@@ -3,10 +3,12 @@ import { FaCircleExclamation, FaFloppyDisk } from 'react-icons/fa6'
 // Fica fixa no rodapé só enquanto há alterações: o formulário é longo e
 // a barra evita rolar até o fim para salvar. O submit usa o atributo `form`
 // para disparar a mesma validação nativa do <form>. Se a API recusar o
-// salvamento, o motivo aparece aqui mesmo, no lugar do aviso
+// salvamento, o motivo aparece aqui mesmo, no lugar do aviso.
+// --fixed-left-offset: telas com barra lateral fixa (painel da ONG) avisam a
+// largura dela, para a barra não passar por cima
 function UnsavedChangesBar({ formId, onDiscard, isSaving = false, errorMessage = null }) {
   return (
-    <div className="fixed inset-x-0 bottom-4 z-40 animate-fade-slide-in px-4">
+    <div className="fixed bottom-4 left-[var(--fixed-left-offset,0px)] right-0 z-40 animate-fade-slide-in px-4">
       <div
         role="status"
         className="mx-auto flex max-w-4xl flex-col gap-3 rounded-2xl bg-emerald-950 px-5 py-4 text-white shadow-2xl shadow-emerald-950/30 ring-1 ring-emerald-800 sm:flex-row sm:items-center sm:justify-between"
