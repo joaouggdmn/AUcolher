@@ -1,17 +1,12 @@
 import { FaHandHoldingHeart, FaHouseChimney, FaPaw } from 'react-icons/fa6'
 import { formatCurrency } from '../../../../core/utils/currency'
+import Timeline from '../../../../core/components/ui/Timeline'
 import ActivityEmptyState from './ActivityEmptyState'
 
 const TIMELINE_META = {
   DOACAO: { icon: FaHandHoldingHeart, className: 'bg-amber-400 text-emerald-950' },
   ADOCAO_RECEBIDA: { icon: FaHouseChimney, className: 'bg-emerald-700 text-white' },
   ADOCAO_DOADA: { icon: FaPaw, className: 'bg-emerald-700 text-white' },
-}
-
-function formatDate(date) {
-  // 'YYYY-MM-DD' vira meia-noite local; datas com hora (adoção, doação) vão direto
-  const parsed = date.length === 10 ? new Date(`${date}T00:00:00`) : new Date(date)
-  return parsed.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function ImpactTile({ value, label, tone = 'emerald' }) {
@@ -55,33 +50,14 @@ function ImpactPanel({ impact, isOng }) {
           }
         />
       ) : (
-        <div className="relative flex flex-col gap-6 pl-2">
-          <div className="pointer-events-none absolute bottom-2 left-[19px] top-2 w-0 border-l-2 border-dashed border-emerald-200" />
-
-          {impact.timeline.map((item) => {
-            const meta = TIMELINE_META[item.type]
-            const Icon = meta.icon
-            return (
-              <div key={item.id} className="relative flex items-start gap-4">
-                <span
-                  className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-md ${meta.className}`}
-                >
-                  <Icon size={15} />
-                </span>
-                <div className="min-w-0 flex-1 pt-1.5">
-                  <p className="text-sm font-bold text-emerald-950">{item.title}</p>
-                  <p className="text-xs text-slate-500">{item.subtitle}</p>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
-                    <span>{formatDate(item.date)}</span>
-                    {item.type === 'DOACAO' && (
-                      <span className="font-bold text-amber-600">{formatCurrency(item.amount)}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        <Timeline
+          items={impact.timeline.map((item) => ({
+            ...item,
+            icon: TIMELINE_META[item.type].icon,
+            iconClassName: TIMELINE_META[item.type].className,
+            highlight: item.type === 'DOACAO' ? formatCurrency(item.amount) : null,
+          }))}
+        />
       )}
     </div>
   )
