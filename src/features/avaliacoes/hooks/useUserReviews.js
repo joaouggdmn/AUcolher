@@ -1,17 +1,16 @@
 import { useMemo } from 'react'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { mockReviews } from '../data/mockReviews'
 
 // Avaliações feitas no fim do ciclo de adoção: reviews.adopter avalia o
 // dono do animal; reviews.owner avalia o adotante
-function collectAdoptionReviews(profileId, requests, animals) {
+function collectAdoptionReviews(profileId, requests) {
   const id = String(profileId)
   const collected = []
 
   requests.forEach((request) => {
     if (request.status !== 'CONCLUDED' || !request.reviews) return
-    const animalName = animals.find((a) => a.id === request.animalId)?.name ?? null
+    const animalName = request.animal.name ?? null
 
     const entries = [
       [String(request.ownerId) === id, request.reviews.adopter, 'adopter'],
@@ -38,13 +37,12 @@ function collectAdoptionReviews(profileId, requests, animals) {
 
 // 🔴 Com a API real, vira uma única chamada: GET /users/{id}/reviews
 export function useUserReviews(profileId) {
-  const { animals } = useAnimals()
   const { requests } = useAdoptionRequests()
 
   return useMemo(() => {
     const reviews = [
       ...mockReviews.filter((review) => String(review.targetId) === String(profileId)),
-      ...collectAdoptionReviews(profileId, requests, animals),
+      ...collectAdoptionReviews(profileId, requests),
     ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
     const count = reviews.length
@@ -55,5 +53,5 @@ export function useUserReviews(profileId) {
     }))
 
     return { reviews, count, average, distribution }
-  }, [profileId, requests, animals])
+  }, [profileId, requests])
 }

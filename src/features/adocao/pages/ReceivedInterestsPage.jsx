@@ -9,6 +9,7 @@ import ConfirmAdoptionModal from '../components/ConfirmAdoptionModal'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
 import { useReceivedRequests } from '../../../core/hooks/useReceivedRequests'
 import { useConcludeAdoption } from '../../../core/hooks/useConcludeAdoption'
+import { animalDisplayName } from '../utils/requestAnimal'
 
 function ReceivedInterestsPage() {
   const { pendingRequests, inProgressRequests, historyRequests, acceptRequest, rejectRequest } = useReceivedRequests()
@@ -53,11 +54,11 @@ function ReceivedInterestsPage() {
 
     requestDelivery({
       requestId: concludingRequest.id,
-      animalName: concludingRequest.animal.name,
+      animalName: animalDisplayName(concludingRequest.animal),
     })
 
     setIsConcluding(false)
-    setSuccessMessage(`Pedido enviado! Assim que ${concludingRequest.animal.name} chegar até o adotante, ele confirmará por lá. 🕒`)
+    setSuccessMessage(`Pedido enviado! Assim que ${animalDisplayName(concludingRequest.animal)} chegar até o adotante, ele confirmará por lá. 🕒`)
     setConcludingRequest(null)
   }
 
@@ -142,7 +143,7 @@ function ReceivedInterestsPage() {
       {concludingRequest && (
         <ConfirmAdoptionModal
           mode="request-delivery"
-          animalName={concludingRequest.animal.name}
+          animalName={animalDisplayName(concludingRequest.animal)}
           isProcessing={isConcluding}
           onConfirm={handleConfirmDeliveryRequest}
           onCancel={() => setConcludingRequest(null)}

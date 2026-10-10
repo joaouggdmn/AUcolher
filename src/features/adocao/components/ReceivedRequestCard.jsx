@@ -7,9 +7,11 @@ import {
   FaComments,
   FaClock,
   FaHandHoldingHeart,
+  FaPaw,
 } from "react-icons/fa6";
 import { LuSparkles } from "react-icons/lu";
 import { computeMatchScore } from "../../aumatch/utils/matchScore";
+import { animalDisplayName } from "../utils/requestAnimal";
 
 function ReceivedRequestCard({
   request,
@@ -22,6 +24,8 @@ function ReceivedRequestCard({
   const { animal, adopter, status } = request;
   const matchScore = computeMatchScore(adopter, animal);
   const isConcluded = status === "CONCLUDED";
+  // Animal do AUmatch (AnimalContext) não tem página: /animais/:id é da API
+  const AnimalHeader = request.animalSource === "api" ? Link : "div";
 
   return (
     <div
@@ -29,21 +33,27 @@ function ReceivedRequestCard({
         isConcluded ? "border-emerald-200" : "border-slate-100"
       }`}
     >
-      <Link
-        to={`/animais/${animal.id}`}
+      <AnimalHeader
+        to={request.animalSource === "api" ? `/animais/${animal.id}` : undefined}
         className="flex items-center gap-3 border-b border-slate-100 bg-emerald-50/60 px-5 py-3 transition-colors duration-300 hover:bg-emerald-50"
       >
-        <img
-          src={animal.photoUrl}
-          alt={animal.name}
-          className="h-10 w-10 shrink-0 rounded-xl object-cover"
-        />
+        {animal.photoUrl ? (
+          <img
+            src={animal.photoUrl}
+            alt={animalDisplayName(animal)}
+            className="h-10 w-10 shrink-0 rounded-xl object-cover"
+          />
+        ) : (
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-emerald-600">
+            <FaPaw size={15} />
+          </span>
+        )}
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
             Interesse em
           </p>
           <p className="truncate text-sm font-bold text-emerald-950">
-            {animal.name}
+            {animalDisplayName(animal)}
           </p>
         </div>
 
@@ -54,7 +64,7 @@ function ReceivedRequestCard({
           <LuSparkles size={12} className="text-amber-300" />
           {matchScore}% Match
         </span>
-      </Link>
+      </AnimalHeader>
 
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="flex items-start gap-3">

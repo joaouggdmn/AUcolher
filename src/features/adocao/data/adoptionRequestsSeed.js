@@ -1,4 +1,4 @@
-export const adoptionRequestsSeed = [
+const seedRequests = [
   {
     id: 1,
     animalId: 1, // Thor
@@ -48,3 +48,7 @@ export const adoptionRequestsSeed = [
     },
   },
 ]
+
+// Os animais destes pedidos são os do AnimalContext (Thor é o id 1 de lá, não
+// o id 1 do banco)
+export const adoptionRequestsSeed = seedRequests.map((request) => ({ ...request, animal: { source: 'legacy' } }))
