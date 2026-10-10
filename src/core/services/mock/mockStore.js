@@ -6,6 +6,18 @@ import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from '../../utils/storageKeys'
 // Sem cache em memória: toda chamada relê o localStorage, então outra aba
 // (ou um F5) sempre enxerga o mesmo estado
 export function createMockStore({ key, version, seed }) {
+  let seedTables = null
+
+  // Um navegador que testou o código no meio de uma mudança pode ter gravado
+  // a versão atual com tabelas de outro formato (ex.: `eventos` em vez de
+  // `events`) — e aí toda rota quebrava. Conta como "sem dados" e re-semeia,
+  // sem precisar subir a versão (o que faria abas abertas com o código
+  // anterior re-semearem por cima uma da outra sem parar)
+  function hasSeedTables(data) {
+    seedTables ??= Object.keys(seed())
+    return seedTables.every((table) => Array.isArray(data[table]))
+  }
+
   function write(data) {
     try {
       localStorage.setItem(key, JSON.stringify({ version, data }))
@@ -18,7 +30,7 @@ export function createMockStore({ key, version, seed }) {
   function read() {
     try {
       const stored = JSON.parse(localStorage.getItem(key))
-      if (stored?.version === version && stored.data) return stored.data
+      if (stored?.version === version && stored.data && hasSeedTables(stored.data)) return stored.data
     } catch {
       // payload corrompido — re-semeia
     }
