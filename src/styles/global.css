@@ -73,6 +73,21 @@ body {
   animation: fade-slide-in 0.25s ease-out both;
 }
 
+/* Só opacidade: o transform do fade-slide-in fica aplicado no fim (`both`) e
+   prende modais e toasts `fixed` dos filhos dentro do elemento animado */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
 @keyframes quiz-slide-forward {
   from { opacity: 0; transform: translateX(24px); }
   to { opacity: 1; transform: translateX(0); }
