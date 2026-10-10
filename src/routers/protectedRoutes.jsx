@@ -23,6 +23,8 @@ import CampaignsPage from '../features/ong/panel/pages/CampaignsPage'
 import DonationsPage from '../features/ong/panel/pages/DonationsPage'
 import EventFormPage from '../features/ong/panel/pages/EventFormPage'
 import CampaignFormPage from '../features/ong/panel/pages/CampaignFormPage'
+import ReviewsPage from '../features/ong/panel/pages/ReviewsPage'
+import ProfilePage from '../features/ong/panel/pages/ProfilePage'
 import ChatLayout from '../core/components/layout/ChatLayout'
 
 
@@ -66,6 +68,8 @@ export const protectedRoutes = [
           { path: 'campanhas/nova', element: <CampaignFormPage /> },
           { path: 'campanhas/:id/editar', element: <CampaignFormPage /> },
           { path: 'doacoes', element: <DonationsPage /> },
+          { path: 'avaliacoes', element: <ReviewsPage /> },
+          { path: 'perfil', element: <ProfilePage /> },
         ],
       },
       // Endereços antigos: os formulários agora ficam dentro do painel

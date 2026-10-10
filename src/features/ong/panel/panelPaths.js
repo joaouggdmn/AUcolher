@@ -14,4 +14,6 @@ export const PANEL_PATHS = {
   campaignNew: `${ROOT}/campanhas/nova`,
   campaignEdit: (id) => `${ROOT}/campanhas/${id}/editar`,
   donations: `${ROOT}/doacoes`,
+  reviews: `${ROOT}/avaliacoes`,
+  profile: `${ROOT}/perfil`,
 }
