@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -9,6 +9,7 @@ import {
   FaLocationDot,
   FaLock,
   FaPen,
+  FaTrashCan,
   FaTriangleExclamation,
   FaUserGroup,
 } from 'react-icons/fa6'
@@ -21,6 +22,8 @@ import SuccessToast from '../../../core/components/ui/SuccessToast'
 import VerifiedBadge from '../../ong/components/VerifiedBadge'
 import CampaignCover from '../components/CampaignCover'
 import CampaignUnavailableState from '../components/CampaignUnavailableState'
+import CloseCampaignDialog from '../components/CloseCampaignDialog'
+import DeleteCampaignDialog from '../components/DeleteCampaignDialog'
 import DonationModal from '../components/DonationModal'
 import DonationProgress from '../components/DonationProgress'
 import { getCategoriaMeta } from '../components/filters/filterOptions'
@@ -82,8 +85,8 @@ function OngCard({ ong }) {
   )
 }
 
-// Ações da ONG dona: editar enquanto a campanha está aberta
-function OwnerActions({ campaign }) {
+// Ações da ONG dona: editar e encerrar enquanto está aberta; excluir sempre
+function OwnerActions({ campaign, onCloseCampaign, onDelete }) {
   return (
     <div className="flex flex-col gap-2">
       <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-800">
@@ -98,13 +101,33 @@ function OwnerActions({ campaign }) {
           Editar campanha
         </Link>
       )}
+      <div className={`grid gap-2 ${campaign.isClosed ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        {!campaign.isClosed && (
+          <button
+            type="button"
+            onClick={onCloseCampaign}
+            className="flex items-center justify-center gap-2 rounded-2xl border border-amber-200 py-3 text-sm font-bold text-amber-700 transition-all duration-300 hover:bg-amber-50"
+          >
+            <FaLock size={11} />
+            Encerrar
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onDelete}
+          className="flex items-center justify-center gap-2 rounded-2xl border border-rose-200 py-3 text-sm font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50"
+        >
+          <FaTrashCan size={11} />
+          Excluir
+        </button>
+      </div>
     </div>
   )
 }
 
 // Ação principal do painel lateral: doar, aviso de encerrada ou ações da dona
-function MainAction({ campaign, isOwner, onDonate }) {
-  if (isOwner) return <OwnerActions campaign={campaign} />
+function MainAction({ campaign, isOwner, onDonate, ownerActions }) {
+  if (isOwner) return <OwnerActions campaign={campaign} {...ownerActions} />
 
   if (campaign.isClosed) {
     return (
@@ -130,9 +153,11 @@ function MainAction({ campaign, isOwner, onDonate }) {
 function CampaignDetailPage() {
   const { id } = useParams()
   const location = useLocation()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { data: campaign, isLoading, isError, error, refetch } = useCampaign(id)
   const [isDonationOpen, setIsDonationOpen] = useState(false)
+  const [ownerDialog, setOwnerDialog] = useState(null) // 'close' | 'delete' | null
   // "Campanha publicada!" / "Campanha atualizada!" vindo do formulário
   const [flashMessage, setFlashMessage] = useState(location.state?.flash ?? null)
   const clearFlashMessage = useCallback(() => setFlashMessage(null), [])
@@ -237,7 +262,12 @@ function CampaignDetailPage() {
               <span className={`font-semibold ${DEADLINE_TONES[deadline.tone]}`}>{deadline.label}</span>
             </InfoRow>
 
-            <MainAction campaign={campaign} isOwner={isOwner} onDonate={() => setIsDonationOpen(true)} />
+            <MainAction
+              campaign={campaign}
+              isOwner={isOwner}
+              onDonate={() => setIsDonationOpen(true)}
+              ownerActions={{ onCloseCampaign: () => setOwnerDialog('close'), onDelete: () => setOwnerDialog('delete') }}
+            />
           </div>
 
           <OngCard ong={campaign.ong} />
@@ -245,6 +275,26 @@ function CampaignDetailPage() {
       </div>
 
       {isDonationOpen && <DonationModal campaign={campaign} onClose={() => setIsDonationOpen(false)} />}
+
+      {ownerDialog === 'close' && (
+        <CloseCampaignDialog
+          campaign={campaign}
+          onClose={() => setOwnerDialog(null)}
+          onClosed={(message) => {
+            setOwnerDialog(null)
+            setFlashMessage(message)
+          }}
+        />
+      )}
+
+      {ownerDialog === 'delete' && (
+        <DeleteCampaignDialog
+          campaign={campaign}
+          onClose={() => setOwnerDialog(null)}
+          // A página da campanha deixa de existir: volta para o painel com o aviso
+          onDeleted={(message) => navigate('/ong/dashboard', { state: { flash: message } })}
+        />
+      )}
 
       <SuccessToast message={flashMessage} onClose={clearFlashMessage} />
     </div>
