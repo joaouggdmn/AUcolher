@@ -18,6 +18,7 @@ import CampaignEditPage from '../features/doacoes/pages/CampaignEditPage'
 import OngPanelLayout from '../features/ong/panel/OngPanelLayout'
 import OverviewPage from '../features/ong/panel/pages/OverviewPage'
 import AnimalsPage from '../features/ong/panel/pages/AnimalsPage'
+import AnimalFormPage from '../features/ong/panel/pages/AnimalFormPage'
 import RequestsPage from '../features/ong/panel/pages/RequestsPage'
 import ChatsPage from '../features/ong/panel/pages/ChatsPage'
 import EventsPage from '../features/ong/panel/pages/EventsPage'
@@ -55,6 +56,8 @@ export const protectedRoutes = [
         children: [
           { index: true, element: <OverviewPage /> },
           { path: 'animais', element: <AnimalsPage /> },
+          { path: 'animais/novo', element: <AnimalFormPage /> },
+          { path: 'animais/:id/editar', element: <AnimalFormPage /> },
           { path: 'pedidos', element: <RequestsPage /> },
           { path: 'conversas', element: <ChatsPage /> },
           { path: 'eventos', element: <EventsPage /> },

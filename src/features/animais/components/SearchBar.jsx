@@ -1,6 +1,6 @@
 import { FaMagnifyingGlass } from 'react-icons/fa6'
 
-function SearchBar({ value, onChange }) {
+function SearchBar({ value, onChange, placeholder = 'Buscar por nome ou cidade...' }) {
   return (
     <div className="relative flex-1">
       <FaMagnifyingGlass
@@ -11,7 +11,7 @@ function SearchBar({ value, onChange }) {
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Buscar por nome ou cidade..."
+        placeholder={placeholder}
         className="h-12 w-full rounded-2xl border border-slate-200 bg-white pl-11 pr-4 text-sm text-slate-900 shadow-sm outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
       />
     </div>

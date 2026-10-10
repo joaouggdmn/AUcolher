@@ -1,5 +1,5 @@
 import PhotoUploadGrid from './PhotoUploadGrid'
-import { STORY_MAX_LENGTH } from '../../hooks/useCreateAnimalForm'
+import { STORY_MAX_LENGTH } from '../../hooks/useAnimalForm'
 
 const SUMMARY_MAX_LENGTH = 100
 
