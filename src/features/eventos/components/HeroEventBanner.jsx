@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom'
 import { FaArrowRight, FaCalendarDays } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 import CalendarDateBadge from './CalendarDateBadge'
-import { getDateParts } from '../utils/dateHelpers'
+import { formatLongDate, formatTimeRange } from '../utils/dateHelpers'
 
+// Destaque da vitrine: o próximo evento da agenda (a lista já vem por data)
 function HeroEventBanner({ event }) {
   if (!event) return null
-  const { day, monthLabel, weekday } = getDateParts(event.date)
 
   return (
     <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-900 to-emerald-950 p-8 sm:p-10 lg:p-14">
@@ -23,7 +23,7 @@ function HeroEventBanner({ event }) {
         <div className="flex flex-col gap-4 lg:max-w-xl">
           <span className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400 px-3.5 py-1.5 text-xs font-extrabold text-emerald-950">
             <LuSparkles size={13} />
-            EM BREVE · EVENTO DO MÊS
+            PRÓXIMO EVENTO
           </span>
 
           <h2 className="text-2xl font-black tracking-tight leading-tight text-white sm:text-3xl lg:text-4xl">
@@ -33,8 +33,10 @@ function HeroEventBanner({ event }) {
           <p className="text-emerald-100/80">{event.description}</p>
 
           <div className="flex items-center gap-2 text-sm font-medium text-emerald-100/70">
-            <FaCalendarDays size={14} className="text-amber-300" />
-            {weekday}, {day} de {monthLabel} · {event.time} · {event.location.city}
+            <FaCalendarDays size={14} className="shrink-0 text-amber-300" />
+            <span className="first-letter:uppercase">
+              {formatLongDate(event.date)} · {formatTimeRange(event.startTime, event.endTime)} · {event.location.city}
+            </span>
           </div>
 
           <Link

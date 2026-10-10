@@ -73,6 +73,28 @@ body {
   animation: fade-slide-in 0.25s ease-out both;
 }
 
+/* Só opacidade: o transform do fade-slide-in fica aplicado no fim (`both`) e
+   prende modais e toasts `fixed` dos filhos dentro do elemento animado */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+/* Barra de rolagem fina e discreta para áreas de fundo escuro (barra
+   lateral do painel da ONG) — a padrão do navegador é clara e grossa */
+.scrollbar-dark {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+}
+
 @keyframes quiz-slide-forward {
   from { opacity: 0; transform: translateX(24px); }
   to { opacity: 1; transform: translateX(0); }

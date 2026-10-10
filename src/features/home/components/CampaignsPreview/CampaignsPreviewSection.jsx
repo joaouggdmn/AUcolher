@@ -1,14 +1,24 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FaArrowRight } from 'react-icons/fa6'
 import CampaignCard from '../../../doacoes/components/CampaignCard'
+import CampaignCardSkeleton from '../../../doacoes/components/CampaignCardSkeleton'
 import DonationModal from '../../../doacoes/components/DonationModal'
-import { mockCampanhas } from '../../../doacoes/data/mockCampanhas'
+import { useCampaigns } from '../../../doacoes/hooks/useCampanhas'
 import RevealOnScroll from '../../../../core/components/ui/RevealOnScroll'
+
+const PREVIEW_SIZE = 3
 
 function CampaignsPreviewSection() {
   const [selectedCampaign, setSelectedCampaign] = useState(null)
-  const featured = mockCampanhas.slice(0, 3)
+  // Mesma query da página /campanhas: abrir uma deixa a outra já carregada
+  const { data: campaigns, isLoading, isError } = useCampaigns()
+
+  // Urgentes primeiro; o resto segue a ordem da API (mais novas antes)
+  const featured = useMemo(() => {
+    const list = campaigns ?? []
+    return [...list.filter((c) => c.isUrgent), ...list.filter((c) => !c.isUrgent)].slice(0, PREVIEW_SIZE)
+  }, [campaigns])
 
   return (
     <section className="bg-white px-4 py-20 sm:px-6 lg:py-28">
@@ -33,13 +43,28 @@ function CampaignsPreviewSection() {
           </Link>
         </RevealOnScroll>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((campaign, index) => (
-            <RevealOnScroll key={campaign.id} delay={index * 120}>
-              <CampaignCard campaign={campaign} onDonate={setSelectedCampaign} />
-            </RevealOnScroll>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: PREVIEW_SIZE }, (_, index) => (
+              <CampaignCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : featured.length === 0 ? (
+          // Erro ou nenhuma campanha: a home não mostra erro técnico
+          <p className="rounded-3xl border border-dashed border-slate-200 px-6 py-12 text-center text-slate-500">
+            {isError
+              ? 'Não foi possível carregar as campanhas agora. Tente novamente em instantes.'
+              : 'Nenhuma campanha aberta no momento. Volte em breve!'}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((campaign, index) => (
+              <RevealOnScroll key={campaign.id} delay={index * 120}>
+                <CampaignCard campaign={campaign} onDonate={setSelectedCampaign} />
+              </RevealOnScroll>
+            ))}
+          </div>
+        )}
       </div>
 
       {selectedCampaign && (

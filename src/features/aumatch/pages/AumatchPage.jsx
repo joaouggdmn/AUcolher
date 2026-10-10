@@ -15,6 +15,7 @@ import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 import { buildAdopterSnapshot } from '../../adocao/utils/buildAdopterSnapshot'
+import { buildAnimalSnapshot } from '../../adocao/utils/requestAnimal'
 import { registerPass } from '../services/aumatchService'
 import { sortPetsByMatchScore } from '../utils/matchScore'
 import { applyMatchPreferences } from '../utils/matchFilters'
@@ -152,6 +153,8 @@ function AumatchPage() {
       animalId: likedPet.id,
       ownerId: likedPet.ownerId,
       adopter: buildAdopterSnapshot(user, profileCompletion),
+      // O deck do AUmatch ainda vem do AnimalContext, não da API
+      animal: buildAnimalSnapshot(likedPet, 'legacy'),
     })
   }
 

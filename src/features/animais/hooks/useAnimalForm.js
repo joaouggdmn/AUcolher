@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { updateMyProfile } from '../../perfil/services/userService'
@@ -11,7 +10,7 @@ import {
   toPersonUpdates,
 } from '../../perfil/utils/accountForm'
 import { isValidAge } from '../utils/ageHelpers'
-import { useCreateAnimal } from './useAnimais'
+import { useCreateAnimal, useUpdateAnimal } from './useAnimais'
 
 const STEPS = ['basic', 'health', 'compatibility', 'media']
 
@@ -46,6 +45,16 @@ const INITIAL_FORM = {
   story: '',
 }
 
+// Animal da API → valores do formulário (a idade vira texto, como no input)
+function toFormValues(animal) {
+  const fields = Object.keys(INITIAL_FORM).filter((field) => field !== 'city' && field !== 'state')
+  return {
+    ...INITIAL_FORM,
+    ...Object.fromEntries(fields.map((field) => [field, animal[field] ?? INITIAL_FORM[field]])),
+    ageValue: String(animal.ageValue ?? ''),
+  }
+}
+
 // A API tira a cidade/UF do anúncio do perfil de quem anuncia. Sem elas no
 // banco o cadastro é recusado, então gravamos antes pelo PUT /users/me — que
 // substitui o perfil inteiro: o corpo sai do usuário completo, como em
@@ -64,18 +73,23 @@ async function saveLocationToProfile(user, city, state) {
   return { ...updates, ...savedProfile }
 }
 
-export function useCreateAnimalForm() {
-  const navigate = useNavigate()
+// Cadastro e edição do anúncio. Com `animal`, edita (PUT); sem, cadastra
+// (POST). `onSaved(animalSalvo)` decide para onde ir depois — cada tela tem o
+// seu destino (página do animal, lista do painel)
+export function useAnimalForm({ animal = null, onSaved }) {
   const { user, updateProfile } = useAuth()
   const { mutateAsync: createAnimal } = useCreateAnimal()
+  const { mutateAsync: updateAnimal } = useUpdateAnimal()
+  const isEditing = animal != null
 
   // Calculado UMA vez na montagem — não deve "sumir" o campo se algo mudar
-  // no meio do preenchimento (mesmo princípio do isQuizOpen no AumatchPage)
-  const [needsLocationInput] = useState(() => !user?.city || !user?.state)
+  // no meio do preenchimento (mesmo princípio do isQuizOpen no AumatchPage).
+  // Na edição não se aplica: o anúncio já existe, e a cidade vem do perfil
+  const [needsLocationInput] = useState(() => !isEditing && (!user?.city || !user?.state))
 
   const [stepIndex, setStepIndex] = useState(0)
-  const [formData, setFormData] = useState(INITIAL_FORM)
-  const [images, setImages] = useState([])
+  const [formData, setFormData] = useState(() => (isEditing ? toFormValues(animal) : INITIAL_FORM))
+  const [images, setImages] = useState(() => (isEditing ? animal.images : []))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState(null)
 
@@ -87,8 +101,8 @@ export function useCreateAnimalForm() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const isStepValid = () => {
-    if (currentStep === 'basic') {
+  const validateStep = (step) => {
+    if (step === 'basic') {
       const hasBasicFields =
         formData.name.trim() !== '' &&
         formData.species !== '' &&
@@ -100,7 +114,7 @@ export function useCreateAnimalForm() {
       if (!needsLocationInput) return hasBasicFields
       return hasBasicFields && formData.city.trim() !== '' && formData.state !== ''
     }
-    if (currentStep === 'compatibility') {
+    if (step === 'compatibility') {
       return (
         formData.energyLevel !== '' &&
         formData.temperament !== '' &&
@@ -112,15 +126,23 @@ export function useCreateAnimalForm() {
         formData.apartmentFriendly !== null
       )
     }
-    if (currentStep === 'media') {
+    if (step === 'media') {
       return images.length > 0 && formData.summary.trim() !== '' && formData.story.trim() !== ''
     }
     return true
   }
 
+  const isStepValid = validateStep(currentStep)
+  const isFormValid = STEPS.every(validateStep)
+
   const goNext = () => {
-    if (!isStepValid() || isLastStep) return
+    if (!isStepValid || isLastStep) return
     setStepIndex((i) => i + 1)
+  }
+
+  // Pular direto para uma etapa só quando todas as anteriores estão completas
+  const goToStep = (index) => {
+    if (STEPS.slice(0, index).every(validateStep)) setStepIndex(index)
   }
 
   const goBack = () => {
@@ -129,7 +151,7 @@ export function useCreateAnimalForm() {
   }
 
   const handleSubmit = async () => {
-    if (!isStepValid()) return
+    if (!isFormValid) return
     setIsSubmitting(true)
     setSubmitError(null)
 
@@ -140,17 +162,22 @@ export function useCreateAnimalForm() {
         updateProfile(await saveLocationToProfile(user, formData.city.trim(), formData.state))
       }
 
-      const createdAnimal = await createAnimal({ form: formData, photos: images })
-      navigate(`/animais/${createdAnimal.id}`, { state: { justCreated: true } })
+      const savedAnimal = isEditing
+        ? await updateAnimal({ id: animal.id, form: formData, photos: images })
+        : await createAnimal({ form: formData, photos: images })
+      onSaved(savedAnimal)
     } catch (error) {
-      setSubmitError(getErrorMessage(error, 'Não foi possível cadastrar o animal. Tente novamente.'))
+      const fallback = isEditing
+        ? 'Não foi possível salvar as alterações. Tente novamente.'
+        : 'Não foi possível cadastrar o animal. Tente novamente.'
+      setSubmitError(getErrorMessage(error, fallback))
       setIsSubmitting(false)
     }
   }
 
   return {
     stepIndex, currentStep, isFirstStep, isLastStep, formData, images, setImages,
-    updateField, isStepValid: isStepValid(), isSubmitting, submitError, needsLocationInput,
-    goNext, goBack, handleSubmit,
+    updateField, isStepValid, isFormValid, isEditing, isSubmitting, submitError, needsLocationInput,
+    goNext, goBack, goToStep, handleSubmit,
   }
 }

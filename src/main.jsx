@@ -9,7 +9,13 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5,
-      retry: 1,
+      // Erro 4xx (não encontrado, sem permissão, regra de negócio) não
+      // melhora tentando de novo — só falha de rede/servidor repete uma vez
+      retry: (failureCount, error) => {
+        const status = error?.response?.status
+        if (status >= 400 && status < 500) return false
+        return failureCount < 1
+      },
     },
   },
 })

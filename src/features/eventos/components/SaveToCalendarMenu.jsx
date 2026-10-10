@@ -1,16 +1,31 @@
 import { FaRegCalendarPlus, FaGoogle, FaMicrosoft, FaApple } from 'react-icons/fa6'
+import { formatEventAddress } from '../utils/eventDisplay'
+
+// "2026-10-03" + "09:00" → "20261003T090000"
+function toCalendarStamp(date, time) {
+  return `${date.replace(/-/g, '')}T${time.replace(':', '')}00`
+}
+
+// Sem término cadastrado, reserva 1 hora na agenda
+function oneHourLater(time) {
+  const [hours, minutes] = time.split(':').map(Number)
+  if (hours >= 23) return '23:59'
+  return `${String(hours + 1).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
 
 function buildGoogleCalendarUrl(event) {
-  const { title, description, date, time, location } = event
-  const [startTime] = time.split(' - ')
-  const start = `${date.replace(/-/g, '')}T${startTime.replace(':', '')}00`
+  const { title, description, date, startTime, endTime, location } = event
+  const start = toCalendarStamp(date, startTime)
+  const end = toCalendarStamp(date, endTime ?? oneHourLater(startTime))
 
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: title,
-    dates: `${start}/${start}`,
+    dates: `${start}/${end}`,
+    // Horário sem fuso é o local do evento, não o de quem salva
+    ctz: 'America/Sao_Paulo',
     details: description,
-    location: `${location.venue}, ${location.city}`,
+    location: `${location.venue}, ${formatEventAddress(location)}`,
   })
 
   return `https://calendar.google.com/calendar/render?${params.toString()}`

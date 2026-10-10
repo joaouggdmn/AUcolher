@@ -7,6 +7,11 @@ export const ADOPTION_REQUESTS_STORAGE_KEY = 'aucolher_adoption_requests'
 export const ANIMALS_STORAGE_KEY = 'aucolher_animals_v2'
 export const LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile' // 🆕
 
+// "Banco" falso de eventos + presenças (core/services/mock/mockStore.js)
+export const MOCK_EVENTOS_STORE_KEY = 'aucolher_mock_eventos'
+// "Banco" falso de campanhas + doações (mesmo mockStore)
+export const MOCK_CAMPANHAS_STORE_KEY = 'aucolher_mock_campanhas'
+
 // Chave dinâmica: cada conversa (match aceito) tem seu próprio histórico
 // isolado no localStorage — centralizado aqui para não haver 2 lugares
 // construindo essa string de formas diferentes
@@ -18,9 +23,4 @@ export function chatMessagesStorageKey(requestId) {
 // é o que permite contar mensagens não lidas no badge da sidebar
 export function chatLastSeenStorageKey(userId) {
   return `aucolher_chat_last_seen_${userId}`
-}
-
-// Eventos em que a conta confirmou presença (seção "Eventos participados")
-export function eventAttendanceStorageKey(userId) {
-  return `aucolher_event_attendance_${userId}`
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaUser, FaEye, FaArrowRightFromBracket } from "react-icons/fa6";
+import { FaUser, FaEye, FaArrowRightFromBracket, FaBuildingNgo } from "react-icons/fa6";
+import { PANEL_PATHS } from "../../../features/ong/panel/panelPaths";
 
 function UserAvatarMenu({
   user,
@@ -99,6 +100,17 @@ function UserAvatarMenu({
                 />
               </div>
             </div>
+
+            {user?.userType === "ONG" && (
+              <Link
+                to={PANEL_PATHS.overview}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-emerald-800 transition-colors duration-200 hover:bg-emerald-50"
+              >
+                <FaBuildingNgo size={14} className="text-amber-500" />
+                Painel da ONG
+              </Link>
+            )}
 
             <Link
               to="/perfil"
