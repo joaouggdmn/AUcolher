@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useChatContacts } from '../../../core/hooks/useChatContacts'
 import { useChatUnread } from '../../../core/hooks/useChatUnread'
+import { isSameId } from '../../../core/utils/ids'
 import { useMyAnimals } from '../../animais/hooks/useAnimais'
 import { IN_PROGRESS_STATUSES, withAdoptionStatus } from '../../animais/utils/listingStatus'
 import { useMyEvents } from '../../eventos/hooks/useEventos'
@@ -11,10 +11,6 @@ import { useMyCampaigns } from '../../doacoes/hooks/useCampanhas'
 import { useReceivedDonations } from '../../doacoes/hooks/useDoacoes'
 
 const NO_ITEMS = []
-
-function isSameId(a, b) {
-  return a != null && b != null && String(a) === String(b)
-}
 
 function byDateAsc(a, b) {
   return a.date.localeCompare(b.date) || (a.startTime ?? '').localeCompare(b.startTime ?? '')
@@ -36,16 +32,14 @@ function previewOf(message, userId) {
 
 // Tudo o que o painel da ONG mostra. Animais vêm da API; pedidos e chat,
 // do localStorage; eventos, campanhas e doações, dos seus serviços (mock ou API).
-// O pedido guarda só o id do animal: os pedidos novos apontam para animais da
-// API, os antigos para o AnimalContext — então procura nos dois, API primeiro.
-// Animal que não está em nenhum dos dois volta com `name: null`
+// O animal de cada pedido já vem resolvido pelo AdoptionRequestProvider
+// (`name: null` quando ele não existe mais)
 export function useOngDashboard() {
   const { user } = useAuth()
   const eventsQuery = useMyEvents()
   const campaignsQuery = useMyCampaigns()
   const donationsQuery = useReceivedDonations()
   const animalsQuery = useMyAnimals()
-  const { animals: legacyAnimals } = useAnimals()
   const { requests: allRequests } = useAdoptionRequests()
   const { contacts } = useChatContacts()
   const { conversations: chats } = useChatUnread()
@@ -57,12 +51,8 @@ export function useOngDashboard() {
   const userId = user?.id
 
   const data = useMemo(() => {
-    const animalsById = new Map([...legacyAnimals, ...apiAnimals].map((animal) => [String(animal.id), animal]))
-    const findAnimal = (id) => animalsById.get(String(id)) ?? { id, name: null, photoUrl: null }
-
     const requests = allRequests
       .filter((request) => isSameId(request.ownerId, userId))
-      .map((request) => ({ ...request, animal: findAnimal(request.animalId) }))
       .sort((a, b) => timeOf(b.createdAt) - timeOf(a.createdAt))
 
     const animals = withAdoptionStatus(apiAnimals, requests)
@@ -74,7 +64,6 @@ export function useOngDashboard() {
         const chat = chats[contact.requestId]
         return {
           ...contact,
-          animalName: findAnimal(contact.animalId).name ?? 'Animal não encontrado',
           unread: chat?.unread ?? 0,
           lastMessageText: previewOf(chat?.lastMessage, userId),
           lastMessageAt: chat?.lastMessage?.timestamp ?? null,
@@ -124,7 +113,7 @@ export function useOngDashboard() {
     }
 
     return { animals, requests, conversations, events, campaigns, donations, timeline, stats }
-  }, [userId, legacyAnimals, apiAnimals, allRequests, contacts, chats, myEvents, myCampaigns, donations])
+  }, [userId, apiAnimals, allRequests, contacts, chats, myEvents, myCampaigns, donations])
 
   return {
     ...data,

@@ -1,3 +1,5 @@
+import { isSameId } from '../../../core/utils/ids'
+
 export const IN_PROGRESS_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
 
 export const LISTING_STATUS_META = {
@@ -7,21 +9,32 @@ export const LISTING_STATUS_META = {
   INACTIVE: { label: 'Fora do ar', className: 'bg-slate-100 text-slate-400' },
 }
 
-// Status do anúncio do ponto de vista do dono: "em processo" quando já
-// existe um pedido aceito caminhando para a entrega
-function deriveListingStatus(animal, requests) {
-  if (animal.status === 'ADOPTED' || animal.status === 'INACTIVE') return animal.status
-  const hasActiveAdoption = requests.some(
-    (request) => request.animalId === animal.id && IN_PROGRESS_STATUSES.includes(request.status)
+// Pedido sobre este animal da API — ids do AnimalContext antigo se repetem
+function isRequestFor(request, animal) {
+  return (
+    request.animalSource === 'api' &&
+    isSameId(request.animalId, animal.id) &&
+    isSameId(request.ownerId, animal.ownerId)
   )
-  return hasActiveAdoption ? 'IN_PROGRESS' : 'AVAILABLE'
+}
+
+// Status do anúncio do ponto de vista do dono: "em processo" quando já
+// existe um pedido aceito caminhando para a entrega. Adoção concluída já
+// conta como adotado antes de a API ser atualizada (useSyncAdoptedAnimals)
+function deriveListingStatus(animal, statuses) {
+  if (animal.status === 'ADOPTED' || statuses.includes('CONCLUDED')) return 'ADOPTED'
+  if (animal.status === 'INACTIVE') return 'INACTIVE'
+  return statuses.some((status) => IN_PROGRESS_STATUSES.includes(status)) ? 'IN_PROGRESS' : 'AVAILABLE'
 }
 
 // Animais do dono com `listingStatus` e quantos pedidos esperam resposta
 export function withAdoptionStatus(animals, requests) {
-  return animals.map((animal) => ({
-    ...animal,
-    listingStatus: deriveListingStatus(animal, requests),
-    pendingInterests: requests.filter((r) => r.animalId === animal.id && r.status === 'PENDING').length,
-  }))
+  return animals.map((animal) => {
+    const statuses = requests.filter((request) => isRequestFor(request, animal)).map((request) => request.status)
+    return {
+      ...animal,
+      listingStatus: deriveListingStatus(animal, statuses),
+      pendingInterests: statuses.filter((status) => status === 'PENDING').length,
+    }
+  })
 }

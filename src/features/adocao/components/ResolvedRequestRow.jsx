@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaXmark, FaBan } from "react-icons/fa6";
+import { animalDisplayName } from "../utils/requestAnimal";
 
 const STATUS_META = {
   REJECTED: {
@@ -31,12 +32,16 @@ function ResolvedRequestRow({ request }) {
         </p>
         <p className="truncate text-xs text-slate-500">
           Interesse em{" "}
-          <Link
-            to={`/animais/${request.animal.id}`}
-            className="font-semibold text-emerald-700 hover:underline"
-          >
-            {request.animal.name}
-          </Link>
+          {request.animalSource === "api" ? (
+            <Link
+              to={`/animais/${request.animal.id}`}
+              className="font-semibold text-emerald-700 hover:underline"
+            >
+              {animalDisplayName(request.animal)}
+            </Link>
+          ) : (
+            <span className="font-semibold text-slate-600">{animalDisplayName(request.animal)}</span>
+          )}
         </p>
       </div>
       <span

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
+import { isSameId } from '../../../core/utils/ids'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
 import { useMyAttendance } from '../../eventos/hooks/useEventos'
 import { useMyDonations } from '../../doacoes/hooks/useDoacoes'
@@ -9,10 +9,6 @@ import { IN_PROGRESS_STATUSES, withAdoptionStatus } from '../../animais/utils/li
 
 const NO_EVENTS = []
 const NO_DONATIONS = []
-
-function isSameId(a, b) {
-  return a != null && b != null && String(a) === String(b)
-}
 
 function byDateAsc(a, b) {
   return a.date.localeCompare(b.date) || (a.startTime ?? '').localeCompare(b.startTime ?? '')
@@ -25,7 +21,6 @@ function byDateAsc(a, b) {
 // 🔴 Com a API real, os outros blocos viram uma chamada cada: /avaliacoes e
 // /adocoes
 export function useAccountActivity(user) {
-  const { animals } = useAnimals()
   const { data: myApiAnimals = [] } = useMyAnimals()
   const { requests } = useAdoptionRequests()
   const reviews = useUserReviews(user?.id)
@@ -44,8 +39,8 @@ export function useAccountActivity(user) {
     const adoptions = myRequests
       .filter((request) => request.status === 'CONCLUDED')
       .map((request) => {
-        const animal = animals.find((a) => a.id === request.animalId)
-        const animalName = animal?.name ?? 'um animal'
+        const { animal } = request
+        const animalName = animal.name ?? 'um animal'
         const gaveAway = isSameId(request.ownerId, userId)
 
         return {
@@ -54,7 +49,7 @@ export function useAccountActivity(user) {
           title: gaveAway ? `${animalName} ganhou um novo lar` : `Você adotou ${animalName}`,
           subtitle: gaveAway
             ? `Adotado por ${request.adopter?.name ?? 'outra pessoa'}`
-            : `Doado por ${animal?.organizationName ?? animal?.ownerName ?? 'outra pessoa'}`,
+            : `Doado por ${animal.organizationName || animal.ownerName || 'outra pessoa'}`,
           date: request.concludedAt ?? request.createdAt,
         }
       })
@@ -90,7 +85,7 @@ export function useAccountActivity(user) {
     }
 
     return { animals: myAnimals, impact, events }
-  }, [user?.id, animals, myApiAnimals, requests, attendedEvents, myDonations])
+  }, [user?.id, myApiAnimals, requests, attendedEvents, myDonations])
 
   return { ...activity, reviews }
 }
