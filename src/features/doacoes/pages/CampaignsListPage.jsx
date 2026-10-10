@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FaFilter, FaHandHoldingHeart } from 'react-icons/fa6'
 import HeroSosBanner from '../components/HeroSosBanner'
@@ -7,26 +7,28 @@ import CampaignsGrid from '../components/CampaignsGrid'
 import DonationModal from '../components/DonationModal'
 import CampaignsFiltersSidebar from '../components/filters/CampaignsFiltersSidebar'
 import CampaignsFiltersDrawer from '../components/filters/CampaignsFiltersDrawer'
-import { mockCampanhas } from '../data/mockCampanhas'
+import { matchesStatusFilter } from '../components/filters/filterOptions'
+import { useCampaigns } from '../hooks/useCampanhas'
+import { pickSosCampaign } from '../utils/campaignDisplay'
+import { getErrorMessage } from '../../../core/utils/apiError'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
 import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 import InfoToast from '../../../core/components/ui/InfoToast'
+import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 
 const INITIAL_FILTERS = { categorias: [], status: [] }
 const PAGE_SIZE = 12
+const NO_CAMPAIGNS = []
 
 function toggleArrayValue(array, value) {
   return array.includes(value) ? array.filter((v) => v !== value) : [...array, value]
 }
 
-function getPercentage(raised, goal) {
-  return Math.min(100, Math.round((raised / goal) * 100))
-}
-
 function CampaignsListPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { data: campaigns = NO_CAMPAIGNS, isLoading, isError, error, refetch } = useCampaigns()
 
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState(INITIAL_FILTERS)
@@ -36,20 +38,31 @@ function CampaignsListPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [ongWarning, setOngWarning] = useState(null)
 
-  const campaigns = mockCampanhas
-  const emergencyCampaign = useMemo(() => campaigns.find((c) => c.isEmergency) || campaigns[0], [campaigns])
+  // A API devolve só campanhas ativas, da mais nova para a mais antiga
+  const sosCampaign = useMemo(() => pickSosCampaign(campaigns), [campaigns])
+
+  // Toda mudança de busca/filtro volta para a primeira página
+  const updateFilters = (updater) => {
+    setFilters(updater)
+    setVisibleCount(PAGE_SIZE)
+  }
+
+  const handleSearchChange = (value) => {
+    setSearch(value)
+    setVisibleCount(PAGE_SIZE)
+  }
 
   const handleToggleCategoria = (value) => {
-    setFilters((prev) => ({ ...prev, categorias: toggleArrayValue(prev.categorias, value) }))
+    updateFilters((prev) => ({ ...prev, categorias: toggleArrayValue(prev.categorias, value) }))
   }
 
   const handleToggleStatus = (value) => {
-    setFilters((prev) => ({ ...prev, status: toggleArrayValue(prev.status, value) }))
+    updateFilters((prev) => ({ ...prev, status: toggleArrayValue(prev.status, value) }))
   }
 
   const handleClearFilters = () => {
     setSearch('')
-    setFilters(INITIAL_FILTERS)
+    updateFilters(INITIAL_FILTERS)
   }
 
   const hasActiveFilters = search !== '' || filters.categorias.length > 0 || filters.status.length > 0
@@ -64,19 +77,12 @@ function CampaignsListPage() {
         campaign.ong.name.toLowerCase().includes(term)
 
       const matchesCategoria = filters.categorias.length === 0 || filters.categorias.includes(campaign.category)
-
-      const percentage = getPercentage(campaign.raisedAmount, campaign.goalAmount)
       const matchesStatus =
-        filters.status.length === 0 ||
-        filters.status.some((s) => (s === 'URGENTE' ? campaign.isUrgent : percentage >= 80))
+        filters.status.length === 0 || filters.status.some((status) => matchesStatusFilter(campaign, status))
 
       return matchesSearch && matchesCategoria && matchesStatus
     })
   }, [campaigns, search, filters])
-
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE)
-  }, [search, filters])
 
   const visibleCampaigns = filteredCampaigns.slice(0, visibleCount)
   const hasMore = visibleCount < filteredCampaigns.length
@@ -101,13 +107,17 @@ function CampaignsListPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:pt-28">
-      <div className="mb-10">
-        <HeroSosBanner campaign={emergencyCampaign} onDonate={setSelectedCampaign} />
-      </div>
+      {sosCampaign && (
+        <div className="mb-10">
+          <HeroSosBanner campaign={sosCampaign} onDonate={setSelectedCampaign} />
+        </div>
+      )}
 
       <header className="mb-6 flex flex-col gap-2">
         <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
-          {filteredCampaigns.length} {filteredCampaigns.length === 1 ? 'campanha encontrada' : 'campanhas encontradas'}
+          {isLoading
+            ? 'Carregando campanhas...'
+            : `${filteredCampaigns.length} ${filteredCampaigns.length === 1 ? 'campanha encontrada' : 'campanhas encontradas'}`}
         </span>
         <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Campanhas de arrecadação
@@ -122,7 +132,7 @@ function CampaignsListPage() {
 
         <div className="min-w-0 flex-1">
           <div className="mb-6 flex items-center gap-3">
-            <CampaignsControlBar search={search} onSearchChange={setSearch} />
+            <CampaignsControlBar search={search} onSearchChange={handleSearchChange} />
 
             <button
               type="button"
@@ -139,11 +149,21 @@ function CampaignsListPage() {
             </button>
           </div>
 
-          <CampaignsGrid
-            campaigns={visibleCampaigns}
-            onDonate={setSelectedCampaign}
-            onClearFilters={handleClearFilters}
-          />
+          {isError ? (
+            <LoadErrorState
+              title="Não foi possível carregar as campanhas"
+              message={getErrorMessage(error)}
+              onRetry={() => refetch()}
+            />
+          ) : (
+            <CampaignsGrid
+              campaigns={visibleCampaigns}
+              isLoading={isLoading}
+              hasActiveFilters={hasActiveFilters}
+              onDonate={setSelectedCampaign}
+              onClearFilters={handleClearFilters}
+            />
+          )}
 
           {hasMore && (
             <ShowMoreButton
