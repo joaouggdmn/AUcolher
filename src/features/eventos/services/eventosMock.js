@@ -276,3 +276,35 @@ export async function listMyAttendance() {
     .sort(byDateAsc)
     .map((row) => toDto(db, row))
 }
+
+// ---------- só do mock: dados de teste do painel (features/ong/panel/dev) ----------
+
+// Grava eventos da ONG logada já com as presenças. As linhas ficam marcadas
+// com `demo: true` para removeDemoEvents apagar só elas
+export async function insertDemoEvents(templates) {
+  await mockDelay()
+  const user = requireSession()
+  requireOng(user)
+  const db = store.read()
+
+  let id = nextId(db.events)
+  const events = []
+  const attendances = []
+  for (const { attendees, ...fields } of templates) {
+    const event = { ...fields, id: id++, status: 'ACTIVE', ngo: ngoSnapshot(user), demo: true }
+    events.push(event)
+    attendances.push(...attendees.map(({ user: attendee, confirmedAt }) => ({ eventId: event.id, user: attendee, confirmedAt })))
+  }
+  store.write({ ...db, events: [...db.events, ...events], attendances: [...db.attendances, ...attendances] })
+}
+
+export async function removeDemoEvents() {
+  await mockDelay()
+  const db = store.read()
+  const demoIds = new Set(db.events.filter((row) => row.demo).map((row) => row.id))
+  store.write({
+    ...db,
+    events: db.events.filter((row) => !row.demo),
+    attendances: db.attendances.filter((attendance) => !demoIds.has(attendance.eventId)),
+  })
+}

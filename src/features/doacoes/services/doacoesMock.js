@@ -398,3 +398,48 @@ export async function simulateDonationApproval(id) {
   store.write(next)
   return toDonationDto(next, approved, { withPix: true })
 }
+
+// ---------- só do mock: dados de teste do painel (features/ong/panel/dev) ----------
+
+// Grava campanhas da ONG logada já com as doações aprovadas. As linhas ficam
+// marcadas com `demo: true` para removeDemoCampaigns apagar só elas
+export async function insertDemoCampaigns(templates) {
+  await mockDelay()
+  const user = requireSession()
+  requireOng(user)
+  const db = store.read()
+
+  let campaignId = nextId(db.campaigns)
+  let donationId = nextId(db.donations)
+  const campaigns = []
+  const donations = []
+  for (const { donations: gifts, ...fields } of templates) {
+    const campaign = { ...fields, id: campaignId++, deleted: false, ngo: ngoSnapshot(user), demo: true }
+    campaigns.push(campaign)
+    donations.push(
+      ...gifts.map(({ amount, approvedAt, donor }) => ({
+        id: donationId++,
+        amount,
+        status: 'APPROVED',
+        createdAt: approvedAt,
+        approvedAt,
+        expiresAt: null,
+        pix: null,
+        donor,
+        campaign: { id: campaign.id, title: campaign.title, ngoName: campaign.ngo.name },
+        demo: true,
+      }))
+    )
+  }
+  store.write({ ...db, campaigns: [...db.campaigns, ...campaigns], donations: [...db.donations, ...donations] })
+}
+
+export async function removeDemoCampaigns() {
+  await mockDelay()
+  const db = store.read()
+  store.write({
+    ...db,
+    campaigns: db.campaigns.filter((row) => !row.demo),
+    donations: db.donations.filter((row) => !row.demo),
+  })
+}
