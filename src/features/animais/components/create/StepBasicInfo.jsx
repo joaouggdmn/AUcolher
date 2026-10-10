@@ -4,7 +4,7 @@ import { BRAZILIAN_STATES } from '../../../../core/utils/brazilianStates'
 import { useCepLookup } from '../../../../core/hooks/useCepLookup' // 🆕
 import CepField from '../../../../core/components/ui/CepField' // 🆕
 import { AGE_RULE_HINT, isValidAge } from '../../utils/ageHelpers'
-import { BREED_MAX_LENGTH, NAME_MAX_LENGTH } from '../../hooks/useCreateAnimalForm'
+import { BREED_MAX_LENGTH, NAME_MAX_LENGTH } from '../../hooks/useAnimalForm'
 
 const SPECIES_OPTIONS = [
   { value: 'DOG', label: 'Cão' }, { value: 'CAT', label: 'Gato' }, { value: 'OTHER', label: 'Outro' },
