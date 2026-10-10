@@ -292,7 +292,7 @@ function CampaignDetailPage() {
           campaign={campaign}
           onClose={() => setOwnerDialog(null)}
           // A página da campanha deixa de existir: volta para o painel com o aviso
-          onDeleted={(message) => navigate('/ong/dashboard', { state: { flash: message } })}
+          onDeleted={(message) => navigate('/ong/dashboard?aba=campanhas', { state: { flash: message } })}
         />
       )}
 

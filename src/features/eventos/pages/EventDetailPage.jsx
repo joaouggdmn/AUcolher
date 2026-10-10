@@ -222,7 +222,7 @@ function EventDetailPage() {
           event={event}
           onClose={() => setIsDeleteOpen(false)}
           // A página do evento deixa de existir: volta para o painel com o aviso
-          onDeleted={(message) => navigate('/ong/dashboard', { state: { flash: message } })}
+          onDeleted={(message) => navigate('/ong/dashboard?aba=eventos', { state: { flash: message } })}
         />
       )}
 

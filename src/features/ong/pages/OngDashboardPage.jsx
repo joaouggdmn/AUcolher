@@ -1,71 +1,107 @@
-import { useCallback, useMemo, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { FaCalendarDays, FaEye, FaHandHoldingDollar, FaHandHoldingHeart, FaPlus } from 'react-icons/fa6'
+import { useCallback, useState } from 'react'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import {
+  FaCalendarDays,
+  FaComments,
+  FaEye,
+  FaHandHoldingDollar,
+  FaHandHoldingHeart,
+  FaInbox,
+  FaPaw,
+  FaPlus,
+  FaTableCellsLarge,
+} from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
-import { formatCurrency } from '../../../core/utils/currency'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
-import { useMyEvents } from '../../eventos/hooks/useEventos'
-import { useMyCampaigns } from '../../doacoes/hooks/useCampanhas'
-import { useReceivedDonations } from '../../doacoes/hooks/useDoacoes'
 import VerifiedBadge from '../components/VerifiedBadge'
 import DashboardSections from '../components/dashboard/DashboardSections'
+import OngOverviewPanel from '../components/dashboard/OngOverviewPanel'
+import OngAnimalsPanel from '../components/dashboard/OngAnimalsPanel'
+import OngAdoptionsPanel from '../components/dashboard/OngAdoptionsPanel'
+import OngConversationsPanel from '../components/dashboard/OngConversationsPanel'
+import OngEventsPanel from '../components/dashboard/OngEventsPanel'
 import OngCampaignsPanel from '../components/dashboard/OngCampaignsPanel'
 import OngDonationsPanel from '../components/dashboard/OngDonationsPanel'
-import OngEventsPanel from '../components/dashboard/OngEventsPanel'
+import { useOngDashboard } from '../hooks/useOngDashboard'
 
-const NO_DONATIONS = []
+// ?aba=eventos abre direto numa aba (e sobrevive ao F5)
+const DASHBOARD_TAB_PARAM = 'aba'
 
-function byDateAsc(a, b) {
-  return a.date.localeCompare(b.date) || (a.startTime ?? '').localeCompare(b.startTime ?? '')
-}
-
-function plural(count, singular, pluralForm) {
-  return `${count} ${count === 1 ? singular : pluralForm}`
-}
-
-// Painel da ONG: o que a instituição divulgou, quem vai participar e quanto
-// já recebeu. Cada área é uma aba (DashboardSections)
+// Painel da ONG: a visão geral resume cada área, e cada área tem a sua aba
 function OngDashboardPage() {
   const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { user } = useAuth()
-  const myEventsQuery = useMyEvents()
-  const myCampaignsQuery = useMyCampaigns()
-  const receivedQuery = useReceivedDonations()
+  const { animals, requests, conversations, events, campaigns, donations, timeline, stats, queries } = useOngDashboard()
   // Vem da página do evento/campanha quando a exclusão foi feita por lá
   const [flashMessage, setFlashMessage] = useState(location.state?.flash ?? null)
   const clearFlashMessage = useCallback(() => setFlashMessage(null), [])
 
-  const events = useMemo(() => {
-    const all = myEventsQuery.data ?? []
-    return {
-      upcoming: all.filter((event) => !event.isPast).sort(byDateAsc),
-      past: all.filter((event) => event.isPast).sort((a, b) => byDateAsc(b, a)),
-    }
-  }, [myEventsQuery.data])
-
-  // A API já manda da mais nova para a mais antiga
-  const campaigns = useMemo(() => {
-    const all = myCampaignsQuery.data ?? []
-    return {
-      active: all.filter((campaign) => !campaign.isClosed),
-      closed: all.filter((campaign) => campaign.isClosed),
-    }
-  }, [myCampaignsQuery.data])
-
-  const donations = receivedQuery.data ?? NO_DONATIONS
-  const totalReceived = donations.reduce((sum, donation) => sum + donation.amount, 0)
-  const upcomingConfirmed = events.upcoming.reduce((sum, event) => sum + event.confirmedCount, 0)
-  const activeRaised = campaigns.active.reduce((sum, campaign) => sum + campaign.raisedAmount, 0)
+  const selectTab = (key) => setSearchParams({ [DASHBOARD_TAB_PARAM]: key }, { replace: true })
 
   const sections = [
     {
+      key: 'visao-geral',
+      icon: FaTableCellsLarge,
+      tab: 'Visão geral',
+      title: 'Visão geral',
+      description: 'Os números de cada área e o que aconteceu por último. Escolha um card para ver os detalhes.',
+      content: (
+        <OngOverviewPanel
+          stats={stats}
+          timeline={timeline}
+          loading={{
+            animals: queries.animals.isLoading,
+            events: queries.events.isLoading,
+            campaigns: queries.campaigns.isLoading,
+            donations: queries.donations.isLoading,
+          }}
+          onSelect={selectTab}
+        />
+      ),
+    },
+    {
+      key: 'animais',
+      icon: FaPaw,
+      tab: 'Animais',
+      title: 'Animais',
+      description:
+        'Os disponíveis aparecem na vitrine e no perfil da ONG. "Em processo" já tem uma adoção encaminhada; os adotados ficam como histórico.',
+      actions: [{ to: '/animais/criar', label: 'Cadastrar animal', icon: FaPlus }],
+      content: (
+        <OngAnimalsPanel
+          animals={animals}
+          isLoading={queries.animals.isLoading}
+          error={queries.animals.error}
+          onRetry={() => queries.animals.refetch()}
+        />
+      ),
+    },
+    {
+      key: 'adocoes',
+      icon: FaInbox,
+      tab: 'Adoções',
+      badge: { count: stats.pendingRequests, label: 'pedidos aguardando resposta' },
+      title: 'Adoções',
+      description:
+        'Pedidos recebidos, adoções em andamento e as já concluídas. Para aceitar ou recusar um pedido, abra Interesses recebidos.',
+      actions: [{ to: '/interesses-recebidos', label: 'Interesses recebidos' }],
+      content: <OngAdoptionsPanel requests={requests} />,
+    },
+    {
+      key: 'conversas',
+      icon: FaComments,
+      tab: 'Conversas',
+      badge: { count: stats.unreadMessages, label: 'mensagens não lidas' },
+      title: 'Conversas',
+      description: 'Chats com quem quer adotar os animais da ONG, das conversas mais recentes para as mais antigas.',
+      actions: [{ to: '/chat', label: 'Abrir chat' }],
+      content: <OngConversationsPanel conversations={conversations} />,
+    },
+    {
       key: 'eventos',
       icon: FaCalendarDays,
-      label: events.upcoming.length === 1 ? 'evento agendado' : 'eventos agendados',
-      value: myEventsQuery.isLoading ? '—' : events.upcoming.length,
-      caption: myEventsQuery.isLoading
-        ? 'Carregando...'
-        : `${plural(upcomingConfirmed, 'presença confirmada', 'presenças confirmadas')} · ${plural(events.past.length, 'realizado', 'realizados')}`,
+      tab: 'Eventos',
       title: 'Eventos',
       description:
         'Os próximos aparecem na vitrine e no perfil da ONG. Veja quem confirmou presença, edite ou cancele. Os já realizados ficam como histórico.',
@@ -73,9 +109,9 @@ function OngDashboardPage() {
       content: (
         <OngEventsPanel
           events={events}
-          isLoading={myEventsQuery.isLoading}
-          error={myEventsQuery.error}
-          onRetry={() => myEventsQuery.refetch()}
+          isLoading={queries.events.isLoading}
+          error={queries.events.error}
+          onRetry={() => queries.events.refetch()}
           onNotify={setFlashMessage}
         />
       ),
@@ -83,11 +119,7 @@ function OngDashboardPage() {
     {
       key: 'campanhas',
       icon: FaHandHoldingHeart,
-      label: campaigns.active.length === 1 ? 'campanha ativa' : 'campanhas ativas',
-      value: myCampaignsQuery.isLoading ? '—' : campaigns.active.length,
-      caption: myCampaignsQuery.isLoading
-        ? 'Carregando...'
-        : `${formatCurrency(activeRaised)} arrecadados · ${plural(campaigns.closed.length, 'encerrada', 'encerradas')}`,
+      tab: 'Campanhas',
       title: 'Campanhas',
       description:
         'As ativas aparecem na vitrine e no perfil da ONG e recebem doações por PIX. Edite, encerre antes do prazo ou exclua. As encerradas ficam como histórico.',
@@ -95,9 +127,9 @@ function OngDashboardPage() {
       content: (
         <OngCampaignsPanel
           campaigns={campaigns}
-          isLoading={myCampaignsQuery.isLoading}
-          error={myCampaignsQuery.error}
-          onRetry={() => myCampaignsQuery.refetch()}
+          isLoading={queries.campaigns.isLoading}
+          error={queries.campaigns.error}
+          onRetry={() => queries.campaigns.refetch()}
           onNotify={setFlashMessage}
         />
       ),
@@ -105,17 +137,15 @@ function OngDashboardPage() {
     {
       key: 'doacoes',
       icon: FaHandHoldingDollar,
-      label: 'recebidos',
-      value: receivedQuery.isLoading ? '—' : formatCurrency(totalReceived),
-      caption: receivedQuery.isLoading ? 'Carregando...' : plural(donations.length, 'doação confirmada', 'doações confirmadas'),
+      tab: 'Doações',
       title: 'Doações recebidas',
       description: 'Cada PIX confirmado nas campanhas da ONG, com quem doou e para qual campanha.',
       content: (
         <OngDonationsPanel
           donations={donations}
-          isLoading={receivedQuery.isLoading}
-          error={receivedQuery.error}
-          onRetry={() => receivedQuery.refetch()}
+          isLoading={queries.donations.isLoading}
+          error={queries.donations.error}
+          onRetry={() => queries.donations.refetch()}
         />
       ),
     },
@@ -142,7 +172,11 @@ function OngDashboardPage() {
         </Link>
       </header>
 
-      <DashboardSections sections={sections} />
+      <DashboardSections
+        sections={sections}
+        activeKey={searchParams.get(DASHBOARD_TAB_PARAM)}
+        onSelect={selectTab}
+      />
 
       <SuccessToast message={flashMessage} onClose={clearFlashMessage} />
     </div>

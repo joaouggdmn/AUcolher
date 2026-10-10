@@ -1,57 +1,60 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { FaArrowRight } from 'react-icons/fa6'
 
-// Quantidade de abas → colunas (classes do Tailwind precisam aparecer inteiras no código)
-const GRID_COLUMNS = { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3' }
+function formatBadge(count) {
+  return count > 9 ? '9+' : count
+}
 
-// Mesmo padrão de "Atividade na AUcolher" (Minha conta): cada card resume uma
-// área e, clicado, abre a lista dela logo abaixo. As áreas chegam por
-// `sections`, então campanhas e doações entram só acrescentando itens
-function DashboardSections({ sections }) {
-  const [activeKey, setActiveKey] = useState(sections[0].key)
+// Abas do painel numa barra só; no celular ela rola para o lado. A aba ativa
+// vem de fora (fica na URL), e `badge` marca o que espera uma ação da ONG
+function DashboardSections({ sections, activeKey, onSelect }) {
   const activeSection = sections.find((section) => section.key === activeKey) ?? sections[0]
+  const activeTabRef = useRef(null)
+
+  // Aba escolhida por um card da visão geral pode estar fora da área visível da barra
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [activeSection.key])
 
   return (
     <section aria-label="Áreas do painel">
-      <div role="tablist" className={`grid grid-cols-1 gap-3 ${GRID_COLUMNS[sections.length] ?? 'sm:grid-cols-3'}`}>
-        {sections.map((section) => {
-          const Icon = section.icon
-          const isActive = section.key === activeSection.key
+      <div
+        role="tablist"
+        aria-label="Áreas do painel"
+        className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-100 bg-white p-1.5 shadow-sm [scrollbar-width:none]"
+      >
+        {sections.map(({ key, icon: Icon, tab, badge }) => {
+          const isActive = key === activeSection.key
 
           return (
             <button
-              key={section.key}
-              id={`dashboard-tab-${section.key}`}
+              key={key}
+              ref={isActive ? activeTabRef : null}
+              id={`dashboard-tab-${key}`}
               type="button"
               role="tab"
               aria-selected={isActive}
               aria-controls="dashboard-panel"
-              onClick={() => setActiveKey(section.key)}
-              className={`flex items-center gap-4 rounded-2xl p-5 text-left transition-all duration-300 ${
+              onClick={() => onSelect(key)}
+              className={`flex shrink-0 scroll-mt-28 items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-bold transition-all duration-300 ${
                 isActive
-                  ? 'bg-emerald-800 text-white shadow-lg shadow-emerald-900/20'
-                  : 'border border-slate-100 bg-white shadow-sm hover:border-emerald-200 hover:shadow-md'
+                  ? 'bg-emerald-800 text-white shadow-md shadow-emerald-900/20'
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
               }`}
             >
-              <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-                  isActive ? 'bg-white/15 text-amber-300' : 'bg-emerald-50 text-emerald-700'
-                }`}
-              >
-                <Icon size={17} />
-              </span>
-              <span className="min-w-0">
-                <span className="flex items-baseline gap-2">
-                  <span className={`text-2xl font-black tracking-tight ${isActive ? 'text-white' : 'text-emerald-950'}`}>
-                    {section.value}
-                  </span>
-                  <span className={`text-sm font-bold ${isActive ? 'text-white' : 'text-emerald-950'}`}>{section.label}</span>
+              <Icon size={13} className={isActive ? 'text-amber-300' : 'text-emerald-600'} />
+              {tab}
+              {badge?.count > 0 && (
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
+                    isActive ? 'bg-amber-300 text-emerald-950' : 'bg-rose-500 text-white'
+                  }`}
+                >
+                  {formatBadge(badge.count)}
+                  <span className="sr-only"> {badge.label}</span>
                 </span>
-                <span className={`block truncate text-xs ${isActive ? 'text-emerald-100/80' : 'text-slate-500'}`}>
-                  {section.caption}
-                </span>
-              </span>
+              )}
             </button>
           )
         })}
