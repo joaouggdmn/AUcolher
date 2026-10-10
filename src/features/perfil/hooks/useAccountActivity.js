@@ -5,8 +5,8 @@ import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
 import { useMyAttendance } from '../../eventos/hooks/useEventos'
 import { useMyDonations } from '../../doacoes/hooks/useDoacoes'
 import { useMyAnimals } from '../../animais/hooks/useAnimais'
+import { IN_PROGRESS_STATUSES, withAdoptionStatus } from '../../animais/utils/listingStatus'
 
-const IN_PROGRESS_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
 const NO_EVENTS = []
 const NO_DONATIONS = []
 
@@ -16,16 +16,6 @@ function isSameId(a, b) {
 
 function byDateAsc(a, b) {
   return a.date.localeCompare(b.date) || (a.startTime ?? '').localeCompare(b.startTime ?? '')
-}
-
-// Status do anúncio do ponto de vista do dono: "em processo" quando já
-// existe um pedido aceito caminhando para a entrega
-function deriveListingStatus(animal, requests) {
-  if (animal.status === 'ADOPTED' || animal.status === 'INACTIVE') return animal.status
-  const hasActiveAdoption = requests.some(
-    (request) => request.animalId === animal.id && IN_PROGRESS_STATUSES.includes(request.status)
-  )
-  return hasActiveAdoption ? 'IN_PROGRESS' : 'AVAILABLE'
 }
 
 // Tudo o que as quatro seções inferiores de "Minha conta" mostram, a partir
@@ -45,11 +35,7 @@ export function useAccountActivity(user) {
   const activity = useMemo(() => {
     const userId = user?.id
 
-    const myAnimals = myApiAnimals.map((animal) => ({
-      ...animal,
-      listingStatus: deriveListingStatus(animal, requests),
-      pendingInterests: requests.filter((r) => r.animalId === animal.id && r.status === 'PENDING').length,
-    }))
+    const myAnimals = withAdoptionStatus(myApiAnimals, requests)
 
     const myRequests = requests.filter(
       (request) => isSameId(request.ownerId, userId) || isSameId(request.adopter?.userId, userId)
