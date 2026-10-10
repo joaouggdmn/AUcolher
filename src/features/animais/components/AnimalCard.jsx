@@ -13,7 +13,7 @@ import FavoriteButton from "../../../core/components/ui/FavoriteButton";
 
 function AnimalCard({ animal }) {
   const { user } = useAuth();
-  const isFemale = animal.sex === "F";
+  const isFemale = animal.sex === "FEMALE";
   const isNgo = animal.listingType === "NGO";
   const isOwner = !!user && user.id === animal.ownerId;
 

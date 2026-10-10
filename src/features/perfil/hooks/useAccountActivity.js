@@ -4,6 +4,7 @@ import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContex
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
 import { useMyAttendance } from '../../eventos/hooks/useEventos'
 import { mockUserDonations } from '../data/mockUserDonations'
+import { useMyAnimals } from '../../animais/hooks/useAnimais'
 
 const IN_PROGRESS_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
 const NO_EVENTS = []
@@ -19,20 +20,22 @@ function byDateAsc(a, b) {
 // Status do anúncio do ponto de vista do dono: "em processo" quando já
 // existe um pedido aceito caminhando para a entrega
 function deriveListingStatus(animal, requests) {
-  if (animal.status === 'ADOTADO') return 'ADOTADO'
+  if (animal.status === 'ADOPTED' || animal.status === 'INACTIVE') return animal.status
   const hasActiveAdoption = requests.some(
     (request) => request.animalId === animal.id && IN_PROGRESS_STATUSES.includes(request.status)
   )
-  return hasActiveAdoption ? 'EM_PROCESSO' : 'DISPONIVEL'
+  return hasActiveAdoption ? 'IN_PROGRESS' : 'AVAILABLE'
 }
 
 // Tudo o que as quatro seções inferiores de "Minha conta" mostram, a partir
 // das mesmas fontes do perfil público — os números batem entre as páginas.
-// 🔴 Com a API real, cada bloco vira uma chamada: /usuarios/{id}/animais,
-// /avaliacoes, /adocoes e /doacoes. Os eventos já vêm de
-// GET /usuarios/me/presencas (mock ou API, ver eventoService)
+// Os animais já vêm da API (GET /animals/mine, em qualquer status) e os
+// eventos do eventoService (mock ou API, ver USE_MOCK_EVENTOS).
+// 🔴 Com a API real, os outros blocos viram uma chamada cada: /avaliacoes,
+// /adocoes e /doacoes
 export function useAccountActivity(user) {
   const { animals } = useAnimals()
+  const { data: myApiAnimals = [] } = useMyAnimals()
   const { requests } = useAdoptionRequests()
   const reviews = useUserReviews(user?.id)
   const { data: attendedEvents = NO_EVENTS } = useMyAttendance()
@@ -41,13 +44,11 @@ export function useAccountActivity(user) {
   const activity = useMemo(() => {
     const userId = user?.id
 
-    const myAnimals = animals
-      .filter((animal) => isSameId(animal.ownerId, userId))
-      .map((animal) => ({
-        ...animal,
-        listingStatus: deriveListingStatus(animal, requests),
-        pendingInterests: requests.filter((r) => r.animalId === animal.id && r.status === 'PENDING').length,
-      }))
+    const myAnimals = myApiAnimals.map((animal) => ({
+      ...animal,
+      listingStatus: deriveListingStatus(animal, requests),
+      pendingInterests: requests.filter((r) => r.animalId === animal.id && r.status === 'PENDING').length,
+    }))
 
     const myRequests = requests.filter(
       (request) => isSameId(request.ownerId, userId) || isSameId(request.adopter?.userId, userId)
@@ -90,7 +91,7 @@ export function useAccountActivity(user) {
     }
 
     return { animals: myAnimals, impact, events }
-  }, [user?.id, isOng, animals, requests, attendedEvents])
+  }, [user?.id, isOng, animals, myApiAnimals, requests, attendedEvents])
 
   return { ...activity, reviews }
 }

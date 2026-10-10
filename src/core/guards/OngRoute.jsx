@@ -14,7 +14,8 @@ function OngRoute() {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  // userType vem de usuario.tipoUsuario no payload do login (PESSOA | ONG | ADMIN)
+  // userType vem de user.userType no payload do login (NGO | PERSON), já
+  // convertido pelo authService para PESSOA | ONG | ADMIN
   if (user?.userType !== 'ONG') {
     return <Navigate to="/" replace />
   }

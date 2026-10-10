@@ -2,10 +2,10 @@ import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash, FaCalendarDays } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import Spinner from '../../../core/components/ui/Spinner'
 import AnimalCard from '../../animais/components/AnimalCard'
+import { useUserAnimals } from '../../animais/hooks/useAnimais'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
 import { useEvents } from '../../eventos/hooks/useEventos'
 import { usePublicProfile } from '../hooks/usePublicProfile'
@@ -18,7 +18,6 @@ import OngEventsTab from '../components/public/OngEventsTab'
 function PublicProfilePage() {
   const { id } = useParams()
   const { user } = useAuth()
-  const { animals } = useAnimals()
   const { requests } = useAdoptionRequests()
   const { profile, isLoading } = usePublicProfile(id)
   const reviewsData = useUserReviews(id)
@@ -26,11 +25,8 @@ function PublicProfilePage() {
   // carregado é de ONG — pessoa não organiza eventos
   const ongEvents = useEvents({ ongId: id, enabled: profile?.userType === 'ONG' })
 
-  // 🔴 Com a API real: GET /usuarios/{id}/animais?status=DISPONIVEL
-  const availableAnimals = useMemo(
-    () => animals.filter((animal) => String(animal.ownerId) === id && animal.status !== 'ADOTADO'),
-    [animals, id],
-  )
+  // GET /users/{id}/animals: a API já devolve só os disponíveis
+  const { data: availableAnimals = [] } = useUserAnimals(id)
 
   const liveConcludedAdoptions = useMemo(
     () =>
