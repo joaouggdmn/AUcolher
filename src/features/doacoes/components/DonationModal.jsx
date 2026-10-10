@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FaXmark } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
@@ -8,7 +9,9 @@ import DonationStatusStep from './DonationStatusStep'
 
 // Doação por PIX em etapas, todas derivadas do estado (sem effect trocando
 // de passo): sem login → convite; sem doação → valor; com doação → status
-// (QR e polling enquanto PENDING, depois sucesso / expirado / cancelado)
+// (QR e polling enquanto PENDING, depois sucesso / expirado / cancelado).
+// Vai por portal para o <body>: aberto de dentro de uma aba animada
+// (transform), o `fixed` ficaria preso a ela em vez de cobrir a tela
 function DonationModal({ campaign, onClose }) {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -29,12 +32,13 @@ function DonationModal({ campaign, onClose }) {
   if (!campaign) return null
 
   if (!user) {
-    return (
+    return createPortal(
       <AuthRequiredModal
         message="Para doar, entre na sua conta: assim a doação fica registrada no seu histórico."
         onCancel={onClose}
         onLogin={() => navigate('/login', { state: { from: location } })}
-      />
+      />,
+      document.body
     )
   }
 
@@ -43,7 +47,7 @@ function DonationModal({ campaign, onClose }) {
     setDonationId(id)
   }
 
-  return (
+  return createPortal(
     // z-[100] garante prioridade sobre a Navbar (z-50) e qualquer card elevado (z-30)
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-emerald-950/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
@@ -77,7 +81,8 @@ function DonationModal({ campaign, onClose }) {
           <DonationStatusStep donationId={donationId} onRetry={() => setDonationId(null)} onClose={onClose} />
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
