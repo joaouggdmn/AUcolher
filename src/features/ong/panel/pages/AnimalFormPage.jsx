@@ -1,5 +1,4 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { FaArrowLeft, FaLock } from 'react-icons/fa6'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../../core/utils/apiError'
 import { isSameId } from '../../../../core/utils/ids'
@@ -8,21 +7,14 @@ import Spinner from '../../../../core/components/ui/Spinner'
 import AnimalFormWizard from '../../../animais/components/create/AnimalFormWizard'
 import { useAnimal } from '../../../animais/hooks/useAnimais'
 import { useAnimalForm } from '../../../animais/hooks/useAnimalForm'
-import PanelPage from '../PanelPage'
+import PanelFormPage from '../PanelFormPage'
+import PanelNotice from '../PanelNotice'
 import { PANEL_PATHS } from '../panelPaths'
 
-const BACK_ACTION = [{ to: PANEL_PATHS.animals, label: 'Voltar para animais', icon: FaArrowLeft }]
+const BACK = { backTo: PANEL_PATHS.animals, backLabel: 'Voltar para animais' }
 
 function gendered(animal, male, female) {
   return animal.sex === 'FEMALE' ? female : male
-}
-
-function FormLayout({ title, description, children }) {
-  return (
-    <PanelPage title={title} description={description} actions={BACK_ACTION} framed={false}>
-      <div className="max-w-3xl">{children}</div>
-    </PanelPage>
-  )
 }
 
 function NewAnimalForm() {
@@ -35,9 +27,9 @@ function NewAnimalForm() {
   })
 
   return (
-    <FormLayout title="Cadastrar animal" description="Quanto mais completo o anúncio, mais fácil encontrar a família certa.">
+    <PanelFormPage title="Cadastrar animal" description="Quanto mais completo o anúncio, mais fácil encontrar a família certa." {...BACK}>
       <AnimalFormWizard form={form} />
-    </FormLayout>
+    </PanelFormPage>
   )
 }
 
@@ -50,25 +42,9 @@ function EditAnimalForm({ animal }) {
   })
 
   return (
-    <FormLayout title={`Editar ${animal.name}`} description="As mudanças aparecem na vitrine assim que você salvar.">
+    <PanelFormPage title={`Editar ${animal.name}`} description="As mudanças aparecem na vitrine assim que você salvar." {...BACK}>
       <AnimalFormWizard form={form} />
-    </FormLayout>
-  )
-}
-
-function Notice({ title, children }) {
-  return (
-    <FormLayout title={title}>
-      <div className="flex flex-col items-center gap-3 rounded-3xl border border-slate-100 bg-white px-6 py-14 text-center shadow-sm">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-          <FaLock size={16} />
-        </span>
-        <p className="max-w-md text-sm text-slate-500">{children}</p>
-        <Link to={PANEL_PATHS.animals} className="text-sm font-bold text-emerald-700 hover:underline">
-          Voltar para animais
-        </Link>
-      </div>
-    </FormLayout>
+    </PanelFormPage>
   )
 }
 
@@ -78,32 +54,38 @@ function EditAnimalLoader({ id }) {
 
   if (isLoading) {
     return (
-      <FormLayout title="Editar animal">
+      <PanelFormPage title="Editar animal" {...BACK}>
         <Spinner />
-      </FormLayout>
+      </PanelFormPage>
     )
   }
   if (error) {
     const notFound = error.response?.status === 404
     return (
-      <FormLayout title="Editar animal">
+      <PanelFormPage title="Editar animal" {...BACK}>
         <LoadErrorState
           title={notFound ? 'Animal não encontrado' : 'Não foi possível carregar o animal'}
           message={notFound ? 'Ele pode ter sido removido.' : getErrorMessage(error)}
           onRetry={notFound ? undefined : () => refetch()}
         />
-      </FormLayout>
+      </PanelFormPage>
     )
   }
   if (!isSameId(animal.ownerId, user?.id)) {
-    return <Notice title="Editar animal">Este animal não é da sua ONG: só quem anunciou pode editar.</Notice>
+    return (
+      <PanelFormPage title="Editar animal" {...BACK}>
+        <PanelNotice {...BACK}>Este animal não é da sua ONG: só quem anunciou pode editar.</PanelNotice>
+      </PanelFormPage>
+    )
   }
   if (animal.status === 'ADOPTED') {
     return (
-      <Notice title={`Editar ${animal.name}`}>
-        {animal.name} já foi {gendered(animal, 'adotado', 'adotada')}. O anúncio fica como histórico e não pode mais ser
-        editado.
-      </Notice>
+      <PanelFormPage title={`Editar ${animal.name}`} {...BACK}>
+        <PanelNotice {...BACK}>
+          {animal.name} já foi {gendered(animal, 'adotado', 'adotada')}. O anúncio fica como histórico e não pode mais ser
+          editado.
+        </PanelNotice>
+      </PanelFormPage>
     )
   }
 

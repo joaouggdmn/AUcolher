@@ -10,6 +10,7 @@ import DeleteCampaignDialog from '../../../doacoes/components/DeleteCampaignDial
 import DonationProgress from '../../../doacoes/components/DonationProgress'
 import { formatDonationsCount, getDeadlineSummary } from '../../../doacoes/utils/campaignDisplay'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
+import { PANEL_PATHS } from '../../panel/panelPaths'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300'
@@ -54,7 +55,7 @@ function OngCampaignRow({ campaign, onCloseCampaign, onDelete }) {
         {!campaign.isClosed && (
           <>
             <Link
-              to={`/campanhas/editar/${campaign.id}`}
+              to={PANEL_PATHS.campaignEdit(campaign.id)}
               className={`${ACTION_CLASSES} border-slate-200 text-slate-600 hover:bg-slate-50`}
             >
               <FaPen size={10} />
@@ -116,7 +117,7 @@ function OngCampaignsPanel({ campaigns, isLoading, error, onRetry, onNotify }) {
         icon={FaHandHoldingHeart}
         title="Sua ONG ainda não abriu nenhuma campanha."
         description="Campanhas de doação aparecem na vitrine, na página inicial e no perfil da ONG, e recebem por PIX."
-        action={{ to: '/campanhas/criar', label: 'Criar primeira campanha', icon: FaHandHoldingHeart }}
+        action={{ to: PANEL_PATHS.campaignNew, label: 'Criar primeira campanha', icon: FaHandHoldingHeart }}
       />
     )
   }

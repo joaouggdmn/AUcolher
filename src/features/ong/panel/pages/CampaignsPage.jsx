@@ -2,6 +2,7 @@ import { FaPlus } from 'react-icons/fa6'
 import OngCampaignsPanel from '../../components/dashboard/OngCampaignsPanel'
 import PanelPage from '../PanelPage'
 import { useOngPanel } from '../useOngPanel'
+import { PANEL_PATHS } from '../panelPaths'
 
 function CampaignsPage() {
   const { dashboard, notify } = useOngPanel()
@@ -11,7 +12,7 @@ function CampaignsPage() {
     <PanelPage
       title="Campanhas"
       description="As ativas aparecem na vitrine e no perfil da ONG e recebem doações por PIX. Edite, encerre antes do prazo ou exclua. As encerradas ficam como histórico."
-      actions={[{ to: '/campanhas/criar', label: 'Criar campanha', icon: FaPlus }]}
+      actions={[{ to: PANEL_PATHS.campaignNew, label: 'Criar campanha', icon: FaPlus }]}
     >
       <OngCampaignsPanel
         campaigns={campaigns}

@@ -95,7 +95,7 @@ function OwnerActions({ campaign, onCloseCampaign, onDelete }) {
       </p>
       {!campaign.isClosed && (
         <Link
-          to={`/campanhas/editar/${campaign.id}`}
+          to={PANEL_PATHS.campaignEdit(campaign.id)}
           className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 py-3 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
         >
           <FaPen size={12} />

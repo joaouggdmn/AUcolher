@@ -15,6 +15,7 @@ import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 import InfoToast from '../../../core/components/ui/InfoToast'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
+import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 
 const INITIAL_FILTERS = { categorias: [], periodo: '', cidade: '' }
 const PAGE_SIZE = 12
@@ -185,7 +186,7 @@ function EventsListPage() {
         title="Sua ONG quer realizar um evento?"
         description="Divulgue feiras de adoção, mutirões e campanhas para milhares de adotantes cadastrados na plataforma."
         buttonLabel="Cadastrar meu evento"
-        targetPath="/eventos/criar"
+        targetPath={PANEL_PATHS.eventNew}
         requireOng
         onNeedsLogin={() => setIsAuthModalOpen(true)}
         onNeedsOng={handleNeedsOng}

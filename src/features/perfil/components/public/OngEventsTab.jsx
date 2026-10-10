@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { FaCalendarDays, FaPlus } from 'react-icons/fa6'
 import EventCard from '../../../eventos/components/EventCard'
 import EventCardSkeleton from '../../../eventos/components/EventCardSkeleton'
+import { PANEL_PATHS } from '../../../ong/panel/panelPaths'
 
 const SKELETON_COUNT = 3
 
@@ -31,7 +32,7 @@ function OngEventsTab({ events, isLoading, isError, ongName, isOwnProfile }) {
         </p>
         {isOwnProfile && !isError && (
           <Link
-            to="/eventos/criar"
+            to={PANEL_PATHS.eventNew}
             className="mt-3 flex items-center gap-2 rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
           >
             <FaPlus size={12} />

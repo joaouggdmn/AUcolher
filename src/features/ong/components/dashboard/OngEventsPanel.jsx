@@ -10,6 +10,7 @@ import { formatTimeRange } from '../../../eventos/utils/dateHelpers'
 import { getAttendanceSummary } from '../../../eventos/utils/eventDisplay'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
 import EventParticipantsModal from './EventParticipantsModal'
+import { PANEL_PATHS } from '../../panel/panelPaths'
 
 const SUMMARY_TONES = {
   neutral: 'text-slate-500',
@@ -56,7 +57,7 @@ function OngEventRow({ event, onShowParticipants, onDelete }) {
         {!event.isPast && (
           <>
             <Link
-              to={`/eventos/editar/${event.id}`}
+              to={PANEL_PATHS.eventEdit(event.id)}
               className={`${ACTION_CLASSES} border-slate-200 text-slate-600 hover:bg-slate-50`}
             >
               <FaPen size={10} />
@@ -110,7 +111,7 @@ function OngEventsPanel({ events, isLoading, error, onRetry, onNotify }) {
         icon={FaCalendarPlus}
         title="Sua ONG ainda não divulgou nenhum evento."
         description="Feiras de adoção, mutirões e bazares aparecem na vitrine de eventos e na página inicial."
-        action={{ to: '/eventos/criar', label: 'Criar primeiro evento', icon: FaCalendarPlus }}
+        action={{ to: PANEL_PATHS.eventNew, label: 'Criar primeiro evento', icon: FaCalendarPlus }}
       />
     )
   }

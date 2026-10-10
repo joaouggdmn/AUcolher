@@ -3,7 +3,6 @@ import PrivateRoute from '../core/guards/PrivateRoute'
 import OngRoute from '../core/guards/OngRoute'
 import AdminRoute from '../core/guards/AdminRoute'
 import UserLayout from '../core/components/layout/UserLayout'
-import OngLayout from '../core/components/layout/OngLayout'
 import AdminLayout from '../core/components/layout/AdminLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
@@ -11,11 +10,9 @@ import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
 import ChatPage from '../features/chat/pages/ChatPage'
 import FavoritosPage from '../features/favoritos/pages/FavoritosPage'
-import EventCreatePage from '../features/eventos/pages/EventCreatePage'
-import EventEditPage from '../features/eventos/pages/EventEditPage'
-import CampaignCreatePage from '../features/doacoes/pages/CampaignCreatePage'
-import CampaignEditPage from '../features/doacoes/pages/CampaignEditPage'
 import OngPanelLayout from '../features/ong/panel/OngPanelLayout'
+import LegacyFormRedirect from '../features/ong/panel/LegacyFormRedirect'
+import { PANEL_PATHS } from '../features/ong/panel/panelPaths'
 import OverviewPage from '../features/ong/panel/pages/OverviewPage'
 import AnimalsPage from '../features/ong/panel/pages/AnimalsPage'
 import AnimalFormPage from '../features/ong/panel/pages/AnimalFormPage'
@@ -24,6 +21,8 @@ import ChatsPage from '../features/ong/panel/pages/ChatsPage'
 import EventsPage from '../features/ong/panel/pages/EventsPage'
 import CampaignsPage from '../features/ong/panel/pages/CampaignsPage'
 import DonationsPage from '../features/ong/panel/pages/DonationsPage'
+import EventFormPage from '../features/ong/panel/pages/EventFormPage'
+import CampaignFormPage from '../features/ong/panel/pages/CampaignFormPage'
 import ChatLayout from '../core/components/layout/ChatLayout'
 
 
@@ -61,20 +60,20 @@ export const protectedRoutes = [
           { path: 'pedidos', element: <RequestsPage /> },
           { path: 'conversas', element: <ChatsPage /> },
           { path: 'eventos', element: <EventsPage /> },
+          { path: 'eventos/novo', element: <EventFormPage /> },
+          { path: 'eventos/:id/editar', element: <EventFormPage /> },
           { path: 'campanhas', element: <CampaignsPage /> },
+          { path: 'campanhas/nova', element: <CampaignFormPage /> },
+          { path: 'campanhas/:id/editar', element: <CampaignFormPage /> },
           { path: 'doacoes', element: <DonationsPage /> },
         ],
       },
-      { path: 'ong/dashboard', element: <Navigate to="/ong/painel" replace /> },
-      {
-        element: <OngLayout />,
-        children: [
-          { path: 'eventos/criar', element: <EventCreatePage /> },
-          { path: 'eventos/editar/:id', element: <EventEditPage /> },
-          { path: 'campanhas/criar', element: <CampaignCreatePage /> },
-          { path: 'campanhas/editar/:id', element: <CampaignEditPage /> },
-        ],
-      },
+      // Endereços antigos: os formulários agora ficam dentro do painel
+      { path: 'ong/dashboard', element: <Navigate to={PANEL_PATHS.overview} replace /> },
+      { path: 'eventos/criar', element: <LegacyFormRedirect to={PANEL_PATHS.eventNew} /> },
+      { path: 'eventos/editar/:id', element: <LegacyFormRedirect to={PANEL_PATHS.eventEdit} /> },
+      { path: 'campanhas/criar', element: <LegacyFormRedirect to={PANEL_PATHS.campaignNew} /> },
+      { path: 'campanhas/editar/:id', element: <LegacyFormRedirect to={PANEL_PATHS.campaignEdit} /> },
     ],
   },
   {

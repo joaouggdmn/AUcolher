@@ -16,6 +16,7 @@ import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 import InfoToast from '../../../core/components/ui/InfoToast'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
+import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 
 const INITIAL_FILTERS = { categorias: [], status: [] }
 const PAGE_SIZE = 12
@@ -179,7 +180,7 @@ function CampaignsListPage() {
         title="Sua ONG quer arrecadar recursos?"
         description="Crie campanhas de doação para tratamentos, alimentação ou estrutura do abrigo, com transparência total para os doadores."
         buttonLabel="Criar campanha"
-        targetPath="/campanhas/criar"
+        targetPath={PANEL_PATHS.campaignNew}
         requireOng
         onNeedsLogin={() => setIsAuthModalOpen(true)}
         onNeedsOng={handleNeedsOng}

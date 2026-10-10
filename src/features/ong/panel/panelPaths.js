@@ -8,6 +8,10 @@ export const PANEL_PATHS = {
   requests: `${ROOT}/pedidos`,
   chats: `${ROOT}/conversas`,
   events: `${ROOT}/eventos`,
+  eventNew: `${ROOT}/eventos/novo`,
+  eventEdit: (id) => `${ROOT}/eventos/${id}/editar`,
   campaigns: `${ROOT}/campanhas`,
+  campaignNew: `${ROOT}/campanhas/nova`,
+  campaignEdit: (id) => `${ROOT}/campanhas/${id}/editar`,
   donations: `${ROOT}/doacoes`,
 }
