@@ -6,45 +6,12 @@ import { formatCurrency } from '../../../../core/utils/currency'
 import Spinner from '../../../../core/components/ui/Spinner'
 import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import ShowMoreButton from '../../../../core/components/ui/ShowMoreButton'
-import { toLocalIsoDate } from '../../../../core/utils/localDate'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
+import { CHART_MONTHS, monthlyDonationColumns } from '../../utils/panelCharts'
 import ChartCard from './charts/ChartCard'
 import ColumnChart from './charts/ColumnChart'
 
 const PAGE_SIZE = 20
-const CHART_MONTHS = 6
-
-function capitalize(text) {
-  return text.charAt(0).toUpperCase() + text.slice(1)
-}
-
-// Mês atual e os anteriores, zerados, somando cada doação no mês em que o PIX
-// foi aprovado ('2026-10-10T12:00:00' → '2026-10')
-function monthlyColumns(donations) {
-  const today = new Date()
-  const months = Array.from({ length: CHART_MONTHS }, (_, index) => {
-    const date = new Date(today.getFullYear(), today.getMonth() - (CHART_MONTHS - 1 - index), 1)
-    return { key: toLocalIsoDate(date).slice(0, 7), date, value: 0, count: 0 }
-  })
-  const byKey = new Map(months.map((month) => [month.key, month]))
-
-  for (const donation of donations) {
-    const month = byKey.get(donation.approvedAt?.slice(0, 7))
-    if (month) {
-      month.value += donation.amount
-      month.count += 1
-    }
-  }
-
-  return months.map(({ key, date, value, count }) => ({
-    key,
-    value,
-    label: capitalize(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')),
-    valueLabel: value.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 }),
-    valueText: formatCurrency(value),
-    detail: `${date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })} · ${count} ${count === 1 ? 'doação' : 'doações'}`,
-  }))
-}
 
 function formatDateTime(isoDateTime) {
   return new Date(isoDateTime).toLocaleString('pt-BR', {
@@ -95,7 +62,7 @@ function OngDonationsPanel({ donations, isLoading, error, onRetry }) {
     <div className="flex flex-col gap-3">
       <div className="mb-5">
         <ChartCard title="Recebido por mês" subtitle={`Últimos ${CHART_MONTHS} meses, em reais`}>
-          <ColumnChart columns={monthlyColumns(donations)} colorClass="bg-amber-600" />
+          <ColumnChart columns={monthlyDonationColumns(donations)} colorClass="bg-amber-600" />
         </ChartCard>
       </div>
 

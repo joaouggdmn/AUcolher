@@ -27,6 +27,7 @@ import { getCategoriaMeta } from '../components/filters/filterOptions'
 import { useEvent } from '../hooks/useEventos'
 import { formatLongDate, formatTimeRange } from '../utils/dateHelpers'
 import { buildMapsUrl, formatEventAddress, getAttendanceSummary } from '../utils/eventDisplay'
+import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 
 const SUMMARY_TONES = {
   neutral: 'text-slate-600',
@@ -222,7 +223,7 @@ function EventDetailPage() {
           event={event}
           onClose={() => setIsDeleteOpen(false)}
           // A página do evento deixa de existir: volta para o painel com o aviso
-          onDeleted={(message) => navigate('/ong/dashboard?aba=eventos', { state: { flash: message } })}
+          onDeleted={(message) => navigate(PANEL_PATHS.events, { state: { flash: message } })}
         />
       )}
 

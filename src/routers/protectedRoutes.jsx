@@ -1,3 +1,4 @@
+import { Navigate } from 'react-router-dom'
 import PrivateRoute from '../core/guards/PrivateRoute'
 import OngRoute from '../core/guards/OngRoute'
 import AdminRoute from '../core/guards/AdminRoute'
@@ -14,7 +15,14 @@ import EventCreatePage from '../features/eventos/pages/EventCreatePage'
 import EventEditPage from '../features/eventos/pages/EventEditPage'
 import CampaignCreatePage from '../features/doacoes/pages/CampaignCreatePage'
 import CampaignEditPage from '../features/doacoes/pages/CampaignEditPage'
-import OngDashboardPage from '../features/ong/pages/OngDashboardPage'
+import OngPanelLayout from '../features/ong/panel/OngPanelLayout'
+import OverviewPage from '../features/ong/panel/pages/OverviewPage'
+import AnimalsPage from '../features/ong/panel/pages/AnimalsPage'
+import RequestsPage from '../features/ong/panel/pages/RequestsPage'
+import ChatsPage from '../features/ong/panel/pages/ChatsPage'
+import EventsPage from '../features/ong/panel/pages/EventsPage'
+import CampaignsPage from '../features/ong/panel/pages/CampaignsPage'
+import DonationsPage from '../features/ong/panel/pages/DonationsPage'
 import ChatLayout from '../core/components/layout/ChatLayout'
 
 
@@ -40,10 +48,24 @@ export const protectedRoutes = [
   {
     element: <OngRoute />,
     children: [
+      // Tela própria, sem a navbar do site (como o chat)
+      {
+        path: 'ong/painel',
+        element: <OngPanelLayout />,
+        children: [
+          { index: true, element: <OverviewPage /> },
+          { path: 'animais', element: <AnimalsPage /> },
+          { path: 'pedidos', element: <RequestsPage /> },
+          { path: 'conversas', element: <ChatsPage /> },
+          { path: 'eventos', element: <EventsPage /> },
+          { path: 'campanhas', element: <CampaignsPage /> },
+          { path: 'doacoes', element: <DonationsPage /> },
+        ],
+      },
+      { path: 'ong/dashboard', element: <Navigate to="/ong/painel" replace /> },
       {
         element: <OngLayout />,
         children: [
-          { path: 'ong/dashboard', element: <OngDashboardPage /> },
           { path: 'eventos/criar', element: <EventCreatePage /> },
           { path: 'eventos/editar/:id', element: <EventEditPage /> },
           { path: 'campanhas/criar', element: <CampaignCreatePage /> },

@@ -99,6 +99,7 @@ export function useOngDashboard() {
       animalsTotal: animals.length,
       animalsAvailable: countWhere(animals, (animal) => animal.listingStatus === 'AVAILABLE'),
       animalsInProgress: countWhere(animals, (animal) => animal.listingStatus === 'IN_PROGRESS'),
+      requestsReceived: requests.length,
       pendingRequests: countWhere(requests, (request) => request.status === 'PENDING'),
       adoptionsInProgress: countWhere(requests, (request) => IN_PROGRESS_STATUSES.includes(request.status)),
       adoptionsConcluded: countWhere(requests, (request) => request.status === 'CONCLUDED'),

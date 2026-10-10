@@ -29,6 +29,7 @@ import DonationProgress from '../components/DonationProgress'
 import { getCategoriaMeta } from '../components/filters/filterOptions'
 import { useCampaign } from '../hooks/useCampanhas'
 import { formatDonationsCount, getDeadlineSummary, isCampaignOwner } from '../utils/campaignDisplay'
+import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 
 const DEADLINE_TONES = {
   neutral: 'text-slate-600',
@@ -292,7 +293,7 @@ function CampaignDetailPage() {
           campaign={campaign}
           onClose={() => setOwnerDialog(null)}
           // A página da campanha deixa de existir: volta para o painel com o aviso
-          onDeleted={(message) => navigate('/ong/dashboard?aba=campanhas', { state: { flash: message } })}
+          onDeleted={(message) => navigate(PANEL_PATHS.campaigns, { state: { flash: message } })}
         />
       )}
 

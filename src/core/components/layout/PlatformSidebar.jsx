@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { FiX } from 'react-icons/fi'
 import { FaHeart, FaPaw, FaInbox, FaComments, FaBuildingNgo } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
+import { PANEL_PATHS } from '../../../features/ong/panel/panelPaths'
 
 // Links principais só aparecem aqui no mobile — no desktop eles já estão
 // centralizados na navbar
@@ -24,8 +25,8 @@ function PlatformSidebar({ isOpen, onClose, isOng, totalFavoritos, pendingCount,
   const closeButtonRef = useRef(null)
 
   const shortcuts = [
-    // Eventos (e, depois, campanhas) da instituição ficam no painel
-    ...(isOng ? [{ label: 'Painel da ONG', to: '/ong/dashboard', icon: FaBuildingNgo, iconClass: 'text-amber-500' }] : []),
+    // Tudo o que a instituição gerencia fica no painel (tela própria)
+    ...(isOng ? [{ label: 'Painel da ONG', to: PANEL_PATHS.overview, icon: FaBuildingNgo, iconClass: 'text-amber-500' }] : []),
     {
       label: 'Meus favoritos',
       to: '/favoritos',
