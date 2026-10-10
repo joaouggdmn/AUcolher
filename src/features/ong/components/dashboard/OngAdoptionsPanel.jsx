@@ -2,6 +2,17 @@ import { Link } from 'react-router-dom'
 import { FaComments, FaInbox, FaPaw, FaReply } from 'react-icons/fa6'
 import { REQUEST_STATUS_META } from '../../../adocao/utils/requestStatus'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
+import BarList from './charts/BarList'
+import ChartCard from './charts/ChartCard'
+
+// Etapas em ordem: um tom só, escurecendo a cada passo (rampa conferida para
+// contraste). Cada etapa conta quem chegou nela ou passou dela
+const FUNNEL_STAGES = [
+  { key: 'received', label: 'Pedidos recebidos', statuses: null, colorClass: 'bg-emerald-500' },
+  { key: 'accepted', label: 'Aceitos', statuses: ['ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED'], colorClass: 'bg-emerald-600' },
+  { key: 'delivery', label: 'Entrega confirmada', statuses: ['AWAITING_DELIVERY', 'CONCLUDED'], colorClass: 'bg-emerald-700' },
+  { key: 'concluded', label: 'Adoções concluídas', statuses: ['CONCLUDED'], colorClass: 'bg-emerald-800' },
+]
 
 const ACTION_CLASSES =
   'flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300'
@@ -102,9 +113,17 @@ function OngAdoptionsPanel({ requests }) {
     { title: 'Concluídas', requests: byStatus('CONCLUDED') },
   ]
   const closedCount = byStatus('REJECTED', 'CANCELLED').length
+  const funnel = FUNNEL_STAGES.map(({ statuses, ...stage }) => {
+    const value = statuses ? byStatus(...statuses).length : requests.length
+    return { ...stage, value, note: `${Math.round((value / requests.length) * 100)}%` }
+  })
 
   return (
     <div className="flex flex-col gap-8">
+      <ChartCard title="Do pedido à adoção" subtitle="Quantos pedidos chegaram a cada etapa, em relação ao total recebido">
+        <BarList items={funnel} />
+      </ChartCard>
+
       {groups.every((group) => group.requests.length === 0) && (
         <p className="py-4 text-center text-sm text-slate-400">Nenhum pedido em aberto no momento.</p>
       )}
