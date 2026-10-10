@@ -1,14 +1,12 @@
-import { useNavigate } from 'react-router-dom'
 import { FaXmark, FaComments } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 
-function MatchCelebrationToast({ request, onClose }) {
-  const navigate = useNavigate()
-
+// `onGoToChat(requestId)`: cada tela abre o chat no seu lugar (site ou painel)
+function MatchCelebrationToast({ request, onClose, onGoToChat }) {
   if (!request) return null
 
   const handleGoToChat = () => {
-    navigate('/chat', { state: { requestId: request.requestId } })
+    onGoToChat(request.requestId)
     onClose()
   }
 

@@ -93,8 +93,9 @@ function OngPanelLayout() {
         </header>
 
         <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto">
-          {/* key força remontagem a cada seção, disparando a animação de entrada */}
-          <div key={location.pathname} className="animate-fade-slide-in">
+          {/* key força remontagem a cada seção, disparando a animação de entrada.
+              Só opacidade: um transform aqui prenderia os modais `fixed` das páginas */}
+          <div key={location.pathname} className="animate-fade-in">
             <Outlet context={{ dashboard, notify: setNotice }} />
           </div>
         </main>

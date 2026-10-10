@@ -1,17 +1,32 @@
-import OngAdoptionsPanel from '../../components/dashboard/OngAdoptionsPanel'
+import { useNavigate } from 'react-router-dom'
+import ReceivedRequestsBoard from '../../../adocao/components/ReceivedRequestsBoard'
+import BarList from '../../components/dashboard/charts/BarList'
+import ChartCard from '../../components/dashboard/charts/ChartCard'
+import { adoptionFunnel } from '../../utils/panelCharts'
 import PanelPage from '../PanelPage'
+import { PANEL_PATHS } from '../panelPaths'
 import { useOngPanel } from '../useOngPanel'
 
 function RequestsPage() {
-  const { dashboard } = useOngPanel()
+  const navigate = useNavigate()
+  const { dashboard, notify } = useOngPanel()
 
   return (
     <PanelPage
       title="Pedidos de adoção"
-      description="Quem quer adotar os animais da ONG, em cada etapa. Para aceitar ou recusar um pedido, abra Interesses recebidos."
-      actions={[{ to: '/interesses-recebidos', label: 'Interesses recebidos' }]}
+      description="Avalie cada interessado, aceite ou recuse, converse e confirme a entrega quando estiver tudo certo."
     >
-      <OngAdoptionsPanel requests={dashboard.requests} />
+      {dashboard.requests.length > 0 && (
+        <div className="mb-10">
+          <ChartCard title="Do pedido à adoção" subtitle="Quantos pedidos chegaram a cada etapa">
+            <BarList items={adoptionFunnel(dashboard.requests)} />
+          </ChartCard>
+        </div>
+      )}
+      <ReceivedRequestsBoard
+        onNotify={notify}
+        onGoToChat={(requestId) => navigate(`${PANEL_PATHS.chats}?conversa=${requestId}`)}
+      />
     </PanelPage>
   )
 }
