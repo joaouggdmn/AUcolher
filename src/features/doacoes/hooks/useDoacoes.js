@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
 import { queryKeys } from '../../../core/services/queryKeys'
@@ -13,7 +14,9 @@ import {
 // ---------- leitura ----------
 
 // Uma doação em andamento (modal do PIX). Enquanto PENDING, pergunta de
-// novo a cada 3 s; aprovada, expirada ou cancelada, para de perguntar
+// novo a cada 3 s; aprovada, expirada ou cancelada, para de perguntar.
+// Continua perguntando com a aba em segundo plano: quem paga costuma sair
+// para o app do banco, e ao voltar o modal já deve mostrar "confirmada"
 export function useDonation(id) {
   return useQuery({
     queryKey: queryKeys.doacoes.detail(id),
@@ -21,6 +24,7 @@ export function useDonation(id) {
     enabled: id != null,
     staleTime: 0,
     refetchInterval: (query) => (query.state.data?.status === 'PENDING' ? DONATION_POLL_INTERVAL : false),
+    refetchIntervalInBackground: true,
   })
 }
 
@@ -64,17 +68,21 @@ export function useCreateDonation() {
 }
 
 // Quando o polling encontra a doação aprovada, a barra da campanha e "Meu
-// impacto" precisam do novo total — quem chama faz isso uma vez por doação
+// impacto" precisam do novo total — quem chama faz isso uma vez por doação.
+// Função estável (useCallback): pode entrar nas dependências de um effect
 export function useRefreshAfterApproval() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const userId = user?.id ?? null
 
-  return () =>
-    Promise.all([
-      queryClient.invalidateQueries({ queryKey: queryKeys.campanhas.all }),
-      queryClient.invalidateQueries({ queryKey: queryKeys.doacoes.mine(userId) }),
-    ])
+  return useCallback(
+    () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.campanhas.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.doacoes.mine(userId) }),
+      ]),
+    [queryClient, userId]
+  )
 }
 
 // 🔴 Só do mock: faz o papel do Mercado Pago confirmando o pagamento
