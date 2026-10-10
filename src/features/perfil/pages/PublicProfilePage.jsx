@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash, FaCalendarDays } from 'react-icons/fa6'
+import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash, FaCalendarDays, FaHandHoldingHeart } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import Spinner from '../../../core/components/ui/Spinner'
@@ -8,12 +8,14 @@ import AnimalCard from '../../animais/components/AnimalCard'
 import { useUserAnimals } from '../../animais/hooks/useAnimais'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
 import { useEvents } from '../../eventos/hooks/useEventos'
+import { useCampaigns } from '../../doacoes/hooks/useCampanhas'
 import { usePublicProfile } from '../hooks/usePublicProfile'
 import ProfileTabs from '../components/ProfileTabs'
 import PublicProfileHeader from '../components/public/PublicProfileHeader'
 import OngDetails from '../components/public/OngDetails'
 import ProfileReviewsList from '../components/public/ProfileReviewsList'
 import OngEventsTab from '../components/public/OngEventsTab'
+import OngCampaignsTab from '../components/public/OngCampaignsTab'
 
 function PublicProfilePage() {
   const { id } = useParams()
@@ -22,8 +24,9 @@ function PublicProfilePage() {
   const { profile, isLoading } = usePublicProfile(id)
   const reviewsData = useUserReviews(id)
   // Antes dos returns antecipados (regra dos hooks); só busca quando o perfil
-  // carregado é de ONG — pessoa não organiza eventos
+  // carregado é de ONG — pessoa não organiza eventos nem abre campanhas
   const ongEvents = useEvents({ ongId: id, enabled: profile?.userType === 'ONG' })
+  const ongCampaigns = useCampaigns({ ongId: id, enabled: profile?.userType === 'ONG' })
 
   // GET /users/{id}/animals: a API já devolve só os disponíveis
   const { data: availableAnimals = [] } = useUserAnimals(id)
@@ -127,6 +130,20 @@ function PublicProfilePage() {
             },
             ...(isOng
               ? [
+                  {
+                    key: 'campanhas',
+                    label: ongCampaigns.data ? `Campanhas (${ongCampaigns.data.length})` : 'Campanhas',
+                    icon: FaHandHoldingHeart,
+                    content: (
+                      <OngCampaignsTab
+                        campaigns={ongCampaigns.data ?? []}
+                        isLoading={ongCampaigns.isLoading}
+                        isError={ongCampaigns.isError}
+                        ongName={profile.name}
+                        isOwnProfile={isOwnProfile}
+                      />
+                    ),
+                  },
                   {
                     key: 'eventos',
                     label: ongEvents.data ? `Eventos (${ongEvents.data.length})` : 'Eventos',
