@@ -30,17 +30,22 @@ export function useChatUnread() {
     }
   }, [])
 
-  const unreadCount = useMemo(() => {
-    if (!user) return 0
+  // `conversations`: não lidas e última mensagem de cada conversa, por requestId
+  const { unreadCount, conversations } = useMemo(() => {
+    if (!user) return { unreadCount: 0, conversations: {} }
     const lastSeen = loadLastSeen(user.id)
-    return contacts.reduce(
-      (total, contact) =>
-        total + countUnreadMessages(loadChatMessages(contact.requestId), user.id, lastSeen[contact.requestId]),
-      0,
-    )
+    const byRequest = {}
+    let total = 0
+    for (const contact of contacts) {
+      const messages = loadChatMessages(contact.requestId)
+      const unread = countUnreadMessages(messages, user.id, lastSeen[contact.requestId])
+      byRequest[contact.requestId] = { unread, lastMessage: messages.at(-1) ?? null }
+      total += unread
+    }
+    return { unreadCount: total, conversations: byRequest }
     // version força a releitura do localStorage após os eventos acima
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, contacts, version])
 
-  return { unreadCount }
+  return { unreadCount, conversations }
 }
