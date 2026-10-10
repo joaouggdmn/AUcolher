@@ -10,6 +10,7 @@ import {
   FaPaw,
 } from "react-icons/fa6";
 import { LuSparkles } from "react-icons/lu";
+import Avatar from "../../../core/components/ui/Avatar";
 import { computeMatchScore } from "../../aumatch/utils/matchScore";
 import { animalDisplayName } from "../utils/requestAnimal";
 
@@ -68,10 +69,10 @@ function ReceivedRequestCard({
 
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="flex items-start gap-3">
-          <img
-            src={adopter.photoUrl}
-            alt={adopter.name}
-            className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-white shadow-md"
+          <Avatar
+            name={adopter.name}
+            photoUrl={adopter.photoUrl}
+            className="h-14 w-14 text-lg ring-2 ring-white shadow-md"
           />
           <div className="min-w-0 flex-1">
             {adopter.userId != null ? (
