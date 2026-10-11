@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { FiMenu, FiX } from 'react-icons/fi'
 import { LuSparkles } from 'react-icons/lu'
-import { FaBuildingNgo, FaHeart } from 'react-icons/fa6'
+import { FaHeart } from 'react-icons/fa6'
 import { useAuth } from '../../context/AuthContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useProfileCompletion } from '../../hooks/useProfileCompletion'
 import { useReceivedRequests } from '../../hooks/useReceivedRequests'
 import { useChatUnread } from '../../hooks/useChatUnread'
+import { getPanelLink } from '../../utils/panelLinks'
 import UserAvatarMenu from './UserAvatarMenu'
 import PlatformSidebar from './PlatformSidebar'
-import { PANEL_PATHS } from '../../../features/ong/panel/panelPaths'
 
 const NAV_LINKS = [
   { label: 'Início', to: '/' },
@@ -29,6 +29,8 @@ function Navbar() {
   const { pendingCount } = useReceivedRequests()
   const { unreadCount: unreadChatCount } = useChatUnread()
   const closeSidebar = useCallback(() => setIsSidebarOpen(false), [])
+  const panelLink = getPanelLink(user?.userType)
+  const PanelLinkIcon = panelLink?.icon
 
   // Badge do botão da sidebar: só o que pede atenção (pedidos pendentes e
   // mensagens não lidas). Favoritos não entram — não são novidade.
@@ -154,17 +156,17 @@ function Navbar() {
               <>
                 {/* Só em telas largas: abaixo disso encostaria nos links do
                     centro, e o painel continua no menu lateral e no do avatar */}
-                {user?.userType === 'ONG' && (
+                {panelLink && (
                   <Link
-                    to={PANEL_PATHS.overview}
+                    to={panelLink.to}
                     className={`hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all duration-300 xl:flex ${
                       isScrolled
                         ? 'bg-white/10 text-white hover:bg-white/20'
                         : 'bg-emerald-800 text-white hover:bg-emerald-900'
                     }`}
                   >
-                    <FaBuildingNgo size={13} className="text-amber-300" />
-                    Painel da ONG
+                    <PanelLinkIcon size={13} className="text-amber-300" />
+                    {panelLink.label}
                   </Link>
                 )}
 
@@ -276,7 +278,7 @@ function Navbar() {
         <PlatformSidebar
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
-          isOng={user?.userType === 'ONG'}
+          panelLink={panelLink}
           totalFavoritos={totalFavoritos}
           pendingCount={pendingCount}
           unreadChatCount={unreadChatCount}

@@ -13,7 +13,9 @@ function AdminRoute() {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  if (user?.role !== 'ADMIN') {
+  // userType vem do login (PERSON | NGO | ADMIN na API), já convertido pelo
+  // authService para PESSOA | ONG | ADMIN
+  if (user?.userType !== 'ADMIN') {
     return <Navigate to="/" replace />
   }
 

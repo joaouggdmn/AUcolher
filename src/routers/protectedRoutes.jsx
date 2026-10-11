@@ -3,7 +3,6 @@ import PrivateRoute from '../core/guards/PrivateRoute'
 import OngRoute from '../core/guards/OngRoute'
 import AdminRoute from '../core/guards/AdminRoute'
 import UserLayout from '../core/components/layout/UserLayout'
-import AdminLayout from '../core/components/layout/AdminLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
@@ -26,6 +25,13 @@ import CampaignFormPage from '../features/ong/panel/pages/CampaignFormPage'
 import ReviewsPage from '../features/ong/panel/pages/ReviewsPage'
 import ProfilePage from '../features/ong/panel/pages/ProfilePage'
 import ChatLayout from '../core/components/layout/ChatLayout'
+import AdminPanelLayout from '../features/admin/panel/AdminPanelLayout'
+import { ADMIN_PATHS } from '../features/admin/panel/adminPaths'
+import AdminOverviewPage from '../features/admin/pages/AdminOverviewPage'
+import AdminUsersPage from '../features/admin/pages/AdminUsersPage'
+import AdminAnimalsPage from '../features/admin/pages/AdminAnimalsPage'
+import AdminCampaignsPage from '../features/admin/pages/AdminCampaignsPage'
+import AdminEventsPage from '../features/admin/pages/AdminEventsPage'
 
 
 export const protectedRoutes = [
@@ -83,15 +89,24 @@ export const protectedRoutes = [
   {
     element: <AdminRoute />,
     children: [
+      // Tela própria, sem a navbar do site (como o painel da ONG)
       {
-        element: <AdminLayout />,
+        path: 'admin',
+        element: <AdminPanelLayout />,
         children: [
-          { path: 'admin/dashboard', element: <PlaceholderPage title="Dashboard admin" /> },
-          { path: 'admin/aprovacoes', element: <PlaceholderPage title="Aprovacoes de ONG" /> },
-          { path: 'admin/denuncias', element: <PlaceholderPage title="Denuncias" /> },
-          { path: 'admin/estatisticas', element: <PlaceholderPage title="Estatisticas" /> },
+          { index: true, element: <AdminOverviewPage /> },
+          { path: 'usuarios', element: <AdminUsersPage /> },
+          { path: 'animais', element: <AdminAnimalsPage /> },
+          { path: 'campanhas', element: <AdminCampaignsPage /> },
+          { path: 'eventos', element: <AdminEventsPage /> },
         ],
       },
+      // Endereços dos antigos placeholders (a aprovação de ONG deixou de existir;
+      // denúncias voltam com a branch feature/denuncias)
+      { path: 'admin/dashboard', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
+      { path: 'admin/estatisticas', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
+      { path: 'admin/aprovacoes', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
+      { path: 'admin/denuncias', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
     ],
   },
   {
