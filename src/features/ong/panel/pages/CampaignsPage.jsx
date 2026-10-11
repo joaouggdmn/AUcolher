@@ -1,6 +1,6 @@
 import { FaPlus } from 'react-icons/fa6'
+import PanelPage from '../../../../core/components/panel/PanelPage'
 import OngCampaignsPanel from '../../components/dashboard/OngCampaignsPanel'
-import PanelPage from '../PanelPage'
 import { useOngPanel } from '../useOngPanel'
 import { PANEL_PATHS } from '../panelPaths'
 

@@ -1,5 +1,5 @@
+import PanelPage from '../../../../core/components/panel/PanelPage'
 import OngDonationsPanel from '../../components/dashboard/OngDonationsPanel'
-import PanelPage from '../PanelPage'
 import { useOngPanel } from '../useOngPanel'
 
 function DonationsPage() {

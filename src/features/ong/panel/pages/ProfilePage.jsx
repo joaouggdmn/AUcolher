@@ -1,7 +1,7 @@
 import { FaEye } from 'react-icons/fa6'
 import { useAuth } from '../../../../core/context/AuthContext'
+import PanelPage from '../../../../core/components/panel/PanelPage'
 import OngAccountForm from '../../../perfil/components/account/OngAccountForm'
-import PanelPage from '../PanelPage'
 
 // O mesmo formulário de "Minha conta": com alterações pendentes, a barra de
 // salvar fica fixa no rodapé e sair do painel pergunta antes

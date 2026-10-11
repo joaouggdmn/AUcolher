@@ -1,5 +1,12 @@
 import ChartTooltip from './ChartTooltip'
 
+// O terço da esquerda abre a dica para a direita, o da direita para a
+// esquerda: assim ela nunca passa da borda do cartão
+function tooltipAlign(index, total) {
+  if (index < total / 3) return 'start'
+  return index >= (total * 2) / 3 ? 'end' : 'center'
+}
+
 // Colunas de uma série só, com o valor no topo. Cada coluna reserva 1.25rem
 // acima dela para esse rótulo, então a maior nunca encosta no limite
 function ColumnChart({ columns, colorClass }) {
@@ -8,7 +15,7 @@ function ColumnChart({ columns, colorClass }) {
   return (
     <div>
       <div className="flex h-40 items-end gap-2 border-b border-slate-200">
-        {columns.map((column) => (
+        {columns.map((column, index) => (
           <div key={column.key} className="flex h-full flex-1 items-end justify-center">
             {column.value > 0 && (
               <div
@@ -20,7 +27,7 @@ function ColumnChart({ columns, colorClass }) {
                 <span className="absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-emerald-950">
                   {column.valueLabel}
                 </span>
-                <ChartTooltip value={column.valueText} label={column.detail} />
+                <ChartTooltip value={column.valueText} label={column.detail} align={tooltipAlign(index, columns.length)} />
               </div>
             )}
           </div>

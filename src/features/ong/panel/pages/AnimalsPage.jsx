@@ -1,20 +1,21 @@
 import { useState } from 'react'
 import { FaCircleCheck, FaPaw, FaPlus } from 'react-icons/fa6'
 import { getErrorMessage } from '../../../../core/utils/apiError'
+import { matchesSearch } from '../../../../core/utils/search'
 import ConfirmDialog from '../../../../core/components/ui/ConfirmDialog'
 import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../../core/components/ui/Spinner'
 import PillToggleGroup from '../../../../core/components/ui/filters/PillToggleGroup'
+import BarList from '../../../../core/components/charts/BarList'
+import ChartCard from '../../../../core/components/charts/ChartCard'
+import PanelPage from '../../../../core/components/panel/PanelPage'
 import SearchBar from '../../../animais/components/SearchBar'
 import { useChangeAnimalStatus } from '../../../animais/hooks/useAnimais'
 import { LISTING_STATUS_META } from '../../../animais/utils/listingStatus'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
 import AnimalStatusChart from '../../components/dashboard/charts/AnimalStatusChart'
-import BarList from '../../components/dashboard/charts/BarList'
-import ChartCard from '../../components/dashboard/charts/ChartCard'
 import { animalStatusSegments, speciesBars } from '../../utils/panelCharts'
 import AnimalRow from '../animals/AnimalRow'
-import PanelPage from '../PanelPage'
 import { PANEL_PATHS } from '../panelPaths'
 import { useOngPanel } from '../useOngPanel'
 
@@ -22,11 +23,6 @@ const SUCCESS_MESSAGES = {
   AVAILABLE: ({ name }) => `${name} voltou para a vitrine.`,
   INACTIVE: ({ name }) => `${name} saiu do ar. Dá para colocar de volta quando quiser.`,
   ADOPTED: ({ name, sex }) => `Que notícia boa! ${name} foi ${sex === 'FEMALE' ? 'marcada como adotada' : 'marcado como adotado'}.`,
-}
-
-// Busca sem diferenciar acento nem maiúscula ("cafe" acha "Café")
-function normalize(text) {
-  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 }
 
 function AnimalsPage() {
@@ -83,10 +79,9 @@ function AnimalsPage() {
         .filter((segment) => segment.value > 0)
         .map((segment) => ({ value: segment.key, label: `${LISTING_STATUS_META[segment.key].label} (${segment.value})` })),
     ]
-    const term = normalize(search.trim())
     const visible = animals
       .filter((animal) => !statusFilter || animal.listingStatus === statusFilter)
-      .filter((animal) => !term || normalize(animal.name).includes(term))
+      .filter((animal) => matchesSearch(search, animal.name))
 
     content = (
       <div className="flex flex-col gap-8">

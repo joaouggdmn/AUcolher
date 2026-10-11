@@ -6,10 +6,10 @@ import { formatCurrency } from '../../../../core/utils/currency'
 import Spinner from '../../../../core/components/ui/Spinner'
 import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import ShowMoreButton from '../../../../core/components/ui/ShowMoreButton'
+import ChartCard from '../../../../core/components/charts/ChartCard'
+import ColumnChart from '../../../../core/components/charts/ColumnChart'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
 import { CHART_MONTHS, monthlyDonationColumns } from '../../utils/panelCharts'
-import ChartCard from './charts/ChartCard'
-import ColumnChart from './charts/ColumnChart'
 import { PANEL_PATHS } from '../../panel/panelPaths'
 
 const PAGE_SIZE = 20
