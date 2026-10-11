@@ -28,3 +28,16 @@ export async function listEvents() {
   const { data } = await api.get('/admin/events')
   return data
 }
+
+// ---------- denúncias (docs/api-admin.md §6.4) ----------
+
+export async function listReports() {
+  const { data } = await api.get('/admin/reports')
+  return data
+}
+
+// Arquiva esta denúncia e as outras pendentes do mesmo alvo
+export async function dismissReports(reportId) {
+  const { data } = await api.post(`/admin/reports/${reportId}/dismiss`)
+  return data
+}

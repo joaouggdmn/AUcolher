@@ -1,5 +1,6 @@
 import { USE_MOCK_ADMIN } from '../../../core/utils/constants'
 import { toFrontendAnimal } from '../../animais/services/animalService'
+import { toFrontendReport } from '../../denuncias/services/denunciaService'
 import { toFrontendCampaign } from '../../doacoes/services/doacaoService'
 import { toFrontendEvent } from '../../eventos/services/eventoService'
 import * as adminApi from './adminApi'
@@ -55,6 +56,7 @@ export function toFrontendAdminStats(dto) {
       ...item,
       detail: item.type === 'ACCOUNT_CREATED' ? FRONTEND_USER_TYPES[item.detail] ?? item.detail : item.detail,
     })),
+    reports: dto.reports ?? { pending: 0, pendingTargets: 0 },
   }
 }
 
@@ -99,4 +101,15 @@ export async function listAdminCampaigns() {
 export async function listAdminEvents() {
   const dtos = await adapter.listEvents()
   return dtos.map(toFrontendEvent)
+}
+
+// Mesmo modelo das denúncias do site, mais `reporter`
+export async function listAdminReports() {
+  const dtos = await adapter.listReports()
+  return dtos.map(toFrontendReport)
+}
+
+export async function dismissAdminReports(reportId) {
+  const dtos = await adapter.dismissReports(reportId)
+  return dtos.map(toFrontendReport)
 }

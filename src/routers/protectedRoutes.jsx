@@ -32,6 +32,7 @@ import AdminUsersPage from '../features/admin/pages/AdminUsersPage'
 import AdminAnimalsPage from '../features/admin/pages/AdminAnimalsPage'
 import AdminCampaignsPage from '../features/admin/pages/AdminCampaignsPage'
 import AdminEventsPage from '../features/admin/pages/AdminEventsPage'
+import AdminReportsPage from '../features/admin/pages/AdminReportsPage'
 
 
 export const protectedRoutes = [
@@ -99,14 +100,13 @@ export const protectedRoutes = [
           { path: 'animais', element: <AdminAnimalsPage /> },
           { path: 'campanhas', element: <AdminCampaignsPage /> },
           { path: 'eventos', element: <AdminEventsPage /> },
+          { path: 'denuncias', element: <AdminReportsPage /> },
         ],
       },
-      // Endereços dos antigos placeholders (a aprovação de ONG deixou de existir;
-      // denúncias voltam com a branch feature/denuncias)
+      // Endereços dos antigos placeholders (a aprovação de ONG deixou de existir)
       { path: 'admin/dashboard', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
       { path: 'admin/estatisticas', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
       { path: 'admin/aprovacoes', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
-      { path: 'admin/denuncias', element: <Navigate to={ADMIN_PATHS.overview} replace /> },
     ],
   },
   {
