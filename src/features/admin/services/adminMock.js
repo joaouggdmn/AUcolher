@@ -21,6 +21,7 @@ import {
 import { reportTargetKey } from '../../denuncias/utils/reportRules'
 import { readAllEventsForAdmin } from '../../eventos/services/eventosMock'
 import { buildSeedAdmin } from '../data/seedAdmin'
+import { banAccount, isAccountBanned, matchesAccount, reactivateAccount } from './moderationMock'
 
 // 🔴 Servidor falso do painel do admin: mesmas funções de adminApi.js e os
 // DTOs de docs/api-admin.md. A API ainda não lista contas, então elas vivem
@@ -134,11 +135,11 @@ function definedFields(object) {
 }
 
 // Contas do banco falso + as contas que aparecem nos dados de verdade: ONGs
-// de campanhas e eventos e, por último (a fonte mais confiável), donos dos
-// animais da API. Os ids do seed (1 a 7) se repetem com os do banco real:
-// mesmo id com outro nome é outra conta, e a de verdade ocupa o lugar da
-// fictícia. Com o mesmo nome, só completa os dados
-function loadAccounts(animals, campaigns, events) {
+// de campanhas e eventos, quem pediu para adotar e, por último (a fonte mais
+// confiável), donos dos animais da API. Os ids do seed (1 a 7) se repetem
+// com os do banco real: mesmo id com outro nome é outra conta, e a de
+// verdade ocupa o lugar da fictícia. Com o mesmo nome, só completa os dados
+function loadAccounts(animals, campaigns, events, requests) {
   const byId = new Map(store.read().accounts.map((account) => [String(account.id), account]))
 
   function see(account) {
@@ -163,6 +164,19 @@ function loadAccounts(animals, campaigns, events) {
       isVerified: Boolean(ngo.isVerified),
     })
   }
+  // Quem só adota não anuncia nada: sem isto, não teria como ser moderado
+  for (const { adopter } of requests) {
+    if (adopter?.userId == null) continue
+    see({
+      id: adopter.userId,
+      name: adopter.name,
+      userType: 'PERSON',
+      photoUrl: adopter.photoUrl ?? null,
+      city: adopter.city ?? null,
+      state: adopter.state ?? null,
+      isVerified: false,
+    })
+  }
   for (const { dto } of animals) {
     if (!dto.owner) continue
     see({
@@ -175,7 +189,8 @@ function loadAccounts(animals, campaigns, events) {
       isVerified: Boolean(dto.owner.isVerified),
     })
   }
-  return [...byId.values()]
+  // Banida = `users.active = false` no backend; aqui vem do moderationMock
+  return [...byId.values()].map((account) => ({ ...account, active: !isAccountBanned(account) }))
 }
 
 function toUserDto(account, animals) {
@@ -217,11 +232,14 @@ function usersStats(accounts, months) {
   }
 }
 
+// Anúncio de conta banida não conta como disponível nem em processo: o site
+// não o mostra mais. Os adotados continuam como histórico
 function animalsStats(animals) {
-  const visible = animals.filter(({ listingStatus }) => listingStatus !== 'INACTIVE')
+  const onSite = animals.filter(({ dto }) => !isAccountBanned(dto.owner))
+  const visible = onSite.filter(({ listingStatus }) => listingStatus !== 'INACTIVE')
   return {
-    available: countBy(animals, ({ listingStatus }) => listingStatus === 'AVAILABLE'),
-    inProgress: countBy(animals, ({ listingStatus }) => listingStatus === 'IN_PROGRESS'),
+    available: countBy(onSite, ({ listingStatus }) => listingStatus === 'AVAILABLE'),
+    inProgress: countBy(onSite, ({ listingStatus }) => listingStatus === 'IN_PROGRESS'),
     adopted: countBy(animals, ({ listingStatus }) => listingStatus === 'ADOPTED'),
     bySpecies: {
       DOG: countBy(visible, ({ dto }) => dto.species === 'DOG'),
@@ -293,6 +311,31 @@ function ngoRanking(accounts, requests, donations) {
   }
 }
 
+function isListedCampaign(campaign) {
+  return !campaign.removed && !isAccountBanned(campaign.ngo)
+}
+
+function isListedEvent(event) {
+  return event.status === 'ACTIVE' && !isAccountBanned(event.ngo)
+}
+
+// `active` do dono (animal) ou da ONG (campanha, evento): o admin vê o
+// conteúdo de conta banida, que o site não mostra mais
+function withOwnerStatus(dto, field) {
+  return dto[field] ? { ...dto, [field]: { ...dto[field], active: !isAccountBanned(dto[field]) } } : dto
+}
+
+// Denúncia que envolve a conta: contra o perfil dela ou contra um anúncio dela
+function involvesAccount(report, account) {
+  if (report.targetType === 'USER') return matchesAccount(account, { id: report.targetId, name: report.target.name })
+  return matchesAccount(account, { id: report.target.ownerId, name: report.target.ownerName })
+}
+
+function banAndResolve(account) {
+  banAccount(account)
+  return resolvePendingReportsForAdmin((report) => involvesAccount(report, account), 'ACCOUNT_BANNED')
+}
+
 // Pendentes: quantas denúncias e quantos alvos ("casos") esperam o admin
 function reportsStats(reports) {
   const pending = reports.filter((report) => report.status === 'PENDING')
@@ -357,7 +400,7 @@ export async function getStats() {
   const donations = readApprovedDonationsForAdmin()
   const campaigns = readAllCampaignsForAdmin()
   const events = readAllEventsForAdmin()
-  const accounts = loadAccounts(animals, campaigns, events)
+  const accounts = loadAccounts(animals, campaigns, events, requests)
   const today = todayLocalIso()
   const months = lastMonthKeys(SERIES_MONTHS)
 
@@ -366,15 +409,18 @@ export async function getStats() {
     animals: animalsStats(animals),
     adoptions: adoptionsStats(requests, months),
     donations: donationsStats(donations, months),
+    // `suspended`: de ONG banida (some do site, mas o dinheiro arrecadado fica)
     campaigns: {
-      active: countBy(campaigns, (campaign) => !campaign.removed && campaign.status === 'ACTIVE'),
-      closed: countBy(campaigns, (campaign) => !campaign.removed && campaign.status === 'CLOSED'),
+      active: countBy(campaigns, (campaign) => isListedCampaign(campaign) && campaign.status === 'ACTIVE'),
+      closed: countBy(campaigns, (campaign) => isListedCampaign(campaign) && campaign.status === 'CLOSED'),
       removed: countBy(campaigns, (campaign) => campaign.removed),
+      suspended: countBy(campaigns, (campaign) => !campaign.removed && isAccountBanned(campaign.ngo)),
     },
     events: {
-      upcoming: countBy(events, (event) => event.status === 'ACTIVE' && event.date >= today),
-      past: countBy(events, (event) => event.status === 'ACTIVE' && event.date < today),
+      upcoming: countBy(events, (event) => isListedEvent(event) && event.date >= today),
+      past: countBy(events, (event) => isListedEvent(event) && event.date < today),
       cancelled: countBy(events, (event) => event.status === 'CANCELLED'),
+      suspended: countBy(events, (event) => event.status === 'ACTIVE' && isAccountBanned(event.ngo)),
     },
     ngoRanking: ngoRanking(accounts, requests, donations),
     recentActivity: recentActivity(accounts, requests, campaigns, events),
@@ -387,8 +433,9 @@ export async function listUsers() {
   await mockDelay()
   requireAdmin()
 
-  const animals = await loadAnimals(readRequests())
-  return loadAccounts(animals, readAllCampaignsForAdmin(), readAllEventsForAdmin())
+  const requests = readRequests()
+  const animals = await loadAnimals(requests)
+  return loadAccounts(animals, readAllCampaignsForAdmin(), readAllEventsForAdmin(), requests)
     .sort(byNewest('createdAt'))
     .map((account) => toUserDto(account, animals))
 }
@@ -399,21 +446,21 @@ export async function listAnimals() {
   requireAdmin()
 
   const animals = await loadAnimals(readRequests())
-  return animals.map(({ dto }) => dto).sort(byNewest('createdAt'))
+  return animals.map(({ dto }) => withOwnerStatus(dto, 'owner')).sort(byNewest('createdAt'))
 }
 
 // GET /api/admin/campaigns — ativas, encerradas e excluídas (`removed`)
 export async function listCampaigns() {
   await mockDelay()
   requireAdmin()
-  return readAllCampaignsForAdmin()
+  return readAllCampaignsForAdmin().map((dto) => withOwnerStatus(dto, 'ngo'))
 }
 
 // GET /api/admin/events — próximos, passados e cancelados
 export async function listEvents() {
   await mockDelay()
   requireAdmin()
-  return readAllEventsForAdmin()
+  return readAllEventsForAdmin().map((dto) => withOwnerStatus(dto, 'ngo'))
 }
 
 // GET /api/admin/reports — todas as denúncias, com quem denunciou
@@ -435,6 +482,45 @@ export async function dismissReports(reportId) {
 
   const key = reportTargetKey(report)
   return resolvePendingReportsForAdmin((row) => reportTargetKey(row) === key, 'DISMISSED')
+}
+
+// POST /api/admin/reports/{id}/ban — bane a conta denunciada (perfil) ou a
+// dona do anúncio denunciado; resolve as pendentes contra ela e os anúncios dela
+export async function banReportedAccount(reportId) {
+  await mockDelay()
+  requireAdmin()
+
+  const report = findReportForAdmin(reportId)
+  if (!report) throw mockHttpError(404, 'Denúncia não encontrada.')
+  if (report.status !== 'PENDING') throw mockHttpError(400, 'Esta denúncia já foi julgada.')
+
+  const isProfile = report.targetType === 'USER'
+  const account = isProfile
+    ? { id: report.targetId, name: report.target.name, userType: report.target.userType }
+    : { id: report.target.ownerId, name: report.target.ownerName, userType: report.target.ownerUserType }
+  if (account.id == null) throw mockHttpError(400, 'Não foi possível identificar a conta denunciada.')
+
+  return banAndResolve(account)
+}
+
+// PATCH /api/admin/users/{id}/status { active } — banir (false) ou reativar
+// (true). Banir também resolve as denúncias pendentes contra a conta e os
+// anúncios dela; os pedidos de adoção ativos são cancelados (no mock, pelo
+// AdoptionRequestProvider, que é quem guarda os pedidos)
+export async function setUserStatus(userId, active) {
+  await mockDelay()
+  requireAdmin()
+  if (typeof active !== 'boolean') throw mockHttpError(400, 'Informe se a conta fica ativa.')
+
+  const requests = readRequests()
+  const animals = await loadAnimals(requests)
+  const accounts = loadAccounts(animals, readAllCampaignsForAdmin(), readAllEventsForAdmin(), requests)
+  const account = accounts.find((item) => isSameId(item.id, userId))
+  if (!account) throw mockHttpError(404, 'Conta não encontrada.')
+
+  if (active) reactivateAccount(account)
+  else banAndResolve(account)
+  return toUserDto({ ...account, active }, animals)
 }
 
 // ---------- só do mock: dados de teste do painel do admin (features/admin/dev) ----------

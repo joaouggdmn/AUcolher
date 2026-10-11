@@ -4,6 +4,7 @@ import { adoptionRequestsSeed } from "../../features/adocao/data/adoptionRequest
 import { requestAnimalSource, resolveRequestAnimal } from "../../features/adocao/utils/requestAnimal";
 import { animalKeys, useMyAnimals } from "../../features/animais/hooks/useAnimais";
 import { getAnimal } from "../../features/animais/services/animalService";
+import { matchesAccount } from "../../features/admin/services/moderationMock";
 import { useSyncAdoptedAnimals } from "../hooks/useSyncAdoptedAnimals";
 import { isSameId } from "../utils/ids";
 import { ADOPTION_REQUESTS_STORAGE_KEY } from "../utils/storageKeys";
@@ -24,6 +25,18 @@ function collectAnimals(results) {
 // pelo papel de quem escreveu: reviews.adopter avalia o doador,
 // reviews.owner avalia o adotante
 const REVIEW_AUTHOR_ROLES = ["adopter", "owner"];
+
+// Pedidos que ainda podem andar — os que um banimento cancela
+const ACTIVE_STATUSES = ["PENDING", "ACCEPTED", "AWAITING_DELIVERY"];
+
+// A conta banida é a dona do animal ou a adotante? O nome vem da cópia
+// guardada no pedido (pedido antigo, sem cópia, compara só o id)
+function bannedSide(request, account) {
+  const ownerName = request.animal?.organizationName ?? request.animal?.ownerName ?? null;
+  if (matchesAccount(account, { id: request.ownerId, name: ownerName })) return "owner";
+  if (matchesAccount(account, { id: request.adopter?.userId, name: request.adopter?.name })) return "adopter";
+  return null;
+}
 
 function loadInitialRequests() {
   try {
@@ -186,6 +199,29 @@ export function AdoptionRequestProvider({ children }) {
     return true;
   }
 
+  // 🔴 Moderação: banir uma conta cancela os pedidos ativos dela, como dona
+  // ou como adotante, e a outra parte vê o motivo (cancelReason). Com os
+  // pedidos no backend, o próprio banimento faz isso no servidor
+  function cancelRequestsOfBannedAccount(account) {
+    const cancelledAt = new Date().toISOString();
+    setRequests((prev) =>
+      prev.map((request) => {
+        if (!ACTIVE_STATUSES.includes(request.status)) return request;
+        const side = bannedSide(request, account);
+        if (!side) return request;
+        return {
+          ...request,
+          status: "CANCELLED",
+          cancelReason: "ACCOUNT_BANNED",
+          bannedSide: side,
+          // A conversa (aceito ou aguardando entrega) continua visível, travada
+          cancelledFromStatus: request.status,
+          cancelledAt,
+        };
+      }),
+    );
+  }
+
   function saveReview(requestId, authorRole, { rating, comment, author }) {
     if (!REVIEW_AUTHOR_ROLES.includes(authorRole)) return;
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) return;
@@ -236,6 +272,7 @@ export function AdoptionRequestProvider({ children }) {
         rejectRequest,
         requestDeliveryConfirmation,
         concludeRequest,
+        cancelRequestsOfBannedAccount,
         saveReview,
         deleteReview,
       }}

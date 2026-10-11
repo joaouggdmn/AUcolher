@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaEye, FaShieldHalved } from 'react-icons/fa6'
+import { FaBan, FaEye, FaRotateLeft, FaShieldHalved } from 'react-icons/fa6'
 import Avatar from '../../../core/components/ui/Avatar'
 
 const TYPE_META = {
@@ -9,6 +9,8 @@ const TYPE_META = {
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
+const BAN_CLASSES =
+  'flex items-center gap-1.5 rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
 
 function memberSince(createdAt) {
   if (!createdAt) return null
@@ -25,8 +27,10 @@ function profilePath(user) {
   return user.userType === 'ONG' ? `/ong/${user.id}` : `/perfil/publico/${user.id}`
 }
 
-// Uma conta na lista do admin: quem é, de onde, desde quando e quanto anuncia
-function UserRow({ user }) {
+// Uma conta na lista do admin: quem é, de onde, desde quando e quanto anuncia,
+// com banir (ativa) ou reativar (banida). O perfil de conta banida fica
+// indisponível no site, mas o admin ainda o abre
+function UserRow({ user, onBan, onReactivate }) {
   const type = TYPE_META[user.userType] ?? TYPE_META.PESSOA
   const location = [user.city, user.state].filter(Boolean).join(' - ')
 
@@ -57,6 +61,17 @@ function UserRow({ user }) {
           <FaEye size={11} />
           Ver perfil
         </Link>
+        {user.isActive ? (
+          <button type="button" onClick={() => onBan(user)} className={BAN_CLASSES}>
+            <FaBan size={11} />
+            Banir
+          </button>
+        ) : (
+          <button type="button" onClick={() => onReactivate(user)} className={ACTION_CLASSES}>
+            <FaRotateLeft size={11} />
+            Reativar
+          </button>
+        )}
       </div>
     </li>
   )

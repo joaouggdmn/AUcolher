@@ -1,5 +1,6 @@
 import * as animaisApi from './animaisApi'
 import { buildAgeLabel } from '../utils/ageHelpers'
+import { isAccountBanned } from '../../admin/services/moderationMock'
 
 // Fachada dos animais: as telas só conhecem estas funções e o modelo do
 // frontend. A API já usa os mesmos nomes e valores (DOG, MALE, YEARS...),
@@ -75,21 +76,35 @@ export function toApiFilters({ search = '', filters = {}, page = 0, size = PAGE_
   return params
 }
 
+// 🔴 Moderação no modo mock (USE_MOCK_ADMIN): a API ainda não sabe quem o
+// admin baniu, então a fachada esconde os anúncios dessas contas. Com a
+// moderação no backend, a própria API deixa de devolvê-los
+function isOnSite(dto) {
+  return !isAccountBanned(dto.owner)
+}
+
 // ---------- operações ----------
 
 // Uma página da vitrine. `hasMore` alimenta o botão "Mostrar mais"
 export async function listAnimals(options) {
   const data = await animaisApi.listAnimals(toApiFilters(options))
+  const onSite = data.content.filter(isOnSite)
   return {
-    animals: data.content.map(toFrontendAnimal),
+    animals: onSite.map(toFrontendAnimal),
     page: data.page,
-    totalElements: data.totalElements,
+    // A API ainda conta os escondidos: desconta os desta página (exato quando
+    // a busca cabe numa página só, o caso do TCC)
+    totalElements: Math.max(data.totalElements - (data.content.length - onSite.length), 0),
     hasMore: data.page + 1 < data.totalPages,
   }
 }
 
+// `moderation`: o anúncio saiu do ar pela moderação ('OWNER_BANNED'). O
+// detalhe mostra "Anúncio indisponível" (o admin ainda vê, com um aviso)
 export async function getAnimal(id) {
-  return toFrontendAnimal(await animaisApi.getAnimal(id))
+  const dto = await animaisApi.getAnimal(id)
+  const animal = toFrontendAnimal(dto)
+  return isOnSite(dto) ? animal : { ...animal, moderation: 'OWNER_BANNED' }
 }
 
 export async function createAnimal(form, photos) {
@@ -115,11 +130,11 @@ export async function listMyAnimals() {
 }
 
 export async function listUserAnimals(userId) {
-  return (await animaisApi.listUserAnimals(userId)).map(toFrontendAnimal)
+  return (await animaisApi.listUserAnimals(userId)).filter(isOnSite).map(toFrontendAnimal)
 }
 
 export async function listFavorites() {
-  return (await animaisApi.listFavorites()).map(toFrontendAnimal)
+  return (await animaisApi.listFavorites()).filter(isOnSite).map(toFrontendAnimal)
 }
 
 export function listFavoriteIds() {

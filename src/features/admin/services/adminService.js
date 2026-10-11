@@ -87,20 +87,26 @@ export async function listAdminUsers() {
   return dtos.map(toFrontendAdminUser)
 }
 
+// `ownerIsBanned` / `isOngBanned`: a conta foi banida, então o site já não
+// mostra o conteúdo (o admin continua vendo)
 export async function listAdminAnimals() {
   const dtos = await adapter.listAnimals()
-  return dtos.map(toFrontendAnimal)
+  return dtos.map((dto) => ({ ...toFrontendAnimal(dto), ownerIsBanned: dto.owner?.active === false }))
 }
 
 // `isRemoved`: excluída pela ONG, mas ainda contando no total arrecadado
 export async function listAdminCampaigns() {
   const dtos = await adapter.listCampaigns()
-  return dtos.map((dto) => ({ ...toFrontendCampaign(dto), isRemoved: Boolean(dto.removed) }))
+  return dtos.map((dto) => ({
+    ...toFrontendCampaign(dto),
+    isRemoved: Boolean(dto.removed),
+    isOngBanned: dto.ngo?.active === false,
+  }))
 }
 
 export async function listAdminEvents() {
   const dtos = await adapter.listEvents()
-  return dtos.map(toFrontendEvent)
+  return dtos.map((dto) => ({ ...toFrontendEvent(dto), isOngBanned: dto.ngo?.active === false }))
 }
 
 // Mesmo modelo das denúncias do site, mais `reporter`
@@ -112,4 +118,14 @@ export async function listAdminReports() {
 export async function dismissAdminReports(reportId) {
   const dtos = await adapter.dismissReports(reportId)
   return dtos.map(toFrontendReport)
+}
+
+export async function banReportedAccount(reportId) {
+  const dtos = await adapter.banReportedAccount(reportId)
+  return dtos.map(toFrontendReport)
+}
+
+// false = banir, true = reativar
+export async function setAdminUserStatus(userId, active) {
+  return toFrontendAdminUser(await adapter.setUserStatus(userId, active))
 }

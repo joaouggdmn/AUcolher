@@ -15,6 +15,10 @@ export const MOCK_CAMPANHAS_STORE_KEY = 'aucolher_mock_campanhas'
 export const MOCK_ADMIN_STORE_KEY = 'aucolher_mock_admin'
 // "Banco" falso das denúncias feitas no site (mesmo mockStore)
 export const MOCK_DENUNCIAS_STORE_KEY = 'aucolher_mock_denuncias'
+// Decisões de moderação do modo mock: contas banidas (mesmo mockStore)
+export const MOCK_MODERACAO_STORE_KEY = 'aucolher_mock_moderacao'
+// sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)
+export const ACCOUNT_SUSPENDED_FLAG_KEY = 'aucolher_account_suspended'
 
 // Chave dinâmica: cada conversa (match aceito) tem seu próprio histórico
 // isolado no localStorage — centralizado aqui para não haver 2 lugares

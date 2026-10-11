@@ -47,6 +47,11 @@ function AdminAnimalRow({ animal }) {
               {animal.listingType === 'NGO' && animal.ownerIsVerified && (
                 <FaShieldHalved size={10} className="text-amber-500" title="Instituição verificada" />
               )}
+              {animal.ownerIsBanned && (
+                <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-600">
+                  Conta banida
+                </span>
+              )}
             </p>
           )}
           {animal.pendingInterests > 0 && (
@@ -58,7 +63,8 @@ function AdminAnimalRow({ animal }) {
         </div>
       </div>
 
-      {animal.listingStatus !== 'INACTIVE' && (
+      {/* Fora do ar pelo dono dá 404; de conta banida o admin ainda abre */}
+      {(animal.listingStatus !== 'INACTIVE' || animal.ownerIsBanned) && (
         <div className="flex shrink-0 flex-wrap gap-2">
           <Link to={`/animais/${animal.id}`} className={ACTION_CLASSES}>
             <FaEye size={11} />

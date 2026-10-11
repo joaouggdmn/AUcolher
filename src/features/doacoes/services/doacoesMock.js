@@ -8,6 +8,7 @@ import {
   nextId,
 } from '../../../core/services/mock/mockStore'
 import { MOCK_CAMPANHAS_STORE_KEY } from '../../../core/utils/storageKeys'
+import { isAccountBanned } from '../../admin/services/moderationMock'
 import { PIX_EXPIRATION_MINUTES } from '../../../core/utils/constants'
 import { addMinutesLocalIso, nowLocalIso, todayLocalIso } from '../../../core/utils/localDate'
 import { buildSeedCampanhas } from '../data/seedCampanhas'
@@ -98,10 +99,11 @@ function requireOwner(row, user) {
   if (!isSameId(row.ngo.id, user.id)) throw mockHttpError(403, 'Só a ONG que criou a campanha pode fazer isso.')
 }
 
-// Excluída (lógica ou real) não existe mais para as rotas de campanha
+// Excluída (lógica ou real) ou de ONG banida não existe mais para as rotas
+// de campanha (o admin vê tudo pelas leituras de admin, no fim do arquivo)
 function findCampaignRow(db, id) {
   const row = db.campaigns.find((campaign) => isSameId(campaign.id, id))
-  if (!row || row.deleted) throw mockHttpError(404, 'Campanha não encontrada.')
+  if (!row || row.deleted || isAccountBanned(row.ngo)) throw mockHttpError(404, 'Campanha não encontrada.')
   return row
 }
 
@@ -203,13 +205,14 @@ function buildFakePixCode(donationId, amount) {
 
 // ---------- rotas: campanhas ----------
 
-// GET /api/campaigns?ngoId=&status= — padrão ACTIVE; excluídas nunca aparecem
+// GET /api/campaigns?ngoId=&status= — padrão ACTIVE; excluídas e de ONG
+// banida nunca aparecem
 export async function listCampaigns({ ngoId, status = 'ACTIVE' } = {}) {
   await mockDelay()
   const db = store.read()
 
   return db.campaigns
-    .filter((row) => !row.deleted && (isClosed(row) ? 'CLOSED' : 'ACTIVE') === status)
+    .filter((row) => !row.deleted && !isAccountBanned(row.ngo) && (isClosed(row) ? 'CLOSED' : 'ACTIVE') === status)
     .filter((row) => ngoId == null || isSameId(row.ngo.id, ngoId))
     .sort(byNewest('createdAt'))
     .map((row) => toCampaignDto(db, row))

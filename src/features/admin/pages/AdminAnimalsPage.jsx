@@ -36,7 +36,15 @@ function AdminAnimalsPage() {
   const [speciesFilter, setSpeciesFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-  const animals = useMemo(() => withPlatformAdoptionStatus(apiAnimals, requests), [apiAnimals, requests])
+  // Anúncio de conta banida está fora do site: conta como "Fora do ar", como
+  // na Visão geral (a etiqueta "Conta banida" na linha explica o motivo)
+  const animals = useMemo(
+    () =>
+      withPlatformAdoptionStatus(apiAnimals, requests).map((animal) =>
+        animal.ownerIsBanned && animal.listingStatus !== 'ADOPTED' ? { ...animal, listingStatus: 'INACTIVE' } : animal
+      ),
+    [apiAnimals, requests]
+  )
 
   // Filtro novo, lista do começo
   function withReset(setter) {
