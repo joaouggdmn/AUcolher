@@ -277,6 +277,16 @@ export async function listMyAttendance() {
     .map((row) => toDto(db, row))
 }
 
+// ---------- só do mock: leitura do painel do admin (features/admin) ----------
+
+// Todos os eventos de todas as ONGs, inclusive passados e cancelados, do
+// mais recente para o mais antigo. Síncrona: o servidor falso do admin
+// (adminMock) junta às consultas dele
+export function readAllEventsForAdmin() {
+  const db = store.read()
+  return [...db.events].sort((a, b) => byDateAsc(b, a)).map((row) => toDto(db, row))
+}
+
 // ---------- só do mock: dados de teste do painel (features/ong/panel/dev) ----------
 
 // Grava eventos da ONG logada já com as presenças. As linhas ficam marcadas

@@ -399,6 +399,37 @@ export async function simulateDonationApproval(id) {
   return toDonationDto(next, approved, { withPix: true })
 }
 
+// ---------- só do mock: leituras do painel do admin (features/admin) ----------
+
+// O admin vê todas as ONGs e todos os status, inclusive as campanhas
+// excluídas (`removed`) — as doações aprovadas delas continuam no total.
+// Síncronas e sem latência: são consultas que o servidor falso do admin
+// (adminMock) junta às dele, como um JOIN no banco
+export function readAllCampaignsForAdmin() {
+  const db = store.read()
+  return [...db.campaigns]
+    .sort(byNewest('createdAt'))
+    .map((row) => ({ ...toCampaignDto(db, row), removed: Boolean(row.deleted) }))
+}
+
+// Toda doação aprovada, com a ONG que recebeu (a campanha de uma doação
+// aprovada nunca é apagada de vez, só marcada como excluída)
+export function readApprovedDonationsForAdmin() {
+  const db = store.read()
+  return db.donations
+    .filter((donation) => donation.status === 'APPROVED')
+    .map((donation) => {
+      const campaign = db.campaigns.find((row) => isSameId(row.id, donation.campaign.id))
+      return {
+        id: donation.id,
+        amount: donation.amount,
+        approvedAt: donation.approvedAt,
+        campaignId: donation.campaign.id,
+        ngo: campaign ? { id: campaign.ngo.id, name: campaign.ngo.name } : null,
+      }
+    })
+}
+
 // ---------- só do mock: dados de teste do painel (features/ong/panel/dev) ----------
 
 // Grava campanhas da ONG logada já com as doações aprovadas. As linhas ficam

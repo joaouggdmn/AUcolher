@@ -4,10 +4,14 @@
 // a API real
 export const USE_MOCK_EVENTOS = import.meta.env.VITE_USE_MOCK_EVENTOS !== 'false'
 export const USE_MOCK_CAMPANHAS = import.meta.env.VITE_USE_MOCK_CAMPANHAS !== 'false'
+// Painel do admin: sem as rotas /api/admin/* no Spring Boot, um servidor falso
+// junta contas (mock), animais (API real), pedidos, campanhas e eventos
+export const USE_MOCK_ADMIN = import.meta.env.VITE_USE_MOCK_ADMIN !== 'false'
 
 // Listas públicas mudam pouco: 30 s evita refazer a busca a cada navegação
 export const EVENTOS_STALE_TIME = 30_000
 export const CAMPANHAS_STALE_TIME = 30_000
+export const ADMIN_STALE_TIME = 30_000
 
 // Capa do evento/campanha (http ou data URL) — mesmo limite do contrato da API
 export const EVENT_COVER_MAX_LENGTH = 600_000
