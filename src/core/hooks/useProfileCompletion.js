@@ -36,6 +36,9 @@ const ONG_CHECKLIST = [
 
 export function useProfileCompletion(profile) {
   return useMemo(() => {
+    // Admin não tem perfil público a completar: sem checklist, conta como completo
+    if (profile?.userType === 'ADMIN') return { checklist: [], percentage: 100 }
+
     const definitions = profile?.userType === 'ONG' ? ONG_CHECKLIST : PERSON_CHECKLIST
 
     const checklist = definitions.map((item) => ({
