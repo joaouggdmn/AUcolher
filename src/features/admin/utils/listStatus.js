@@ -6,12 +6,17 @@ export const CAMPAIGN_STATUS_META = {
   CLOSED: { label: 'Encerrada', filterLabel: 'Encerradas', className: 'bg-slate-100 text-slate-500' },
   REMOVED: { label: 'Excluída pela ONG', filterLabel: 'Excluídas', className: 'bg-rose-50 text-rose-600' },
   SUSPENDED: { label: 'ONG banida', filterLabel: 'De ONG banida', className: 'bg-rose-50 text-rose-600' },
+  MODERATED: {
+    label: 'Removida pela moderação',
+    filterLabel: 'Removidas pela moderação',
+    className: 'bg-rose-50 text-rose-600',
+  },
 }
 
-// Excluída pela ONG ainda aparece para o admin: as doações dela contam no
-// total. De ONG banida: saiu do site, mas continua aqui
+// Excluída (pela ONG ou pelo admin) ainda aparece aqui: as doações dela
+// contam no total. De ONG banida: saiu do site, mas continua aqui
 export function campaignStatus(campaign) {
-  if (campaign.isRemoved) return 'REMOVED'
+  if (campaign.isRemoved) return campaign.isRemovedByModeration ? 'MODERATED' : 'REMOVED'
   if (campaign.isOngBanned) return 'SUSPENDED'
   return campaign.isClosed ? 'CLOSED' : 'ACTIVE'
 }
@@ -21,15 +26,28 @@ export const EVENT_STATUS_META = {
   PAST: { label: 'Já aconteceu', filterLabel: 'Já aconteceram', className: 'bg-slate-100 text-slate-500' },
   CANCELLED: { label: 'Cancelado', filterLabel: 'Cancelados', className: 'bg-rose-50 text-rose-600' },
   SUSPENDED: { label: 'ONG banida', filterLabel: 'De ONG banida', className: 'bg-rose-50 text-rose-600' },
+  MODERATED: {
+    label: 'Removido pela moderação',
+    filterLabel: 'Removidos pela moderação',
+    className: 'bg-rose-50 text-rose-600',
+  },
 }
 
 export function eventStatus(event) {
-  if (event.status === 'CANCELLED') return 'CANCELLED'
+  if (event.status === 'CANCELLED') return event.isRemovedByModeration ? 'MODERATED' : 'CANCELLED'
   if (event.isOngBanned) return 'SUSPENDED'
   return event.isPast ? 'PAST' : 'UPCOMING'
 }
 
-// Só o que ainda tem página pública ganha o link "Ver"
+const OFF_SITE_STATUSES = ['REMOVED', 'CANCELLED', 'SUSPENDED', 'MODERATED']
+
+// Só o que ainda tem página pública ganha o link "Ver" (e pode ser removido)
 export function hasPublicPage(statusKey) {
-  return statusKey !== 'REMOVED' && statusKey !== 'CANCELLED' && statusKey !== 'SUSPENDED'
+  return !OFF_SITE_STATUSES.includes(statusKey)
+}
+
+// O admin remove o que ainda está no site ou é de ONG banida (para não
+// voltar se ela for reativada)
+export function canRemove(statusKey) {
+  return hasPublicPage(statusKey) || statusKey === 'SUSPENDED'
 }

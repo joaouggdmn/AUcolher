@@ -94,19 +94,24 @@ export async function listAdminAnimals() {
   return dtos.map((dto) => ({ ...toFrontendAnimal(dto), ownerIsBanned: dto.owner?.active === false }))
 }
 
-// `isRemoved`: excluída pela ONG, mas ainda contando no total arrecadado
+// `isRemoved`: excluída (pela ONG ou, com `isRemovedByModeration`, pelo admin)
 export async function listAdminCampaigns() {
   const dtos = await adapter.listCampaigns()
   return dtos.map((dto) => ({
     ...toFrontendCampaign(dto),
     isRemoved: Boolean(dto.removed),
+    isRemovedByModeration: Boolean(dto.removedByModeration),
     isOngBanned: dto.ngo?.active === false,
   }))
 }
 
 export async function listAdminEvents() {
   const dtos = await adapter.listEvents()
-  return dtos.map((dto) => ({ ...toFrontendEvent(dto), isOngBanned: dto.ngo?.active === false }))
+  return dtos.map((dto) => ({
+    ...toFrontendEvent(dto),
+    isRemovedByModeration: Boolean(dto.removedByModeration),
+    isOngBanned: dto.ngo?.active === false,
+  }))
 }
 
 // Mesmo modelo das denúncias do site, mais `reporter`
@@ -128,4 +133,16 @@ export async function banReportedAccount(reportId) {
 // false = banir, true = reativar
 export async function setAdminUserStatus(userId, active) {
   return toFrontendAdminUser(await adapter.setUserStatus(userId, active))
+}
+
+export function removeAdminAnimal(animalId) {
+  return adapter.removeAnimal(animalId)
+}
+
+export function removeAdminCampaign(campaignId) {
+  return adapter.removeCampaign(campaignId)
+}
+
+export function removeAdminEvent(eventId) {
+  return adapter.removeEvent(eventId)
 }

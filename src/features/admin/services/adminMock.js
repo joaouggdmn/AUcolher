@@ -12,16 +12,27 @@ import { adoptionRequestsSeed } from '../../adocao/data/adoptionRequestsSeed'
 import { requestAnimalSource } from '../../adocao/utils/requestAnimal'
 import * as animaisApi from '../../animais/services/animaisApi'
 import { withAdoptionStatus } from '../../animais/utils/listingStatus'
-import { readAllCampaignsForAdmin, readApprovedDonationsForAdmin } from '../../doacoes/services/doacoesMock'
+import {
+  readAllCampaignsForAdmin,
+  readApprovedDonationsForAdmin,
+  removeCampaignForAdmin,
+} from '../../doacoes/services/doacoesMock'
 import {
   findReportForAdmin,
   readAllReportsForAdmin,
   resolvePendingReportsForAdmin,
 } from '../../denuncias/services/denunciasMock'
 import { reportTargetKey } from '../../denuncias/utils/reportRules'
-import { readAllEventsForAdmin } from '../../eventos/services/eventosMock'
+import { readAllEventsForAdmin, removeEventForAdmin } from '../../eventos/services/eventosMock'
 import { buildSeedAdmin } from '../data/seedAdmin'
-import { banAccount, isAccountBanned, matchesAccount, reactivateAccount } from './moderationMock'
+import {
+  banAccount,
+  isAccountBanned,
+  isAnimalRemoved,
+  matchesAccount,
+  reactivateAccount,
+  removeAnimalListing,
+} from './moderationMock'
 
 // 🔴 Servidor falso do painel do admin: mesmas funções de adminApi.js e os
 // DTOs de docs/api-admin.md. A API ainda não lista contas, então elas vivem
@@ -117,7 +128,10 @@ function adoptedFromRequests(requests, availableById) {
 // Tudo o que o admin enxerga de animais + a situação de cada um ("em
 // processo" e "adotado" também dependem dos pedidos, como no painel da ONG)
 async function loadAnimals(requests) {
-  const available = await fetchAvailableAnimals()
+  // Removido pelo admin: a API ainda lista, o "banco" de moderação sabe
+  const available = (await fetchAvailableAnimals()).map((dto) =>
+    isAnimalRemoved(dto) ? { ...dto, status: 'REMOVED' } : dto
+  )
   const availableById = new Map(available.map((dto) => [String(dto.id), dto]))
   const animals = [...available, ...adoptedFromRequests(requests, availableById)]
 
@@ -236,11 +250,12 @@ function usersStats(accounts, months) {
 // não o mostra mais. Os adotados continuam como histórico
 function animalsStats(animals) {
   const onSite = animals.filter(({ dto }) => !isAccountBanned(dto.owner))
-  const visible = onSite.filter(({ listingStatus }) => listingStatus !== 'INACTIVE')
+  const visible = onSite.filter(({ listingStatus }) => listingStatus !== 'INACTIVE' && listingStatus !== 'REMOVED')
   return {
     available: countBy(onSite, ({ listingStatus }) => listingStatus === 'AVAILABLE'),
     inProgress: countBy(onSite, ({ listingStatus }) => listingStatus === 'IN_PROGRESS'),
     adopted: countBy(animals, ({ listingStatus }) => listingStatus === 'ADOPTED'),
+    removed: countBy(animals, ({ listingStatus }) => listingStatus === 'REMOVED'),
     bySpecies: {
       DOG: countBy(visible, ({ dto }) => dto.species === 'DOG'),
       CAT: countBy(visible, ({ dto }) => dto.species === 'CAT'),
@@ -521,6 +536,43 @@ export async function setUserStatus(userId, active) {
   if (active) reactivateAccount(account)
   else banAndResolve(account)
   return toUserDto({ ...account, active }, animals)
+}
+
+// DELETE /api/admin/animals/{id} — tira o anúncio do site de vez (o dono vê
+// "Removido pela moderação" e não reativa) e resolve as denúncias pendentes
+// contra ele. Os pedidos ativos do animal são cancelados (no mock, pelo
+// AdoptionRequestProvider, que é quem guarda os pedidos)
+export async function removeAnimal(animalId) {
+  await mockDelay()
+  requireAdmin()
+
+  const animals = await loadAnimals(readRequests())
+  const found = animals.find(({ dto }) => isSameId(dto.id, animalId))
+  if (!found) throw mockHttpError(404, 'Anúncio não encontrado.')
+  if (found.listingStatus === 'REMOVED') throw mockHttpError(400, 'Este anúncio já foi removido.')
+  if (found.listingStatus === 'ADOPTED') {
+    throw mockHttpError(400, 'Este animal já foi adotado: o anúncio fica só como histórico.')
+  }
+
+  removeAnimalListing({ id: found.dto.id, ownerId: found.dto.owner?.id, name: found.dto.name })
+  resolvePendingReportsForAdmin(
+    (report) => report.targetType === 'ANIMAL' && isSameId(report.targetId, animalId),
+    'LISTING_REMOVED'
+  )
+}
+
+// DELETE /api/admin/campaigns/{id} — sai do site e para de receber doações
+export async function removeCampaign(campaignId) {
+  await mockDelay()
+  requireAdmin()
+  removeCampaignForAdmin(campaignId)
+}
+
+// DELETE /api/admin/events/{id} — vira cancelado para quem tinha confirmado
+export async function removeEvent(eventId) {
+  await mockDelay()
+  requireAdmin()
+  removeEventForAdmin(eventId)
 }
 
 // ---------- só do mock: dados de teste do painel do admin (features/admin/dev) ----------

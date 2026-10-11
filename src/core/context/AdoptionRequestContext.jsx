@@ -222,6 +222,30 @@ export function AdoptionRequestProvider({ children }) {
     );
   }
 
+  // 🔴 Moderação: remover um anúncio cancela os pedidos ativos do animal, e
+  // as duas partes veem o motivo. Os ids do AUmatch antigo se repetem com os
+  // da API, então o dono também precisa bater e o pedido não pode ser de lá
+  function cancelRequestsOfRemovedAnimal(animal) {
+    const cancelledAt = new Date().toISOString();
+    setRequests((prev) =>
+      prev.map((request) => {
+        const isForAnimal =
+          ACTIVE_STATUSES.includes(request.status) &&
+          request.animal?.source !== "legacy" &&
+          isSameId(request.animalId, animal.id) &&
+          isSameId(request.ownerId, animal.ownerId);
+        if (!isForAnimal) return request;
+        return {
+          ...request,
+          status: "CANCELLED",
+          cancelReason: "LISTING_REMOVED",
+          cancelledFromStatus: request.status,
+          cancelledAt,
+        };
+      }),
+    );
+  }
+
   function saveReview(requestId, authorRole, { rating, comment, author }) {
     if (!REVIEW_AUTHOR_ROLES.includes(authorRole)) return;
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) return;
@@ -273,6 +297,7 @@ export function AdoptionRequestProvider({ children }) {
         requestDeliveryConfirmation,
         concludeRequest,
         cancelRequestsOfBannedAccount,
+        cancelRequestsOfRemovedAnimal,
         saveReview,
         deleteReview,
       }}

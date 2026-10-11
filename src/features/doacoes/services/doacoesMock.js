@@ -76,6 +76,7 @@ function toDonationDto(db, row, { withPix = false, withDonor = false } = {}) {
       title: campaign?.title ?? row.campaign.title,
       ngoName: campaign?.ngo.name ?? row.campaign.ngoName,
       removed: !campaign || campaign.deleted,
+      removedByModeration: Boolean(campaign?.removedByAdmin),
     },
     donor: withDonor ? row.donor : null,
   }
@@ -412,7 +413,29 @@ export function readAllCampaignsForAdmin() {
   const db = store.read()
   return [...db.campaigns]
     .sort(byNewest('createdAt'))
-    .map((row) => ({ ...toCampaignDto(db, row), removed: Boolean(row.deleted) }))
+    .map((row) => ({
+      ...toCampaignDto(db, row),
+      removed: Boolean(row.deleted),
+      removedByModeration: Boolean(row.removedByAdmin),
+    }))
+}
+
+// DELETE /api/admin/campaigns/{id} (o adminMock confere o admin): sai do site
+// como uma exclusão da ONG, mas a linha fica sempre (marcada), para o admin
+// ver o que removeu. Os PIX não pagos são cancelados; os aprovados continuam
+// no total e no histórico de quem doou
+export function removeCampaignForAdmin(id) {
+  const db = store.read()
+  const row = db.campaigns.find((campaign) => isSameId(campaign.id, id))
+  if (!row || row.deleted) throw mockHttpError(404, 'Campanha não encontrada.')
+
+  store.write({
+    ...db,
+    campaigns: db.campaigns.map((campaign) =>
+      campaign.id === row.id ? { ...campaign, deleted: true, removedByAdmin: true } : campaign
+    ),
+    donations: cancelPendingDonations(db.donations, row.id),
+  })
 }
 
 // Toda doação aprovada, com a ONG que recebeu (a campanha de uma doação

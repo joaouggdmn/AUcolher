@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { FaHandHoldingDollar, FaHandHoldingHeart, FaLock, FaReceipt } from 'react-icons/fa6'
+import { FaHandHoldingDollar, FaHandHoldingHeart, FaLock, FaReceipt, FaTrashCan } from 'react-icons/fa6'
 import BarList from '../../../core/components/charts/BarList'
 import ChartCard from '../../../core/components/charts/ChartCard'
 import PanelPage from '../../../core/components/panel/PanelPage'
+import ConfirmDialog from '../../../core/components/ui/ConfirmDialog'
 import StatTile from '../../../core/components/panel/StatTile'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
@@ -15,7 +16,9 @@ import SearchBar from '../../animais/components/SearchBar'
 import { CATEGORIA_OPTIONS } from '../../doacoes/components/filters/filterOptions'
 import ActivityEmptyState from '../../perfil/components/activity/ActivityEmptyState'
 import AdminCampaignRow from '../components/AdminCampaignRow'
-import { useAdminCampaigns } from '../hooks/useAdmin'
+import { useAdminCampaigns, useRemoveCampaign } from '../hooks/useAdmin'
+import { useAdminPanel } from '../panel/useAdminPanel'
+import { removeCampaignDescription } from '../utils/moderationText'
 import { CAMPAIGN_STATUS_META, campaignStatus } from '../utils/listStatus'
 
 const PAGE_SIZE = 20
@@ -34,6 +37,24 @@ function AdminCampaignsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const { notify } = useAdminPanel()
+  const removeCampaign = useRemoveCampaign()
+  // Campanha esperando a confirmação da remoção
+  const [removing, setRemoving] = useState(null)
+
+  function askRemoval(campaign) {
+    removeCampaign.reset()
+    setRemoving(campaign)
+  }
+
+  function handleRemove() {
+    removeCampaign.mutate(removing, {
+      onSuccess: () => {
+        setRemoving(null)
+        notify('Campanha removida.')
+      },
+    })
+  }
 
   // Filtro novo, lista do começo
   function withReset(setter) {
@@ -131,7 +152,7 @@ function AdminCampaignsPage() {
             <>
               <ul className="flex flex-col gap-3">
                 {visible.map((campaign) => (
-                  <AdminCampaignRow key={campaign.id} campaign={campaign} />
+                  <AdminCampaignRow key={campaign.id} campaign={campaign} onRemove={askRemoval} />
                 ))}
               </ul>
               {visibleCount < filtered.length && (
@@ -153,6 +174,21 @@ function AdminCampaignsPage() {
       description="Campanhas de doação de todas as ONGs. As excluídas pela ONG continuam aqui porque as doações delas contam no total."
     >
       {content}
+
+      {removing && (
+        <ConfirmDialog
+          icon={FaTrashCan}
+          variant="danger"
+          title="Remover a campanha?"
+          description={removeCampaignDescription(removing.title)}
+          confirmLabel="Remover"
+          processingLabel="Removendo..."
+          isProcessing={removeCampaign.isPending}
+          error={removeCampaign.isError ? getErrorMessage(removeCampaign.error) : null}
+          onConfirm={handleRemove}
+          onCancel={() => setRemoving(null)}
+        />
+      )}
     </PanelPage>
   )
 }

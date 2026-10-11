@@ -1,6 +1,7 @@
 import * as animaisApi from './animaisApi'
 import { buildAgeLabel } from '../utils/ageHelpers'
-import { isAccountBanned } from '../../admin/services/moderationMock'
+import { mockHttpError } from '../../../core/services/mock/mockStore'
+import { isAccountBanned, isAnimalRemoved } from '../../admin/services/moderationMock'
 
 // Fachada dos animais: as telas só conhecem estas funções e o modelo do
 // frontend. A API já usa os mesmos nomes e valores (DOG, MALE, YEARS...),
@@ -77,10 +78,22 @@ export function toApiFilters({ search = '', filters = {}, page = 0, size = PAGE_
 }
 
 // 🔴 Moderação no modo mock (USE_MOCK_ADMIN): a API ainda não sabe quem o
-// admin baniu, então a fachada esconde os anúncios dessas contas. Com a
-// moderação no backend, a própria API deixa de devolvê-los
+// admin baniu nem o que ele removeu, então a fachada esconde esses anúncios.
+// Com a moderação no backend, a própria API deixa de devolvê-los
 function isOnSite(dto) {
-  return !isAccountBanned(dto.owner)
+  return !isAccountBanned(dto.owner) && !isAnimalRemoved(dto)
+}
+
+function moderationOf(dto) {
+  if (isAnimalRemoved(dto)) return 'REMOVED'
+  return isAccountBanned(dto.owner) ? 'OWNER_BANNED' : null
+}
+
+// Removido é definitivo: o dono não edita, não tira do ar nem reativa
+function assertNotRemoved(id) {
+  if (isAnimalRemoved({ id })) {
+    throw mockHttpError(403, 'Este anúncio foi removido pela moderação e não pode mais ser alterado.')
+  }
 }
 
 // ---------- operações ----------
@@ -99,12 +112,14 @@ export async function listAnimals(options) {
   }
 }
 
-// `moderation`: o anúncio saiu do ar pela moderação ('OWNER_BANNED'). O
-// detalhe mostra "Anúncio indisponível" (o admin ainda vê, com um aviso)
+// `moderation`: o anúncio saiu do ar pela moderação ('REMOVED' ou
+// 'OWNER_BANNED'). O detalhe mostra "Anúncio indisponível" (o admin ainda
+// vê, com um aviso)
 export async function getAnimal(id) {
   const dto = await animaisApi.getAnimal(id)
+  const moderation = moderationOf(dto)
   const animal = toFrontendAnimal(dto)
-  return isOnSite(dto) ? animal : { ...animal, moderation: 'OWNER_BANNED' }
+  return moderation ? { ...animal, moderation } : animal
 }
 
 export async function createAnimal(form, photos) {
@@ -112,21 +127,28 @@ export async function createAnimal(form, photos) {
 }
 
 export async function updateAnimal(id, form, photos) {
+  assertNotRemoved(id)
   return toFrontendAnimal(await animaisApi.updateAnimal(id, toApiAnimal(form, photos)))
 }
 
 // AVAILABLE, ADOPTED (definitivo) ou INACTIVE (tirado do ar)
 export async function changeAnimalStatus(id, status) {
+  assertNotRemoved(id)
   return toFrontendAnimal(await animaisApi.changeAnimalStatus(id, status))
 }
 
 // Exclusão lógica: o anúncio vira INACTIVE
-export function deleteAnimal(id) {
+export async function deleteAnimal(id) {
+  assertNotRemoved(id)
   return animaisApi.deleteAnimal(id)
 }
 
+// O dono vê o anúncio removido pela moderação com `status: 'REMOVED'` (no
+// backend, um status próprio que ele não consegue trocar)
 export async function listMyAnimals() {
-  return (await animaisApi.listMyAnimals()).map(toFrontendAnimal)
+  return (await animaisApi.listMyAnimals())
+    .map((dto) => (isAnimalRemoved(dto) ? { ...dto, status: 'REMOVED' } : dto))
+    .map(toFrontendAnimal)
 }
 
 export async function listUserAnimals(userId) {

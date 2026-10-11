@@ -12,6 +12,9 @@ import {
   listAdminEvents,
   listAdminReports,
   listAdminUsers,
+  removeAdminAnimal,
+  removeAdminCampaign,
+  removeAdminEvent,
   setAdminUserStatus,
 } from '../services/adminService'
 import { reportedAccount } from '../utils/reportCases'
@@ -112,5 +115,35 @@ export function useSetUserStatus() {
       if (!active) cancelRequests(user)
       return invalidate()
     },
+  })
+}
+
+// 🔴 Remover um anúncio também cancela os pedidos ativos do animal: no mock,
+// quem faz isso é o AdoptionRequestProvider. `animal`: { id, ownerId }
+export function useRemoveAnimal() {
+  const invalidate = useInvalidateModeration()
+  const { cancelRequestsOfRemovedAnimal } = useAdoptionRequests()
+  return useMutation({
+    mutationFn: (animal) => removeAdminAnimal(animal.id),
+    onSuccess: (_, animal) => {
+      cancelRequestsOfRemovedAnimal(animal)
+      return invalidate()
+    },
+  })
+}
+
+export function useRemoveCampaign() {
+  const invalidate = useInvalidateModeration()
+  return useMutation({
+    mutationFn: (campaign) => removeAdminCampaign(campaign.id),
+    onSuccess: invalidate,
+  })
+}
+
+export function useRemoveEvent() {
+  const invalidate = useInvalidateModeration()
+  return useMutation({
+    mutationFn: (event) => removeAdminEvent(event.id),
+    onSuccess: invalidate,
   })
 }
