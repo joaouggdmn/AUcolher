@@ -74,7 +74,7 @@ function ChatConversationPanel({ contact, onBack }) {
   // (AWAITING_DELIVERY) — o histórico continua visível, só o input some
   const isAwaitingDelivery = contact.status === "AWAITING_DELIVERY";
   const isConcluded = contact.status === "CONCLUDED";
-  // Uma das contas foi banida pela moderação e o pedido foi cancelado
+  // A moderação baniu uma das contas ou removeu o anúncio, e o pedido foi cancelado
   const isClosedByModeration = contact.status === "CANCELLED";
   const initial = contact.name?.charAt(0)?.toUpperCase() ?? "?";
 
@@ -200,7 +200,9 @@ function ChatConversationPanel({ contact, onBack }) {
       {isClosedByModeration ? (
         <p className="flex shrink-0 items-center justify-center gap-2 border-t bg-rose-50 px-4 py-3.5 text-center text-xs font-semibold text-rose-700">
           <FaBan size={11} className="shrink-0" />
-          Conversa encerrada: a conta de {contact.name} foi suspensa pela moderação do AUcolher e o pedido de adoção foi cancelado.
+          {contact.cancelReason === "LISTING_REMOVED"
+            ? `Conversa encerrada: o anúncio de ${contact.animalName} foi removido pela moderação do AUcolher e o pedido de adoção foi cancelado.`
+            : `Conversa encerrada: a conta de ${contact.name} foi suspensa pela moderação do AUcolher e o pedido de adoção foi cancelado.`}
         </p>
       ) : isConcluded ? (
         <AdoptionConcludedPanel contact={contact} />

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FaBan, FaBoxArchive, FaFlag } from 'react-icons/fa6'
+import { FaBan, FaBoxArchive, FaFlag, FaTrashCan } from 'react-icons/fa6'
 import PanelPage from '../../../core/components/panel/PanelPage'
 import ConfirmDialog from '../../../core/components/ui/ConfirmDialog'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
@@ -8,9 +8,9 @@ import PillToggleGroup from '../../../core/components/ui/filters/PillToggleGroup
 import { getErrorMessage } from '../../../core/utils/apiError'
 import ActivityEmptyState from '../../perfil/components/activity/ActivityEmptyState'
 import ReportCaseCard from '../components/ReportCaseCard'
-import { useAdminReports, useBanReportedAccount, useDismissReports } from '../hooks/useAdmin'
+import { useAdminReports, useBanReportedAccount, useDismissReports, useRemoveAnimal } from '../hooks/useAdmin'
 import { useAdminPanel } from '../panel/useAdminPanel'
-import { banDescription } from '../utils/moderationText'
+import { banDescription, removeListingDescription } from '../utils/moderationText'
 import { byPriority, byResolvedAt, groupReportsIntoCases, reportedAccount } from '../utils/reportCases'
 
 const NO_REPORTS = []
@@ -35,6 +35,7 @@ function AdminReportsPage() {
   const { notify } = useAdminPanel()
   const dismissReports = useDismissReports()
   const banAccount = useBanReportedAccount()
+  const removeAnimal = useRemoveAnimal()
   const [statusFilter, setStatusFilter] = useState('PENDING')
   const [typeFilter, setTypeFilter] = useState('')
   // Caso esperando a confirmação de uma decisão: { action, reportCase }
@@ -45,7 +46,22 @@ function AdminReportsPage() {
   function askConfirmation(action, reportCase) {
     dismissReports.reset()
     banAccount.reset()
+    removeAnimal.reset()
     setConfirming({ action, reportCase })
+  }
+
+  // O animal do caso, no formato que a remoção espera ({ id, ownerId })
+  function handleRemoveListing() {
+    const { reportCase } = confirming
+    removeAnimal.mutate(
+      { id: reportCase.targetId, ownerId: reportCase.target.ownerId },
+      {
+        onSuccess: () => {
+          setConfirming(null)
+          notify('Anúncio removido.')
+        },
+      }
+    )
   }
 
   function handleBan() {
@@ -68,11 +84,21 @@ function AdminReportsPage() {
     })
   }
 
-  // Perfil: banir a conta. Anúncio: banir quem anunciou
+  // Perfil: banir a conta. Anúncio: remover o anúncio ou banir quem anunciou
   function actionsFor(reportCase) {
     if (!reportCase.isPending) return []
     return [
       { label: 'Arquivar', icon: FaBoxArchive, onClick: () => askConfirmation('dismiss', reportCase) },
+      ...(reportCase.targetType === 'ANIMAL'
+        ? [
+            {
+              label: 'Remover anúncio',
+              icon: FaTrashCan,
+              variant: 'danger',
+              onClick: () => askConfirmation('remove', reportCase),
+            },
+          ]
+        : []),
       {
         label: reportCase.targetType === 'USER' ? 'Banir conta' : 'Banir quem anunciou',
         icon: FaBan,
@@ -156,6 +182,21 @@ function AdminReportsPage() {
           isProcessing={dismissReports.isPending}
           error={dismissReports.isError ? getErrorMessage(dismissReports.error) : null}
           onConfirm={handleDismiss}
+          onCancel={() => setConfirming(null)}
+        />
+      )}
+
+      {confirming?.action === 'remove' && (
+        <ConfirmDialog
+          icon={FaTrashCan}
+          variant="danger"
+          title={`Remover o anúncio de ${confirming.reportCase.target.name}?`}
+          description={removeListingDescription(confirming.reportCase.target.name)}
+          confirmLabel="Remover anúncio"
+          processingLabel="Removendo..."
+          isProcessing={removeAnimal.isPending}
+          error={removeAnimal.isError ? getErrorMessage(removeAnimal.error) : null}
+          onConfirm={handleRemoveListing}
           onCancel={() => setConfirming(null)}
         />
       )}

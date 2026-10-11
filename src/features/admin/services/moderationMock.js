@@ -3,15 +3,15 @@ import { USE_MOCK_ADMIN } from '../../../core/utils/constants'
 import { MOCK_MODERACAO_STORE_KEY } from '../../../core/utils/storageKeys'
 import { nowLocalIso } from '../../../core/utils/localDate'
 
-// 🔴 Decisões de moderação no modo mock (USE_MOCK_ADMIN): quem o admin baniu.
-// A API ainda não sabe disso, então o site consulta este "banco" para
-// esconder o conteúdo e recusar o login dessas contas. Com as rotas de
-// moderação no backend, quem filtra é a própria API e tudo aqui responde
-// "ninguém foi banido"
+// 🔴 Decisões de moderação no modo mock (USE_MOCK_ADMIN): quem o admin baniu
+// e quais anúncios de animais ele removeu. A API ainda não sabe disso, então
+// o site consulta este "banco" para esconder o conteúdo e recusar o login
+// dessas contas. Com as rotas de moderação no backend, quem filtra é a
+// própria API e tudo aqui responde "nada foi moderado"
 const store = createMockStore({
   key: MOCK_MODERACAO_STORE_KEY,
   version: 1,
-  seed: () => ({ bannedAccounts: [] }),
+  seed: () => ({ bannedAccounts: [], removedAnimals: [] }),
 })
 
 // Avisa a própria aba (o evento 'storage' só chega nas outras)
@@ -35,6 +35,15 @@ export function readBannedAccounts() {
 // campanha, usuário logado, adotante de um pedido
 export function isAccountBanned(account, bannedAccounts = readBannedAccounts()) {
   return bannedAccounts.some((banned) => matchesAccount(banned, account))
+}
+
+export function readRemovedAnimals() {
+  return USE_MOCK_ADMIN ? store.read().removedAnimals : []
+}
+
+// Os anúncios são da API real, com id único: basta o id
+export function isAnimalRemoved(animal, removedAnimals = readRemovedAnimals()) {
+  return removedAnimals.some((removed) => isSameId(removed.id, animal.id))
 }
 
 // Para o useSyncExternalStore (useModeration): o texto gravado muda a cada
@@ -72,4 +81,12 @@ export function banAccount(account) {
 export function reactivateAccount(account) {
   const db = store.read()
   write({ ...db, bannedAccounts: db.bannedAccounts.filter((banned) => !matchesAccount(banned, account)) })
+}
+
+// Remoção definitiva: o dono não consegue reativar (não há "desfazer")
+export function removeAnimalListing(animal) {
+  const db = store.read()
+  if (isAnimalRemoved(animal, db.removedAnimals)) return
+  const removed = { id: animal.id, ownerId: animal.ownerId ?? null, name: animal.name, removedAt: nowLocalIso() }
+  write({ ...db, removedAnimals: [...db.removedAnimals, removed] })
 }

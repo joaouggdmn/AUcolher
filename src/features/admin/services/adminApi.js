@@ -55,3 +55,17 @@ export async function setUserStatus(userId, active) {
   const { data } = await api.patch(`/admin/users/${userId}/status`, { active })
   return data
 }
+
+// Remover conteúdo (docs/api-admin.md §8). O anúncio também resolve as
+// denúncias pendentes contra ele
+export async function removeAnimal(animalId) {
+  await api.delete(`/admin/animals/${animalId}`)
+}
+
+export async function removeCampaign(campaignId) {
+  await api.delete(`/admin/campaigns/${campaignId}`)
+}
+
+export async function removeEvent(eventId) {
+  await api.delete(`/admin/events/${eventId}`)
+}

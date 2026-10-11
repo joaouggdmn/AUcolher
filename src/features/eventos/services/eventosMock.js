@@ -286,7 +286,25 @@ export async function listMyAttendance() {
 // (adminMock) junta às consultas dele
 export function readAllEventsForAdmin() {
   const db = store.read()
-  return [...db.events].sort((a, b) => byDateAsc(b, a)).map((row) => toDto(db, row))
+  return [...db.events]
+    .sort((a, b) => byDateAsc(b, a))
+    .map((row) => ({ ...toDto(db, row), removedByModeration: Boolean(row.removedByAdmin) }))
+}
+
+// DELETE /api/admin/events/{id} (o adminMock confere o admin): vira
+// CANCELLED, como a exclusão da ONG com confirmados, e quem confirmou vê
+// "Evento cancelado" em Minha conta. A linha fica, marcada, para o admin
+export function removeEventForAdmin(id) {
+  const db = store.read()
+  const row = db.events.find((event) => isSameId(event.id, id))
+  if (!row || row.status === 'CANCELLED') throw mockHttpError(404, 'Evento não encontrado.')
+
+  store.write({
+    ...db,
+    events: db.events.map((event) =>
+      event.id === row.id ? { ...event, status: 'CANCELLED', removedByAdmin: true } : event
+    ),
+  })
 }
 
 // ---------- só do mock: dados de teste do painel (features/ong/panel/dev) ----------

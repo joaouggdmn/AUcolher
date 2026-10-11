@@ -1,17 +1,19 @@
 import { Link } from 'react-router-dom'
-import { FaClock, FaEye, FaTriangleExclamation } from 'react-icons/fa6'
+import { FaClock, FaEye, FaTrashCan, FaTriangleExclamation } from 'react-icons/fa6'
 import CampaignCover from '../../doacoes/components/CampaignCover'
 import DonationProgress from '../../doacoes/components/DonationProgress'
 import { getCategoriaMeta } from '../../doacoes/components/filters/filterOptions'
 import { formatDonationsCount, getDeadlineSummary } from '../../doacoes/utils/campaignDisplay'
-import { CAMPAIGN_STATUS_META, campaignStatus, hasPublicPage } from '../utils/listStatus'
+import { CAMPAIGN_STATUS_META, campaignStatus, canRemove, hasPublicPage } from '../utils/listStatus'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
+const REMOVE_CLASSES =
+  'flex items-center gap-1.5 rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
 
 // Uma campanha na lista do admin: de qual ONG, quanto já arrecadou e até quando.
 // Excluída ou de ONG banida não tem mais página pública, então fica sem link
-function AdminCampaignRow({ campaign }) {
+function AdminCampaignRow({ campaign, onRemove }) {
   const statusKey = campaignStatus(campaign)
   const status = CAMPAIGN_STATUS_META[statusKey]
   const isOffSite = !hasPublicPage(statusKey)
@@ -53,12 +55,18 @@ function AdminCampaignRow({ campaign }) {
         </div>
       </div>
 
-      {!isOffSite && (
+      {canRemove(statusKey) && (
         <div className="flex shrink-0 flex-wrap gap-2">
-          <Link to={`/campanhas/${campaign.id}`} className={ACTION_CLASSES}>
-            <FaEye size={11} />
-            Ver campanha
-          </Link>
+          {!isOffSite && (
+            <Link to={`/campanhas/${campaign.id}`} className={ACTION_CLASSES}>
+              <FaEye size={11} />
+              Ver campanha
+            </Link>
+          )}
+          <button type="button" onClick={() => onRemove(campaign)} className={REMOVE_CLASSES}>
+            <FaTrashCan size={11} />
+            Remover
+          </button>
         </div>
       )}
     </li>

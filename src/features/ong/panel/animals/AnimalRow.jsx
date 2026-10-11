@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaCircleCheck, FaEye, FaEyeSlash, FaHeart, FaPaw, FaPen } from 'react-icons/fa6'
+import { FaCircleCheck, FaEye, FaEyeSlash, FaHeart, FaPaw, FaPen, FaShieldHalved } from 'react-icons/fa6'
 import { SPECIES_OPTIONS } from '../../../animais/components/filters/filterOptions'
 import { LISTING_STATUS_META } from '../../../animais/utils/listingStatus'
 import { PANEL_PATHS } from '../panelPaths'
@@ -16,7 +16,8 @@ function Spinner() {
 }
 
 // Uma linha da lista de animais do painel. As ações seguem o status na API:
-// adotado é definitivo (só dá para ver); fora do ar pode voltar
+// adotado é definitivo (só dá para ver); fora do ar pode voltar; removido
+// pela moderação não tem ação nenhuma
 function AnimalRow({ animal, pendingStatus, onChangeStatus, onMarkAdopted }) {
   const status = LISTING_STATUS_META[animal.listingStatus]
   const isBusy = pendingStatus != null
@@ -52,61 +53,68 @@ function AnimalRow({ animal, pendingStatus, onChangeStatus, onMarkAdopted }) {
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-wrap gap-2">
-        {animal.status !== 'ADOPTED' && (
+      {animal.status === 'REMOVED' ? (
+        <p className="flex max-w-xs shrink-0 items-start gap-1.5 text-xs font-semibold text-rose-600">
+          <FaShieldHalved size={11} className="mt-0.5 shrink-0" />
+          A moderação do AUcolher removeu este anúncio. Ele saiu do site e não pode ser editado nem reativado.
+        </p>
+      ) : (
+        <div className="flex shrink-0 flex-wrap gap-2">
+          {animal.status !== 'ADOPTED' && (
+            <Link
+              to={PANEL_PATHS.animalEdit(animal.id)}
+              className={`${ACTION_CLASSES} border-slate-200 text-slate-600 hover:bg-slate-50`}
+            >
+              <FaPen size={10} />
+              Editar
+            </Link>
+          )}
+
+          {animal.status === 'AVAILABLE' && (
+            <button
+              type="button"
+              onClick={() => onChangeStatus(animal, 'INACTIVE')}
+              disabled={isBusy}
+              className={`${ACTION_CLASSES} border-slate-200 text-slate-600 hover:bg-slate-50`}
+            >
+              {pendingStatus === 'INACTIVE' ? <Spinner /> : <FaEyeSlash size={11} />}
+              Tirar do ar
+            </button>
+          )}
+
+          {animal.status === 'INACTIVE' && (
+            <button
+              type="button"
+              onClick={() => onChangeStatus(animal, 'AVAILABLE')}
+              disabled={isBusy}
+              className={`${ACTION_CLASSES} border-emerald-200 text-emerald-700 hover:bg-emerald-50`}
+            >
+              {pendingStatus === 'AVAILABLE' ? <Spinner /> : <FaEye size={11} />}
+              Colocar no ar
+            </button>
+          )}
+
+          {animal.status !== 'ADOPTED' && (
+            <button
+              type="button"
+              onClick={() => onMarkAdopted(animal)}
+              disabled={isBusy}
+              className={`${ACTION_CLASSES} border-amber-200 text-amber-700 hover:bg-amber-50`}
+            >
+              <FaCircleCheck size={11} />
+              Marcar como {adoptedWord}
+            </button>
+          )}
+
           <Link
-            to={PANEL_PATHS.animalEdit(animal.id)}
-            className={`${ACTION_CLASSES} border-slate-200 text-slate-600 hover:bg-slate-50`}
+            to={`/animais/${animal.id}`}
+            className={`${ACTION_CLASSES} border-slate-200 text-slate-500 hover:bg-slate-50`}
           >
-            <FaPen size={10} />
-            Editar
+            <FaEye size={11} />
+            Ver no site
           </Link>
-        )}
-
-        {animal.status === 'AVAILABLE' && (
-          <button
-            type="button"
-            onClick={() => onChangeStatus(animal, 'INACTIVE')}
-            disabled={isBusy}
-            className={`${ACTION_CLASSES} border-slate-200 text-slate-600 hover:bg-slate-50`}
-          >
-            {pendingStatus === 'INACTIVE' ? <Spinner /> : <FaEyeSlash size={11} />}
-            Tirar do ar
-          </button>
-        )}
-
-        {animal.status === 'INACTIVE' && (
-          <button
-            type="button"
-            onClick={() => onChangeStatus(animal, 'AVAILABLE')}
-            disabled={isBusy}
-            className={`${ACTION_CLASSES} border-emerald-200 text-emerald-700 hover:bg-emerald-50`}
-          >
-            {pendingStatus === 'AVAILABLE' ? <Spinner /> : <FaEye size={11} />}
-            Colocar no ar
-          </button>
-        )}
-
-        {animal.status !== 'ADOPTED' && (
-          <button
-            type="button"
-            onClick={() => onMarkAdopted(animal)}
-            disabled={isBusy}
-            className={`${ACTION_CLASSES} border-amber-200 text-amber-700 hover:bg-amber-50`}
-          >
-            <FaCircleCheck size={11} />
-            Marcar como {adoptedWord}
-          </button>
-        )}
-
-        <Link
-          to={`/animais/${animal.id}`}
-          className={`${ACTION_CLASSES} border-slate-200 text-slate-500 hover:bg-slate-50`}
-        >
-          <FaEye size={11} />
-          Ver no site
-        </Link>
-      </div>
+        </div>
+      )}
     </li>
   )
 }

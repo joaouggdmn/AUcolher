@@ -135,9 +135,11 @@ function AnimalDetailsPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
-      {animal.moderation === "OWNER_BANNED" && (
+      {animal.moderation && (
         <ModerationNotice>
-          A conta de quem anunciou foi banida: este anúncio não aparece mais para ninguém no site.
+          {animal.moderation === "REMOVED"
+            ? "Anúncio removido pela moderação: ele não aparece mais para ninguém no site."
+            : "A conta de quem anunciou foi banida: este anúncio não aparece mais para ninguém no site."}
         </ModerationNotice>
       )}
 
