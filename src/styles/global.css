@@ -88,6 +88,22 @@ body {
   animation: fade-in 0.25s ease-out both;
 }
 
+/* Impressão ("Exportar PDF" do painel do admin): folha A4 com margem, e as
+   barras dos gráficos (que são cor de fundo) saem coloridas como na tela —
+   sem isso o navegador economiza tinta e imprime tudo em branco */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  html,
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
 /* Barra de rolagem fina e discreta para áreas de fundo escuro (barra
    lateral do painel da ONG) — a padrão do navegador é clara e grossa */
 .scrollbar-dark {

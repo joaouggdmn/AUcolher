@@ -25,4 +25,13 @@ export const queryKeys = {
     mine: (userId) => ['doacoes', 'mine', String(userId)],
     received: (userId) => ['doacoes', 'received', String(userId)],
   },
+  // Painel do admin: tudo da plataforma, igual para qualquer conta admin
+  admin: {
+    all: ['admin'],
+    stats: ['admin', 'stats'],
+    users: ['admin', 'users'],
+    animals: ['admin', 'animals'],
+    campaigns: ['admin', 'campaigns'],
+    events: ['admin', 'events'],
+  },
 }

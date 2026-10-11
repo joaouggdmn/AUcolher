@@ -1,13 +1,13 @@
+import BarList from '../../../../core/components/charts/BarList'
+import ChartCard from '../../../../core/components/charts/ChartCard'
+import ColumnChart from '../../../../core/components/charts/ColumnChart'
+import PanelPage from '../../../../core/components/panel/PanelPage'
 import AnimalStatusChart from '../../components/dashboard/charts/AnimalStatusChart'
-import BarList from '../../components/dashboard/charts/BarList'
-import ChartCard from '../../components/dashboard/charts/ChartCard'
-import ColumnChart from '../../components/dashboard/charts/ColumnChart'
 import { adoptionFunnel, CHART_MONTHS, monthlyDonationColumns } from '../../utils/panelCharts'
 import DemoDataCard from '../dev/DemoDataCard'
 import AttentionList from '../overview/AttentionList'
 import OverviewTiles from '../overview/OverviewTiles'
 import RecentActivity from '../overview/RecentActivity'
-import PanelPage from '../PanelPage'
 import { useOngPanel } from '../useOngPanel'
 
 function ChartMessage({ children }) {

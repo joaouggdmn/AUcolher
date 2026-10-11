@@ -5,6 +5,7 @@ import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
+import { getHomePath } from '../../../core/utils/panelLinks'
 
 function LoginPage() {
   const { login } = useAuth()
@@ -27,8 +28,9 @@ function LoginPage() {
     setError(null)
 
     try {
-      await login(formData)
-      const destination = location.state?.from?.pathname || '/'
+      const loggedUser = await login(formData)
+      // Mesmo destino do GuestRoute: a página de origem ou o início do papel
+      const destination = location.state?.from?.pathname || getHomePath(loggedUser.userType)
       navigate(destination, { replace: true })
     } catch (err) {
       setError(getErrorMessage(err, 'E-mail ou senha inválidos. Tente novamente.'))

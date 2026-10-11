@@ -11,6 +11,8 @@ export const LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile' // �
 export const MOCK_EVENTOS_STORE_KEY = 'aucolher_mock_eventos'
 // "Banco" falso de campanhas + doações (mesmo mockStore)
 export const MOCK_CAMPANHAS_STORE_KEY = 'aucolher_mock_campanhas'
+// "Banco" falso do painel do admin: as contas da plataforma (mesmo mockStore)
+export const MOCK_ADMIN_STORE_KEY = 'aucolher_mock_admin'
 
 // Chave dinâmica: cada conversa (match aceito) tem seu próprio histórico
 // isolado no localStorage — centralizado aqui para não haver 2 lugares

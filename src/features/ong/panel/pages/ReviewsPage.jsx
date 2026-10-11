@@ -1,7 +1,7 @@
 import { useAuth } from '../../../../core/context/AuthContext'
+import PanelPage from '../../../../core/components/panel/PanelPage'
 import { useUserReviews } from '../../../avaliacoes/hooks/useUserReviews'
 import ProfileReviewsList from '../../../perfil/components/public/ProfileReviewsList'
-import PanelPage from '../PanelPage'
 
 function ReviewsPage() {
   const { user } = useAuth()
