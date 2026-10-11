@@ -1,4 +1,5 @@
-// Barras horizontais com o valor na ponta. `note` vai ao lado do valor (ex.: %).
+// Barras horizontais com o valor na ponta. `note` vai ao lado do valor (ex.: %)
+// e `valueText` troca o número escrito (ex.: em reais), sem mudar a barra.
 // Uma grade só para a lista inteira: a coluna dos rótulos tem a largura do
 // maior, e todas as barras partem da mesma linha. A barra para 4.5rem antes
 // do fim, que é o espaço do valor da maior. No celular o rótulo sobe para
@@ -20,7 +21,7 @@ function BarList({ items }) {
               />
             )}
             <span className="whitespace-nowrap text-xs font-bold text-emerald-950">
-              {item.value}
+              {item.valueText ?? item.value}
               {item.note && <span className="font-normal text-slate-400"> · {item.note}</span>}
             </span>
           </span>

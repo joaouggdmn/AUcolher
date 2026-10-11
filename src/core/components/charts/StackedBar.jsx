@@ -11,8 +11,10 @@ function StackedBar({ segments }) {
       <div className="flex h-3 gap-0.5">
         {segments
           .filter((segment) => segment.value > 0)
-          .map((segment) => {
+          .map((segment, index, visible) => {
             const share = `${Math.round((segment.value / total) * 100)}%`
+            // Primeiro e último segmentos abrem a dica para dentro da barra
+            const align = index === 0 ? 'start' : index === visible.length - 1 ? 'end' : 'center'
             return (
               <div
                 key={segment.key}
@@ -21,7 +23,7 @@ function StackedBar({ segments }) {
                 style={{ flexGrow: segment.value }}
                 className={`group relative min-w-1 basis-0 outline-none transition-[filter] duration-150 first:rounded-l last:rounded-r hover:brightness-110 focus-visible:ring-2 focus-visible:ring-emerald-950/30 ${segment.colorClass}`}
               >
-                <ChartTooltip value={`${segment.value} · ${share}`} label={segment.label} />
+                <ChartTooltip value={`${segment.value} · ${share}`} label={segment.label} align={align} />
               </div>
             )
           })}

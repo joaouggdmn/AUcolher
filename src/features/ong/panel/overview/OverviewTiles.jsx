@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
 import { FaCalendarDays, FaHandHoldingDollar, FaHandHoldingHeart, FaHouseChimney, FaInbox, FaPaw } from 'react-icons/fa6'
+import StatTile from '../../../../core/components/panel/StatTile'
 import { formatCurrency } from '../../../../core/utils/currency'
 import { PANEL_PATHS } from '../panelPaths'
 
@@ -9,24 +9,6 @@ function plural(count, singular, pluralForm) {
 
 function formatDayMonth(isoDate) {
   return new Date(`${isoDate}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
-}
-
-function OverviewTile({ to, icon: Icon, value, label, caption }) {
-  return (
-    <Link
-      to={to}
-      className="flex flex-col items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-emerald-200 hover:shadow-md"
-    >
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
-        <Icon size={15} />
-      </span>
-      <span className="min-w-0 max-w-full">
-        <span className="block text-2xl font-black tracking-tight text-emerald-950">{value}</span>
-        <span className="block text-sm font-bold leading-snug text-emerald-950">{label}</span>
-        <span className="mt-0.5 block truncate text-xs text-slate-500">{caption}</span>
-      </span>
-    </Link>
-  )
 }
 
 // Os números de cada área; o clique leva para a seção
@@ -93,7 +75,7 @@ function OverviewTiles({ stats, loading }) {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {tiles.map(({ key, ...tile }) => (
-        <OverviewTile key={key} {...tile} />
+        <StatTile key={key} {...tile} />
       ))}
     </div>
   )

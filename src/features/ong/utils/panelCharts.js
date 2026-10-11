@@ -38,9 +38,10 @@ export function countAnimalsByStatus(animals) {
   )
 }
 
-export function animalStatusSegments(animals) {
-  const counts = countAnimalsByStatus(animals)
-  return STATUS_ORDER.map((status) => ({
+// Os gráficos também aceitam contagens prontas ({ AVAILABLE: 3, ... }), que
+// é o que o painel do admin recebe da API. Só entram as situações presentes
+export function animalStatusSegmentsFromCounts(counts) {
+  return STATUS_ORDER.filter((status) => status in counts).map((status) => ({
     key: status,
     label: LISTING_STATUS_META[status].label,
     value: counts[status],
@@ -48,22 +49,44 @@ export function animalStatusSegments(animals) {
   }))
 }
 
+export function animalStatusSegments(animals) {
+  return animalStatusSegmentsFromCounts(countAnimalsByStatus(animals))
+}
+
 // "Outros" só aparece se houver algum
-export function speciesBars(animals) {
+export function speciesBarsFromCounts(bySpecies) {
   return SPECIES.map(({ key, label }) => ({
     key,
     label,
-    value: animals.filter((animal) => animal.species === key).length,
+    value: bySpecies[key] ?? 0,
     colorClass: 'bg-emerald-600',
   })).filter((bar) => bar.key !== 'OTHER' || bar.value > 0)
 }
 
-export function adoptionFunnel(requests) {
-  return FUNNEL_STAGES.map(({ statuses, ...stage }) => {
-    const value = statuses ? requests.filter((request) => statuses.includes(request.status)).length : requests.length
-    const share = requests.length > 0 ? Math.round((value / requests.length) * 100) : 0
-    return { ...stage, value, note: `${share}%` }
+export function speciesBars(animals) {
+  const bySpecies = Object.fromEntries(
+    SPECIES.map(({ key }) => [key, animals.filter((animal) => animal.species === key).length])
+  )
+  return speciesBarsFromCounts(bySpecies)
+}
+
+// `funnel`: { received, accepted, delivery, concluded }, as chaves das etapas
+export function adoptionFunnelFromCounts(funnel) {
+  return FUNNEL_STAGES.map(({ key, label, colorClass }) => {
+    const value = funnel[key] ?? 0
+    const share = funnel.received > 0 ? Math.round((value / funnel.received) * 100) : 0
+    return { key, label, colorClass, value, note: `${share}%` }
   })
+}
+
+export function adoptionFunnel(requests) {
+  const funnel = Object.fromEntries(
+    FUNNEL_STAGES.map(({ key, statuses }) => [
+      key,
+      statuses ? requests.filter((request) => statuses.includes(request.status)).length : requests.length,
+    ])
+  )
+  return adoptionFunnelFromCounts(funnel)
 }
 
 function capitalize(text) {
