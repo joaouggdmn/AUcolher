@@ -10,7 +10,7 @@ function VerifiedBadge({ size = 'md' }) {
 
   return (
     <span
-      title="CNPJ ativo e cadastro aprovado pela equipe AUcolher"
+      title="ONG cadastrada com CNPJ na AUcolher"
       className={`inline-flex w-fit items-center rounded-full bg-gradient-to-r from-amber-400 to-amber-500 font-extrabold text-emerald-950 shadow-md shadow-amber-500/30 ${styles.wrapper}`}
     >
       <FaShieldHalved size={styles.icon} />
