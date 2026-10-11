@@ -16,8 +16,11 @@ const STATUS_META = {
   },
 };
 
+// Cancelado porque o admin baniu o adotante (regras §8)
+const BANNED_META = { ...STATUS_META.CANCELLED, label: "Cancelado — conta suspensa" };
+
 function ResolvedRequestRow({ request }) {
-  const meta = STATUS_META[request.status];
+  const meta = request.cancelReason === "ACCOUNT_BANNED" ? BANNED_META : STATUS_META[request.status];
   const Icon = meta.icon;
 
   return (

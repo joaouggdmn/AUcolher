@@ -40,4 +40,11 @@ export const queryKeys = {
     events: ['admin', 'events'],
     reports: ['admin', 'reports'],
   },
+  // Prefixos de outros módulos (as chaves completas moram nos hooks deles)
+  // que uma decisão de moderação precisa atualizar
+  moderated: {
+    animals: ['animals'],
+    favorites: ['favorites'],
+    publicProfile: ['public-profile'],
+  },
 }

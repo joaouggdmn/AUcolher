@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FaBoxArchive, FaFlag } from 'react-icons/fa6'
+import { FaBan, FaBoxArchive, FaFlag } from 'react-icons/fa6'
 import PanelPage from '../../../core/components/panel/PanelPage'
 import ConfirmDialog from '../../../core/components/ui/ConfirmDialog'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
@@ -8,9 +8,10 @@ import PillToggleGroup from '../../../core/components/ui/filters/PillToggleGroup
 import { getErrorMessage } from '../../../core/utils/apiError'
 import ActivityEmptyState from '../../perfil/components/activity/ActivityEmptyState'
 import ReportCaseCard from '../components/ReportCaseCard'
-import { useAdminReports, useDismissReports } from '../hooks/useAdmin'
+import { useAdminReports, useBanReportedAccount, useDismissReports } from '../hooks/useAdmin'
 import { useAdminPanel } from '../panel/useAdminPanel'
-import { byPriority, byResolvedAt, groupReportsIntoCases } from '../utils/reportCases'
+import { banDescription } from '../utils/moderationText'
+import { byPriority, byResolvedAt, groupReportsIntoCases, reportedAccount } from '../utils/reportCases'
 
 const NO_REPORTS = []
 
@@ -33,6 +34,7 @@ function AdminReportsPage() {
   const { data: reports = NO_REPORTS, isLoading, error, refetch } = useAdminReports()
   const { notify } = useAdminPanel()
   const dismissReports = useDismissReports()
+  const banAccount = useBanReportedAccount()
   const [statusFilter, setStatusFilter] = useState('PENDING')
   const [typeFilter, setTypeFilter] = useState('')
   // Caso esperando a confirmação de uma decisão: { action, reportCase }
@@ -42,7 +44,18 @@ function AdminReportsPage() {
 
   function askConfirmation(action, reportCase) {
     dismissReports.reset()
+    banAccount.reset()
     setConfirming({ action, reportCase })
+  }
+
+  function handleBan() {
+    const { reportCase } = confirming
+    banAccount.mutate(reportCase, {
+      onSuccess: () => {
+        setConfirming(null)
+        notify('Conta banida.')
+      },
+    })
   }
 
   function handleDismiss() {
@@ -55,9 +68,18 @@ function AdminReportsPage() {
     })
   }
 
+  // Perfil: banir a conta. Anúncio: banir quem anunciou
   function actionsFor(reportCase) {
     if (!reportCase.isPending) return []
-    return [{ label: 'Arquivar', icon: FaBoxArchive, onClick: () => askConfirmation('dismiss', reportCase) }]
+    return [
+      { label: 'Arquivar', icon: FaBoxArchive, onClick: () => askConfirmation('dismiss', reportCase) },
+      {
+        label: reportCase.targetType === 'USER' ? 'Banir conta' : 'Banir quem anunciou',
+        icon: FaBan,
+        variant: 'danger',
+        onClick: () => askConfirmation('ban', reportCase),
+      },
+    ]
   }
 
   let content
@@ -134,6 +156,26 @@ function AdminReportsPage() {
           isProcessing={dismissReports.isPending}
           error={dismissReports.isError ? getErrorMessage(dismissReports.error) : null}
           onConfirm={handleDismiss}
+          onCancel={() => setConfirming(null)}
+        />
+      )}
+
+      {confirming?.action === 'ban' && (
+        <ConfirmDialog
+          icon={FaBan}
+          variant="danger"
+          title={`Banir ${reportedAccount(confirming.reportCase).name}?`}
+          description={banDescription(
+            reportedAccount(confirming.reportCase).name,
+            confirming.reportCase.targetType === 'USER'
+              ? confirming.reportCase.target.userType
+              : confirming.reportCase.target.ownerUserType
+          )}
+          confirmLabel="Banir conta"
+          processingLabel="Banindo..."
+          isProcessing={banAccount.isPending}
+          error={banAccount.isError ? getErrorMessage(banAccount.error) : null}
+          onConfirm={handleBan}
           onCancel={() => setConfirming(null)}
         />
       )}

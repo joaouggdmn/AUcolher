@@ -3,6 +3,16 @@ import { useAuth } from "../context/AuthContext";
 import { useAdoptionRequests } from "../context/AdoptionRequestContext";
 import { animalDisplayName } from "../../features/adocao/utils/requestAnimal";
 
+// Conversa que já existia (pedido aceito ou aguardando entrega) e foi
+// cancelada porque uma das contas foi banida: continua visível, travada
+function isChatClosedByModeration(request) {
+  return (
+    request.status === "CANCELLED" &&
+    request.cancelReason === "ACCOUNT_BANNED" &&
+    ["ACCEPTED", "AWAITING_DELIVERY"].includes(request.cancelledFromStatus)
+  );
+}
+
 export function useChatContacts() {
   const { user } = useAuth();
   const { requests } = useAdoptionRequests();
@@ -19,7 +29,8 @@ export function useChatContacts() {
           (request) =>
             request.status === "ACCEPTED" ||
             request.status === "AWAITING_DELIVERY" ||
-            request.status === "CONCLUDED",
+            request.status === "CONCLUDED" ||
+            isChatClosedByModeration(request),
         )
         .map((request) => {
           const { animal } = request;

@@ -8,6 +8,7 @@ import {
   nextId,
 } from '../../../core/services/mock/mockStore'
 import { MOCK_EVENTOS_STORE_KEY } from '../../../core/utils/storageKeys'
+import { isAccountBanned } from '../../admin/services/moderationMock'
 import { addDaysIso, nowLocalIso, todayLocalIso } from '../../../core/utils/localDate'
 import { buildSeedEventos, DEMO_ATTENDANCE_EVENT_IDS } from '../data/seedEventos'
 import { getEventPayloadErrors } from '../utils/eventoRules'
@@ -61,10 +62,11 @@ function requireOwner(row, user) {
   if (!isSameId(row.ngo.id, user.id)) throw mockHttpError(403, 'Só a ONG que criou o evento pode fazer isso.')
 }
 
-// Cancelado é a exclusão lógica: para as rotas comuns ele "não existe" mais
+// Cancelado é a exclusão lógica: para as rotas comuns ele "não existe" mais.
+// Evento de ONG banida também sai do site
 function findActiveRow(db, id) {
   const row = db.events.find((event) => isSameId(event.id, id))
-  if (!row || row.status === 'CANCELLED') throw mockHttpError(404, 'Evento não encontrado.')
+  if (!row || row.status === 'CANCELLED' || isAccountBanned(row.ngo)) throw mockHttpError(404, 'Evento não encontrado.')
   return row
 }
 
@@ -72,7 +74,7 @@ function findActiveRow(db, id) {
 // confirmado entende por que não consegue mais mexer
 function findRowForAttendance(db, id, user) {
   const row = db.events.find((event) => isSameId(event.id, id))
-  if (!row) throw mockHttpError(404, 'Evento não encontrado.')
+  if (!row || isAccountBanned(row.ngo)) throw mockHttpError(404, 'Evento não encontrado.')
   if (row.status === 'CANCELLED') throw mockHttpError(400, 'Este evento foi cancelado.')
   if (isPast(row)) throw mockHttpError(400, 'Este evento já aconteceu.')
   if (isSameId(row.ngo.id, user.id)) {
@@ -136,7 +138,7 @@ export async function listEvents({ ngoId } = {}) {
   const today = todayLocalIso()
 
   return db.events
-    .filter((row) => row.status === 'ACTIVE' && row.date >= today)
+    .filter((row) => row.status === 'ACTIVE' && row.date >= today && !isAccountBanned(row.ngo))
     .filter((row) => ngoId == null || isSameId(row.ngo.id, ngoId))
     .sort(byDateAsc)
     .map((row) => toDto(db, row))

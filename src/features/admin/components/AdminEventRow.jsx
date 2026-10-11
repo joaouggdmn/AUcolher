@@ -4,7 +4,7 @@ import CalendarDateBadge from '../../eventos/components/CalendarDateBadge'
 import { getCategoriaMeta } from '../../eventos/components/filters/filterOptions'
 import { formatTimeRange } from '../../eventos/utils/dateHelpers'
 import { getAttendanceSummary } from '../../eventos/utils/eventDisplay'
-import { EVENT_STATUS_META, eventStatus } from '../utils/listStatus'
+import { EVENT_STATUS_META, eventStatus, hasPublicPage } from '../utils/listStatus'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
@@ -16,7 +16,8 @@ const SUMMARY_TONES = {
 }
 
 // Um evento na lista do admin: quando, onde, de qual ONG e quantos
-// confirmaram. Cancelado não tem mais página pública, então fica sem link
+// confirmaram. Cancelado ou de ONG banida não tem mais página pública, então
+// fica sem link
 function AdminEventRow({ event }) {
   const statusKey = eventStatus(event)
   const status = EVENT_STATUS_META[statusKey]
@@ -49,7 +50,7 @@ function AdminEventRow({ event }) {
         </div>
       </div>
 
-      {statusKey !== 'CANCELLED' && (
+      {hasPublicPage(statusKey) && (
         <div className="flex shrink-0 flex-wrap gap-2">
           <Link to={`/eventos/${event.id}`} className={ACTION_CLASSES}>
             <FaEye size={11} />

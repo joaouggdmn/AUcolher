@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { loginRequest, registerRequest } from '../services/authService'
+import { isAccountBanned, subscribeModeration } from '../../features/admin/services/moderationMock'
 import {
+  ACCOUNT_SUSPENDED_FLAG_KEY,
   TOKEN_STORAGE_KEY,
   TOKEN_TYPE_STORAGE_KEY,
   USER_STORAGE_KEY,
@@ -8,6 +10,14 @@ import {
 } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
+
+function isStoredSessionOf(user) {
+  try {
+    return String(JSON.parse(localStorage.getItem(USER_STORAGE_KEY))?.id) === String(user.id)
+  } catch {
+    return false
+  }
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -24,6 +34,11 @@ export function AuthProvider({ children }) {
         // Sessão salva antes da API em inglês (usuário com `cidade`/`estado`):
         // descarta e pede um novo login, que traz o perfil no formato atual
         if ('cidade' in parsedUser) throw new Error('sessão em formato antigo')
+        // Conta banida enquanto estava fora: a sessão salva não vale mais
+        if (isAccountBanned(parsedUser)) {
+          sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
+          throw new Error('conta suspensa')
+        }
         setUser(parsedUser)
         setIsAuthenticated(true)
       } catch {
@@ -42,6 +57,25 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
+  // 🔴 Moderação no modo mock: se o admin banir a conta logada (em outra
+  // aba), a sessão cai na hora e o login explica o motivo. As abas dividem a
+  // mesma sessão salva: se outra conta já entrou por cima (o próprio admin,
+  // por exemplo), só esta aba sai e a sessão salva fica como está
+  useEffect(() => {
+    if (!user) return undefined
+    return subscribeModeration(() => {
+      if (!isAccountBanned(user)) return
+      sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
+      if (isStoredSessionOf(user)) {
+        logout()
+      } else {
+        setUser(null)
+        setIsAuthenticated(false)
+      }
+      window.location.assign('/login')
+    })
+  }, [user])
+
   // Só e-mail e senha — o papel (userType) vem do payload da API
   async function login({ email, password }) {
     const { token, tokenType, user: loggedUser } = await loginRequest({ email, password })
@@ -57,6 +91,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem(TOKEN_STORAGE_KEY, token)
     localStorage.setItem(TOKEN_TYPE_STORAGE_KEY, tokenType)
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mergedUser))
+    sessionStorage.removeItem(ACCOUNT_SUSPENDED_FLAG_KEY)
 
     setUser(mergedUser)
     setIsAuthenticated(true)

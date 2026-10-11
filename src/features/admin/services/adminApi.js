@@ -41,3 +41,17 @@ export async function dismissReports(reportId) {
   const { data } = await api.post(`/admin/reports/${reportId}/dismiss`)
   return data
 }
+
+// Bane a conta denunciada (perfil) ou a dona do anúncio denunciado
+export async function banReportedAccount(reportId) {
+  const { data } = await api.post(`/admin/reports/${reportId}/ban`)
+  return data
+}
+
+// ---------- moderação direta (docs/api-admin.md §7) ----------
+
+// Banir (active: false) ou reativar (true) uma conta
+export async function setUserStatus(userId, active) {
+  const { data } = await api.patch(`/admin/users/${userId}/status`, { active })
+  return data
+}

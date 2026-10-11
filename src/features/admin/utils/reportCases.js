@@ -62,6 +62,13 @@ export function byResolvedAt(a, b) {
   return (b.resolvedAt ?? '').localeCompare(a.resolvedAt ?? '')
 }
 
+// A conta que um banimento atinge: a do perfil denunciado ou a dona do anúncio
+export function reportedAccount(reportCase) {
+  const { target } = reportCase
+  if (reportCase.targetType === 'USER') return { id: reportCase.targetId, name: target.name, userType: target.userType }
+  return { id: target.ownerId, name: target.ownerName, userType: target.ownerUserType }
+}
+
 // Badge da barra lateral: quantos alvos esperam uma decisão
 export function countPendingCases(reports) {
   return new Set(reports.filter((report) => report.isPending).map(reportTargetKey)).size
