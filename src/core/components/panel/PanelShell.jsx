@@ -43,13 +43,15 @@ function PanelShell({ title, nav, context }) {
   }, [isDrawerOpen, closeDrawer])
 
   return (
-    // --fixed-left-offset: largura da barra lateral, para barras fixas das páginas não passarem por cima
-    <div className="flex h-screen overflow-hidden bg-slate-50 lg:[--fixed-left-offset:16rem]">
-      <aside className="hidden w-64 shrink-0 lg:flex">
+    // --fixed-left-offset: largura da barra lateral, para barras fixas das páginas não passarem por cima.
+    // Na impressão (PDF) sai só o conteúdo, em altura livre: sem barra lateral,
+    // cabeçalho do celular nem a rolagem própria da área principal
+    <div className="flex h-screen overflow-hidden bg-slate-50 lg:[--fixed-left-offset:16rem] print:block print:h-auto print:overflow-visible print:bg-white">
+      <aside className="hidden w-64 shrink-0 lg:flex print:hidden">
         <PanelNav {...nav} />
       </aside>
 
-      <div className={`fixed inset-0 z-[60] lg:hidden ${isDrawerOpen ? '' : 'pointer-events-none'}`} inert={!isDrawerOpen}>
+      <div className={`fixed inset-0 z-[60] lg:hidden print:hidden ${isDrawerOpen ? '' : 'pointer-events-none'}`} inert={!isDrawerOpen}>
         <div
           aria-hidden="true"
           onClick={closeDrawer}
@@ -70,7 +72,7 @@ function PanelShell({ title, nav, context }) {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-100 bg-white px-3 lg:hidden">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-100 bg-white px-3 lg:hidden print:hidden">
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
@@ -87,7 +89,7 @@ function PanelShell({ title, nav, context }) {
           <span className="text-sm font-semibold text-slate-400">{title}</span>
         </header>
 
-        <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto">
+        <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto print:overflow-visible">
           {/* key força remontagem a cada seção, disparando a animação de entrada.
               Só opacidade: um transform aqui prenderia os modais `fixed` das páginas */}
           <div key={location.pathname} className="animate-fade-in">
@@ -96,7 +98,9 @@ function PanelShell({ title, nav, context }) {
         </main>
       </div>
 
-      <SuccessToast message={notice ?? flash} onClose={closeToast} />
+      <div className="print:hidden">
+        <SuccessToast message={notice ?? flash} onClose={closeToast} />
+      </div>
     </div>
   )
 }

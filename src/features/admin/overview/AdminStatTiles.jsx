@@ -91,7 +91,7 @@ function AdminStatTiles({ stats }) {
   ]
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 print:grid-cols-4">
       {tiles.map(({ key, ...tile }) => (
         <StatTile key={key} {...tile} />
       ))}

@@ -1,3 +1,4 @@
+import { FaFilePdf } from 'react-icons/fa6'
 import BarList from '../../../core/components/charts/BarList'
 import ChartCard from '../../../core/components/charts/ChartCard'
 import ColumnChart from '../../../core/components/charts/ColumnChart'
@@ -18,6 +19,7 @@ import { useAdminStats } from '../hooks/useAdmin'
 import AdminRecentActivity from '../overview/AdminRecentActivity'
 import AdminStatTiles from '../overview/AdminStatTiles'
 import NgoRankingCard from '../overview/NgoRankingCard'
+import PrintReportHeader from '../overview/PrintReportHeader'
 
 function plural(count, singular, pluralForm) {
   return count === 1 ? singular : pluralForm
@@ -36,10 +38,16 @@ function MonthlyChart({ columns, colorClass, emptyMessage }) {
 function AdminOverviewPage() {
   const { data: stats, isLoading, error, refetch } = useAdminStats()
 
+  // Exportar = imprimir: o navegador oferece "Salvar como PDF", com o layout
+  // de impressão (sem barra lateral, A4, cabeçalho do relatório)
+  const actions = stats ? [{ label: 'Exportar PDF', icon: FaFilePdf, onClick: () => window.print() }] : []
+
   return (
     <PanelPage
       title="Visão geral"
       description="Como a plataforma está hoje: contas, animais, adoções, doações e eventos."
+      actions={actions}
+      printHeader={<PrintReportHeader />}
       framed={false}
     >
       {isLoading ? (
@@ -70,7 +78,7 @@ function OverviewContent({ stats }) {
     <div className="flex flex-col gap-6">
       <AdminStatTiles stats={stats} />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 print:grid-cols-2">
         <ChartCard title="Adoções concluídas por mês" subtitle={`Últimos ${CHART_MONTHS} meses, em toda a plataforma`}>
           <MonthlyChart
             columns={monthColumns(adoptions.concludedByMonth, {
@@ -90,7 +98,7 @@ function OverviewContent({ stats }) {
         </ChartCard>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 print:grid-cols-2">
         <ChartCard title="Novas contas por mês" subtitle={`Cadastros nos últimos ${CHART_MONTHS} meses`}>
           <MonthlyChart
             columns={monthColumns(users.newByMonth, {
@@ -126,7 +134,7 @@ function OverviewContent({ stats }) {
         </ChartCard>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 print:grid-cols-2">
         <ChartCard title="Do pedido à adoção" subtitle="Quantos pedidos chegaram a cada etapa, em toda a plataforma">
           {adoptions.funnel.received > 0 ? (
             <BarList items={adoptionFunnelFromCounts(adoptions.funnel)} />
