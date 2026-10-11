@@ -4,6 +4,7 @@ import {
   isSameId,
   mockDelay,
   mockHttpError,
+  nextId,
 } from '../../../core/services/mock/mockStore'
 import { ADOPTION_REQUESTS_STORAGE_KEY, MOCK_ADMIN_STORE_KEY } from '../../../core/utils/storageKeys'
 import { toLocalIsoDate, todayLocalIso } from '../../../core/utils/localDate'
@@ -400,4 +401,23 @@ export async function listEvents() {
   await mockDelay()
   requireAdmin()
   return readAllEventsForAdmin()
+}
+
+// ---------- só do mock: dados de teste do painel do admin (features/admin/dev) ----------
+
+// Contas de teste, marcadas com `adminDemo` para removeDemoAccounts apagar só elas
+export async function insertDemoAccounts(templates) {
+  await mockDelay()
+  requireAdmin()
+  const db = store.read()
+
+  let id = nextId(db.accounts)
+  const accounts = templates.map((template) => ({ ...template, id: id++, active: true, adminDemo: true }))
+  store.write({ ...db, accounts: [...db.accounts, ...accounts] })
+}
+
+export async function removeDemoAccounts() {
+  await mockDelay()
+  const db = store.read()
+  store.write({ ...db, accounts: db.accounts.filter((account) => !account.adminDemo) })
 }

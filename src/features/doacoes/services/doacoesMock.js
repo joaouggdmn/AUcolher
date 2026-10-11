@@ -474,3 +474,47 @@ export async function removeDemoCampaigns() {
     donations: db.donations.filter((row) => !row.demo),
   })
 }
+
+// ---------- só do mock: dados de teste do painel do admin (features/admin/dev) ----------
+
+// Campanhas de várias ONGs (cada modelo traz a sua `ngo`), com as doações
+// aprovadas. Marcadas com `adminDemo`, separadas das de teste do painel da
+// ONG (`demo`): um botão nunca apaga o que o outro gerou
+export async function insertAdminDemoCampaigns(templates) {
+  await mockDelay()
+  const db = store.read()
+
+  let campaignId = nextId(db.campaigns)
+  let donationId = nextId(db.donations)
+  const campaigns = []
+  const donations = []
+  for (const { donations: gifts, ...fields } of templates) {
+    const campaign = { ...fields, id: campaignId++, deleted: false, adminDemo: true }
+    campaigns.push(campaign)
+    donations.push(
+      ...gifts.map(({ amount, approvedAt, donor }) => ({
+        id: donationId++,
+        amount,
+        status: 'APPROVED',
+        createdAt: approvedAt,
+        approvedAt,
+        expiresAt: null,
+        pix: null,
+        donor,
+        campaign: { id: campaign.id, title: campaign.title, ngoName: campaign.ngo.name },
+        adminDemo: true,
+      }))
+    )
+  }
+  store.write({ ...db, campaigns: [...db.campaigns, ...campaigns], donations: [...db.donations, ...donations] })
+}
+
+export async function removeAdminDemoCampaigns() {
+  await mockDelay()
+  const db = store.read()
+  store.write({
+    ...db,
+    campaigns: db.campaigns.filter((row) => !row.adminDemo),
+    donations: db.donations.filter((row) => !row.adminDemo),
+  })
+}
