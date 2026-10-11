@@ -1,6 +1,6 @@
+import ChartCard from '../../../../../core/components/charts/ChartCard'
+import StackedBar from '../../../../../core/components/charts/StackedBar'
 import { animalStatusSegments } from '../../../utils/panelCharts'
-import ChartCard from './ChartCard'
-import StackedBar from './StackedBar'
 
 function AnimalStatusChart({ animals }) {
   const segments = animalStatusSegments(animals)

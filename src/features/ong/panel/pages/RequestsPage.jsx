@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import BarList from '../../../../core/components/charts/BarList'
+import ChartCard from '../../../../core/components/charts/ChartCard'
+import PanelPage from '../../../../core/components/panel/PanelPage'
 import ReceivedRequestsBoard from '../../../adocao/components/ReceivedRequestsBoard'
-import BarList from '../../components/dashboard/charts/BarList'
-import ChartCard from '../../components/dashboard/charts/ChartCard'
 import { adoptionFunnel } from '../../utils/panelCharts'
-import PanelPage from '../PanelPage'
 import { PANEL_PATHS } from '../panelPaths'
 import { useOngPanel } from '../useOngPanel'
 

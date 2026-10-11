@@ -1,51 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { FiX } from 'react-icons/fi'
-import {
-  FaArrowLeft,
-  FaBuildingNgo,
-  FaShieldHalved,
-  FaCalendarDays,
-  FaComments,
-  FaEye,
-  FaHandHoldingDollar,
-  FaHandHoldingHeart,
-  FaInbox,
-  FaPaw,
-  FaStar,
-  FaTableCellsLarge,
-} from 'react-icons/fa6'
-import { useAuth } from '../../../core/context/AuthContext'
-import { PANEL_PATHS } from './panelPaths'
-
-// `badge` aponta para um número de stats (useOngDashboard): o que espera a ONG
-const NAV_GROUPS = [
-  {
-    items: [{ to: PANEL_PATHS.overview, end: true, label: 'Visão geral', icon: FaTableCellsLarge }],
-  },
-  {
-    title: 'Adoção',
-    items: [
-      { to: PANEL_PATHS.animals, label: 'Animais', icon: FaPaw },
-      { to: PANEL_PATHS.requests, label: 'Pedidos', icon: FaInbox, badge: 'pendingRequests', badgeLabel: 'aguardando resposta' },
-      { to: PANEL_PATHS.chats, label: 'Conversas', icon: FaComments, badge: 'unreadMessages', badgeLabel: 'mensagens não lidas' },
-    ],
-  },
-  {
-    title: 'Arrecadação e eventos',
-    items: [
-      { to: PANEL_PATHS.events, label: 'Eventos', icon: FaCalendarDays },
-      { to: PANEL_PATHS.campaigns, label: 'Campanhas', icon: FaHandHoldingHeart },
-      { to: PANEL_PATHS.donations, label: 'Doações', icon: FaHandHoldingDollar },
-    ],
-  },
-  {
-    title: 'Instituição',
-    items: [
-      { to: PANEL_PATHS.reviews, label: 'Avaliações', icon: FaStar },
-      { to: PANEL_PATHS.profile, label: 'Perfil da ONG', icon: FaBuildingNgo },
-    ],
-  },
-]
+import { FaShieldHalved } from 'react-icons/fa6'
 
 const FOOTER_LINK_CLASSES =
   'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-emerald-100/80 transition-colors duration-200 hover:bg-white/5 hover:text-white'
@@ -54,27 +9,24 @@ function formatBadge(count) {
   return count > 9 ? '9+' : count
 }
 
-function OngAvatar({ user }) {
+function IdentityAvatar({ name, photoUrl }) {
   return (
     <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/10 text-base font-black text-amber-300">
-      {user?.photoUrl ? (
-        <img src={user.photoUrl} alt="" className="h-full w-full object-cover" />
-      ) : (
-        user?.name?.charAt(0).toUpperCase()
-      )}
+      {photoUrl ? <img src={photoUrl} alt="" className="h-full w-full object-cover" /> : name?.charAt(0).toUpperCase()}
     </span>
   )
 }
 
-// Conteúdo da barra lateral, igual no desktop (fixa) e no celular (gaveta).
-// Na gaveta chegam `onClose` (mostra o X) e `onNavigate` (fecha ao trocar de seção)
-function PanelSidebar({ stats, onClose, onNavigate, closeButtonRef }) {
-  const { user } = useAuth()
-
+// Conteúdo da barra lateral dos painéis (ONG e admin), igual no desktop
+// (fixa) e no celular (gaveta). Cada painel passa quem está logado
+// (`identity`), os grupos de links e os links do rodapé; `badge` de um item
+// aponta para um número de `stats`. Na gaveta chegam `onClose` (mostra o X)
+// e `onNavigate` (fecha ao trocar de seção)
+function PanelNav({ homePath, identity, groups, stats = {}, footerLinks = [], onClose, onNavigate, closeButtonRef }) {
   return (
     <div className="flex h-full w-full flex-col bg-emerald-950 text-emerald-100">
       <div className="flex items-center justify-between px-5 pt-4">
-        <Link to={PANEL_PATHS.overview} onClick={onNavigate} className="text-xl font-black tracking-tight">
+        <Link to={homePath} onClick={onNavigate} className="text-xl font-black tracking-tight">
           <span className="text-white">AU</span>
           <span className="text-amber-400">colher</span>
         </Link>
@@ -92,20 +44,20 @@ function PanelSidebar({ stats, onClose, onNavigate, closeButtonRef }) {
       </div>
 
       <div className="mx-3 mt-4 flex items-center gap-3 rounded-2xl bg-white/5 p-2.5">
-        <OngAvatar user={user} />
+        <IdentityAvatar name={identity.name} photoUrl={identity.photoUrl} />
         <div className="min-w-0">
-          <p className="flex items-center gap-1.5 text-sm font-bold text-white" title={user?.name}>
-            <span className="truncate">{user?.name}</span>
-            {user?.isVerified && (
+          <p className="flex items-center gap-1.5 text-sm font-bold text-white" title={identity.name}>
+            <span className="truncate">{identity.name}</span>
+            {identity.isVerified && (
               <FaShieldHalved size={11} className="shrink-0 text-amber-300" title="Instituição verificada" />
             )}
           </p>
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90">Painel da ONG</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90">{identity.caption}</p>
         </div>
       </div>
 
       <nav aria-label="Seções do painel" className="scrollbar-dark mt-3 min-h-0 flex-1 overflow-y-auto px-3 pb-3">
-        {NAV_GROUPS.map((group, index) => (
+        {groups.map((group, index) => (
           <div key={group.title ?? index} className={index > 0 ? 'mt-4' : ''}>
             {group.title && (
               <p className="px-3 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-300/70">{group.title}</p>
@@ -146,18 +98,18 @@ function PanelSidebar({ stats, onClose, onNavigate, closeButtonRef }) {
         ))}
       </nav>
 
-      <div className="flex flex-col gap-0.5 border-t border-white/10 px-3 py-2">
-        <Link to={`/ong/${user?.id}`} onClick={onNavigate} className={FOOTER_LINK_CLASSES}>
-          <FaEye size={14} className="text-emerald-300/70" />
-          Ver perfil público
-        </Link>
-        <Link to="/" className={FOOTER_LINK_CLASSES}>
-          <FaArrowLeft size={14} className="text-emerald-300/70" />
-          Voltar ao site
-        </Link>
-      </div>
+      {footerLinks.length > 0 && (
+        <div className="flex flex-col gap-0.5 border-t border-white/10 px-3 py-2">
+          {footerLinks.map(({ to, label, icon: Icon }) => (
+            <Link key={to} to={to} onClick={onNavigate} className={FOOTER_LINK_CLASSES}>
+              <Icon size={14} className="text-emerald-300/70" />
+              {label}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
-export default PanelSidebar
+export default PanelNav

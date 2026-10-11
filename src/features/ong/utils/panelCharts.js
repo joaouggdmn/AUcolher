@@ -70,30 +70,56 @@ function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
-// Mês atual e os anteriores, zerados, somando cada doação no mês em que o PIX
-// foi aprovado ('2026-10-10T12:00:00' → '2026-10')
-export function monthlyDonationColumns(donations) {
+// Mês atual e os anteriores, do mais antigo para o atual ('2026-10')
+function lastMonths(months) {
   const today = new Date()
-  const months = Array.from({ length: CHART_MONTHS }, (_, index) => {
-    const date = new Date(today.getFullYear(), today.getMonth() - (CHART_MONTHS - 1 - index), 1)
-    return { key: toLocalIsoDate(date).slice(0, 7), date, value: 0, count: 0 }
+  return Array.from({ length: months }, (_, index) => {
+    const date = new Date(today.getFullYear(), today.getMonth() - (months - 1 - index), 1)
+    return { key: toLocalIsoDate(date).slice(0, 7), date }
   })
-  const byKey = new Map(months.map((month) => [month.key, month]))
+}
 
-  for (const donation of donations) {
-    const month = byKey.get(donation.approvedAt?.slice(0, 7))
-    if (month) {
-      month.value += donation.amount
-      month.count += 1
-    }
+// Soma cada item no mês da data dele ('2026-10-10T12:00:00' → '2026-10').
+// Devolve o mesmo formato de uma série mensal da API: [{ month, value, count }]
+export function bucketByMonth(items, { dateOf, valueOf = () => 1 }) {
+  const byMonth = new Map()
+  for (const item of items) {
+    const month = dateOf(item)?.slice(0, 7)
+    if (!month) continue
+    const bucket = byMonth.get(month) ?? { month, value: 0, count: 0 }
+    bucket.value += valueOf(item)
+    bucket.count += 1
+    byMonth.set(month, bucket)
   }
+  return [...byMonth.values()]
+}
 
-  return months.map(({ key, date, value, count }) => ({
-    key,
-    value,
-    label: capitalize(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')),
-    valueLabel: value.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 }),
-    valueText: formatCurrency(value),
-    detail: `${date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })} · ${count} ${count === 1 ? 'doação' : 'doações'}`,
-  }))
+// Série mensal → colunas do ColumnChart: os últimos `months` meses, zerados
+// onde não há dado. `formatValue` escreve o valor por extenso (dica e leitor
+// de tela); `countLabel` ([singular, plural]) acrescenta a contagem ao detalhe
+export function monthColumns(points, { months = CHART_MONTHS, formatValue = String, countLabel } = {}) {
+  const byMonth = new Map(points.map((point) => [point.month, point]))
+
+  return lastMonths(months).map(({ key, date }) => {
+    const value = byMonth.get(key)?.value ?? 0
+    const count = byMonth.get(key)?.count ?? 0
+    const monthName = date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+    return {
+      key,
+      value,
+      label: capitalize(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')),
+      valueLabel: value.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 }),
+      valueText: formatValue(value),
+      detail: countLabel ? `${monthName} · ${count} ${count === 1 ? countLabel[0] : countLabel[1]}` : monthName,
+    }
+  })
+}
+
+// Recebido por mês: cada doação conta no mês em que o PIX foi aprovado
+export function monthlyDonationColumns(donations) {
+  const points = bucketByMonth(donations, {
+    dateOf: (donation) => donation.approvedAt,
+    valueOf: (donation) => donation.amount,
+  })
+  return monthColumns(points, { formatValue: formatCurrency, countLabel: ['doação', 'doações'] })
 }
