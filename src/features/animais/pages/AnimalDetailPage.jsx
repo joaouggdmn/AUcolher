@@ -27,6 +27,7 @@ import { buildAnimalSnapshot } from "../../adocao/utils/requestAnimal";
 import BehaviorProfile from "../components/BehaviorProfile";
 import OwnerListingPanel from "../components/OwnerListingPanel";
 import { useAnimal } from "../hooks/useAnimais";
+import ReportButton from "../../denuncias/components/ReportButton";
 
 const SIZE_LABELS = { SMALL: "Pequeno", MEDIUM: "Médio", LARGE: "Grande" };
 
@@ -272,6 +273,11 @@ function AnimalDetailsPage() {
                 </button>
               </>
             )}
+          </div>
+
+          {/* Some sozinho para o dono do anúncio e para o admin */}
+          <div className="flex justify-center">
+            <ReportButton targetType="ANIMAL" target={animal} />
           </div>
         </div>
       </div>

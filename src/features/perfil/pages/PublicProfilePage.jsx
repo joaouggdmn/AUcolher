@@ -16,6 +16,7 @@ import OngDetails from '../components/public/OngDetails'
 import ProfileReviewsList from '../components/public/ProfileReviewsList'
 import OngEventsTab from '../components/public/OngEventsTab'
 import OngCampaignsTab from '../components/public/OngCampaignsTab'
+import ReportButton from '../../denuncias/components/ReportButton'
 
 function PublicProfilePage() {
   const { id } = useParams()
@@ -116,7 +117,11 @@ function PublicProfilePage() {
       )}
 
       <div className="flex flex-col gap-6">
-        <PublicProfileHeader profile={profile} stats={stats} />
+        <PublicProfileHeader
+          profile={profile}
+          stats={stats}
+          action={<ReportButton targetType="USER" target={profile} variant="pill" />}
+        />
 
         {isOng && <OngDetails profile={profile} />}
 
