@@ -13,6 +13,12 @@ import { requestAnimalSource } from '../../adocao/utils/requestAnimal'
 import * as animaisApi from '../../animais/services/animaisApi'
 import { withAdoptionStatus } from '../../animais/utils/listingStatus'
 import { readAllCampaignsForAdmin, readApprovedDonationsForAdmin } from '../../doacoes/services/doacoesMock'
+import {
+  findReportForAdmin,
+  readAllReportsForAdmin,
+  resolvePendingReportsForAdmin,
+} from '../../denuncias/services/denunciasMock'
+import { reportTargetKey } from '../../denuncias/utils/reportRules'
 import { readAllEventsForAdmin } from '../../eventos/services/eventosMock'
 import { buildSeedAdmin } from '../data/seedAdmin'
 
@@ -22,7 +28,7 @@ import { buildSeedAdmin } from '../data/seedAdmin'
 //   animais  → API real (GET /api/animals, só os disponíveis) + adotados
 //              tirados da cópia guardada nos pedidos
 //   pedidos  → localStorage do AdoptionRequestProvider
-//   campanhas, doações e eventos → os outros servidores falsos
+//   campanhas, doações, eventos e denúncias → os outros servidores falsos
 const store = createMockStore({ key: MOCK_ADMIN_STORE_KEY, version: 1, seed: buildSeedAdmin })
 
 // Séries mensais: os últimos 12 meses (a tela mostra os que quiser)
@@ -287,6 +293,12 @@ function ngoRanking(accounts, requests, donations) {
   }
 }
 
+// Pendentes: quantas denúncias e quantos alvos ("casos") esperam o admin
+function reportsStats(reports) {
+  const pending = reports.filter((report) => report.status === 'PENDING')
+  return { pending: pending.length, pendingTargets: new Set(pending.map(reportTargetKey)).size }
+}
+
 // O que aconteceu por último na plataforma (o `id` é do que foi criado:
 // conta, animal adotado, campanha ou evento)
 function recentActivity(accounts, requests, campaigns, events) {
@@ -366,6 +378,7 @@ export async function getStats() {
     },
     ngoRanking: ngoRanking(accounts, requests, donations),
     recentActivity: recentActivity(accounts, requests, campaigns, events),
+    reports: reportsStats(readAllReportsForAdmin()),
   }
 }
 
@@ -401,6 +414,27 @@ export async function listEvents() {
   await mockDelay()
   requireAdmin()
   return readAllEventsForAdmin()
+}
+
+// GET /api/admin/reports — todas as denúncias, com quem denunciou
+export async function listReports() {
+  await mockDelay()
+  requireAdmin()
+  return readAllReportsForAdmin()
+}
+
+// POST /api/admin/reports/{id}/dismiss — arquiva (improcedente) esta denúncia
+// e as outras pendentes do mesmo alvo; devolve as que foram arquivadas
+export async function dismissReports(reportId) {
+  await mockDelay()
+  requireAdmin()
+
+  const report = findReportForAdmin(reportId)
+  if (!report) throw mockHttpError(404, 'Denúncia não encontrada.')
+  if (report.status !== 'PENDING') throw mockHttpError(400, 'Esta denúncia já foi julgada.')
+
+  const key = reportTargetKey(report)
+  return resolvePendingReportsForAdmin((row) => reportTargetKey(row) === key, 'DISMISSED')
 }
 
 // ---------- só do mock: dados de teste do painel do admin (features/admin/dev) ----------

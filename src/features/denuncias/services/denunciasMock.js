@@ -154,3 +154,39 @@ export async function listMyReports() {
     .sort(byNewest('createdAt'))
     .map(toDto)
 }
+
+// ---------- só do mock: leituras e escritas do painel do admin (features/admin) ----------
+
+// O admin vê também quem denunciou
+function toAdminDto(row) {
+  return { ...toDto(row), reporter: row.reporter }
+}
+
+// Todas as denúncias, das mais recentes para as mais antigas. Síncronas e
+// sem latência: o servidor falso do admin (adminMock) as junta às rotas
+// dele, como um JOIN no banco
+export function readAllReportsForAdmin() {
+  return [...store.read().reports].sort(byNewest('createdAt')).map(toAdminDto)
+}
+
+export function findReportForAdmin(id) {
+  const row = store.read().reports.find((report) => isSameId(report.id, id))
+  return row ? toAdminDto(row) : null
+}
+
+// Julga de uma vez as denúncias pendentes que `matches` aceitar (as do mesmo
+// alvo, ou tudo o que envolve uma conta banida). Devolve as que mudaram
+export function resolvePendingReportsForAdmin(matches, resolution) {
+  const db = store.read()
+  const resolvedAt = nowLocalIso()
+  const resolved = []
+
+  const reports = db.reports.map((row) => {
+    if (row.status !== 'PENDING' || !matches(row)) return row
+    const updated = { ...row, status: 'RESOLVED', resolution, resolvedAt }
+    resolved.push(updated)
+    return updated
+  })
+  if (resolved.length > 0) store.write({ ...db, reports })
+  return resolved.map(toAdminDto)
+}

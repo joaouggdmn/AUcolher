@@ -6,4 +6,5 @@ export const ADMIN_PATHS = {
   animals: `${ROOT}/animais`,
   campaigns: `${ROOT}/campanhas`,
   events: `${ROOT}/eventos`,
+  reports: `${ROOT}/denuncias`,
 }

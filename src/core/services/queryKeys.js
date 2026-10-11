@@ -38,5 +38,6 @@ export const queryKeys = {
     animals: ['admin', 'animals'],
     campaigns: ['admin', 'campaigns'],
     events: ['admin', 'events'],
+    reports: ['admin', 'reports'],
   },
 }
