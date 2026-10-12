@@ -1,6 +1,6 @@
 // Perfis públicos mockados — mesmos ids dos donos (ownerId) em animalsSeed,
 // para que os anúncios do seed apontem para um perfil completo.
-// 🔴 Some quando o endpoint GET /usuarios/{id}/perfil-publico existir
+// 🔴 Some quando o endpoint GET /users/{id}/public-profile existir
 export const mockPublicProfiles = [
   {
     id: 1,

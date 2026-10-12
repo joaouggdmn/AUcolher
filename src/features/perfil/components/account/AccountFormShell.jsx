@@ -10,7 +10,7 @@ const ACCOUNT_FORM_ID = 'account-form'
 // Casca comum aos formulários de pessoa e ONG: submit, barra de alterações
 // pendentes e o bloqueio de navegação. Sem o bloqueio, clicar em "Meu
 // perfil público" com edições pendentes mostrava a versão antiga do perfil.
-// onSave é assíncrono (PUT /usuarios/me) e rejeita quando a API recusa
+// onSave é assíncrono (PUT /users/me) e rejeita quando a API recusa
 function AccountFormShell({ isDirty, onSave, onDiscard, children }) {
   const formRef = useRef(null)
   const [successMessage, setSuccessMessage] = useState(null)

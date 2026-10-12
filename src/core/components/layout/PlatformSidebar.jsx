@@ -20,10 +20,12 @@ function formatBadge(count) {
 
 // Ações do dia a dia na plataforma. O menu do avatar ficou só com o que é
 // da conta em si (perfil e sair).
-function PlatformSidebar({ isOpen, onClose, totalFavoritos, pendingCount, unreadChatCount }) {
+function PlatformSidebar({ isOpen, onClose, panelLink, totalFavoritos, pendingCount, unreadChatCount }) {
   const closeButtonRef = useRef(null)
 
   const shortcuts = [
+    // ONG e admin gerenciam tudo no painel próprio (tela sem a navbar do site)
+    ...(panelLink ? [{ ...panelLink, iconClass: 'text-amber-500' }] : []),
     {
       label: 'Meus favoritos',
       to: '/favoritos',

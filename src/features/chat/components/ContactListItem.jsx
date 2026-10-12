@@ -35,6 +35,16 @@ function ContactListItem({ contact, isSelected, onClick }) {
         </p>
       </div>
 
+      {/* `unread` só vem quando a tela calcula (painel da ONG) */}
+      {contact.unread > 0 && (
+        <span className="shrink-0 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-black leading-none text-white">
+          {contact.unread > 9 ? "9+" : contact.unread}
+          <span className="sr-only">
+            {contact.unread === 1 ? " mensagem não lida" : " mensagens não lidas"}
+          </span>
+        </span>
+      )}
+
       {isAwaitingDelivery && (
         <FaClock
           size={13}

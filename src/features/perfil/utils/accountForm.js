@@ -30,8 +30,8 @@ export function buildPersonForm(user) {
     name: user?.name ?? '',
     photoUrl: user?.photoUrl ?? null,
     bio: user?.bio ?? '',
-    cidade: user?.cidade ?? '',
-    estado: user?.estado ?? '',
+    city: user?.city ?? '',
+    state: user?.state ?? '',
     latitude: user?.latitude ?? null, // 🆕 oculto — nunca vira input visível
     longitude: user?.longitude ?? null, // 🆕
     moradia: user?.moradia ?? '',
@@ -49,7 +49,7 @@ export function toPersonUpdates(form) {
     ...form,
     name: form.name.trim(),
     bio: form.bio.trim(),
-    cidade: form.cidade.trim(),
+    city: form.city.trim(),
   }
 }
 
@@ -76,8 +76,8 @@ export function buildOngForm(user) {
     // viram '' para os inputs continuarem controlados
     address: {
       ...EMPTY_ADDRESS,
-      city: user?.cidade ?? '',
-      state: user?.estado ?? '',
+      city: user?.city ?? '',
+      state: user?.state ?? '',
       ...Object.fromEntries(Object.entries(user?.address ?? {}).filter(([, value]) => value != null)),
     },
     visitingHours: user?.visitingHours ?? [],
@@ -102,20 +102,22 @@ export function toOngUpdates(form) {
     // Sem logradouro o bloco "Visitas" do perfil público não tem o que mostrar
     address: address.street ? address : null,
     // Cidade/UF da ONG = sede: é o que os anúncios dela e a busca por distância usam
-    cidade: address.city,
-    estado: address.state,
+    city: address.city,
+    state: address.state,
     visitingHours: cleanRows(form.visitingHours),
     team: cleanRows(form.team),
   }
 }
 
-// Corpo do PUT /usuarios/me (AtualizacaoPerfilDTO no backend): espelha as
-// colunas de docs/script_banco_aucolher.sql em camelCase, como o CadastroOngDTO.
-// É uma substituição completa — passe o usuário inteiro já com as alterações
+// Corpo do PUT /users/me (ProfileUpdateDTO no backend): espelha as colunas
+// de docs/script_banco_aucolher.sql em camelCase, como o NgoRegistrationDTO.
+// É uma substituição completa — passe o usuário inteiro já com as alterações.
+// Coordenadas e Perfil AUmatch não vão: o banco ainda não tem colunas para
+// eles, e o AuthContext os guarda localmente
 export function toApiPayload(updates, userType) {
   const basePayload = {
-    nome: updates.name,
-    fotoUrl: updates.photoUrl ?? null,
+    name: updates.name,
+    photoUrl: updates.photoUrl ?? null,
     bio: updates.bio || null,
   }
 
@@ -123,21 +125,8 @@ export function toApiPayload(updates, userType) {
     return {
       ...basePayload,
       cep: updates.cep?.replace(/\D/g, '') || null,
-      cidade: updates.cidade || null,
-      estado: updates.estado || null,
-      // Ainda sem coluna no banco: o backend ignora, e o AuthContext guarda
-      // coordenadas e Perfil AUmatch localmente
-      latitude: updates.latitude,
-      longitude: updates.longitude,
-      perfilAumatch: {
-        tipoMoradia: updates.moradia,
-        rotinaExercicios: updates.rotinaExercicio,
-        tempoForaCasa: updates.tempoForaCasa,
-        temCriancasOuPets: updates.temCriancasOuPets,
-        especiePreferida: updates.speciesPreference,
-        perfilPetIdeal: updates.idealPetProfile,
-        portePreferido: updates.portePreferido,
-      },
+      city: updates.city || null,
+      state: updates.state || null,
     }
   }
 
@@ -145,20 +134,20 @@ export function toApiPayload(updates, userType) {
 
   return {
     ...basePayload,
-    emailInstitucional: updates.institutionalEmail,
-    anoFundacao: updates.foundedYear ?? null,
+    institutionalEmail: updates.institutionalEmail,
+    foundedYear: updates.foundedYear ?? null,
     instagram: sanitizeInstagramHandle(updates.socialLinks.instagram ?? '') || null,
     twitter: sanitizeXHandle(updates.socialLinks.x ?? '') || null,
     facebook: updates.socialLinks.facebook,
     cep: (address.cep ?? '').replace(/\D/g, '') || null,
-    logradouro: address.street || null,
-    numero: address.number || null,
-    complemento: address.complement || null,
-    bairro: address.district || null,
-    cidade: updates.cidade || null,
-    estado: updates.estado || null,
-    // A ordem da lista é a ordem de exibição no perfil (coluna "ordem" no banco)
-    equipe: updates.team.map((member) => ({ nome: member.name, funcao: member.role || null })),
-    horariosVisita: updates.visitingHours.map((slot) => ({ dias: slot.days, horario: slot.hours })),
+    street: address.street || null,
+    number: address.number || null,
+    complement: address.complement || null,
+    district: address.district || null,
+    city: updates.city || null,
+    state: updates.state || null,
+    // A ordem da lista é a ordem de exibição no perfil (coluna "sort_order" no banco)
+    team: updates.team.map((member) => ({ name: member.name, role: member.role || null })),
+    visitingHours: updates.visitingHours.map((slot) => ({ days: slot.days, hours: slot.hours })),
   }
 }

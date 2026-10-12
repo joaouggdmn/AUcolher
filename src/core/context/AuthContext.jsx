@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { loginRequest, registerRequest } from '../services/authService'
+import { isAccountBanned, subscribeModeration } from '../../features/admin/services/moderationMock'
 import {
+  ACCOUNT_SUSPENDED_FLAG_KEY,
   TOKEN_STORAGE_KEY,
   TOKEN_TYPE_STORAGE_KEY,
   USER_STORAGE_KEY,
@@ -8,6 +10,14 @@ import {
 } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
+
+function isStoredSessionOf(user) {
+  try {
+    return String(JSON.parse(localStorage.getItem(USER_STORAGE_KEY))?.id) === String(user.id)
+  } catch {
+    return false
+  }
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -20,7 +30,16 @@ export function AuthProvider({ children }) {
 
     if (storedToken && storedUser) {
       try {
-        setUser(JSON.parse(storedUser))
+        const parsedUser = JSON.parse(storedUser)
+        // Sessão salva antes da API em inglês (usuário com `cidade`/`estado`):
+        // descarta e pede um novo login, que traz o perfil no formato atual
+        if ('cidade' in parsedUser) throw new Error('sessão em formato antigo')
+        // Conta banida enquanto estava fora: a sessão salva não vale mais
+        if (isAccountBanned(parsedUser)) {
+          sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
+          throw new Error('conta suspensa')
+        }
+        setUser(parsedUser)
         setIsAuthenticated(true)
       } catch {
         localStorage.removeItem(TOKEN_STORAGE_KEY)
@@ -38,6 +57,25 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
+  // 🔴 Moderação no modo mock: se o admin banir a conta logada (em outra
+  // aba), a sessão cai na hora e o login explica o motivo. As abas dividem a
+  // mesma sessão salva: se outra conta já entrou por cima (o próprio admin,
+  // por exemplo), só esta aba sai e a sessão salva fica como está
+  useEffect(() => {
+    if (!user) return undefined
+    return subscribeModeration(() => {
+      if (!isAccountBanned(user)) return
+      sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
+      if (isStoredSessionOf(user)) {
+        logout()
+      } else {
+        setUser(null)
+        setIsAuthenticated(false)
+      }
+      window.location.assign('/login')
+    })
+  }, [user])
+
   // Só e-mail e senha — o papel (userType) vem do payload da API
   async function login({ email, password }) {
     const { token, tokenType, user: loggedUser } = await loginRequest({ email, password })
@@ -45,14 +83,15 @@ export function AuthProvider({ children }) {
     // 🆕 Sem isso, cada novo login apagava silenciosamente as respostas do
     // quiz que o usuário já tinha dado — o backend não devolve esses
     // campos (toFrontendUser sempre reseta para vazio)
-    // O perfil público (bio, redes, endereço, equipe...) vem inteiro da API:
-    // "Minha conta" salva pelo PUT /usuarios/me
+    // O perfil público (bio, redes, endereço, cidade/UF, equipe...) vem
+    // inteiro da API: "Minha conta" salva pelo PUT /users/me
     const storedLifestyle = loadStoredLifestyleProfile()
     const mergedUser = { ...loggedUser, ...storedLifestyle }
 
     localStorage.setItem(TOKEN_STORAGE_KEY, token)
     localStorage.setItem(TOKEN_TYPE_STORAGE_KEY, tokenType)
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mergedUser))
+    sessionStorage.removeItem(ACCOUNT_SUSPENDED_FLAG_KEY)
 
     setUser(mergedUser)
     setIsAuthenticated(true)
@@ -73,7 +112,7 @@ export function AuthProvider({ children }) {
   }
 
   // Só atualiza a sessão local — quem precisa gravar no banco chama a API
-  // antes (ver useAccountForm, que usa o PUT /usuarios/me)
+  // antes (ver useAccountForm, que usa o PUT /users/me)
   function updateProfile(updates) {
     persistLifestyleFields(updates)
 
@@ -84,19 +123,25 @@ export function AuthProvider({ children }) {
     })
   }
 
-  // 🆕 Mesmos campos monitorados por useProfileCompletion — o backend ainda
-// não tem colunas para eles, então persistimos numa chave própria,
-// independente da sessão de autenticação
+  // 🆕 Campos que o backend ainda não guarda (coordenadas e Perfil AUmatch),
+// persistidos numa chave própria, independente da sessão de autenticação.
+// Cidade, UF e CEP NÃO entram aqui: eles têm coluna no banco, e uma cópia
+// local sobrescreveria no login o que a API acabou de devolver
 const LIFESTYLE_FIELDS = [
-  'cidade', 'estado', 'cep', 'latitude', 'longitude',
+  'latitude', 'longitude',
   'moradia', 'rotinaExercicio', 'tempoForaCasa',
   'temCriancasOuPets', 'speciesPreference', 'idealPetProfile', 'portePreferido',
 ]
 
+// Só devolve os campos da lista acima — descarta chaves que versões antigas
+// guardaram aqui (cidade, estado, cep) e que agora vêm do banco
 function loadStoredLifestyleProfile() {
   try {
     const stored = localStorage.getItem(LIFESTYLE_PROFILE_STORAGE_KEY)
-    if (stored) return JSON.parse(stored)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      return Object.fromEntries(Object.entries(parsed).filter(([key]) => LIFESTYLE_FIELDS.includes(key)))
+    }
   } catch {
     // payload corrompido — ignora
   }

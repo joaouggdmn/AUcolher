@@ -6,15 +6,15 @@ import { getPublicProfile } from '../services/userService'
 
 // Perfil da própria conta: sai exatamente do que ela salvou em "Minha conta",
 // com os mesmos campos que outra pessoa veria. 🔴 Com a API real, o
-// GET /usuarios/{id}/perfil-publico devolve este mesmo formato
+// GET /users/{id}/public-profile devolve este mesmo formato
 function buildOwnProfile(user) {
   return {
     id: user.id,
     userType: user.userType === 'ONG' ? 'ONG' : 'PESSOA',
     name: user.name,
     photoUrl: user.photoUrl ?? null,
-    city: user.cidade || user.address?.city,
-    state: user.estado || user.address?.state,
+    city: user.city || user.address?.city,
+    state: user.state || user.address?.state,
     bio: user.bio ?? '',
     socialLinks: user.socialLinks,
     address: user.address,

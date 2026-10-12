@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUser, FaEye, FaArrowRightFromBracket } from "react-icons/fa6";
+import { getPanelLink } from "../../utils/panelLinks";
 
 function UserAvatarMenu({
   user,
@@ -11,6 +12,10 @@ function UserAvatarMenu({
 }) {
   const [isOpen, setIsOpenState] = useState(false);
   const initial = user?.name?.charAt(0)?.toUpperCase() ?? "U";
+  const panelLink = getPanelLink(user?.userType);
+  const PanelLinkIcon = panelLink?.icon;
+  // Admin não tem perfil público nem checklist de perfil para completar
+  const isAdmin = user?.userType === "ADMIN";
 
   const setIsOpen = (value) => {
     setIsOpenState(value);
@@ -32,7 +37,11 @@ function UserAvatarMenu({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label={`Abrir menu da conta — perfil ${percentage}% completo`}
+        aria-label={
+          isAdmin
+            ? "Abrir menu da conta"
+            : `Abrir menu da conta — perfil ${percentage}% completo`
+        }
         className="relative h-11 w-11 shrink-0 rounded-full transition-all duration-300"
         style={{
           background: `conic-gradient(#fbbf24 ${percentage}%, ${trackColor} ${percentage}%)`,
@@ -83,22 +92,35 @@ function UserAvatarMenu({
               </div>
             </div>
 
-            <div className="border-b border-slate-100 px-4 py-3">
-              <div className="mb-1.5 flex items-center justify-between text-xs">
-                <span className="font-semibold text-slate-500">
-                  Perfil completo
-                </span>
-                <span className="font-bold text-emerald-700">
-                  {percentage}%
-                </span>
+            {!isAdmin && (
+              <div className="border-b border-slate-100 px-4 py-3">
+                <div className="mb-1.5 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-slate-500">
+                    Perfil completo
+                  </span>
+                  <span className="font-bold text-emerald-700">
+                    {percentage}%
+                  </span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700 ease-out"
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700 ease-out"
-                  style={{ width: `${percentage}%` }}
-                />
-              </div>
-            </div>
+            )}
+
+            {panelLink && (
+              <Link
+                to={panelLink.to}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-emerald-800 transition-colors duration-200 hover:bg-emerald-50"
+              >
+                <PanelLinkIcon size={14} className="text-amber-500" />
+                {panelLink.label}
+              </Link>
+            )}
 
             <Link
               to="/perfil"
@@ -109,7 +131,7 @@ function UserAvatarMenu({
               Minha conta
             </Link>
 
-            {user?.id != null && (
+            {user?.id != null && !isAdmin && (
               <Link
                 to={`/perfil/publico/${user.id}`}
                 onClick={() => setIsOpen(false)}

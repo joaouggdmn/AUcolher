@@ -16,7 +16,7 @@ function PetDetailModal({ pet, onClose }) {
 
   if (!pet) return null
 
-  const isFemale = pet.sex === 'F'
+  const isFemale = pet.sex === 'FEMALE'
   const isNgo = pet.listingType === 'NGO'
   const isOwner = !!user && user.id === pet.ownerId
 

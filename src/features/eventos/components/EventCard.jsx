@@ -1,34 +1,26 @@
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { FaLocationDot, FaCircleCheck } from 'react-icons/fa6'
+import { Link } from 'react-router-dom'
+import { FaLocationDot, FaShieldHalved, FaUserGroup } from 'react-icons/fa6'
 import SaveToCalendarMenu from './SaveToCalendarMenu'
 import CalendarDateBadge from './CalendarDateBadge'
-import { CATEGORIA_META } from './filters/filterOptions'
-import { useEventAttendance } from '../hooks/useEventAttendance'
-import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+import EventCover from './EventCover'
+import AttendanceButton from './AttendanceButton'
+import { getCategoriaMeta } from './filters/filterOptions'
+import { formatTimeRange } from '../utils/dateHelpers'
+import { getAttendanceSummary } from '../utils/eventDisplay'
+
+const SUMMARY_TONES = {
+  neutral: 'text-slate-500',
+  few: 'text-amber-600',
+  full: 'text-rose-600',
+}
 
 function EventCard({ event, layout = 'grid' }) {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { isAttending, toggleAttendance } = useEventAttendance()
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false)
-  const isConfirmed = isAttending(event.id)
-  const categoria = CATEGORIA_META[event.category]
+  const categoria = getCategoriaMeta(event.category)
   const CategoriaIcon = categoria.icon
+  const summary = getAttendanceSummary(event)
   const isList = layout === 'list'
-
-  // A presença fica salva na conta e alimenta "Eventos participados" em
-  // Minha conta — sem sessão não há onde guardar, então convida ao login
-  const handleConfirmClick = () => {
-    if (!toggleAttendance(event.id)) setIsAuthModalOpen(true)
-  }
-
-  const handleGoToLogin = () => {
-    setIsAuthModalOpen(false)
-    navigate('/login', { state: { from: location } })
-  }
 
   return (
     // z-index dinâmico: z-30 quando o dropdown está aberto eleva o card INTEIRO
@@ -47,11 +39,10 @@ function EventCard({ event, layout = 'grid' }) {
             : 'h-48 w-full rounded-t-3xl'
         }`}
       >
-        <Link to={`/eventos/${event.id}`}>
-          <img
-            src={event.coverUrl}
-            alt={event.title}
-            className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-110"
+        <Link to={`/eventos/${event.id}`} className="block h-full">
+          <EventCover
+            event={event}
+            className="transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-110"
           />
         </Link>
 
@@ -69,33 +60,41 @@ function EventCard({ event, layout = 'grid' }) {
         </span>
 
         <div>
-          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{event.title}</h3>
-          <p className="mt-1 text-sm text-slate-500">{event.time}</p>
+          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">
+            <Link to={`/eventos/${event.id}`} className="transition-colors duration-300 hover:text-emerald-700">
+              {event.title}
+            </Link>
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">{formatTimeRange(event.startTime, event.endTime)}</p>
         </div>
 
         <div className="flex items-center gap-1.5 text-sm text-slate-500">
-          <FaLocationDot size={13} className="text-emerald-600" />
-          {event.location.venue}, {event.location.city}
+          <FaLocationDot size={13} className="shrink-0 text-emerald-600" />
+          <span className="truncate">
+            {event.location.venue}, {event.location.city}
+          </span>
         </div>
 
-        <p className="text-sm text-slate-600">
-          Organizado por <span className="font-semibold text-emerald-800">{event.organizer.name}</span>
+        <p className="flex items-center gap-1.5 text-sm text-slate-600">
+          Organizado por
+          <Link
+            to={`/ong/${event.organizer.id}`}
+            className="flex items-center gap-1 font-semibold text-emerald-800 transition-colors duration-300 hover:text-emerald-600"
+          >
+            {event.organizer.name}
+            {event.organizer.isVerified && (
+              <FaShieldHalved size={11} className="shrink-0 text-amber-500" title="Instituição verificada" />
+            )}
+          </Link>
+        </p>
+
+        <p className={`flex items-center gap-1.5 text-xs font-semibold ${SUMMARY_TONES[summary.tone]}`}>
+          <FaUserGroup size={12} className="shrink-0" />
+          {summary.label}
         </p>
 
         <div className="relative mt-auto flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleConfirmClick}
-            aria-pressed={isConfirmed}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all duration-300 ${
-              isConfirmed
-                ? 'bg-emerald-700 text-white'
-                : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-800 hover:text-white'
-            }`}
-          >
-            <FaCircleCheck size={14} />
-            {isConfirmed ? 'Presença confirmada' : 'Confirmar presença'}
-          </button>
+          <AttendanceButton event={event} className="flex-1" />
 
           <SaveToCalendarMenu
             event={event}
@@ -104,17 +103,6 @@ function EventCard({ event, layout = 'grid' }) {
           />
         </div>
       </div>
-
-      {/* Portal: o modal fixed não pode herdar o contexto de empilhamento do card */}
-      {isAuthModalOpen &&
-        createPortal(
-          <AuthRequiredModal
-            message="Faça login para confirmar presença e acompanhar seus eventos na sua conta."
-            onCancel={() => setIsAuthModalOpen(false)}
-            onLogin={handleGoToLogin}
-          />,
-          document.body
-        )}
     </div>
   )
 }
