@@ -20,6 +20,7 @@ import { useAdminStats } from '../hooks/useAdmin'
 import AdminRecentActivity from '../overview/AdminRecentActivity'
 import AdminStatTiles from '../overview/AdminStatTiles'
 import NgoRankingCard from '../overview/NgoRankingCard'
+import PendingReportsNotice from '../overview/PendingReportsNotice'
 import PrintReportHeader from '../overview/PrintReportHeader'
 
 function plural(count, singular, pluralForm) {
@@ -80,6 +81,7 @@ function OverviewContent({ stats }) {
       {/* Ferramenta de desenvolvimento: no build de produção vira código morto */}
       {import.meta.env.DEV && <AdminDemoDataCard />}
 
+      <PendingReportsNotice reports={stats.reports} />
       <AdminStatTiles stats={stats} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 print:grid-cols-2">

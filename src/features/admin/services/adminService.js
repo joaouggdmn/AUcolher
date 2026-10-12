@@ -1,5 +1,6 @@
 import { USE_MOCK_ADMIN } from '../../../core/utils/constants'
 import { toFrontendAnimal } from '../../animais/services/animalService'
+import { toFrontendReport } from '../../denuncias/services/denunciaService'
 import { toFrontendCampaign } from '../../doacoes/services/doacaoService'
 import { toFrontendEvent } from '../../eventos/services/eventoService'
 import * as adminApi from './adminApi'
@@ -55,6 +56,7 @@ export function toFrontendAdminStats(dto) {
       ...item,
       detail: item.type === 'ACCOUNT_CREATED' ? FRONTEND_USER_TYPES[item.detail] ?? item.detail : item.detail,
     })),
+    reports: dto.reports ?? { pending: 0, pendingTargets: 0 },
   }
 }
 
@@ -85,18 +87,62 @@ export async function listAdminUsers() {
   return dtos.map(toFrontendAdminUser)
 }
 
+// `ownerIsBanned` / `isOngBanned`: a conta foi banida, então o site já não
+// mostra o conteúdo (o admin continua vendo)
 export async function listAdminAnimals() {
   const dtos = await adapter.listAnimals()
-  return dtos.map(toFrontendAnimal)
+  return dtos.map((dto) => ({ ...toFrontendAnimal(dto), ownerIsBanned: dto.owner?.active === false }))
 }
 
-// `isRemoved`: excluída pela ONG, mas ainda contando no total arrecadado
+// `isRemoved`: excluída (pela ONG ou, com `isRemovedByModeration`, pelo admin)
 export async function listAdminCampaigns() {
   const dtos = await adapter.listCampaigns()
-  return dtos.map((dto) => ({ ...toFrontendCampaign(dto), isRemoved: Boolean(dto.removed) }))
+  return dtos.map((dto) => ({
+    ...toFrontendCampaign(dto),
+    isRemoved: Boolean(dto.removed),
+    isRemovedByModeration: Boolean(dto.removedByModeration),
+    isOngBanned: dto.ngo?.active === false,
+  }))
 }
 
 export async function listAdminEvents() {
   const dtos = await adapter.listEvents()
-  return dtos.map(toFrontendEvent)
+  return dtos.map((dto) => ({
+    ...toFrontendEvent(dto),
+    isRemovedByModeration: Boolean(dto.removedByModeration),
+    isOngBanned: dto.ngo?.active === false,
+  }))
+}
+
+// Mesmo modelo das denúncias do site, mais `reporter`
+export async function listAdminReports() {
+  const dtos = await adapter.listReports()
+  return dtos.map(toFrontendReport)
+}
+
+export async function dismissAdminReports(reportId) {
+  const dtos = await adapter.dismissReports(reportId)
+  return dtos.map(toFrontendReport)
+}
+
+export async function banReportedAccount(reportId) {
+  const dtos = await adapter.banReportedAccount(reportId)
+  return dtos.map(toFrontendReport)
+}
+
+// false = banir, true = reativar
+export async function setAdminUserStatus(userId, active) {
+  return toFrontendAdminUser(await adapter.setUserStatus(userId, active))
+}
+
+export function removeAdminAnimal(animalId) {
+  return adapter.removeAnimal(animalId)
+}
+
+export function removeAdminCampaign(campaignId) {
+  return adapter.removeCampaign(campaignId)
+}
+
+export function removeAdminEvent(eventId) {
+  return adapter.removeEvent(eventId)
 }

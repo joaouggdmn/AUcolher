@@ -52,7 +52,8 @@ function TrustSeal({ icon: Icon, tone = 'emerald', children }) {
   )
 }
 
-function PublicProfileHeader({ profile, stats }) {
+// `action`: botão extra no canto, ao lado das redes sociais ("Denunciar")
+function PublicProfileHeader({ profile, stats, action }) {
   const isOng = profile.userType === 'ONG'
   const isVerifiedOng = isOng && profile.isVerified
   const initial = profile.name?.charAt(0)?.toUpperCase() ?? '?'
@@ -101,8 +102,8 @@ function PublicProfileHeader({ profile, stats }) {
             )}
           </div>
 
-          {socialLinks.length > 0 && (
-            <div className="flex gap-2 pt-4">
+          {(socialLinks.length > 0 || action) && (
+            <div className="flex flex-wrap justify-end gap-2 pt-4">
               {socialLinks.map(({ key, label, icon: Icon }) => (
                 <a
                   key={key}
@@ -116,6 +117,7 @@ function PublicProfileHeader({ profile, stats }) {
                   <Icon size={15} />
                 </a>
               ))}
+              {action}
             </div>
           )}
         </div>

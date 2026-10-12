@@ -7,13 +7,16 @@ import { LISTING_STATUS_META } from '../../animais/utils/listingStatus'
 // céu; "fora do ar" em cinza de propósito (é o que não pede atenção); funil
 // num tom só que escurece a cada etapa
 
-const STATUS_ORDER = ['AVAILABLE', 'IN_PROGRESS', 'ADOPTED', 'INACTIVE']
+const STATUS_ORDER = ['AVAILABLE', 'IN_PROGRESS', 'ADOPTED', 'INACTIVE', 'REMOVED']
 
+// Removido pela moderação também é "fora do site", mas pede atenção: rosa
+// claro, separado do cinza por luminosidade e não só pela cor
 const STATUS_COLORS = {
   AVAILABLE: 'bg-emerald-700',
   IN_PROGRESS: 'bg-amber-600',
   ADOPTED: 'bg-sky-600',
   INACTIVE: 'bg-slate-300',
+  REMOVED: 'bg-rose-400',
 }
 
 const SPECIES = [

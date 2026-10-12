@@ -7,6 +7,7 @@ export const LISTING_STATUS_META = {
   IN_PROGRESS: { label: 'Em processo', className: 'bg-amber-50 text-amber-700' },
   ADOPTED: { label: 'Adotado', className: 'bg-slate-100 text-slate-500' },
   INACTIVE: { label: 'Fora do ar', className: 'bg-slate-100 text-slate-400' },
+  REMOVED: { label: 'Removido pela moderação', className: 'bg-rose-50 text-rose-600' },
 }
 
 // Pedido sobre este animal da API — ids do AnimalContext antigo se repetem
@@ -22,6 +23,8 @@ function isRequestFor(request, animal) {
 // existe um pedido aceito caminhando para a entrega. Adoção concluída já
 // conta como adotado antes de a API ser atualizada (useSyncAdoptedAnimals)
 function deriveListingStatus(animal, statuses) {
+  // Removido pelo admin é definitivo e vale mais que qualquer pedido
+  if (animal.status === 'REMOVED') return 'REMOVED'
   if (animal.status === 'ADOPTED' || statuses.includes('CONCLUDED')) return 'ADOPTED'
   if (animal.status === 'INACTIVE') return 'INACTIVE'
   return statuses.some((status) => IN_PROGRESS_STATUSES.includes(status)) ? 'IN_PROGRESS' : 'AVAILABLE'

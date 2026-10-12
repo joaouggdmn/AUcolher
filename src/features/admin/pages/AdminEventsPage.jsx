@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { FaCalendarCheck, FaCalendarDays, FaCalendarXmark, FaUserGroup } from 'react-icons/fa6'
+import { FaCalendarCheck, FaCalendarDays, FaCalendarXmark, FaTrashCan, FaUserGroup } from 'react-icons/fa6'
 import BarList from '../../../core/components/charts/BarList'
 import ChartCard from '../../../core/components/charts/ChartCard'
 import PanelPage from '../../../core/components/panel/PanelPage'
+import ConfirmDialog from '../../../core/components/ui/ConfirmDialog'
 import StatTile from '../../../core/components/panel/StatTile'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
@@ -14,7 +15,9 @@ import SearchBar from '../../animais/components/SearchBar'
 import { CATEGORIA_OPTIONS } from '../../eventos/components/filters/filterOptions'
 import ActivityEmptyState from '../../perfil/components/activity/ActivityEmptyState'
 import AdminEventRow from '../components/AdminEventRow'
-import { useAdminEvents } from '../hooks/useAdmin'
+import { useAdminEvents, useRemoveEvent } from '../hooks/useAdmin'
+import { useAdminPanel } from '../panel/useAdminPanel'
+import { removeEventDescription } from '../utils/moderationText'
 import { EVENT_STATUS_META, eventStatus } from '../utils/listStatus'
 
 const PAGE_SIZE = 20
@@ -37,6 +40,24 @@ function AdminEventsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const { notify } = useAdminPanel()
+  const removeEvent = useRemoveEvent()
+  // Evento esperando a confirmação da remoção
+  const [removing, setRemoving] = useState(null)
+
+  function askRemoval(event) {
+    removeEvent.reset()
+    setRemoving(event)
+  }
+
+  function handleRemove() {
+    removeEvent.mutate(removing, {
+      onSuccess: () => {
+        setRemoving(null)
+        notify('Evento removido.')
+      },
+    })
+  }
 
   // Filtro novo, lista do começo
   function withReset(setter) {
@@ -133,7 +154,7 @@ function AdminEventsPage() {
             <>
               <ul className="flex flex-col gap-3">
                 {visible.map((event) => (
-                  <AdminEventRow key={event.id} event={event} />
+                  <AdminEventRow key={event.id} event={event} onRemove={askRemoval} />
                 ))}
               </ul>
               {visibleCount < filtered.length && (
@@ -152,6 +173,21 @@ function AdminEventsPage() {
   return (
     <PanelPage title="Eventos" description="Eventos de todas as ONGs: os agendados, os que já aconteceram e os cancelados.">
       {content}
+
+      {removing && (
+        <ConfirmDialog
+          icon={FaTrashCan}
+          variant="danger"
+          title="Remover o evento?"
+          description={removeEventDescription(removing.title, removing.confirmedCount)}
+          confirmLabel="Remover"
+          processingLabel="Removendo..."
+          isProcessing={removeEvent.isPending}
+          error={removeEvent.isError ? getErrorMessage(removeEvent.error) : null}
+          onConfirm={handleRemove}
+          onCancel={() => setRemoving(null)}
+        />
+      )}
     </PanelPage>
   )
 }

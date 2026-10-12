@@ -8,6 +8,7 @@ import {
   FaClock,
   FaLock,
   FaHandHoldingHeart,
+  FaBan,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { useChatMessages } from "../hooks/useChatMessages";
@@ -73,6 +74,8 @@ function ChatConversationPanel({ contact, onBack }) {
   // (AWAITING_DELIVERY) — o histórico continua visível, só o input some
   const isAwaitingDelivery = contact.status === "AWAITING_DELIVERY";
   const isConcluded = contact.status === "CONCLUDED";
+  // A moderação baniu uma das contas ou removeu o anúncio, e o pedido foi cancelado
+  const isClosedByModeration = contact.status === "CANCELLED";
   const initial = contact.name?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
@@ -147,7 +150,9 @@ function ChatConversationPanel({ contact, onBack }) {
               <FaComments size={18} />
             </span>
             <p className="text-sm text-slate-500">
-              Nenhuma mensagem ainda. Diga oi para {contact.name.split(" ")[0]}!
+              {isClosedByModeration
+                ? "Nenhuma mensagem nesta conversa."
+                : `Nenhuma mensagem ainda. Diga oi para ${contact.name.split(" ")[0]}!`}
             </p>
           </div>
         ) : (
@@ -192,7 +197,14 @@ function ChatConversationPanel({ contact, onBack }) {
         <div ref={bottomRef} />
       </div>
 
-      {isConcluded ? (
+      {isClosedByModeration ? (
+        <p className="flex shrink-0 items-center justify-center gap-2 border-t bg-rose-50 px-4 py-3.5 text-center text-xs font-semibold text-rose-700">
+          <FaBan size={11} className="shrink-0" />
+          {contact.cancelReason === "LISTING_REMOVED"
+            ? `Conversa encerrada: o anúncio de ${contact.animalName} foi removido pela moderação do AUcolher e o pedido de adoção foi cancelado.`
+            : `Conversa encerrada: a conta de ${contact.name} foi suspensa pela moderação do AUcolher e o pedido de adoção foi cancelado.`}
+        </p>
+      ) : isConcluded ? (
         <AdoptionConcludedPanel contact={contact} />
       ) : isAwaitingDelivery ? (
         <div className="flex shrink-0 flex-col gap-3 border-t bg-slate-50 px-4 py-3.5">

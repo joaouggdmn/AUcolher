@@ -63,7 +63,9 @@ export function useAccountActivity(user) {
         type: 'DOACAO',
         title: donation.campaign.title,
         subtitle: donation.campaign.isRemoved
-          ? `${donation.campaign.ngoName} · campanha encerrada pela ONG`
+          ? `${donation.campaign.ngoName} · ${
+              donation.campaign.isRemovedByModeration ? 'campanha removida pela moderação' : 'campanha encerrada pela ONG'
+            }`
           : donation.campaign.ngoName,
         amount: donation.amount,
         date: donation.approvedAt ?? donation.createdAt,

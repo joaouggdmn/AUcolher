@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
-import { FaEye, FaHeart, FaPaw, FaShieldHalved } from 'react-icons/fa6'
+import { FaEye, FaHeart, FaPaw, FaShieldHalved, FaTrashCan } from 'react-icons/fa6'
 import { SPECIES_OPTIONS } from '../../animais/components/filters/filterOptions'
 import { LISTING_STATUS_META } from '../../animais/utils/listingStatus'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
+const REMOVE_CLASSES =
+  'flex items-center gap-1.5 rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
 
 function speciesLabel(species) {
   return SPECIES_OPTIONS.find((option) => option.value === species)?.label ?? 'Animal'
@@ -15,9 +17,11 @@ function ownerPath(animal) {
   return animal.listingType === 'NGO' ? `/ong/${animal.ownerId}` : `/perfil/publico/${animal.ownerId}`
 }
 
-// Um anúncio na lista do admin: o animal, a situação e quem anunciou
-function AdminAnimalRow({ animal }) {
+// Um anúncio na lista do admin: o animal, a situação e quem anunciou. Adotado
+// é histórico e removido já saiu: os dois não têm "Remover"
+function AdminAnimalRow({ animal, onRemove }) {
   const status = LISTING_STATUS_META[animal.listingStatus]
+  const canRemove = animal.listingStatus !== 'ADOPTED' && animal.listingStatus !== 'REMOVED'
   const location = [animal.city, animal.state].filter(Boolean).join(' - ')
 
   return (
@@ -47,6 +51,11 @@ function AdminAnimalRow({ animal }) {
               {animal.listingType === 'NGO' && animal.ownerIsVerified && (
                 <FaShieldHalved size={10} className="text-amber-500" title="Instituição verificada" />
               )}
+              {animal.ownerIsBanned && (
+                <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-600">
+                  Conta banida
+                </span>
+              )}
             </p>
           )}
           {animal.pendingInterests > 0 && (
@@ -58,12 +67,19 @@ function AdminAnimalRow({ animal }) {
         </div>
       </div>
 
-      {animal.listingStatus !== 'INACTIVE' && (
+      {/* Fora do ar pelo dono dá 404; de conta banida o admin ainda abre */}
+      {(animal.listingStatus !== 'INACTIVE' || animal.ownerIsBanned) && (
         <div className="flex shrink-0 flex-wrap gap-2">
           <Link to={`/animais/${animal.id}`} className={ACTION_CLASSES}>
             <FaEye size={11} />
             Ver anúncio
           </Link>
+          {canRemove && (
+            <button type="button" onClick={() => onRemove(animal)} className={REMOVE_CLASSES}>
+              <FaTrashCan size={11} />
+              Remover
+            </button>
+          )}
         </div>
       )}
     </li>

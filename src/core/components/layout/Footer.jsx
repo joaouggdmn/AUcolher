@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FaInstagram,
@@ -12,6 +13,7 @@ import {
   FaTriangleExclamation,
 } from 'react-icons/fa6'
 import { LuCompass, LuLifeBuoy } from 'react-icons/lu'
+import HowToReportDialog from '../../../features/denuncias/components/HowToReportDialog'
 
 const quickLinks = [
   { label: 'Buscar pets', to: '/animais', icon: FaMagnifyingGlass },
@@ -23,8 +25,11 @@ const quickLinks = [
 const supportLinks = [
   { label: 'Cadastrar minha ONG', to: '/cadastro-ong', icon: FaBuilding },
   { label: 'Central de ajuda', to: '/ajuda', icon: FaCircleQuestion },
-  { label: 'Denunciar anúncio', to: '/denuncia', icon: FaTriangleExclamation },
 ]
+
+const LINK_CLASSES =
+  'group flex items-center gap-2 text-sm text-emerald-200/80 transition-colors duration-300 hover:text-amber-400'
+const LINK_ICON_CLASSES = 'text-emerald-400 transition-colors duration-300 group-hover:text-amber-400'
 
 const socialLinks = [
   { label: 'Instagram', href: 'https://instagram.com', icon: FaInstagram },
@@ -33,6 +38,8 @@ const socialLinks = [
 ]
 
 function Footer() {
+  const [isReportHelpOpen, setIsReportHelpOpen] = useState(false)
+
   return (
     <footer className="bg-emerald-950 px-4 py-14 text-emerald-100 sm:px-6 sm:py-16">
       <div className="mx-auto max-w-7xl">
@@ -96,15 +103,19 @@ function Footer() {
             <ul className="flex flex-col gap-3">
               {supportLinks.map(({ label, to, icon: Icon }) => (
                 <li key={label}>
-                  <Link
-                    to={to}
-                    className="group flex items-center gap-2 text-sm text-emerald-200/80 transition-colors duration-300 hover:text-amber-400"
-                  >
-                    <Icon size={13} className="text-emerald-400 transition-colors duration-300 group-hover:text-amber-400" />
+                  <Link to={to} className={LINK_CLASSES}>
+                    <Icon size={13} className={LINK_ICON_CLASSES} />
                     {label}
                   </Link>
                 </li>
               ))}
+              {/* A denúncia é feita no próprio anúncio ou perfil: aqui só explica como */}
+              <li>
+                <button type="button" onClick={() => setIsReportHelpOpen(true)} className={LINK_CLASSES}>
+                  <FaTriangleExclamation size={13} className={LINK_ICON_CLASSES} />
+                  Como denunciar
+                </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -115,6 +126,8 @@ function Footer() {
           
         </div>
       </div>
+
+      {isReportHelpOpen && <HowToReportDialog onClose={() => setIsReportHelpOpen(false)} />}
     </footer>
   )
 }
