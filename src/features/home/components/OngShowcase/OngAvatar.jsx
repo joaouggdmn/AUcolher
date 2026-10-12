@@ -15,9 +15,10 @@ function initials(name) {
     .toUpperCase()
 }
 
-// Foto do perfil público quando existe; sem perfil, as iniciais da ONG
+// Foto do perfil público quando existe (ou a que veio da API); sem foto, as
+// iniciais da ONG
 function OngAvatar({ ong, size = 'sm', className = '' }) {
-  const photoUrl = ong.profile?.photoUrl
+  const photoUrl = ong.profile?.photoUrl ?? ong.photoUrl
 
   if (photoUrl) {
     return <PetPhoto src={photoUrl} width={160} className={`shrink-0 rounded-full ${SIZES[size]} ${className}`} />

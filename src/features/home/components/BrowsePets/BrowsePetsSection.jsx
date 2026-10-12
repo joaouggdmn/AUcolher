@@ -39,7 +39,7 @@ function getHeaderCopy(isMatchedList, availableCount, cityCount) {
 // recém-cadastrados entram no início)
 function BrowsePetsSection({ persona }) {
   const { kind, user } = persona
-  const { available, availableCount, cities, cityCount } = usePlatformStats()
+  const { available, availableCount, cities, cityCount, isLoading } = usePlatformStats()
   const { ranked } = useRankedPets(kind === 'matched' ? user : null, { excludeRequested: true })
   const brokenPhotos = useBrokenPhotos()
 
@@ -82,7 +82,17 @@ function BrowsePetsSection({ persona }) {
           <CityChips cities={cities} />
         </HomeReveal>
 
-        {pets.length > 0 ? (
+        {isLoading ? (
+          // Enquanto a API responde: o espaço dos cards, sem piscar o "nenhum animal"
+          <div aria-hidden="true" className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: CARD_COUNT }, (_, index) => (
+              <div
+                key={index}
+                className={`h-96 rounded-3xl bg-slate-200/70 motion-safe:animate-pulse ${index > 0 ? 'hidden sm:block' : ''}`}
+              />
+            ))}
+          </div>
+        ) : pets.length > 0 ? (
           <HomeReveal delay={100}>
             {/* Mobile: carrossel com snap (rolável pelo teclado); sm+: grade */}
             <ul

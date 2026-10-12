@@ -1,16 +1,16 @@
 import { useMemo } from 'react'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { sortPetsByMatchScore } from '../../aumatch/utils/matchScore'
 import { uniqueByPhoto } from '../utils/homePets'
 import { useBrokenPhotos } from './useBrokenPhotos'
+import { useHomeAnimals } from './useHomeAnimals'
 
 // Mesmas regras de elegibilidade do deck do /aumatch, sem alterar nada lá:
-// fora os adotados, os próprios anúncios e (se pedido) os pets que a pessoa
+// só disponíveis (a API já filtra), fora os próprios anúncios e (se pedido) os pets que a pessoa
 // já solicitou — um pedido recusado libera o pet de volta
 export function useRankedPets(profile, { excludeRequested = false } = {}) {
-  const { animals } = useAnimals()
+  const { animals } = useHomeAnimals()
   const { user } = useAuth()
   const { requests } = useAdoptionRequests()
   const brokenPhotos = useBrokenPhotos()
@@ -27,7 +27,6 @@ export function useRankedPets(profile, { excludeRequested = false } = {}) {
     const species = profile?.speciesPreference
     const pool = animals.filter(
       (pet) =>
-        pet.status !== 'ADOTADO' &&
         pet.photoUrl &&
         !requestedIds.has(pet.id) &&
         (!species || species === 'BOTH' || pet.species === species)

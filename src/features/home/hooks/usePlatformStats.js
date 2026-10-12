@@ -1,15 +1,14 @@
 import { useMemo } from 'react'
-import { useAnimals } from '../../../core/context/AnimalContext'
+import { useHomeAnimals } from './useHomeAnimals'
 import { quizQuestions } from '../../onboarding/data/quizQuestions'
 
 // Todo número exibido na home sai daqui: contagem real dos anúncios ou fato
 // do produto (perguntas do quiz). Nada de
-// estatística escrita à mão
+// estatística escrita à mão. A API só lista os disponíveis
 export function usePlatformStats() {
-  const { animals } = useAnimals()
+  const { animals: available, isLoading } = useHomeAnimals()
 
   return useMemo(() => {
-    const available = animals.filter((pet) => pet.status !== 'ADOTADO')
 
     const ngoCount = new Set(
       available.filter((pet) => pet.listingType === 'NGO' && pet.organizationName).map((pet) => pet.organizationName)
@@ -24,6 +23,7 @@ export function usePlatformStats() {
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'pt-BR'))
 
     return {
+      isLoading,
       available,
       availableCount: available.length,
       ngoCount,
@@ -31,5 +31,5 @@ export function usePlatformStats() {
       cityCount: cities.length,
       questionCount: quizQuestions.length,
     }
-  }, [animals])
+  }, [available, isLoading])
 }
