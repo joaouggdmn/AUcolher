@@ -3,6 +3,19 @@ import { useAuth } from "../context/AuthContext";
 import { useAdoptionRequests } from "../context/AdoptionRequestContext";
 import { animalDisplayName } from "../../features/adocao/utils/requestAnimal";
 
+const MODERATION_REASONS = ["ACCOUNT_BANNED", "LISTING_REMOVED"];
+
+// Conversa que já existia (pedido aceito ou aguardando entrega) e foi
+// cancelada pela moderação (conta banida ou anúncio removido): continua
+// visível, travada
+function isChatClosedByModeration(request) {
+  return (
+    request.status === "CANCELLED" &&
+    MODERATION_REASONS.includes(request.cancelReason) &&
+    ["ACCEPTED", "AWAITING_DELIVERY"].includes(request.cancelledFromStatus)
+  );
+}
+
 export function useChatContacts() {
   const { user } = useAuth();
   const { requests } = useAdoptionRequests();
@@ -19,7 +32,8 @@ export function useChatContacts() {
           (request) =>
             request.status === "ACCEPTED" ||
             request.status === "AWAITING_DELIVERY" ||
-            request.status === "CONCLUDED",
+            request.status === "CONCLUDED" ||
+            isChatClosedByModeration(request),
         )
         .map((request) => {
           const { animal } = request;
@@ -36,6 +50,7 @@ export function useChatContacts() {
             animalId: request.animalId, // 🆕 necessário para concludeAdoption
             animalName: animalDisplayName(animal),
             status: request.status, // 🆕 controla o estado travado do header
+            cancelReason: request.cancelReason ?? null,
             isOwnerView: isOwner, // 🆕 só o doador vê o botão "Confirmar Entrega"
             reviews: request.reviews ?? {},
           };

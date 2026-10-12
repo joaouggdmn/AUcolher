@@ -1,4 +1,6 @@
 import api from "./api";
+import { mockHttpError } from "./mock/mockStore";
+import { isAccountBanned } from "../../features/admin/services/moderationMock";
 import { instagramUrl, normalizeFacebookUrl, xUrl } from "../utils/socialLinks";
 import { maskCEP } from "../utils/masks";
 import { parseFoundedYear } from "../utils/foundedYear";
@@ -117,15 +119,22 @@ function toFrontendUser(backendUser) {
   }
 }
 
+export const ACCOUNT_SUSPENDED_MESSAGE = "Esta conta foi suspensa pela moderação do AUcolher.";
+
 // Rota única para qualquer tipo de conta — o papel vem em user.userType
 export async function loginRequest({ email, password }) {
   const { data } = await api.post("/auth/login", { email, password });
+  const user = toFrontendUser(data.user);
+
+  // 🔴 Moderação no modo mock: a API ainda não sabe quem o admin baniu. Com
+  // o backend, a conta banida fica com `active = false` e o próprio login recusa
+  if (isAccountBanned(user)) throw mockHttpError(403, ACCOUNT_SUSPENDED_MESSAGE);
 
   // Formato da API: { token, type, user }
   return {
     token: data.token,
     tokenType: data.type ?? "Bearer",
-    user: toFrontendUser(data.user),
+    user,
   };
 }
 

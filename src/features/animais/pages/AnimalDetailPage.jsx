@@ -19,6 +19,7 @@ import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContex
 import { useProfileCompletion } from "../../../core/hooks/useProfileCompletion";
 import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
 import SuccessToast from "../../../core/components/ui/SuccessToast";
+import ModerationNotice from "../../../core/components/ui/ModerationNotice";
 import PhotoGallery from "../components/PhotoGallery";
 import HealthBadges from "../components/HealthBadges";
 import InterestInfoBubble from "../components/InterestInfoBubble";
@@ -27,6 +28,8 @@ import { buildAnimalSnapshot } from "../../adocao/utils/requestAnimal";
 import BehaviorProfile from "../components/BehaviorProfile";
 import OwnerListingPanel from "../components/OwnerListingPanel";
 import { useAnimal } from "../hooks/useAnimais";
+import ReportButton from "../../denuncias/components/ReportButton";
+import ListingUnavailable from "../components/ListingUnavailable";
 
 const SIZE_LABELS = { SMALL: "Pequeno", MEDIUM: "Médio", LARGE: "Grande" };
 
@@ -84,6 +87,10 @@ function AnimalDetailsPage() {
     );
   }
 
+  // Saiu do ar pela moderação: só o admin ainda vê o anúncio
+  const isAdmin = user?.userType === "ADMIN";
+  if (animal.moderation && !isAdmin) return <ListingUnavailable />;
+
   const isFemale = animal.sex === "FEMALE";
   const isNgo = animal.listingType === "NGO";
   const ownerDisplayName = isNgo
@@ -128,6 +135,14 @@ function AnimalDetailsPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
+      {animal.moderation && (
+        <ModerationNotice>
+          {animal.moderation === "REMOVED"
+            ? "Anúncio removido pela moderação: ele não aparece mais para ninguém no site."
+            : "A conta de quem anunciou foi banida: este anúncio não aparece mais para ninguém no site."}
+        </ModerationNotice>
+      )}
+
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
         <div className="lg:sticky lg:top-28">
           <PhotoGallery
@@ -272,6 +287,11 @@ function AnimalDetailsPage() {
                 </button>
               </>
             )}
+          </div>
+
+          {/* Some sozinho para o dono do anúncio e para o admin */}
+          <div className="flex justify-center">
+            <ReportButton targetType="ANIMAL" target={animal} />
           </div>
         </div>
       </div>

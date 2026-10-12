@@ -4,6 +4,8 @@ import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash, FaCalendarDays, FaHandHol
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import Spinner from '../../../core/components/ui/Spinner'
+import ModerationNotice from '../../../core/components/ui/ModerationNotice'
+import { useModeration } from '../../admin/hooks/useModeration'
 import AnimalCard from '../../animais/components/AnimalCard'
 import { useUserAnimals } from '../../animais/hooks/useAnimais'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
@@ -16,12 +18,14 @@ import OngDetails from '../components/public/OngDetails'
 import ProfileReviewsList from '../components/public/ProfileReviewsList'
 import OngEventsTab from '../components/public/OngEventsTab'
 import OngCampaignsTab from '../components/public/OngCampaignsTab'
+import ReportButton from '../../denuncias/components/ReportButton'
 
 function PublicProfilePage() {
   const { id } = useParams()
   const { user } = useAuth()
   const { requests } = useAdoptionRequests()
   const { profile, isLoading } = usePublicProfile(id)
+  const { isAccountBanned } = useModeration()
   const reviewsData = useUserReviews(id)
   // Antes dos returns antecipados (regra dos hooks); só busca quando o perfil
   // carregado é de ONG — pessoa não organiza eventos nem abre campanhas
@@ -68,6 +72,27 @@ function PublicProfilePage() {
     )
   }
 
+  // Conta banida: o perfil some do site; só o admin ainda vê, com um aviso
+  const isSuspended = isAccountBanned({ id: profile.id, name: profile.name })
+  const isAdmin = user?.userType === 'ADMIN'
+  if (isSuspended && !isAdmin) {
+    return (
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pb-16 pt-32 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+          <FaUserSlash size={20} />
+        </span>
+        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-emerald-950">Perfil indisponível</h1>
+        <p className="mt-2 text-slate-500">Esta conta foi suspensa pela moderação do AUcolher.</p>
+        <Link
+          to="/animais"
+          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+        >
+          Ver animais para adoção
+        </Link>
+      </div>
+    )
+  }
+
   const isOng = profile.userType === 'ONG'
   const isOwnProfile = Boolean(user) && String(user.id) === id
   const firstName = isOng ? profile.name : profile.name.split(' ')[0]
@@ -99,6 +124,13 @@ function PublicProfilePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
+      {isSuspended && (
+        <ModerationNotice>
+          Conta banida pela moderação: este perfil, os anúncios{isOng ? ', as campanhas e os eventos' : ''} dela não
+          aparecem mais para ninguém no site.
+        </ModerationNotice>
+      )}
+
       {isOwnProfile && (
         <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
@@ -116,7 +148,11 @@ function PublicProfilePage() {
       )}
 
       <div className="flex flex-col gap-6">
-        <PublicProfileHeader profile={profile} stats={stats} />
+        <PublicProfileHeader
+          profile={profile}
+          stats={stats}
+          action={<ReportButton targetType="USER" target={profile} variant="pill" />}
+        />
 
         {isOng && <OngDetails profile={profile} />}
 

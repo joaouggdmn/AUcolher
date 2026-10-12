@@ -16,8 +16,14 @@ const STATUS_META = {
   },
 };
 
+// Cancelado por uma decisão da moderação (regras §8)
+const MODERATION_META = {
+  ACCOUNT_BANNED: { ...STATUS_META.CANCELLED, label: "Cancelado — conta suspensa" },
+  LISTING_REMOVED: { ...STATUS_META.CANCELLED, label: "Cancelado — anúncio removido" },
+};
+
 function ResolvedRequestRow({ request }) {
-  const meta = STATUS_META[request.status];
+  const meta = MODERATION_META[request.cancelReason] ?? STATUS_META[request.status];
   const Icon = meta.icon;
 
   return (

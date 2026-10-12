@@ -5,7 +5,9 @@ import {
   ADOPTION_REQUESTS_STORAGE_KEY,
   MOCK_ADMIN_STORE_KEY,
   MOCK_CAMPANHAS_STORE_KEY,
+  MOCK_DENUNCIAS_STORE_KEY,
   MOCK_EVENTOS_STORE_KEY,
+  MOCK_MODERACAO_STORE_KEY,
 } from '../utils/storageKeys'
 
 // Chave do banco falso → queries que dependem dele. O painel do admin lê
@@ -14,6 +16,17 @@ const MOCK_STORE_QUERIES = {
   [MOCK_EVENTOS_STORE_KEY]: [queryKeys.eventos.all, queryKeys.admin.all],
   [MOCK_CAMPANHAS_STORE_KEY]: [queryKeys.campanhas.all, queryKeys.doacoes.all, queryKeys.admin.all],
   [MOCK_ADMIN_STORE_KEY]: [queryKeys.admin.all],
+  [MOCK_DENUNCIAS_STORE_KEY]: [queryKeys.denuncias.all, queryKeys.admin.all],
+  // Banir ou reativar muda o que o site mostra: vitrine, perfis, favoritos,
+  // campanhas e eventos
+  [MOCK_MODERACAO_STORE_KEY]: [
+    queryKeys.admin.all,
+    queryKeys.moderated.animals,
+    queryKeys.moderated.favorites,
+    queryKeys.moderated.publicProfile,
+    queryKeys.campanhas.all,
+    queryKeys.eventos.all,
+  ],
   [ADOPTION_REQUESTS_STORAGE_KEY]: [queryKeys.admin.all],
 }
 

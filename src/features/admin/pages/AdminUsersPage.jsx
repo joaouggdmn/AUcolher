@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { FaUsers } from 'react-icons/fa6'
+import { FaBan, FaRotateLeft, FaUsers } from 'react-icons/fa6'
 import PanelPage from '../../../core/components/panel/PanelPage'
+import ConfirmDialog from '../../../core/components/ui/ConfirmDialog'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
 import Spinner from '../../../core/components/ui/Spinner'
@@ -10,7 +11,9 @@ import { matchesSearch } from '../../../core/utils/search'
 import SearchBar from '../../animais/components/SearchBar'
 import ActivityEmptyState from '../../perfil/components/activity/ActivityEmptyState'
 import UserRow from '../components/UserRow'
-import { useAdminUsers } from '../hooks/useAdmin'
+import { useAdminUsers, useSetUserStatus } from '../hooks/useAdmin'
+import { useAdminPanel } from '../panel/useAdminPanel'
+import { banDescription, reactivateDescription } from '../utils/moderationText'
 
 const PAGE_SIZE = 20
 
@@ -24,6 +27,24 @@ function AdminUsersPage() {
   const [typeFilter, setTypeFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const { notify } = useAdminPanel()
+  const setUserStatus = useSetUserStatus()
+  // Conta esperando a confirmação: { user, active } (false = banir)
+  const [confirming, setConfirming] = useState(null)
+
+  function askConfirmation(user, active) {
+    setUserStatus.reset()
+    setConfirming({ user, active })
+  }
+
+  function handleConfirm() {
+    setUserStatus.mutate(confirming, {
+      onSuccess: () => {
+        notify(confirming.active ? 'Conta reativada.' : 'Conta banida.')
+        setConfirming(null)
+      },
+    })
+  }
 
   // Filtro novo, lista do começo
   function withReset(setter) {
@@ -81,7 +102,12 @@ function AdminUsersPage() {
             </p>
             <ul className="flex flex-col gap-3">
               {visible.map((user) => (
-                <UserRow key={user.id} user={user} />
+                <UserRow
+                  key={user.id}
+                  user={user}
+                  onBan={(target) => askConfirmation(target, false)}
+                  onReactivate={(target) => askConfirmation(target, true)}
+                />
               ))}
             </ul>
             {visibleCount < filtered.length && (
@@ -102,6 +128,25 @@ function AdminUsersPage() {
       description="Todas as contas da plataforma: pessoas e ONGs. Toda ONG já entra verificada."
     >
       {content}
+
+      {confirming && (
+        <ConfirmDialog
+          icon={confirming.active ? FaRotateLeft : FaBan}
+          variant={confirming.active ? 'default' : 'danger'}
+          title={confirming.active ? `Reativar ${confirming.user.name}?` : `Banir ${confirming.user.name}?`}
+          description={
+            confirming.active
+              ? reactivateDescription(confirming.user.name)
+              : banDescription(confirming.user.name, confirming.user.userType)
+          }
+          confirmLabel={confirming.active ? 'Reativar conta' : 'Banir conta'}
+          processingLabel={confirming.active ? 'Reativando...' : 'Banindo...'}
+          isProcessing={setUserStatus.isPending}
+          error={setUserStatus.isError ? getErrorMessage(setUserStatus.error) : null}
+          onConfirm={handleConfirm}
+          onCancel={() => setConfirming(null)}
+        />
+      )}
     </PanelPage>
   )
 }

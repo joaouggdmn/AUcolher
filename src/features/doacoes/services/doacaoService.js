@@ -89,6 +89,7 @@ export function toFrontendDonation(dto) {
       ngoName: dto.campaign.ngoName ?? '',
       // Excluída depois da doação: o histórico mostra o título, sem link
       isRemoved: Boolean(dto.campaign.removed),
+      isRemovedByModeration: Boolean(dto.campaign.removedByModeration),
     },
     donor: dto.donor
       ? { id: dto.donor.id, name: dto.donor.name, photoUrl: dto.donor.photoUrl ?? null }

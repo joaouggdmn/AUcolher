@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom'
-import { FaEye, FaLocationDot } from 'react-icons/fa6'
+import { FaEye, FaLocationDot, FaTrashCan } from 'react-icons/fa6'
 import CalendarDateBadge from '../../eventos/components/CalendarDateBadge'
 import { getCategoriaMeta } from '../../eventos/components/filters/filterOptions'
 import { formatTimeRange } from '../../eventos/utils/dateHelpers'
 import { getAttendanceSummary } from '../../eventos/utils/eventDisplay'
-import { EVENT_STATUS_META, eventStatus } from '../utils/listStatus'
+import { canRemove, EVENT_STATUS_META, eventStatus, hasPublicPage } from '../utils/listStatus'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
+const REMOVE_CLASSES =
+  'flex items-center gap-1.5 rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
 
 const SUMMARY_TONES = {
   neutral: 'text-slate-500',
@@ -16,8 +18,9 @@ const SUMMARY_TONES = {
 }
 
 // Um evento na lista do admin: quando, onde, de qual ONG e quantos
-// confirmaram. Cancelado não tem mais página pública, então fica sem link
-function AdminEventRow({ event }) {
+// confirmaram. Cancelado ou de ONG banida não tem mais página pública, então
+// fica sem link
+function AdminEventRow({ event, onRemove }) {
   const statusKey = eventStatus(event)
   const status = EVENT_STATUS_META[statusKey]
   const summary = getAttendanceSummary(event)
@@ -49,12 +52,18 @@ function AdminEventRow({ event }) {
         </div>
       </div>
 
-      {statusKey !== 'CANCELLED' && (
+      {canRemove(statusKey) && (
         <div className="flex shrink-0 flex-wrap gap-2">
-          <Link to={`/eventos/${event.id}`} className={ACTION_CLASSES}>
-            <FaEye size={11} />
-            Ver evento
-          </Link>
+          {hasPublicPage(statusKey) && (
+            <Link to={`/eventos/${event.id}`} className={ACTION_CLASSES}>
+              <FaEye size={11} />
+              Ver evento
+            </Link>
+          )}
+          <button type="button" onClick={() => onRemove(event)} className={REMOVE_CLASSES}>
+            <FaTrashCan size={11} />
+            Remover
+          </button>
         </div>
       )}
     </li>
