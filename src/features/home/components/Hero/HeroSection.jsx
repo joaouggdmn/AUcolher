@@ -2,7 +2,6 @@ import HeroCopy from './HeroCopy'
 import HeroAUmatchMockup from './HeroAUmatchMockup'
 import PlatformStatsBar from './PlatformStatsBar'
 import HomeSearch from '../Search/HomeSearch'
-import NearbyButton from '../Search/NearbyButton'
 import { useRankedPets } from '../../hooks/useRankedPets'
 
 // Pontilhado bem sutil, apagando nas bordas: textura sem competir com o texto
@@ -40,7 +39,6 @@ function HeroSection({ persona }) {
               Prefere buscar do seu jeito?
             </p>
             <HomeSearch labelledBy="home-search-title" />
-            <NearbyButton variant="link" className="pl-1" />
           </div>
         </div>
 

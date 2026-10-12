@@ -4,7 +4,6 @@ import { FaArrowRight, FaPaw } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 import SectionHeader from '../shared/SectionHeader'
 import HomeReveal from '../shared/HomeReveal'
-import NearbyButton from '../Search/NearbyButton'
 import CityChips from './CityChips'
 import PetCard from './PetCard'
 import { usePlatformStats } from '../../hooks/usePlatformStats'
@@ -62,20 +61,17 @@ function BrowsePetsSection({ persona }) {
         <HomeReveal className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeader id="browse-title" {...header} />
 
-          <div className="flex shrink-0 flex-wrap items-start gap-3">
-            <NearbyButton variant="pill" />
-            <Link
-              to="/animais"
-              className="group inline-flex h-12 items-center gap-2 rounded-full bg-emerald-800 px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/15 transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
-            >
-              {availableCount > 0 ? `Ver todos os ${availableCount} animais` : 'Ver todos os animais'}
-              <FaArrowRight
-                aria-hidden="true"
-                size={12}
-                className="transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </Link>
-          </div>
+          <Link
+            to="/animais"
+            className="group inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-full lg:self-auto bg-emerald-800 px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/15 transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+          >
+            {availableCount > 0 ? `Ver todos os ${availableCount} animais` : 'Ver todos os animais'}
+            <FaArrowRight
+              aria-hidden="true"
+              size={12}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </Link>
         </HomeReveal>
 
         <HomeReveal className="mt-8">
