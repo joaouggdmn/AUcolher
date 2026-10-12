@@ -1,7 +1,7 @@
 import { LuSparkles } from 'react-icons/lu'
 import ActionLink, { ActionSkeleton } from '../shared/ActionLink'
 import { getPersonaActions } from '../../data/personaActions'
-import { CRITERIA_COUNT } from '../../data/criteriaGuide'
+import { quizQuestions } from '../../../onboarding/data/quizQuestions'
 import { plural } from '../../utils/homePets'
 
 // "AU" + "migo" nas cores do logo. emerald-600 e amber-600 só passam no
@@ -53,7 +53,7 @@ function getCopy({ kind, firstName, quizProgress }, { ranked, eligibleCount }) {
       eyebrow: 'AUmatch para ONGs',
       title: 'Leve seus resgatados até a família certa.',
       subtitle:
-        'No AUmatch, cada anúncio é comparado com a rotina de quem quer adotar — e seus animais aparecem com o selo dourado de ONG verificada.',
+        'No AUmatch, cada anúncio é comparado com a rotina de quem quer adotar, e seus animais aparecem com o selo dourado de ONG verificada.',
     }
   }
 
@@ -62,7 +62,7 @@ function getCopy({ kind, firstName, quizProgress }, { ranked, eligibleCount }) {
   return {
     eyebrow: 'AUmatch · compatibilidade que se explica',
     title: PERSON_TITLE,
-    subtitle: `O AUmatch compara ${CRITERIA_COUNT} critérios do seu dia a dia com o jeito de cada pet e mostra, ponto a ponto, por que vocês dão match.`,
+    subtitle: `Responda ${quizQuestions.length} perguntas rápidas sobre a sua casa e a sua rotina e veja, ponto a ponto, por que cada pet combina com você.`,
   }
 }
 
