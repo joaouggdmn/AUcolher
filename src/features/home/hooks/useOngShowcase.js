@@ -1,26 +1,26 @@
 import { useMemo } from 'react'
 import { useAnimals } from '../../../core/context/AnimalContext'
-import { mockCampanhas } from '../../doacoes/data/mockCampanhas'
-import { mockEventos } from '../../eventos/data/mockEventos'
+import { useCampaigns } from '../../doacoes/hooks/useCampanhas'
+import { useEvents } from '../../eventos/hooks/useEventos'
 import { mockPublicProfiles } from '../../perfil/data/mockPublicProfiles'
 import { matchesPeriod } from '../../eventos/utils/dateHelpers'
 
-// As mesmas fontes que /campanhas e /eventos usam hoje. Os mocks só guardam
-// o nome da ONG (não o id), então é pelo nome que tudo se junta
-function buildShowcase(animals) {
+// As mesmas fontes que /campanhas e /eventos usam hoje. Os perfis e os animais
+// só trazem o nome da ONG (não o id), então é pelo nome que tudo se junta
+function buildShowcase(animals, campaigns, events) {
   const byName = new Map()
   const entryFor = (name) => {
     if (!byName.has(name)) byName.set(name, { name, campaigns: [], upcomingEvents: [], petCount: 0 })
     return byName.get(name)
   }
 
-  for (const campaign of mockCampanhas) {
+  for (const campaign of campaigns) {
     if (campaign.ong?.name) entryFor(campaign.ong.name).campaigns.push(campaign)
   }
 
   // matchesPeriod(data, null) já descarta o que passou — o mesmo critério da
   // listagem de eventos. Evento vencido nunca aparece como "próximo"
-  for (const event of mockEventos) {
+  for (const event of events) {
     if (event.organizer?.name && matchesPeriod(event.date, null)) {
       entryFor(event.organizer.name).upcomingEvents.push(event)
     }
@@ -51,5 +51,8 @@ function buildShowcase(animals) {
 // ativas primeiro — é o que a seção "ONGs parceiras" da home desenha
 export function useOngShowcase() {
   const { animals } = useAnimals()
-  return useMemo(() => buildShowcase(animals), [animals])
+  const { data: campaigns } = useCampaigns()
+  const { data: events } = useEvents()
+
+  return useMemo(() => buildShowcase(animals, campaigns ?? [], events ?? []), [animals, campaigns, events])
 }
