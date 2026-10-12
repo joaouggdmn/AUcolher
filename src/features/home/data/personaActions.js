@@ -1,5 +1,5 @@
-// Próximo passo de cada público, num lugar só: o hero usa estas ações e a
-// seção de atalhos logo abaixo evita repeti-las.
+// Próximo passo de cada público, num lugar só: o hero, a seção de atalhos e
+// o fechamento da "Adoção segura" usam as mesmas ações, então nunca divergem.
 // - pending: no /aumatch o quiz abre sozinho para quem está logado sem ele
 // - hash (#atalhos): rolagem dentro da própria home via useScrollToHash
 // - visitor: o LoginPage volta para state.from depois de entrar
