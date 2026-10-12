@@ -1,8 +1,6 @@
 import { FaUser, FaEnvelope, FaLocationDot, FaHeartCircleCheck } from 'react-icons/fa6'
-import { useCepLookup } from '../../../../core/hooks/useCepLookup'
-import { BRAZILIAN_STATES } from '../../../../core/utils/brazilianStates'
 import AvatarUploadInput from '../../../../core/components/ui/AvatarUploadInput'
-import CepField from '../../../../core/components/ui/CepField'
+import CityStateFields from '../../../../core/components/ui/CityStateFields'
 import FormField from '../../../../core/components/ui/FormField'
 import { useAccountForm } from '../../hooks/useAccountForm'
 import { buildPersonForm, toPersonUpdates } from '../../utils/accountForm'
@@ -14,37 +12,19 @@ import AccountGroupHeading from './AccountGroupHeading'
 import TextAreaField from './TextAreaField'
 
 // Pessoa física (seção 6.1): o perfil público é enxuto — foto, nome, bio e
-// cidade. O resto (e-mail, CEP, Perfil AUmatch) é privado
+// cidade. O resto (e-mail, Perfil AUmatch) é privado
 function PersonAccountForm() {
   const { user, formData, setField, setFields, isDirty, checklist, percentage, save, discard } = useAccountForm({
     buildForm: buildPersonForm,
     toUpdates: toPersonUpdates,
   })
 
-  // O CEP (ViaCEP) só preenche cidade e estado, que continuam editáveis à
-  // mão. Se a consulta vier sem um dos dois, mantém o que já estava
-  const { cep, status: cepStatus, errorMessage: cepError, handleCepChange } = useCepLookup((location) => {
-    setFields((prev) => ({
-      city: location.city || prev.city,
-      state: location.state || prev.state,
-    }))
-  })
-
-  // CEP pela metade não vai para a API (que só aceita os 8 dígitos) — fica o
-  // que já estava salvo
-  const handleSave = () => save(cep.length === 8 ? { cep } : {})
-
-  const handleDiscard = () => {
-    discard()
-    handleCepChange('')
-  }
-
   return (
     <>
       <ProfileCompletionBar checklist={checklist} percentage={percentage} />
 
       <div className="mt-10">
-        <AccountFormShell isDirty={isDirty} onSave={handleSave} onDiscard={handleDiscard}>
+        <AccountFormShell isDirty={isDirty} onSave={() => save()} onDiscard={discard}>
           <AccountGroupHeading
             visibility="public"
             title="Perfil público"
@@ -95,37 +75,7 @@ function PersonAccountForm() {
           </ProfileSection>
 
           <ProfileSection icon={FaLocationDot} title="Localização" description="Sua cidade e estado aparecem no perfil público">
-            <div className="mb-4">
-              <CepField cep={cep} status={cepStatus} errorMessage={cepError} onChange={handleCepChange} />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                label="Cidade"
-                value={formData.city}
-                onChange={(e) => setField('city', e.target.value)}
-                placeholder="Preenchido automaticamente pelo CEP"
-              />
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-slate-700">Estado</label>
-                <select
-                  value={formData.state}
-                  onChange={(e) => setField('state', e.target.value)}
-                  className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
-                >
-                  <option value="">Selecione</option>
-                  {BRAZILIAN_STATES.map((uf) => (
-                    <option key={uf.value} value={uf.value}>
-                      {uf.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <p className="mt-3 text-xs text-slate-400">
-              No perfil público aparecem só a cidade e o estado. O CEP fica com você.
-            </p>
+            <CityStateFields state={formData.state} city={formData.city} onChange={setFields} />
           </ProfileSection>
 
           <ProfileSection

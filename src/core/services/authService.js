@@ -96,7 +96,6 @@ export function toFrontendProfile(backendUser) {
     visitingHours: backendUser.visitingHours ?? [],
     city: backendUser.city ?? '',
     state: backendUser.state ?? '',
-    cep: backendUser.cep ?? '',
   }
 }
 
