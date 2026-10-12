@@ -122,7 +122,6 @@ export function toApiPayload(updates, userType) {
   if (userType !== 'ONG') {
     return {
       ...basePayload,
-      cep: updates.cep?.replace(/\D/g, '') || null,
       city: updates.city || null,
       state: updates.state || null,
     }
