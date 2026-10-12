@@ -1,10 +1,11 @@
 import PublicLayout from '../core/components/layout/PublicLayout'
-import PlaceholderPage from '../core/components/PlaceholderPage'
 import HomePage from '../features/home/pages/HomePage'
 import AnimaisListPage from '../features/animais/pages/AnimaisListPage'
 import AnimalDetailPage from '../features/animais/pages/AnimalDetailPage'
 import EventsListPage from '../features/eventos/pages/EventsListPage'
-import CampaingsListPage from '../features/doacoes/pages/CampaignsListPage'
+import EventDetailPage from '../features/eventos/pages/EventDetailPage'
+import CampaignsListPage from '../features/doacoes/pages/CampaignsListPage'
+import CampaignDetailPage from '../features/doacoes/pages/CampaignDetailPage'
 import AumatchPage from '../features/aumatch/pages/AumatchPage'
 import PublicProfilePage from '../features/perfil/pages/PublicProfilePage'
 
@@ -38,15 +39,15 @@ export const publicRoutes = [
       },
       {
         path: 'eventos/:id',
-        element: <PlaceholderPage title="Detalhes do evento" />,
+        element: <EventDetailPage />,
       },
       {
         path: 'campanhas',
-        element: <CampaingsListPage />,
+        element: <CampaignsListPage />,
       },
       {
         path: 'campanhas/:id',
-        element: <PlaceholderPage title="Detalhes da campanha" />,
+        element: <CampaignDetailPage />,
       },
       {
         path: 'ong/:id',

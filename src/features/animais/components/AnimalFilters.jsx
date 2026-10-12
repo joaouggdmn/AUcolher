@@ -15,8 +15,8 @@ const PORTES = [
 
 const SEXOS = [
   { value: '', label: 'Sexo' },
-  { value: 'M', label: 'Macho' },
-  { value: 'F', label: 'Fêmea' },
+  { value: 'MALE', label: 'Macho' },
+  { value: 'FEMALE', label: 'Fêmea' },
 ]
 
 function FilterSelect({ value, onChange, options }) {

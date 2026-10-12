@@ -1,31 +1,39 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash } from 'react-icons/fa6'
+import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash, FaCalendarDays, FaHandHoldingHeart } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import Spinner from '../../../core/components/ui/Spinner'
+import ModerationNotice from '../../../core/components/ui/ModerationNotice'
+import { useModeration } from '../../admin/hooks/useModeration'
 import AnimalCard from '../../animais/components/AnimalCard'
+import { useUserAnimals } from '../../animais/hooks/useAnimais'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
+import { useEvents } from '../../eventos/hooks/useEventos'
+import { useCampaigns } from '../../doacoes/hooks/useCampanhas'
 import { usePublicProfile } from '../hooks/usePublicProfile'
 import ProfileTabs from '../components/ProfileTabs'
 import PublicProfileHeader from '../components/public/PublicProfileHeader'
 import OngDetails from '../components/public/OngDetails'
 import ProfileReviewsList from '../components/public/ProfileReviewsList'
+import OngEventsTab from '../components/public/OngEventsTab'
+import OngCampaignsTab from '../components/public/OngCampaignsTab'
+import ReportButton from '../../denuncias/components/ReportButton'
 
 function PublicProfilePage() {
   const { id } = useParams()
   const { user } = useAuth()
-  const { animals } = useAnimals()
   const { requests } = useAdoptionRequests()
   const { profile, isLoading } = usePublicProfile(id)
+  const { isAccountBanned } = useModeration()
   const reviewsData = useUserReviews(id)
+  // Antes dos returns antecipados (regra dos hooks); só busca quando o perfil
+  // carregado é de ONG — pessoa não organiza eventos nem abre campanhas
+  const ongEvents = useEvents({ ongId: id, enabled: profile?.userType === 'ONG' })
+  const ongCampaigns = useCampaigns({ ongId: id, enabled: profile?.userType === 'ONG' })
 
-  // 🔴 Com a API real: GET /usuarios/{id}/animais?status=DISPONIVEL
-  const availableAnimals = useMemo(
-    () => animals.filter((animal) => String(animal.ownerId) === id && animal.status !== 'ADOTADO'),
-    [animals, id],
-  )
+  // GET /users/{id}/animals: a API já devolve só os disponíveis
+  const { data: availableAnimals = [] } = useUserAnimals(id)
 
   const liveConcludedAdoptions = useMemo(
     () =>
@@ -54,6 +62,27 @@ function PublicProfilePage() {
         </span>
         <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-emerald-950">Perfil não encontrado</h1>
         <p className="mt-2 text-slate-500">Essa conta pode ter sido removida ou o link está incorreto.</p>
+        <Link
+          to="/animais"
+          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+        >
+          Ver animais para adoção
+        </Link>
+      </div>
+    )
+  }
+
+  // Conta banida: o perfil some do site; só o admin ainda vê, com um aviso
+  const isSuspended = isAccountBanned({ id: profile.id, name: profile.name })
+  const isAdmin = user?.userType === 'ADMIN'
+  if (isSuspended && !isAdmin) {
+    return (
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pb-16 pt-32 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+          <FaUserSlash size={20} />
+        </span>
+        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-emerald-950">Perfil indisponível</h1>
+        <p className="mt-2 text-slate-500">Esta conta foi suspensa pela moderação do AUcolher.</p>
         <Link
           to="/animais"
           className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
@@ -95,6 +124,13 @@ function PublicProfilePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
+      {isSuspended && (
+        <ModerationNotice>
+          Conta banida pela moderação: este perfil, os anúncios{isOng ? ', as campanhas e os eventos' : ''} dela não
+          aparecem mais para ninguém no site.
+        </ModerationNotice>
+      )}
+
       {isOwnProfile && (
         <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
@@ -112,7 +148,11 @@ function PublicProfilePage() {
       )}
 
       <div className="flex flex-col gap-6">
-        <PublicProfileHeader profile={profile} stats={stats} />
+        <PublicProfileHeader
+          profile={profile}
+          stats={stats}
+          action={<ReportButton targetType="USER" target={profile} variant="pill" />}
+        />
 
         {isOng && <OngDetails profile={profile} />}
 
@@ -124,6 +164,38 @@ function PublicProfilePage() {
               icon: FaPaw,
               content: animalsContent,
             },
+            ...(isOng
+              ? [
+                  {
+                    key: 'campanhas',
+                    label: ongCampaigns.data ? `Campanhas (${ongCampaigns.data.length})` : 'Campanhas',
+                    icon: FaHandHoldingHeart,
+                    content: (
+                      <OngCampaignsTab
+                        campaigns={ongCampaigns.data ?? []}
+                        isLoading={ongCampaigns.isLoading}
+                        isError={ongCampaigns.isError}
+                        ongName={profile.name}
+                        isOwnProfile={isOwnProfile}
+                      />
+                    ),
+                  },
+                  {
+                    key: 'eventos',
+                    label: ongEvents.data ? `Eventos (${ongEvents.data.length})` : 'Eventos',
+                    icon: FaCalendarDays,
+                    content: (
+                      <OngEventsTab
+                        events={ongEvents.data ?? []}
+                        isLoading={ongEvents.isLoading}
+                        isError={ongEvents.isError}
+                        ongName={profile.name}
+                        isOwnProfile={isOwnProfile}
+                      />
+                    ),
+                  },
+                ]
+              : []),
             {
               key: 'avaliacoes',
               label: `Avaliações (${reviewsData.count})`,

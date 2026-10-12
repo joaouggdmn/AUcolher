@@ -8,7 +8,7 @@ import { injectSystemMessage } from '../utils/chatSystemMessage'
 //   Passo 1 (doador): trava o chat e avisa o adotante que precisa
 //   confirmar o recebimento do pet
 //   Passo 2 (adotante): conclui o pedido (o contexto cancela os pedidos
-//   concorrentes e marca o animal como ADOTADO) e celebra no chat
+//   concorrentes e marca o animal como ADOPTED) e celebra no chat
 export function useConcludeAdoption() {
   const { requestDeliveryConfirmation, concludeRequest } = useAdoptionRequests()
 

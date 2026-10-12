@@ -1,14 +1,42 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useQueries } from "@tanstack/react-query";
 import { adoptionRequestsSeed } from "../../features/adocao/data/adoptionRequestsSeed";
+import { requestAnimalSource, resolveRequestAnimal } from "../../features/adocao/utils/requestAnimal";
+import { animalKeys, useMyAnimals } from "../../features/animais/hooks/useAnimais";
+import { getAnimal } from "../../features/animais/services/animalService";
+import { matchesAccount } from "../../features/admin/services/moderationMock";
+import { useSyncAdoptedAnimals } from "../hooks/useSyncAdoptedAnimals";
+import { isSameId } from "../utils/ids";
 import { ADOPTION_REQUESTS_STORAGE_KEY } from "../utils/storageKeys";
+import { useAuth } from "./AuthContext";
 import { useAnimals } from "./AnimalContext";
 
 const AdoptionRequestContext = createContext(null);
+
+const NO_ANIMALS = [];
+
+// Fora do componente: com a mesma referência, o useQueries só recombina
+// quando algum resultado muda
+function collectAnimals(results) {
+  return results.map((result) => result.data).filter(Boolean);
+}
 
 // Cada pedido CONCLUDED guarda no máximo 1 avaliação por lado, indexada
 // pelo papel de quem escreveu: reviews.adopter avalia o doador,
 // reviews.owner avalia o adotante
 const REVIEW_AUTHOR_ROLES = ["adopter", "owner"];
+
+// Pedidos que ainda podem andar — os que um banimento cancela
+const ACTIVE_STATUSES = ["PENDING", "ACCEPTED", "AWAITING_DELIVERY"];
+
+// A conta banida é a dona do animal ou a adotante? O nome vem da cópia
+// guardada no pedido (pedido antigo, sem cópia, compara só o id)
+function bannedSide(request, account) {
+  const ownerName = request.animal?.organizationName ?? request.animal?.ownerName ?? null;
+  if (matchesAccount(account, { id: request.ownerId, name: ownerName })) return "owner";
+  if (matchesAccount(account, { id: request.adopter?.userId, name: request.adopter?.name })) return "adopter";
+  return null;
+}
 
 function loadInitialRequests() {
   try {
@@ -22,7 +50,48 @@ function loadInitialRequests() {
 
 export function AdoptionRequestProvider({ children }) {
   const [requests, setRequests] = useState(loadInitialRequests);
-  const { markAnimalAsAdopted } = useAnimals();
+  const { user } = useAuth();
+  const { animals: legacyAnimals, markAnimalAsAdopted } = useAnimals();
+  const { data: myApiAnimals = NO_ANIMALS } = useMyAnimals();
+
+  // Pedidos em que a conta logada é a adotante e o animal não é dela: busca
+  // o animal na API para ter foto e dados atuais (pedidos antigos nem têm cópia)
+  const animalIdsToFetch = useMemo(() => {
+    if (!user) return [];
+    const mine = new Set(myApiAnimals.map((animal) => String(animal.id)));
+    const ids = requests
+      .filter((request) => isSameId(request.adopter?.userId ?? request.adopterId, user.id))
+      .filter((request) => request.animal?.source !== "legacy" && !mine.has(String(request.animalId)))
+      .map((request) => String(request.animalId));
+    return [...new Set(ids)];
+  }, [user, requests, myApiAnimals]);
+
+  const fetchedAnimals = useQueries({
+    queries: animalIdsToFetch.map((id) => ({
+      queryKey: animalKeys.detail(id),
+      queryFn: () => getAnimal(id),
+    })),
+    combine: collectAnimals,
+  });
+
+  // O que as telas recebem: cada pedido com o animal certo em `animal` e a
+  // origem dele em `animalSource`. O que vai para o localStorage continua
+  // sendo só o pedido como foi gravado
+  const resolvedRequests = useMemo(() => {
+    const apiById = new Map([...fetchedAnimals, ...myApiAnimals].map((animal) => [String(animal.id), animal]));
+    const legacyById = new Map(legacyAnimals.map((animal) => [String(animal.id), animal]));
+
+    return requests.map((request) => {
+      const apiAnimal = apiById.get(String(request.animalId));
+      return {
+        ...request,
+        animalSource: requestAnimalSource(request, apiAnimal),
+        animal: resolveRequestAnimal(request, { apiAnimal, legacyAnimal: legacyById.get(String(request.animalId)) }),
+      };
+    });
+  }, [requests, fetchedAnimals, myApiAnimals, legacyAnimals]);
+
+  useSyncAdoptedAnimals({ userId: user?.id, requests: resolvedRequests, myAnimals: myApiAnimals });
 
   // Persiste toda alteração — o localStorage funciona como um "banco de
   // dados" mockado, compartilhado entre abas do mesmo navegador
@@ -50,7 +119,8 @@ export function AdoptionRequestProvider({ children }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  function createRequest({ animalId, ownerId, adopter }) {
+  // `animal` é a cópia de buildAnimalSnapshot (features/adocao/utils/requestAnimal)
+  function createRequest({ animalId, ownerId, adopter, animal }) {
     const newRequest = {
       id: Date.now(),
       animalId,
@@ -58,6 +128,7 @@ export function AdoptionRequestProvider({ children }) {
       status: "PENDING",
       createdAt: new Date().toISOString(),
       adopter,
+      animal,
     };
     setRequests((prev) => [newRequest, ...prev]);
     return newRequest;
@@ -109,9 +180,11 @@ export function AdoptionRequestProvider({ children }) {
         }
         // Exclusão mútua: qualquer OUTRO pedido para o MESMO animal que
         // ainda não tinha sido recusado vira CANCELLED — o animal não
-        // está mais disponível, então esse pedido nunca mais avança
+        // está mais disponível, então esse pedido nunca mais avança.
+        // O dono também precisa bater: ids da API e do AnimalContext se repetem
         if (
           request.animalId === target.animalId &&
+          isSameId(request.ownerId, target.ownerId) &&
           request.status !== "REJECTED"
         ) {
           return { ...request, status: "CANCELLED" };
@@ -119,8 +192,58 @@ export function AdoptionRequestProvider({ children }) {
         return request;
       }),
     );
-    markAnimalAsAdopted(target.animalId);
+    // Animal da API vira ADOPTED quando o dono entrar (useSyncAdoptedAnimals);
+    // aqui só o do AnimalContext, que é o que o AUmatch mostra
+    const resolved = resolvedRequests.find((request) => request.id === requestId);
+    if (resolved?.animalSource === "legacy") markAnimalAsAdopted(target.animalId);
     return true;
+  }
+
+  // 🔴 Moderação: banir uma conta cancela os pedidos ativos dela, como dona
+  // ou como adotante, e a outra parte vê o motivo (cancelReason). Com os
+  // pedidos no backend, o próprio banimento faz isso no servidor
+  function cancelRequestsOfBannedAccount(account) {
+    const cancelledAt = new Date().toISOString();
+    setRequests((prev) =>
+      prev.map((request) => {
+        if (!ACTIVE_STATUSES.includes(request.status)) return request;
+        const side = bannedSide(request, account);
+        if (!side) return request;
+        return {
+          ...request,
+          status: "CANCELLED",
+          cancelReason: "ACCOUNT_BANNED",
+          bannedSide: side,
+          // A conversa (aceito ou aguardando entrega) continua visível, travada
+          cancelledFromStatus: request.status,
+          cancelledAt,
+        };
+      }),
+    );
+  }
+
+  // 🔴 Moderação: remover um anúncio cancela os pedidos ativos do animal, e
+  // as duas partes veem o motivo. Os ids do AUmatch antigo se repetem com os
+  // da API, então o dono também precisa bater e o pedido não pode ser de lá
+  function cancelRequestsOfRemovedAnimal(animal) {
+    const cancelledAt = new Date().toISOString();
+    setRequests((prev) =>
+      prev.map((request) => {
+        const isForAnimal =
+          ACTIVE_STATUSES.includes(request.status) &&
+          request.animal?.source !== "legacy" &&
+          isSameId(request.animalId, animal.id) &&
+          isSameId(request.ownerId, animal.ownerId);
+        if (!isForAnimal) return request;
+        return {
+          ...request,
+          status: "CANCELLED",
+          cancelReason: "LISTING_REMOVED",
+          cancelledFromStatus: request.status,
+          cancelledAt,
+        };
+      }),
+    );
   }
 
   function saveReview(requestId, authorRole, { rating, comment, author }) {
@@ -167,12 +290,14 @@ export function AdoptionRequestProvider({ children }) {
   return (
     <AdoptionRequestContext.Provider
       value={{
-        requests,
+        requests: resolvedRequests,
         createRequest,
         acceptRequest,
         rejectRequest,
         requestDeliveryConfirmation,
         concludeRequest,
+        cancelRequestsOfBannedAccount,
+        cancelRequestsOfRemovedAnimal,
         saveReview,
         deleteReview,
       }}

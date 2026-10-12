@@ -3,6 +3,15 @@ import { FaCamera, FaXmark } from 'react-icons/fa6'
 import { compressImage } from '../../../../core/utils/compressImage'
 
 const MAX_PHOTOS = 4
+// Mesmo limite da API por foto (PhotoUrl.MAX_LENGTH, em caracteres do data URL)
+const PHOTO_MAX_LENGTH = 300_000
+
+// 600 px dá conta da galeria do detalhe; foto com muito detalhe que ainda
+// passe do limite é recomprimida menor, em vez de a API recusar o anúncio
+async function compressForUpload(file) {
+  const dataUrl = await compressImage(file, { maxSize: 600 })
+  return dataUrl.length <= PHOTO_MAX_LENGTH ? dataUrl : compressImage(file, { maxSize: 480, quality: 0.6 })
+}
 
 function PhotoUploadGrid({ images, onChange }) {
   const inputRef = useRef(null)
@@ -15,7 +24,7 @@ function PhotoUploadGrid({ images, onChange }) {
       if (!file.type.startsWith('image/')) return
       // Atualização funcional: evita que imagens processadas fora de ordem
       // (a compressão é assíncrona) sobrescrevam umas às outras
-      compressImage(file)
+      compressForUpload(file)
         .then((dataUrl) => onChange((prev) => (prev.length < MAX_PHOTOS ? [...prev, dataUrl] : prev)))
         .catch((error) => console.warn(error.message))
     })

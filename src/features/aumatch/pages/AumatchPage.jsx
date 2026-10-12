@@ -14,7 +14,9 @@ import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
+import { useModeration } from '../../admin/hooks/useModeration'
 import { buildAdopterSnapshot } from '../../adocao/utils/buildAdopterSnapshot'
+import { buildAnimalSnapshot } from '../../adocao/utils/requestAnimal'
 import { registerPass } from '../services/aumatchService'
 import { sortPetsByMatchScore } from '../utils/matchScore'
 import { applyMatchPreferences } from '../utils/matchFilters'
@@ -25,6 +27,7 @@ import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 
 function AumatchPage() {
   const { animals: pets } = useAnimals()
+  const { isAccountBanned } = useModeration()
   const { user, isAuthenticated, updateProfile } = useAuth()
   const { requests, createRequest } = useAdoptionRequests()
   const { percentage: profileCompletion } = useProfileCompletion(user)
@@ -73,12 +76,14 @@ function AumatchPage() {
       : []
 
     // 2. Filtro base: espécie preferida + já solicitados + já adotados.
-    // 🆕 O filtro de ADOTADO não depende de QUEM pediu — uma vez que o
+    // 🆕 O filtro de ADOPTED não depende de QUEM pediu — uma vez que o
     // pet foi adotado por qualquer pessoa, ele nunca mais aparece no
     // deck de ninguém.
     const baseFiltered = pets.filter((pet) => {
       if (requestedAnimalIds.includes(pet.id)) return false
-      if (pet.status === 'ADOTADO') return false
+      if (pet.status === 'ADOPTED') return false
+      // Dono banido pela moderação: os animais dele saem do deck
+      if (isAccountBanned({ id: pet.ownerId, name: pet.organizationName ?? pet.ownerName })) return false
 
       if (user?.speciesPreference && user.speciesPreference !== 'BOTH') {
         return pet.species === user.speciesPreference
@@ -90,7 +95,7 @@ function AumatchPage() {
 
     // 3. Aplica o algoritmo de match e oculta os próprios animais do doador
     return sortPetsByMatchScore(user, baseFiltered, user.id)
-  }, [pets, user, isAuthenticated, requests])
+  }, [pets, user, isAuthenticated, requests, isAccountBanned])
 
   // 4. Preferências do painel esquerdo por último: elas filtram e reordenam
   // o resultado do algoritmo, sem interferir nas regras de elegibilidade
@@ -152,6 +157,8 @@ function AumatchPage() {
       animalId: likedPet.id,
       ownerId: likedPet.ownerId,
       adopter: buildAdopterSnapshot(user, profileCompletion),
+      // O deck do AUmatch ainda vem do AnimalContext, não da API
+      animal: buildAnimalSnapshot(likedPet, 'legacy'),
     })
   }
 

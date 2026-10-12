@@ -8,6 +8,7 @@ import { useFavorites } from '../../context/FavoritesContext'
 import { useProfileCompletion } from '../../hooks/useProfileCompletion'
 import { useReceivedRequests } from '../../hooks/useReceivedRequests'
 import { useChatUnread } from '../../hooks/useChatUnread'
+import { getPanelLink } from '../../utils/panelLinks'
 import UserAvatarMenu from './UserAvatarMenu'
 import PlatformSidebar from './PlatformSidebar'
 
@@ -28,6 +29,8 @@ function Navbar() {
   const { pendingCount } = useReceivedRequests()
   const { unreadCount: unreadChatCount } = useChatUnread()
   const closeSidebar = useCallback(() => setIsSidebarOpen(false), [])
+  const panelLink = getPanelLink(user?.userType)
+  const PanelLinkIcon = panelLink?.icon
 
   // Badge do botão da sidebar: só o que pede atenção (pedidos pendentes e
   // mensagens não lidas). Favoritos não entram — não são novidade.
@@ -151,6 +154,22 @@ function Navbar() {
               <div className="h-11 w-11 animate-pulse rounded-full bg-slate-200" />
             ) : isAuthenticated ? (
               <>
+                {/* Só em telas largas: abaixo disso encostaria nos links do
+                    centro, e o painel continua no menu lateral e no do avatar */}
+                {panelLink && (
+                  <Link
+                    to={panelLink.to}
+                    className={`hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all duration-300 xl:flex ${
+                      isScrolled
+                        ? 'bg-white/10 text-white hover:bg-white/20'
+                        : 'bg-emerald-800 text-white hover:bg-emerald-900'
+                    }`}
+                  >
+                    <PanelLinkIcon size={13} className="text-amber-300" />
+                    {panelLink.label}
+                  </Link>
+                )}
+
                 {/* Atalho para /favoritos com o contador global — visível para
                     qualquer usuário logado (comum ou ONG) */}
                 <Link
@@ -259,6 +278,7 @@ function Navbar() {
         <PlatformSidebar
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
+          panelLink={panelLink}
           totalFavoritos={totalFavoritos}
           pendingCount={pendingCount}
           unreadChatCount={unreadChatCount}

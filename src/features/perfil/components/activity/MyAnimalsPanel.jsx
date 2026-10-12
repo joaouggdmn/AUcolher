@@ -1,12 +1,7 @@
 import { Link } from 'react-router-dom'
 import { FaArrowRight, FaPaw, FaPlus, FaHeart } from 'react-icons/fa6'
+import { LISTING_STATUS_META } from '../../../animais/utils/listingStatus'
 import ActivityEmptyState from './ActivityEmptyState'
-
-const LISTING_STATUS_META = {
-  DISPONIVEL: { label: 'Disponível', className: 'bg-emerald-50 text-emerald-700' },
-  EM_PROCESSO: { label: 'Em processo', className: 'bg-amber-50 text-amber-700' },
-  ADOTADO: { label: 'Adotado', className: 'bg-slate-100 text-slate-500' },
-}
 
 function MyAnimalsPanel({ animals }) {
   if (animals.length === 0) {

@@ -18,10 +18,8 @@ function FiltersPanel({
   onToggleArrayFilter,
   onToggleSpecialNeeds,
   onCityChange,
-  onDistanceChange,
   onClear,
   hasActiveFilters,
-  isProximityActive, // 🆕
 }) {
   return (
     <div className="flex flex-col">
@@ -123,43 +121,6 @@ function FiltersPanel({
             </div>
           </FilterSection>
 
-          <FilterSection title="Distância máxima">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <span
-                  className={`text-sm font-bold ${isProximityActive ? "text-slate-400" : "text-emerald-800"}`}
-                >
-                  Até {filters.maxDistance} km
-                </span>
-                {isProximityActive && (
-                  <span className="text-[11px] font-semibold text-emerald-600">
-                    Ordenado por GPS
-                  </span>
-                )}
-              </div>
-
-              <input
-                type="range"
-                min={1}
-                max={50}
-                value={filters.maxDistance}
-                onChange={(e) => onDistanceChange(Number(e.target.value))}
-                disabled={isProximityActive}
-                className={`h-1.5 w-full appearance-none rounded-full bg-slate-200 accent-emerald-700 ${
-                  isProximityActive
-                    ? "cursor-not-allowed opacity-40"
-                    : "cursor-pointer"
-                }`}
-              />
-
-              {isProximityActive && (
-                <p className="text-[11px] text-slate-400">
-                  Desativado durante a busca por proximidade — a distância real
-                  (GPS) já ordena a lista.
-                </p>
-              )}
-            </div>
-          </FilterSection>
         </div>
       </CollapsibleSection>
 
