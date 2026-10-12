@@ -52,8 +52,15 @@ function EmptyBlock({ children }) {
   )
 }
 
+// Cidade e foto vêm do perfil mock quando existe e, senão, do que a API
+// trouxe da ONG. Os links de perfil só usam o perfil mock: a página
+// /ong/:id ainda lê os perfis do mock, e o id real de uma ONG da API pode
+// abrir o perfil de outra conta. O perfil abre na aba "Animais para Adoção",
+// então "Ver pets" leva aos pets desta ONG quando há perfil
 function OngCard({ ong }) {
   const { profile } = ong
+  const city = profile?.city ?? ong.city
+  const state = profile?.city ? profile.state : ong.state
   const stats = [
     { label: plural(ong.petCount, 'pet', 'pets'), value: ong.petCount },
     { label: plural(ong.campaigns.length, 'campanha', 'campanhas'), value: ong.campaigns.length },
@@ -74,10 +81,10 @@ function OngCard({ ong }) {
           {ong.name}
           <NgoShield size="sm" />
         </p>
-        {profile?.city && (
+        {city && (
           <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
             <FaLocationDot aria-hidden="true" size={11} className="text-emerald-600" />
-            {profile.city}, {profile.state}
+            {city}, {state}
           </p>
         )}
 
@@ -92,7 +99,9 @@ function OngCard({ ong }) {
 
         <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
           {profile && <ArrowLink to={`/ong/${profile.id}`}>Ver perfil</ArrowLink>}
-          {ong.petCount > 0 && <ArrowLink to="/animais">Ver pets para adoção</ArrowLink>}
+          {ong.petCount > 0 && (
+            <ArrowLink to={profile ? `/ong/${profile.id}` : '/animais'}>Ver pets para adoção</ArrowLink>
+          )}
         </div>
       </div>
     </div>

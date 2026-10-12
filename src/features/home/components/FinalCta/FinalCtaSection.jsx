@@ -85,7 +85,8 @@ function getActions(persona) {
   switch (persona.kind) {
     case 'visitor':
       return {
-        primary: actions.primary,
+        // Mesmo destino do hero, com outro texto para não repetir o botão de cima
+        primary: { ...actions.primary, label: 'Ver compatibilidade' },
         // O LoginPage volta para state.from depois de entrar
         secondary: { label: 'Já tenho conta', to: '/login', state: { from: { pathname: '/aumatch' } } },
       }

@@ -58,9 +58,10 @@ function getCopy({ kind, firstName, quizProgress }, { ranked, eligibleCount }) {
   }
 
   // visitor e loading: enquanto a sessão carrega, título e texto já nascem
-  // como os do visitante (a maioria) e só o eyebrow e os botões viram skeleton
+  // como os do visitante (a maioria) e só o eyebrow e os botões viram skeleton.
+  // O visitante fica sem eyebrow: o selo é a saudação de quem está logado
   return {
-    eyebrow: 'AUmatch · compatibilidade que se explica',
+    eyebrow: null,
     title: PERSON_TITLE,
     subtitle: `Responda ${quizQuestions.length} perguntas rápidas sobre a sua casa e a sua rotina e veja, ponto a ponto, por que cada pet combina com você.`,
   }
@@ -102,9 +103,10 @@ function HeroCopy({ persona, deck }) {
 
   return (
     <>
-      {kind === 'loading' ? (
+      {kind === 'loading' && (
         <div aria-hidden="true" className="h-8 w-64 rounded-full bg-slate-200/70 motion-safe:animate-pulse" />
-      ) : (
+      )}
+      {copy.eyebrow && (
         <p className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-800">
           <LuSparkles aria-hidden="true" size={15} className="shrink-0" />
           {copy.eyebrow}
