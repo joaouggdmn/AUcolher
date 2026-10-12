@@ -13,9 +13,9 @@ const EXAMPLE_PET = {
   breed: 'SRD',
   city: 'Curitiba',
   state: 'PR',
-  summary: 'Brincalhona, ama correr na praia e se dá bem com crianças.',
+  summary: 'Brincalhona e cheia de energia, ama correr no quintal.',
   matchScore: 92,
-  photoUrl: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1200&q=80',
+  photoUrl: 'https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?auto=format&fit=crop&w=1200&q=80',
 }
 
 const BACK_PHOTOS = [
@@ -64,10 +64,6 @@ function HeroAUmatchMockup() {
 
   return (
     <figure id="match" className="mx-auto flex w-full max-w-md scroll-mt-28 flex-col items-center xl:max-w-none">
-      <p className="mb-6 inline-flex rounded-full bg-white px-3 py-1 text-xs font-bold text-emerald-900 shadow-sm ring-1 ring-emerald-100">
-        Exemplo de card do AUmatch
-      </p>
-
       <div className="flex w-full flex-col items-center gap-10 xl:flex-row xl:items-center xl:gap-8">
         <div aria-hidden="true" className="relative w-64 shrink-0 select-none sm:w-72 xl:w-64">
           <div className="relative">

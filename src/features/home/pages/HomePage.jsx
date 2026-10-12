@@ -1,5 +1,5 @@
 import HeroSection from '../components/Hero/HeroSection'
-import ShortcutsSection from '../components/Shortcuts/ShortcutsSection'
+import FinalCtaSection from '../components/FinalCta/FinalCtaSection'
 import OngShowcaseSection from '../components/OngShowcase/OngShowcaseSection'
 import BrowsePetsSection from '../components/BrowsePets/BrowsePetsSection'
 import TrustJourneySection from '../components/TrustJourney/TrustJourneySection'
@@ -17,7 +17,7 @@ function HomePage() {
   return (
     <main>
       <HeroSection persona={persona} />
-      <ShortcutsSection persona={persona} />
+      <FinalCtaSection persona={persona} />
       <OngShowcaseSection persona={persona} />
       <BrowsePetsSection persona={persona} />
       <TrustJourneySection persona={persona} />
