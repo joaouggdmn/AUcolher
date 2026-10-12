@@ -58,7 +58,6 @@ function AumatchPage() {
   const {
     filters,
     setCity,
-    setMaxDistance,
     setSort,
     clearFilters,
     activeFiltersCount,
@@ -100,8 +99,8 @@ function AumatchPage() {
   // 4. Preferências do painel esquerdo por último: elas filtram e reordenam
   // o resultado do algoritmo, sem interferir nas regras de elegibilidade
   const preferredPets = useMemo(
-    () => applyMatchPreferences({ pets: eligiblePets, user, filters }),
-    [eligiblePets, user, filters]
+    () => applyMatchPreferences({ pets: eligiblePets, filters }),
+    [eligiblePets, filters]
   )
 
   // 🆕 Filtragem por ID — imune a preferredPets mudar de tamanho no meio da sessão
@@ -172,7 +171,6 @@ function AumatchPage() {
   const preferencesPanelProps = {
     filters,
     onCityChange: setCity,
-    onDistanceChange: setMaxDistance,
     onSortChange: setSort,
     onClear: clearFilters,
     hasActiveFilters,

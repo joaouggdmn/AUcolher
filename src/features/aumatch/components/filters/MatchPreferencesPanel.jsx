@@ -1,6 +1,6 @@
 import { FaChevronDown, FaLocationDot, FaXmark, FaArrowRotateRight } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
-import { CITY_OPTIONS, MAX_DISTANCE_KM, SORT_OPTIONS } from './matchFilterOptions'
+import { CITY_OPTIONS, SORT_OPTIONS } from './matchFilterOptions'
 
 // Seção em versão escura: o painel é translúcido sobre o emerald-950, então
 // os componentes claros de filtro da listagem (FilterSection/CheckboxOption)
@@ -27,17 +27,12 @@ const OPTION_CLASS = 'bg-emerald-900 text-white'
 function MatchPreferencesPanel({
   filters,
   onCityChange,
-  onDistanceChange,
   onSortChange,
   onClear,
   hasActiveFilters,
   onOpenQuiz,
   hasCompletedQuiz,
 }) {
-  // No topo do slider o raio deixa de filtrar — combina com o
-  // applyMatchPreferences, que trata esse valor como "sem limite"
-  const isDistanceUnlimited = filters.maxDistance >= MAX_DISTANCE_KM
-
   return (
     <div className="flex flex-col">
       {/* Atalho para refazer o quiz: é o que realmente move a agulha do
@@ -76,27 +71,6 @@ function MatchPreferencesPanel({
           <FaChevronDown
             size={11}
             className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-200/70"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between gap-2">
-            <label htmlFor="aumatch-radius" className="text-sm font-bold text-white">
-              {isDistanceUnlimited ? 'Qualquer distância' : `Raio de até ${filters.maxDistance} km`}
-            </label>
-            {isDistanceUnlimited && (
-              <span className="text-[11px] font-semibold text-emerald-200/60">arraste para limitar</span>
-            )}
-          </div>
-
-          <input
-            id="aumatch-radius"
-            type="range"
-            min={1}
-            max={MAX_DISTANCE_KM}
-            value={filters.maxDistance}
-            onChange={(event) => onDistanceChange(Number(event.target.value))}
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/20 accent-amber-400"
           />
         </div>
       </PanelSection>
