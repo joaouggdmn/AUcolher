@@ -6,7 +6,6 @@ import {
   FaLocationDot,
   FaArrowRight,
   FaPaw,
-  FaLocationCrosshairs,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import FavoriteButton from "../../../core/components/ui/FavoriteButton";
@@ -81,13 +80,6 @@ function AnimalCard({ animal }) {
           <FaLocationDot size={13} className="text-emerald-600" />
           {animal.city}, {animal.state}
         </div>
-
-        {Number.isFinite(animal.liveDistanceKm) && (
-          <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
-            <FaLocationCrosshairs size={10} />A{" "}
-            {Math.round(animal.liveDistanceKm)} km de distância
-          </span>
-        )}
 
         {isNgo && animal.organizationName && (
           <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">

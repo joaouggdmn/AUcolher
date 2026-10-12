@@ -123,18 +123,18 @@ export function AuthProvider({ children }) {
     })
   }
 
-  // 🆕 Campos que o backend ainda não guarda (coordenadas e Perfil AUmatch),
+  // 🆕 Campos que o backend ainda não guarda (as respostas do Perfil AUmatch),
 // persistidos numa chave própria, independente da sessão de autenticação.
 // Cidade, UF e CEP NÃO entram aqui: eles têm coluna no banco, e uma cópia
 // local sobrescreveria no login o que a API acabou de devolver
 const LIFESTYLE_FIELDS = [
-  'latitude', 'longitude',
   'moradia', 'rotinaExercicio', 'tempoForaCasa',
   'temCriancasOuPets', 'speciesPreference', 'idealPetProfile', 'portePreferido',
 ]
 
 // Só devolve os campos da lista acima — descarta chaves que versões antigas
-// guardaram aqui (cidade, estado, cep) e que agora vêm do banco
+// guardaram aqui (cidade, estado, cep, latitude, longitude) e que agora vêm
+// do banco ou nem existem mais
 function loadStoredLifestyleProfile() {
   try {
     const stored = localStorage.getItem(LIFESTYLE_PROFILE_STORAGE_KEY)
