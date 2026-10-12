@@ -1,19 +1,20 @@
-// Próximo passo de cada público, num lugar só: o hero, o simulador e o CTA
-// final usam as mesmas ações, então nunca divergem entre si.
+// Próximo passo de cada público, num lugar só: o hero usa estas ações e a
+// seção de atalhos logo abaixo evita repeti-las.
 // - pending: no /aumatch o quiz abre sozinho para quem está logado sem ele
-// - hash (#simulador): rolagem dentro da própria home via useScrollToHash
+// - hash (#atalhos): rolagem dentro da própria home via useScrollToHash
+// - visitor: o LoginPage volta para state.from depois de entrar
 const ACTIONS = {
   visitor: {
     primary: { label: 'Começar meu AUmatch', to: '/cadastro', state: { preselectUserType: 'PESSOA' } },
-    secondary: { label: 'Testar com a minha rotina', to: '#simulador' },
+    secondary: { label: 'Já tenho conta', to: '/login', state: { from: { pathname: '/aumatch' } } },
   },
   pending: {
     primary: { label: 'Terminar meu quiz', to: '/aumatch' },
-    secondary: { label: 'Ver prévia dos meus matches', to: '#simulador' },
+    secondary: { label: 'Ver o que falta', to: '#atalhos' },
   },
   matched: {
     primary: { label: 'Continuar no AUmatch', to: '/aumatch' },
-    secondary: { label: 'Ver o porquê de cada match', to: '#simulador' },
+    secondary: { label: 'Ver meus favoritos', to: '/favoritos' },
   },
   ong: {
     primary: { label: 'Cadastrar animal', to: '/animais/criar' },

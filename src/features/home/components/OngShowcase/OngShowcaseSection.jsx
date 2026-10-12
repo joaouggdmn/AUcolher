@@ -114,7 +114,7 @@ function OngShowcaseSection({ persona }) {
   const events = selected.upcomingEvents.slice(0, MAX_ITEMS)
 
   return (
-    <section aria-labelledby="ongs-title" className="bg-white py-20 lg:py-28">
+    <section aria-labelledby="ongs-title" className="bg-stone-50 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         <HomeReveal>
           <SectionHeader
@@ -138,7 +138,7 @@ function OngShowcaseSection({ persona }) {
             id={PANEL_ID}
             role="tabpanel"
             aria-label={selected.name}
-            className="mt-6 grid gap-6 rounded-[2rem] bg-stone-50 p-4 ring-1 ring-slate-200/60 motion-safe:animate-[fade-slide-in_0.25s_ease-out_both] sm:p-6 lg:grid-cols-12 lg:gap-8 lg:p-8"
+            className="mt-6 grid grid-cols-1 gap-6 rounded-[2rem] bg-white p-4 shadow-sm shadow-emerald-950/5 ring-1 ring-slate-200/60 motion-safe:animate-[fade-slide-in_0.25s_ease-out_both] sm:p-6 lg:grid-cols-12 lg:gap-8 lg:p-8"
           >
             <div className="lg:col-span-5">
               <OngCard ong={selected} />

@@ -25,12 +25,7 @@ export function uniqueByPhoto(pets) {
   })
 }
 
-// Só o que o anúncio realmente confirma — campo falso ou ausente não vira selo
-export function healthTags(pet) {
-  const isFemale = pet?.sex === 'F'
-  return [
-    pet?.vaccinated && (isFemale ? 'Vacinada' : 'Vacinado'),
-    pet?.neutered && (isFemale ? 'Castrada' : 'Castrado'),
-    pet?.dewormed && (isFemale ? 'Vermifugada' : 'Vermifugado'),
-  ].filter(Boolean)
+// Resposta do quiz preenchida: `false` conta (ex.: "não tenho crianças nem pets")
+export function isAnswered(value) {
+  return value !== undefined && value !== null && value !== ''
 }

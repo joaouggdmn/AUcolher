@@ -20,7 +20,7 @@ const SIZES = {
 }
 
 // `action` = { label, to, state?, badge? } — o mesmo formato de
-// data/personaActions.js. `to` pode ser uma âncora da home (#simulador)
+// data/personaActions.js. `to` pode ser uma âncora da home (#atalhos)
 function ActionLink({ action, variant = 'amber', size = 'lg', icon, showArrow = variant === 'amber', className = '' }) {
   const Icon = icon ?? (variant === 'amber' ? LuSparkles : null)
 

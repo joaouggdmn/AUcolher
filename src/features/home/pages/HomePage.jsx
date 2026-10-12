@@ -1,31 +1,26 @@
 import HeroSection from '../components/Hero/HeroSection'
-import MatchPlaygroundSection from '../components/MatchPlayground/MatchPlaygroundSection'
-import TrustJourneySection from '../components/TrustJourney/TrustJourneySection'
+import ShortcutsSection from '../components/Shortcuts/ShortcutsSection'
 import OngShowcaseSection from '../components/OngShowcase/OngShowcaseSection'
 import BrowsePetsSection from '../components/BrowsePets/BrowsePetsSection'
-import FinalCtaSection from '../components/FinalCta/FinalCtaSection'
+import TrustJourneySection from '../components/TrustJourney/TrustJourneySection'
 import { useHomePersona } from '../hooks/useHomePersona'
-import { useMatchProfile } from '../hooks/useMatchProfile'
 import { useScrollToHash } from '../hooks/useScrollToHash'
 
-// Home e landing ao mesmo tempo: o hero mostra um match real explicado, o
-// simulador deixa testar, e cada seção termina num atalho para uma parte do
-// sistema (AUmatch, ONGs, campanhas, eventos, animais).
-// O perfil do simulador sobe até aqui porque o card do hero acompanha as
-// respostas trocadas lá embaixo (e a vitrine evita repetir os pets do hero)
+// Home e landing ao mesmo tempo: o hero explica o AUmatch com um card de
+// exemplo fixo (a busca de pets em si é só no /aumatch), os atalhos mostram o
+// próximo passo de cada público, as vitrines mostram ONGs e animais reais e a
+// "Adoção segura" fecha a página com o caminho até o lar
 function HomePage() {
   const persona = useHomePersona()
-  const sim = useMatchProfile(persona)
   useScrollToHash()
 
   return (
     <main>
-      <HeroSection persona={persona} sim={sim} />
-      <MatchPlaygroundSection persona={persona} sim={sim} />
-      <TrustJourneySection persona={persona} />
+      <HeroSection persona={persona} />
+      <ShortcutsSection persona={persona} />
       <OngShowcaseSection persona={persona} />
-      <BrowsePetsSection persona={persona} sim={sim} />
-      <FinalCtaSection persona={persona} />
+      <BrowsePetsSection persona={persona} />
+      <TrustJourneySection persona={persona} />
     </main>
   )
 }

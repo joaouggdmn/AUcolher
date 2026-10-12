@@ -21,7 +21,7 @@ const PERSON_TITLE = (
   </>
 )
 
-function getCopy({ kind, firstName, quizProgress }, { pets, eligibleCount }) {
+function getCopy({ kind, firstName, quizProgress }, { ranked, eligibleCount }) {
   const greeting = firstName ? `, ${firstName}` : ''
 
   if (kind === 'pending') {
@@ -34,7 +34,7 @@ function getCopy({ kind, firstName, quizProgress }, { pets, eligibleCount }) {
   }
 
   if (kind === 'matched') {
-    const top = pets[0]
+    const top = ranked[0]
     return {
       eyebrow: `Seus matches estão prontos${greeting}`,
       title: (
@@ -93,10 +93,11 @@ function QuizProgress({ answered, total }) {
 }
 
 // Devolve um fragmento: os blocos entram direto no flex da coluna do hero,
-// que controla o espaçamento entre eles
-function HeroCopy({ persona, featured }) {
+// que controla o espaçamento entre eles. `deck` é o ranking real de quem já
+// fez o quiz (vazio para os demais), só para citar o melhor match no texto
+function HeroCopy({ persona, deck }) {
   const { kind, quizProgress } = persona
-  const copy = getCopy(persona, featured)
+  const copy = getCopy(persona, deck)
   const actions = getPersonaActions(persona)
 
   return (
@@ -134,7 +135,6 @@ function HeroCopy({ persona, featured }) {
           </>
         )}
       </div>
-
     </>
   )
 }

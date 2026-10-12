@@ -2,8 +2,9 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
-// O react-router não rola até âncoras sozinho: sem isto, o link
-// "Como funciona o match" do rodapé (/#match) só abria o topo da home
+// O react-router não rola até âncoras sozinho: sem isto, o "Como funciona o
+// match" do rodapé (/#match) e o "Ver o que falta" do hero (#atalhos) só
+// abririam o topo da home
 export function useScrollToHash() {
   const { hash, key } = useLocation()
   const prefersReducedMotion = usePrefersReducedMotion()

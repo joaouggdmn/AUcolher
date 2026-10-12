@@ -8,7 +8,7 @@ import NearbyButton from '../Search/NearbyButton'
 import CityChips from './CityChips'
 import PetCard from './PetCard'
 import { usePlatformStats } from '../../hooks/usePlatformStats'
-import { useFeaturedPets } from '../../hooks/useFeaturedPets'
+import { useRankedPets } from '../../hooks/useRankedPets'
 import { useBrokenPhotos } from '../../hooks/useBrokenPhotos'
 import { plural, uniqueByPhoto } from '../../utils/homePets'
 
@@ -18,8 +18,8 @@ function getHeaderCopy(isMatchedList, availableCount, cityCount) {
   if (isMatchedList) {
     return {
       eyebrow: 'Calculado para você',
-      title: 'Mais pets que combinam com você',
-      subtitle: 'Na sequência do seu deck no AUmatch.',
+      title: 'Os pets que mais combinam com você',
+      subtitle: 'Os primeiros do seu deck no AUmatch.',
     }
   }
 
@@ -34,36 +34,30 @@ function getHeaderCopy(isMatchedList, availableCount, cityCount) {
   }
 }
 
-// Com o quiz feito, a vitrine continua o deck de onde o card do hero parou
-// (4º lugar em diante). Para os demais, os anúncios na ordem do catálogo
-// (os recém-cadastrados entram no início), sem repetir quem já está no hero
-function BrowsePetsSection({ persona, sim }) {
+// Com o quiz feito, a vitrine mostra o começo do deck real (o mesmo ranking
+// do /aumatch). Para os demais, os anúncios na ordem do catálogo (os
+// recém-cadastrados entram no início)
+function BrowsePetsSection({ persona }) {
   const { kind, user } = persona
   const { available, availableCount, cities, cityCount } = usePlatformStats()
-  const featured = useFeaturedPets(persona, sim)
+  const { ranked } = useRankedPets(kind === 'matched' ? user : null, { excludeRequested: true })
   const brokenPhotos = useBrokenPhotos()
 
-  const matchedPets =
-    kind === 'matched' ? featured.ranked.slice(featured.pets.length, featured.pets.length + CARD_COUNT) : []
+  const matchedPets = kind === 'matched' ? ranked.slice(0, CARD_COUNT) : []
   const isMatchedList = matchedPets.length > 0
 
   const catalogPets = useMemo(() => {
-    const featuredPhotos = new Set(featured.pets.map((pet) => pet.photoUrl))
     const pool = available.filter(
-      (pet) =>
-        pet.photoUrl &&
-        !featuredPhotos.has(pet.photoUrl) &&
-        !brokenPhotos.has(pet.photoUrl) &&
-        (!user || pet.ownerId !== user.id)
+      (pet) => pet.photoUrl && !brokenPhotos.has(pet.photoUrl) && (!user || pet.ownerId !== user.id)
     )
     return uniqueByPhoto(pool).slice(0, CARD_COUNT)
-  }, [available, featured.pets, brokenPhotos, user])
+  }, [available, brokenPhotos, user])
 
   const pets = isMatchedList ? matchedPets : catalogPets
   const header = getHeaderCopy(isMatchedList, availableCount, cityCount)
 
   return (
-    <section aria-labelledby="browse-title" className="bg-stone-50 py-20 lg:py-28">
+    <section aria-labelledby="browse-title" className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         <HomeReveal className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeader id="browse-title" {...header} />
@@ -100,7 +94,7 @@ function BrowsePetsSection({ persona, sim }) {
                 <li key={pet.id} className="w-[78%] shrink-0 snap-start sm:w-auto">
                   {isMatchedList ? (
                     <div className="relative h-full pt-4">
-                      <span className="absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white ring-4 ring-stone-50">
+                      <span className="absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white ring-4 ring-white">
                         <LuSparkles aria-hidden="true" size={11} className="text-amber-300" />
                         {pet.matchScore}% match
                       </span>

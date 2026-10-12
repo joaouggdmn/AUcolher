@@ -2,8 +2,7 @@ import { useAuth } from '../../../core/context/AuthContext'
 import { useReceivedRequests } from '../../../core/hooks/useReceivedRequests'
 import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
 import { quizQuestions } from '../../onboarding/data/quizQuestions'
-import { isAnswered } from '../data/exampleProfile'
-import { getFirstName } from '../utils/homePets'
+import { getFirstName, isAnswered } from '../utils/homePets'
 
 function resolveKind({ user, isAuthenticated, isLoading }) {
   if (isLoading) return 'loading'
