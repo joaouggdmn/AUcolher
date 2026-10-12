@@ -67,7 +67,8 @@ function OngCard({ ong }) {
       </div>
 
       <div className="px-5 pb-5">
-        <OngAvatar ong={ong} size="lg" className="-mt-8" />
+        {/* relative: sem ele o banner (relative) é pintado por cima do avatar */}
+        <OngAvatar ong={ong} size="lg" className="relative -mt-8" />
 
         <p className="mt-3 flex items-center gap-2 text-xl font-black tracking-tight text-emerald-950">
           {ong.name}

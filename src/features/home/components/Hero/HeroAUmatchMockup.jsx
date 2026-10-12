@@ -29,20 +29,7 @@ const BACK_CARD_STYLES = [
   'translate-x-4 rotate-[4deg] scale-[0.94] opacity-45',
 ]
 
-const STEPS = [
-  {
-    title: `Responda ${quizQuestions.length} perguntas`,
-    description: 'Sobre a sua casa e a sua rotina. O AUmatch ordena os pets pela compatibilidade com você.',
-  },
-  {
-    title: 'Veja o % de match',
-    description: 'Toque no número e veja o porquê de cada ponto.',
-  },
-  {
-    title: 'Curta para enviar seu interesse',
-    description: 'Quem cuida do pet recebe o seu pedido. Passar não tem compromisso.',
-  },
-]
+const STEPS = [`Responda ${quizQuestions.length} perguntas`, 'Veja o % de match', 'Curta para enviar seu interesse']
 
 // Mesmo selo numerado dos passos da "Adoção segura": liga cada parte do
 // card à legenda com o mesmo número
@@ -64,8 +51,12 @@ function HeroAUmatchMockup() {
 
   return (
     <figure id="match" className="mx-auto flex w-full max-w-md scroll-mt-28 flex-col items-center xl:max-w-none">
-      <div className="flex w-full flex-col items-center gap-10 xl:flex-row xl:items-center xl:gap-8">
-        <div aria-hidden="true" className="relative w-64 shrink-0 select-none sm:w-72 xl:w-64">
+      {/* O card é o protagonista; as legendas ficam pequenas e estreitas à
+          direita dele, centralizadas na altura do card (no mobile, logo
+          abaixo). O grupo encosta na borda direita da coluna: legenda
+          estreita = o card sai do meio da tela */}
+      <div className="flex w-full flex-col items-center gap-8 xl:flex-row xl:items-center xl:justify-end xl:gap-5">
+        <div aria-hidden="true" className="relative w-72 shrink-0 select-none sm:w-80">
           <div className="relative">
             {BACK_PHOTOS.map((photo, index) => (
               <div
@@ -123,20 +114,17 @@ function HeroAUmatchMockup() {
           </div>
         </div>
 
-        <figcaption className="w-full max-w-sm xl:flex-1">
-          <ol className="flex flex-col gap-5">
+        <figcaption className="xl:max-w-44">
+          <ol className="flex flex-col gap-2.5">
             {STEPS.map((step, index) => (
-              <li key={step.title} className="flex items-start gap-3.5">
+              <li key={step} className="flex items-center gap-2.5">
                 <span
                   aria-hidden="true"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400 text-xs font-black text-emerald-950 shadow-md shadow-amber-500/30"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400 text-[11px] font-black text-emerald-950 shadow-md shadow-amber-500/30"
                 >
                   {index + 1}
                 </span>
-                <p className="flex flex-col gap-0.5 pt-0.5">
-                  <span className="text-base font-extrabold tracking-tight text-emerald-950">{step.title}</span>
-                  <span className="text-sm leading-relaxed text-slate-600">{step.description}</span>
-                </p>
+                <span className="text-sm font-bold text-emerald-950">{step}</span>
               </li>
             ))}
           </ol>
