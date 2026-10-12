@@ -1,9 +1,9 @@
 import HeroCopy from './HeroCopy'
-import HeroMatchCard from './HeroMatchCard'
+import HeroAUmatchMockup from './HeroAUmatchMockup'
 import PlatformStatsBar from './PlatformStatsBar'
 import HomeSearch from '../Search/HomeSearch'
 import NearbyButton from '../Search/NearbyButton'
-import { useFeaturedPets } from '../../hooks/useFeaturedPets'
+import { useRankedPets } from '../../hooks/useRankedPets'
 
 // Pontilhado bem sutil, apagando nas bordas: textura sem competir com o texto
 const DOT_PATTERN = {
@@ -13,10 +13,12 @@ const DOT_PATTERN = {
   WebkitMaskImage: 'radial-gradient(ellipse 75% 65% at 50% 40%, #000 30%, transparent 100%)',
 }
 
-// Sem foto de banco de imagem nem PNG gigante: o visual do hero é um pet
-// real do catálogo com o match explicado — a promessa do AUmatch à vista
-function HeroSection({ persona, sim }) {
-  const featured = useFeaturedPets(persona, sim)
+// O visual do hero é fixo e igual para todos: um card de exemplo do AUmatch
+// explicando o fluxo. Só o texto e os botões mudam por público; o deck real
+// entra apenas para citar o melhor match de quem já fez o quiz
+function HeroSection({ persona }) {
+  const { kind, user } = persona
+  const deck = useRankedPets(kind === 'matched' ? user : null, { excludeRequested: true })
 
   return (
     <section
@@ -31,7 +33,7 @@ function HeroSection({ persona, sim }) {
 
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-14 px-5 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-x-10">
         <div className="flex flex-col items-start gap-6 lg:col-span-6">
-          <HeroCopy persona={persona} featured={featured} />
+          <HeroCopy persona={persona} deck={deck} />
 
           <div className="mt-2 flex w-full max-w-xl flex-col gap-2.5">
             <p id="home-search-title" className="text-sm font-semibold text-slate-500">
@@ -43,7 +45,7 @@ function HeroSection({ persona, sim }) {
         </div>
 
         <div className="lg:col-span-6">
-          <HeroMatchCard persona={persona} sim={sim} featured={featured} />
+          <HeroAUmatchMockup />
         </div>
       </div>
 

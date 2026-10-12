@@ -3,8 +3,9 @@ import { LuLightbulb } from 'react-icons/lu'
 import SectionHeader from '../shared/SectionHeader'
 import HomeReveal from '../shared/HomeReveal'
 import NgoShield from '../shared/NgoShield'
-import ActionLink from '../shared/ActionLink'
+import ActionLink, { ActionSkeleton } from '../shared/ActionLink'
 import { JOURNEY_STEPS } from '../../data/journeySteps'
+import { getPersonaActions } from '../../data/personaActions'
 
 // Réplicas em miniatura dos elementos do AUmatch (mesmas cores e ícones do
 // PetSwipeCard e dos botões de swipe), para a pessoa reconhecê-los lá dentro
@@ -71,6 +72,7 @@ function StepBadge({ step }) {
 
 function TrustJourneySection({ persona }) {
   const isOng = persona.kind === 'ong'
+  const closingAction = getPersonaActions(persona)?.primary
 
   return (
     <section aria-labelledby="journey-title" className="bg-stone-50 py-20 lg:py-28">
@@ -133,17 +135,19 @@ function TrustJourneySection({ persona }) {
             </ul>
           </div>
 
-          {/* Atalho para o próximo passo real: o deck (ou, para a ONG, os pedidos) */}
-          <ActionLink
-            action={
-              isOng
-                ? { label: 'Ver interesses recebidos', to: '/interesses-recebidos', badge: persona.pendingCount }
-                : { label: 'Ir para o AUmatch', to: '/aumatch' }
-            }
-            variant="outline"
-            size="md"
-            showArrow
-          />
+          {/* Última seção da home: fecha com o próximo passo real de cada
+              público — o mesmo botão principal do hero (ou, para a ONG, os pedidos) */}
+          {isOng ? (
+            <ActionLink
+              action={{ label: 'Ver interesses recebidos', to: '/interesses-recebidos', badge: persona.pendingCount }}
+              variant="emerald"
+              showArrow
+            />
+          ) : closingAction ? (
+            <ActionLink action={closingAction} />
+          ) : (
+            <ActionSkeleton />
+          )}
         </HomeReveal>
       </div>
     </section>

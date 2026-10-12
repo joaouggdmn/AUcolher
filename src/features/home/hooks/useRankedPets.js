@@ -6,16 +6,10 @@ import { sortPetsByMatchScore } from '../../aumatch/utils/matchScore'
 import { uniqueByPhoto } from '../utils/homePets'
 import { useBrokenPhotos } from './useBrokenPhotos'
 
-// Nenhum ownerId é igual a um Symbol novo: é o "não exclua ninguém" do
-// sortPetsByMatchScore, que sempre filtra pelo id recebido
-const NO_OWNER = Symbol('sem-dono')
-
 // Mesmas regras de elegibilidade do deck do /aumatch, sem alterar nada lá:
 // fora os adotados, os próprios anúncios e (se pedido) os pets que a pessoa
-// já solicitou — um pedido recusado libera o pet de volta.
-// excludeOwn: false é só para a ONG, que no simulador quer ver em que
-// posição os próprios animais aparecem para quem adota
-export function useRankedPets(profile, { excludeRequested = false, excludeOwn = true } = {}) {
+// já solicitou — um pedido recusado libera o pet de volta
+export function useRankedPets(profile, { excludeRequested = false } = {}) {
   const { animals } = useAnimals()
   const { user } = useAuth()
   const { requests } = useAdoptionRequests()
@@ -41,7 +35,7 @@ export function useRankedPets(profile, { excludeRequested = false, excludeOwn = 
 
     // `?? null`: com undefined, o filtro de "próprios anúncios" do
     // sortPetsByMatchScore descartaria todo pet sem ownerId
-    const sorted = sortPetsByMatchScore(profile, pool, excludeOwn ? (user?.id ?? null) : NO_OWNER)
+    const sorted = sortPetsByMatchScore(profile, pool, user?.id ?? null)
 
     // A foto quebrada só sai da vitrine: o pet continua contando como
     // elegível, porque no deck do AUmatch ele segue lá
@@ -49,5 +43,5 @@ export function useRankedPets(profile, { excludeRequested = false, excludeOwn = 
       ranked: uniqueByPhoto(sorted.filter((pet) => !brokenPhotos.has(pet.photoUrl))),
       eligibleCount: sorted.length,
     }
-  }, [animals, user, requests, profile, excludeRequested, excludeOwn, brokenPhotos])
+  }, [animals, user, requests, profile, excludeRequested, brokenPhotos])
 }
