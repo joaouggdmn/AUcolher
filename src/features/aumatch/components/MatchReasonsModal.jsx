@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { FaXmark, FaHouseChimney, FaBolt, FaClock, FaChildren, FaHeart, FaArrowRotateRight } from 'react-icons/fa6'
+import { FaXmark, FaHouseChimney, FaBolt, FaClock, FaChildren, FaHeart, FaRulerCombined, FaArrowRotateRight } from 'react-icons/fa6'
 import { LuLightbulb } from 'react-icons/lu'
 import { useAuth } from '../../../core/context/AuthContext'
 import { explainMatchScore } from '../utils/matchScore'
@@ -10,6 +10,7 @@ const CRITERION_ICONS = {
   independence: FaClock,
   living: FaChildren,
   temperament: FaHeart,
+  size: FaRulerCombined,
 }
 
 // Verde para o critério cravado, âmbar para o parcial, cinza para o que não
