@@ -61,6 +61,14 @@ function getCopy({ kind, quizProgress }, eligibleCount) {
     }
   }
 
+  if (kind === 'admin') {
+    return {
+      eyebrow: 'Administração',
+      title: 'Acompanhe a plataforma pelo painel.',
+      subtitle: 'Usuários, animais, campanhas, eventos e denúncias, num lugar só.',
+    }
+  }
+
   if (kind === 'ong') {
     return {
       eyebrow: 'Atalhos da sua ONG',
@@ -155,6 +163,7 @@ function SidePanel({ persona }) {
     case 'pending':
     case 'matched':
     case 'ong':
+    case 'admin':
       return <ShortcutsPanel persona={persona} />
     default:
       return <QuizQuestionsPanel />

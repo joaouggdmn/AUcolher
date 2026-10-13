@@ -8,13 +8,14 @@ function resolveKind({ user, isAuthenticated, isLoading }) {
   if (isLoading) return 'loading'
   if (!isAuthenticated || !user) return 'visitor'
   if (user.userType === 'ONG') return 'ong'
-  // ADMIN cai aqui junto com pessoa: o que muda é só se já fez o quiz
+  // O AUmatch é só de pessoa física: o admin não recebe o convite do quiz
+  if (user.userType === 'ADMIN') return 'admin'
   return hasCompletedLifestyleQuiz(user) ? 'matched' : 'pending'
 }
 
 // Fonte única do "quem está vendo a home": cada seção recebe isto por props
 // em vez de repetir checagens de sessão e de quiz
-// kind: 'loading' | 'visitor' | 'pending' | 'matched' | 'ong'
+// kind: 'loading' | 'visitor' | 'pending' | 'matched' | 'ong' | 'admin'
 export function useHomePersona() {
   const { user, isAuthenticated, isLoading } = useAuth()
   const { pendingCount } = useReceivedRequests()
