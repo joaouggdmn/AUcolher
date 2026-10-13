@@ -8,7 +8,6 @@ import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
 import Spinner from '../../../core/components/ui/Spinner'
 import PillToggleGroup from '../../../core/components/ui/filters/PillToggleGroup'
-import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { matchesSearch } from '../../../core/utils/search'
 import SearchBar from '../../animais/components/SearchBar'
@@ -20,7 +19,6 @@ import AdminAnimalRow from '../components/AdminAnimalRow'
 import { useAdminAnimals, useRemoveAnimal } from '../hooks/useAdmin'
 import { useAdminPanel } from '../panel/useAdminPanel'
 import { removeListingDescription } from '../utils/moderationText'
-import { withPlatformAdoptionStatus } from '../utils/platformAnimals'
 
 const PAGE_SIZE = 20
 const NO_ANIMALS = []
@@ -33,7 +31,6 @@ const SPECIES_FILTERS = [
 
 function AdminAnimalsPage() {
   const { data: apiAnimals = NO_ANIMALS, isLoading, error, refetch } = useAdminAnimals()
-  const { requests } = useAdoptionRequests()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [speciesFilter, setSpeciesFilter] = useState('')
@@ -61,12 +58,12 @@ function AdminAnimalsPage() {
   // na Visão geral (a etiqueta "Conta banida" na linha explica o motivo)
   const animals = useMemo(
     () =>
-      withPlatformAdoptionStatus(apiAnimals, requests).map((animal) =>
+      apiAnimals.map((animal) =>
         animal.ownerIsBanned && !['ADOPTED', 'REMOVED'].includes(animal.listingStatus)
           ? { ...animal, listingStatus: 'INACTIVE' }
           : animal
       ),
-    [apiAnimals, requests]
+    [apiAnimals]
   )
 
   // Filtro novo, lista do começo

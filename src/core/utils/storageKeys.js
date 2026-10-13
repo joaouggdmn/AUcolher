@@ -1,6 +1,8 @@
 export const TOKEN_STORAGE_KEY = 'aucolher_token'
 export const TOKEN_TYPE_STORAGE_KEY = 'aucolher_token_type'
 export const USER_STORAGE_KEY = 'aucolher_user'
+// Os pedidos de adoção agora vêm da API; esta chave só guarda os pedidos de
+// demonstração do painel do admin (adminDemoData, só em dev)
 export const ADOPTION_REQUESTS_STORAGE_KEY = 'aucolher_adoption_requests'
 // Antigo: as respostas do quiz agora vêm da API (GET /match/profile). O
 // AuthContext só apaga o que versões anteriores deixaram nesta chave

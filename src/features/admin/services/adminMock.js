@@ -8,8 +8,7 @@ import {
 } from '../../../core/services/mock/mockStore'
 import { ADOPTION_REQUESTS_STORAGE_KEY, MOCK_ADMIN_STORE_KEY } from '../../../core/utils/storageKeys'
 import { toLocalIsoDate, todayLocalIso } from '../../../core/utils/localDate'
-import { adoptionRequestsSeed } from '../../adocao/data/adoptionRequestsSeed'
-import { requestAnimalSource } from '../../adocao/utils/requestAnimal'
+import * as adocaoApi from '../../adocao/services/adocaoApi'
 import * as animaisApi from '../../animais/services/animaisApi'
 import { withAdoptionStatus } from '../../animais/utils/listingStatus'
 import {
@@ -38,8 +37,9 @@ import {
 // DTOs de docs/api-admin.md. A API ainda não lista contas, então elas vivem
 // aqui (seedAdmin.js); o resto vem de onde já mora hoje:
 //   animais  → API real (GET /api/animals, só os disponíveis) + adotados
-//              tirados da cópia guardada nos pedidos
-//   pedidos  → localStorage do AdoptionRequestProvider
+//              tirados dos pedidos concluídos
+//   pedidos  → API real (GET /api/admin/adoption-requests) + os de
+//              demonstração do admin (só em dev, no localStorage)
 //   campanhas, doações, eventos e denúncias → os outros servidores falsos
 const store = createMockStore({ key: MOCK_ADMIN_STORE_KEY, version: 1, seed: buildSeedAdmin })
 
@@ -66,15 +66,47 @@ function byNewest(field) {
   return (a, b) => (b[field] ?? '').localeCompare(a[field] ?? '')
 }
 
-// O mesmo "banco" que o AdoptionRequestProvider grava (todas as contas)
-function readRequests() {
-  try {
-    const stored = localStorage.getItem(ADOPTION_REQUESTS_STORAGE_KEY)
-    if (stored) return JSON.parse(stored)
-  } catch {
-    // payload corrompido — cai para o seed, como o provider
+// Pedido da API no formato que as estatísticas daqui leem (o mesmo dos
+// pedidos de demonstração): cópia do animal em `animal`, adotante em `adopter`
+function toStatsRequest(dto) {
+  const ownerIsNgo = dto.owner.userType === 'NGO'
+  return {
+    id: dto.id,
+    status: dto.status,
+    cancelReason: dto.cancelReason,
+    createdAt: dto.createdAt,
+    concludedAt: dto.concludedAt,
+    animalId: dto.animal.id,
+    ownerId: dto.owner.id,
+    animalSource: 'api',
+    animal: {
+      id: dto.animal.id,
+      name: dto.animal.name,
+      species: dto.animal.species,
+      photoUrl: dto.animal.coverPhoto,
+      ownerName: dto.owner.name,
+      ownerPhotoUrl: null,
+      organizationName: ownerIsNgo ? dto.owner.name : null,
+    },
+    adopter: { userId: dto.adopter.id, name: dto.adopter.name, photoUrl: null, city: null, state: null },
   }
-  return adoptionRequestsSeed
+}
+
+// Pedidos de demonstração do admin (adminDemoData, só em dev): continuam no
+// localStorage, marcados com `adminDemo`, para os gráficos terem volume
+function readDemoRequests() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(ADOPTION_REQUESTS_STORAGE_KEY))
+    return Array.isArray(stored) ? stored.filter((request) => request.adminDemo) : []
+  } catch {
+    return []
+  }
+}
+
+// Todos os pedidos da plataforma
+async function loadRequests() {
+  const real = await adocaoApi.listAllForAdmin()
+  return [...real.map(toStatsRequest), ...readDemoRequests()]
 }
 
 // A vitrine pública só lista disponíveis, de página em página
@@ -87,11 +119,10 @@ async function fetchAvailableAnimals() {
   }
 }
 
-// Mesmo critério do AdoptionRequestProvider: o pedido é de um animal da API
-// quando a cópia diz isso ou quando o animal da API com esse id é do mesmo dono
-function sourceOf(request, availableById) {
-  const apiAnimal = availableById.get(String(request.animalId))
-  return requestAnimalSource(request, apiAnimal && { ownerId: apiAnimal.owner?.id })
+// Pedido real é de animal da API; os de demonstração dizem na cópia (são
+// de animais fictícios, que não existem na API)
+function sourceOf(request) {
+  return request.animalSource ?? request.animal?.source ?? 'legacy'
 }
 
 // Animais da API que a vitrine não mostra mais por terem sido adotados: só
@@ -102,7 +133,7 @@ function adoptedFromRequests(requests, availableById) {
     const snapshot = request.animal
     const key = String(request.animalId)
     if (request.status !== 'CONCLUDED' || !snapshot || availableById.has(key) || adopted.has(key)) continue
-    if (sourceOf(request, availableById) !== 'api') continue
+    if (sourceOf(request) !== 'api') continue
 
     adopted.set(key, {
       id: request.animalId,
@@ -137,7 +168,7 @@ async function loadAnimals(requests) {
 
   const withStatus = withAdoptionStatus(
     animals.map((dto) => ({ id: dto.id, ownerId: dto.owner?.id ?? null, status: dto.status })),
-    requests.map((request) => ({ ...request, animalSource: sourceOf(request, availableById) }))
+    requests.map((request) => ({ ...request, animalSource: sourceOf(request) }))
   )
   const listingStatus = new Map(withStatus.map((animal) => [String(animal.id), animal.listingStatus]))
 
@@ -410,7 +441,7 @@ export async function getStats() {
   await mockDelay()
   requireAdmin()
 
-  const requests = readRequests()
+  const requests = await loadRequests()
   const animals = await loadAnimals(requests)
   const donations = readApprovedDonationsForAdmin()
   const campaigns = readAllCampaignsForAdmin()
@@ -448,7 +479,7 @@ export async function listUsers() {
   await mockDelay()
   requireAdmin()
 
-  const requests = readRequests()
+  const requests = await loadRequests()
   const animals = await loadAnimals(requests)
   return loadAccounts(animals, readAllCampaignsForAdmin(), readAllEventsForAdmin(), requests)
     .sort(byNewest('createdAt'))
@@ -460,8 +491,12 @@ export async function listAnimals() {
   await mockDelay()
   requireAdmin()
 
-  const animals = await loadAnimals(readRequests())
-  return animals.map(({ dto }) => withOwnerStatus(dto, 'owner')).sort(byNewest('createdAt'))
+  const animals = await loadAnimals(await loadRequests())
+  // `listingStatus`: a situação do anúncio, que também depende dos pedidos
+  // ("em processo", adotado) — calculada aqui, como a API do admin fará
+  return animals
+    .map(({ dto, listingStatus }) => ({ ...withOwnerStatus(dto, 'owner'), listingStatus }))
+    .sort(byNewest('createdAt'))
 }
 
 // GET /api/admin/campaigns — ativas, encerradas e excluídas (`removed`)
@@ -520,14 +555,14 @@ export async function banReportedAccount(reportId) {
 
 // PATCH /api/admin/users/{id}/status { active } — banir (false) ou reativar
 // (true). Banir também resolve as denúncias pendentes contra a conta e os
-// anúncios dela; os pedidos de adoção ativos são cancelados (no mock, pelo
-// AdoptionRequestProvider, que é quem guarda os pedidos)
+// anúncios dela; os pedidos de adoção ativos aparecem cancelados (no mock,
+// pela camada de moderação do AdoptionRequestProvider — o servidor não muda)
 export async function setUserStatus(userId, active) {
   await mockDelay()
   requireAdmin()
   if (typeof active !== 'boolean') throw mockHttpError(400, 'Informe se a conta fica ativa.')
 
-  const requests = readRequests()
+  const requests = await loadRequests()
   const animals = await loadAnimals(requests)
   const accounts = loadAccounts(animals, readAllCampaignsForAdmin(), readAllEventsForAdmin(), requests)
   const account = accounts.find((item) => isSameId(item.id, userId))
@@ -540,13 +575,13 @@ export async function setUserStatus(userId, active) {
 
 // DELETE /api/admin/animals/{id} — tira o anúncio do site de vez (o dono vê
 // "Removido pela moderação" e não reativa) e resolve as denúncias pendentes
-// contra ele. Os pedidos ativos do animal são cancelados (no mock, pelo
-// AdoptionRequestProvider, que é quem guarda os pedidos)
+// contra ele. Os pedidos ativos do animal aparecem cancelados (no mock,
+// pela camada de moderação do AdoptionRequestProvider)
 export async function removeAnimal(animalId) {
   await mockDelay()
   requireAdmin()
 
-  const animals = await loadAnimals(readRequests())
+  const animals = await loadAnimals(await loadRequests())
   const found = animals.find(({ dto }) => isSameId(dto.id, animalId))
   if (!found) throw mockHttpError(404, 'Anúncio não encontrado.')
   if (found.listingStatus === 'REMOVED') throw mockHttpError(400, 'Este anúncio já foi removido.')
