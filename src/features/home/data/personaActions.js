@@ -20,6 +20,11 @@ const ACTIONS = {
     primary: { label: 'Cadastrar animal', to: '/animais/criar' },
     secondary: { label: 'Interesses recebidos', to: '/interesses-recebidos' },
   },
+  // O admin não usa o AUmatch (é de quem adota): só vê a prévia
+  admin: {
+    primary: { label: 'Abrir o painel do admin', to: '/admin' },
+    secondary: { label: 'Ver a prévia do AUmatch', to: '/aumatch' },
+  },
 }
 
 // null enquanto a sessão carrega: quem chama mostra um skeleton, evitando o

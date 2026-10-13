@@ -18,6 +18,11 @@ export const matchDeckKeys = {
   preview: [...animalKeys.all, 'match-deck', 'preview'],
 }
 
+// Deck da pessoa logada, já ordenado pelo score — também usado pela home
+export function matchDeckQuery(userId) {
+  return { queryKey: matchDeckKeys.mine(userId), queryFn: getMatchDeck, staleTime: STALE_TIME }
+}
+
 // Os pets do AUmatch. Pessoa física recebe o deck da API, já ordenado pelo
 // score de compatibilidade; visitante, ONG e admin veem uma prévia com a
 // vitrine pública, sem score (a API do AUmatch é só de quem adota)
@@ -25,12 +30,7 @@ export function useAumatchDeck() {
   const { user, isLoading: isAuthLoading } = useAuth()
   const isAdopter = user?.userType === 'PESSOA'
 
-  const deck = useQuery({
-    queryKey: matchDeckKeys.mine(user?.id),
-    queryFn: getMatchDeck,
-    enabled: !isAuthLoading && isAdopter,
-    staleTime: STALE_TIME,
-  })
+  const deck = useQuery({ ...matchDeckQuery(user?.id), enabled: !isAuthLoading && isAdopter })
 
   const preview = useQuery({
     queryKey: matchDeckKeys.preview,
