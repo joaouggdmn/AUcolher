@@ -12,16 +12,16 @@ import { injectSystemMessage } from '../utils/chatSystemMessage'
 export function useConcludeAdoption() {
   const { requestDeliveryConfirmation, concludeRequest } = useAdoptionRequests()
 
-  function requestDelivery({ requestId, animalName }) {
-    requestDeliveryConfirmation(requestId)
+  async function requestDelivery({ requestId, animalName }) {
+    await requestDeliveryConfirmation(requestId)
     injectSystemMessage(
       requestId,
       `O doador confirmou a entrega de ${animalName}. O chat foi bloqueado para novas mensagens — quando o pet chegar até você, confirme o recebimento para concluir a adoção.`,
     )
   }
 
-  function concludeAdoption({ requestId, animalName }) {
-    if (!concludeRequest(requestId)) return
+  async function concludeAdoption({ requestId, animalName }) {
+    await concludeRequest(requestId)
     injectSystemMessage(requestId, `Adoção de ${animalName} concluída! Parabéns pelo novo membro da família.`)
   }
 

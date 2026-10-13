@@ -16,15 +16,13 @@ import { useAuth } from "../../../core/context/AuthContext";
 import { getErrorMessage } from "../../../core/utils/apiError";
 import Spinner from "../../../core/components/ui/Spinner";
 import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContext";
-import { useProfileCompletion } from "../../../core/hooks/useProfileCompletion";
+import { isSameId } from "../../../core/utils/ids";
 import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
 import SuccessToast from "../../../core/components/ui/SuccessToast";
 import ModerationNotice from "../../../core/components/ui/ModerationNotice";
 import PhotoGallery from "../components/PhotoGallery";
 import HealthBadges from "../components/HealthBadges";
 import InterestInfoBubble from "../components/InterestInfoBubble";
-import { buildAdopterSnapshot } from "../../adocao/utils/buildAdopterSnapshot";
-import { buildAnimalSnapshot } from "../../adocao/utils/requestAnimal";
 import BehaviorProfile from "../components/BehaviorProfile";
 import OwnerListingPanel from "../components/OwnerListingPanel";
 import { useAnimal } from "../hooks/useAnimais";
@@ -40,7 +38,6 @@ function AnimalDetailsPage() {
   const { isAuthenticated, user } = useAuth();
   const { data: animal, isLoading, error } = useAnimal(id);
   const { requests, createRequest } = useAdoptionRequests();
-  const { percentage: profileCompletion } = useProfileCompletion(user);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
@@ -96,7 +93,7 @@ function AnimalDetailsPage() {
   const ownerDisplayName = isNgo
     ? (animal.organizationName ?? animal.ownerName)
     : animal.ownerName;
-  const isOwner = isAuthenticated && animal.ownerId === user?.id;
+  const isOwner = isAuthenticated && isSameId(animal.ownerId, user?.id);
   const isAdopted = animal.status === "ADOPTED";
 
   // Evita pedidos duplicados enquanto testamos o fluxo com contas reais
@@ -104,9 +101,8 @@ function AnimalDetailsPage() {
     isAuthenticated &&
     requests.some(
       (r) =>
-        r.animalSource === "api" &&
-        r.animalId === animal.id &&
-        r.adopter?.userId === user.id &&  
+        isSameId(r.animalId, animal.id) &&
+        isSameId(r.adopter?.userId, user.id) &&
         r.status !== "REJECTED",
     );
 
@@ -116,16 +112,9 @@ function AnimalDetailsPage() {
       return;
     }
 
-    createRequest({
-      animalId: animal.id,
-      ownerId: animal.ownerId,
-      adopter: buildAdopterSnapshot(user, profileCompletion),
-      animal: buildAnimalSnapshot(animal, "api"),
-    });
-
-    setSuccessMessage(
-      "Pedido enviado com sucesso! Aguarde a avaliação da ONG/Protetor.",
-    );
+    createRequest(animal.id)
+      .then(() => setSuccessMessage("Pedido enviado com sucesso! Aguarde a avaliação da ONG/Protetor."))
+      .catch((error) => setSuccessMessage(getErrorMessage(error, "Não foi possível enviar o pedido.")));
   };
 
   const handleGoToLogin = () => {

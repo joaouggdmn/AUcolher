@@ -20,8 +20,8 @@ function isRequestFor(request, animal) {
 }
 
 // Status do anúncio do ponto de vista do dono: "em processo" quando já
-// existe um pedido aceito caminhando para a entrega. Adoção concluída já
-// conta como adotado antes de a API ser atualizada (useSyncAdoptedAnimals)
+// existe um pedido aceito caminhando para a entrega. Adoção concluída conta
+// como adotado mesmo antes de a lista de animais recarregar
 function deriveListingStatus(animal, statuses) {
   // Removido pelo admin é definitivo e vale mais que qualquer pedido
   if (animal.status === 'REMOVED') return 'REMOVED'

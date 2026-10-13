@@ -14,11 +14,8 @@ import MatchPreferencesSidebar from '../components/filters/MatchPreferencesSideb
 import MatchPreferencesDrawer from '../components/filters/MatchPreferencesDrawer'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
-import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 import { isSameId } from '../../../core/utils/ids'
 import { useModeration } from '../../admin/hooks/useModeration'
-import { buildAdopterSnapshot } from '../../adocao/utils/buildAdopterSnapshot'
-import { buildAnimalSnapshot } from '../../adocao/utils/requestAnimal'
 import { applyMatchPreferences } from '../utils/matchFilters'
 import { useMatchPreferences } from '../hooks/useMatchPreferences'
 import { matchDeckKeys, useAumatchDeck } from '../hooks/useAumatchDeck'
@@ -40,7 +37,6 @@ function AumatchPage() {
   const { user, isAuthenticated, isMatchProfileReady, saveMatchProfile } = useAuth()
   const { pets, isAdopter, isLoading, isError, refetch } = useAumatchDeck()
   const { requests, createRequest } = useAdoptionRequests()
-  const { percentage: profileCompletion } = useProfileCompletion(user)
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const location = useLocation()
@@ -172,12 +168,7 @@ function AumatchPage() {
     setMatchedPet(likedPet)
     setTimeout(() => setMatchedPet(null), 1800)
 
-    createRequest({
-      animalId: likedPet.id,
-      ownerId: likedPet.ownerId,
-      adopter: buildAdopterSnapshot(user, profileCompletion),
-      animal: buildAnimalSnapshot(likedPet, 'api'),
-    })
+    createRequest(likedPet.id).catch((error) => console.error('Falha ao enviar o pedido:', error))
   }
 
   const handleReset = () => setSwipedIds(new Set())

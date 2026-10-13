@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { FaHeart, FaPen, FaStar } from 'react-icons/fa6'
-import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import RatingStars from '../../avaliacoes/components/RatingStars'
 import ReviewForm from '../../avaliacoes/components/ReviewForm'
 
 function AdoptionConcludedPanel({ contact }) {
-  const { user } = useAuth()
   const { saveReview, deleteReview } = useAdoptionRequests()
   const [isFormOpen, setIsFormOpen] = useState(false)
 
@@ -17,22 +15,15 @@ function AdoptionConcludedPanel({ contact }) {
   const firstName = contact.name.split(' ')[0]
 
   const handleSubmit = ({ rating, comment }) => {
-    saveReview(contact.requestId, myRole, {
-      rating,
-      comment,
-      author: {
-        id: user?.id,
-        name: user?.name,
-        photoUrl: user?.photoUrl,
-        isOng: user?.userType === 'ONG',
-      },
-    })
-    setIsFormOpen(false)
+    saveReview(contact.requestId, { rating, comment })
+      .then(() => setIsFormOpen(false))
+      .catch((error) => console.error('Falha ao salvar a avaliação:', error))
   }
 
   const handleDelete = () => {
-    deleteReview(contact.requestId, myRole)
-    setIsFormOpen(false)
+    deleteReview(contact.requestId)
+      .then(() => setIsFormOpen(false))
+      .catch((error) => console.error('Falha ao apagar a avaliação:', error))
   }
 
   return (

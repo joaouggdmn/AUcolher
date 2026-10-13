@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
+import { useUserAnimals } from '../../animais/hooks/useAnimais'
 import { getPublicProfile } from '../services/userService'
 
 // Perfil da própria conta: sai exatamente do que ela salvou em "Minha conta",
@@ -31,12 +31,13 @@ function buildOwnProfile(user) {
 }
 
 // Contas reais criadas nos testes não estão no mock — monta um perfil
-// básico com o que já existe localmente (anúncios e pedidos). Some junto
-// com o mock quando a API real responder por qualquer id
+// básico com o que já existe: os anúncios dela na API ou um pedido em que
+// ela é a adotante. Some junto com o mock quando a API real responder por
+// qualquer id
 function buildLocalProfile(profileId, { animals, requests }) {
   const id = String(profileId)
 
-  const ownedAnimal = animals.find((animal) => String(animal.ownerId) === id)
+  const ownedAnimal = animals[0]
   if (ownedAnimal) {
     const isOng = ownedAnimal.listingType === 'NGO'
     return {
@@ -69,7 +70,7 @@ function buildLocalProfile(profileId, { animals, requests }) {
 
 export function usePublicProfile(profileId) {
   const { user } = useAuth()
-  const { animals } = useAnimals()
+  const { data: animals = [] } = useUserAnimals(profileId)
   const { requests } = useAdoptionRequests()
 
   // Os ids do mock (1, 2, 4...) coincidem com ids reais do banco — sem este

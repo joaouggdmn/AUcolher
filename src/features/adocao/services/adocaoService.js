@@ -69,14 +69,15 @@ export function toFrontendRequest(dto) {
 // admin baniu nem o que ele removeu. Pedido ativo com uma parte banida ou com
 // o anúncio removido aparece cancelado, com o motivo, e não aceita mais
 // ações — só na tela, o servidor não muda. Com a moderação no backend, o
-// próprio banimento cancela no servidor
-function withModeration(request) {
+// próprio banimento cancela no servidor. `isBanned` vem do useModeration
+// quando a tela precisa reagir na hora a um banimento
+export function withModeration(request, isBanned = isAccountBanned) {
   if (!ACTIVE_STATUSES.includes(request.status)) return request
 
   const removed = isAnimalRemoved({ id: request.animalId })
   const banned =
-    isAccountBanned({ id: request.ownerId, name: request.animal.organizationName ?? request.animal.ownerName }) ||
-    isAccountBanned({ id: request.adopter.userId, name: request.adopter.name })
+    isBanned({ id: request.ownerId, name: request.animal.organizationName ?? request.animal.ownerName }) ||
+    isBanned({ id: request.adopter.userId, name: request.adopter.name })
   if (!removed && !banned) return request
 
   return {
@@ -88,28 +89,28 @@ function withModeration(request) {
   }
 }
 
-const toScreen = (dto) => withModeration(toFrontendRequest(dto))
-
 // ---------- operações ----------
+// Devolvem os pedidos como o servidor guarda; a camada de moderação fica
+// para quem mostra (AdoptionRequestProvider)
 
 export async function listSentRequests() {
-  return (await adocaoApi.listSent()).map(toScreen)
+  return (await adocaoApi.listSent()).map(toFrontendRequest)
 }
 
 export async function listReceivedRequests() {
-  return (await adocaoApi.listReceived()).map(toScreen)
+  return (await adocaoApi.listReceived()).map(toFrontendRequest)
 }
 
 export async function createAdoptionRequest(animalId) {
-  return toScreen(await adocaoApi.createRequest(animalId))
+  return toFrontendRequest(await adocaoApi.createRequest(animalId))
 }
 
 export async function changeRequestStatus(id, status) {
-  return toScreen(await adocaoApi.changeStatus(id, status))
+  return toFrontendRequest(await adocaoApi.changeStatus(id, status))
 }
 
 export async function saveRequestReview(id, { rating, comment }) {
-  return toScreen(await adocaoApi.saveReview(id, { rating, comment: comment?.trim() || null }))
+  return toFrontendRequest(await adocaoApi.saveReview(id, { rating, comment: comment?.trim() || null }))
 }
 
 export function deleteRequestReview(id) {
