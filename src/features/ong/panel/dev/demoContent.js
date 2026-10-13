@@ -30,8 +30,8 @@ const BASE_FORM = {
   apartmentFriendly: true,
 }
 
-// `finalStatus`: como cada um termina. Os adotados viram ADOPTED pela
-// sincronização do dono (useSyncAdoptedAnimals) quando a página recarrega
+// `finalStatus`: como cada um termina. O gerador marca os adotados direto
+// (PATCH /animals/{id}/status), já que não há pedidos de demonstração
 export const DEMO_ANIMALS = [
   {
     key: 'thor',
@@ -136,25 +136,6 @@ function photoFor(index) {
   return PERSON_PHOTOS[index % PERSON_PHOTOS.length] ?? null
 }
 
-const ADOPTER_LIST = [
-  ['camila', 'Camila Rodrigues', 'Criciúma', 90, 'Casa com quintal · Rotina ativa · Sem outros pets'],
-  ['lucas', 'Lucas Ferreira', 'Araranguá', 65, 'Apartamento · Rotina moderada · Já tem outro cão'],
-  ['pedro', 'Pedro Henrique Souza', 'Içara', 40, 'Apartamento · Pouco tempo em casa'],
-  ['beatriz', 'Beatriz Martins', 'Criciúma', 100, 'Casa · Muito ativa · Tem crianças'],
-  ['rafael', 'Rafael Costa', 'Criciúma', 85, 'Casa com quintal · Rotina ativa · Tem uma filha'],
-  ['juliana', 'Juliana Alves', 'Forquilhinha', 95, 'Apartamento · Trabalha em casa · Sem outros pets'],
-  ['mariana', 'Mariana Lopes', 'Criciúma', 100, 'Casa · Rotina tranquila · Já tem uma gata'],
-  ['gustavo', 'Gustavo Pereira', 'Nova Veneza', 70, 'Casa com quintal · Rotina moderada'],
-  ['fernanda', 'Fernanda Dias', 'Içara', 80, 'Apartamento · Rotina tranquila · Sem outros pets'],
-]
-
-export const DEMO_ADOPTERS = Object.fromEntries(
-  ADOPTER_LIST.map(([key, name, city, profileCompletion, lifestyleSummary], index) => [
-    key,
-    { userId: null, name, photoUrl: photoFor(index), city, state: 'SC', profileCompletion, lifestyleSummary },
-  ])
-)
-
 const EXTRA_NAMES = [
   'Ana Clara Bitencourt', 'Bruno Zanette', 'Carla Mendes', 'Daniel Fabris', 'Eduarda Rosso', 'Fábio Cardoso',
   'Giovana Pizzetti', 'Hugo Medeiros', 'Isadora Coral', 'Jonas Bez', 'Karina Freitas', 'Leonardo Damiani',
@@ -165,71 +146,6 @@ const EXTRA_NAMES = [
 ]
 
 const EXTRA_PEOPLE = EXTRA_NAMES.map((name, index) => ({ id: 9801 + index, name, photoUrl: photoFor(index + 3) }))
-
-// ---------- pedidos de adoção e conversas (localStorage) ----------
-
-export const DEMO_REQUESTS = [
-  { key: 'thor-camila', animal: 'thor', adopter: 'camila', status: 'PENDING', daysAgo: 4 },
-  { key: 'thor-lucas', animal: 'thor', adopter: 'lucas', status: 'PENDING', daysAgo: 1 },
-  { key: 'thor-pedro', animal: 'thor', adopter: 'pedro', status: 'REJECTED', daysAgo: 40 },
-  { key: 'luna-beatriz', animal: 'luna', adopter: 'beatriz', status: 'PENDING', daysAgo: 2 },
-  { key: 'bento-rafael', animal: 'bento', adopter: 'rafael', status: 'ACCEPTED', daysAgo: 12 },
-  { key: 'mel-juliana', animal: 'mel', adopter: 'juliana', status: 'AWAITING_DELIVERY', daysAgo: 20 },
-  {
-    key: 'pipoca-mariana', animal: 'pipoca', adopter: 'mariana', status: 'CONCLUDED', daysAgo: 70, concludedDaysAgo: 55,
-    review: { rating: 5, comment: 'Processo cuidadoso do começo ao fim. A equipe tirou todas as nossas dúvidas e a Pipoca chegou saudável e vacinada.' },
-  },
-  { key: 'pipoca-gustavo', animal: 'pipoca', adopter: 'gustavo', status: 'CANCELLED', daysAgo: 68 },
-  {
-    key: 'frida-fernanda', animal: 'frida', adopter: 'fernanda', status: 'CONCLUDED', daysAgo: 130, concludedDaysAgo: 110,
-    review: { rating: 4, comment: 'Adoção tranquila e bem orientada. Só demorou um pouco para marcarmos a entrega.' },
-  },
-]
-
-// `from`: 'adopter', 'ong' ou 'system'. `unread`: chega depois da última leitura da ONG
-export const DEMO_CHATS = {
-  'bento-rafael': [
-    { from: 'adopter', daysAgo: 11, time: '19:12', text: 'Oi! Vi o Bento no site e me apaixonei. Ele se dá bem com crianças?' },
-    { from: 'ong', daysAgo: 11, time: '20:03', text: 'Oi, Rafael! Se dá muito bem: é grandão, mas super dócil. Quantos anos tem sua filha?' },
-    { from: 'adopter', daysAgo: 10, time: '08:40', text: 'Ela tem 7 anos e já pediu um cachorro grande de presente.' },
-    { from: 'ong', daysAgo: 10, time: '09:15', text: 'Perfeito! Podemos marcar uma visita para vocês conhecerem o Bento.' },
-    { from: 'adopter', daysAgo: 1, time: '18:30', text: 'Pode ser neste sábado de manhã?', unread: true },
-    { from: 'adopter', daysAgo: 1, time: '18:31', text: 'Posso levar minha filha junto?', unread: true },
-  ],
-  'mel-juliana': [
-    { from: 'adopter', daysAgo: 19, time: '10:05', text: 'Oi! A Mel ainda está disponível? Trabalho em casa e procuro uma companheira tranquila.' },
-    { from: 'ong', daysAgo: 19, time: '11:20', text: 'Está sim, Juliana! Ela é calminha e adora colo. As janelas do seu apartamento têm tela?' },
-    { from: 'adopter', daysAgo: 18, time: '09:02', text: 'Têm sim, e já comprei caminha e ração.' },
-    { from: 'ong', daysAgo: 3, time: '16:45', text: 'Combinado, então! Levamos a Mel no sábado às 10h.' },
-    {
-      from: 'system', daysAgo: 3, time: '16:46',
-      text: 'O doador confirmou a entrega de Mel. O chat foi bloqueado para novas mensagens — quando o pet chegar até você, confirme o recebimento para concluir a adoção.',
-    },
-  ],
-  'pipoca-mariana': [
-    { from: 'adopter', daysAgo: 69, time: '14:10', text: 'Olá! Tenho uma gata bem tranquila em casa. Acham que a Pipoca se daria bem com ela?' },
-    { from: 'ong', daysAgo: 69, time: '15:00', text: 'Acreditamos que sim: ela já convive com os gatos do abrigo. Que tal uma visita?' },
-    { from: 'adopter', daysAgo: 60, time: '19:30', text: 'Amamos conhecer a Pipoca! Podemos buscar na semana que vem?' },
-    { from: 'system', daysAgo: 55, time: '11:00', text: 'Adoção de Pipoca concluída! Parabéns pelo novo membro da família.' },
-  ],
-  'frida-fernanda': [
-    { from: 'adopter', daysAgo: 129, time: '20:15', text: 'Boa noite! Moro sozinha e procuro uma gata independente. A Frida é assim?' },
-    { from: 'ong', daysAgo: 128, time: '09:30', text: 'É exatamente assim! Carinhosa no tempo dela. Vamos conversar sobre a adaptação?' },
-    { from: 'system', daysAgo: 110, time: '17:20', text: 'Adoção de Frida concluída! Parabéns pelo novo membro da família.' },
-  ],
-}
-
-export function demoMessageTime({ daysAgo, time }) {
-  return daysAgoAt(daysAgo, time)
-}
-
-export function demoRequestDates({ daysAgo, concludedDaysAgo }) {
-  return {
-    createdAt: daysAgoAt(daysAgo, '10:30'),
-    concludedAt: concludedDaysAgo == null ? null : daysAgoAt(concludedDaysAgo, '11:00'),
-    reviewedAt: concludedDaysAgo == null ? null : daysAgoAt(Math.max(concludedDaysAgo - 2, 0), '20:00'),
-  }
-}
 
 // ---------- eventos e campanhas (mocks no localStorage) ----------
 
