@@ -39,7 +39,9 @@ function toFrontendAdopter(dto) {
   // Toda conta tem e-mail; a API só não expõe o do adotante
   const completion = isPerson ? computeProfileCompletion({ ...profile, email: '-', userType: 'PESSOA' }).percentage : null
 
-  return { ...buildAdopterSnapshot(profile, completion), isOng: dto.userType === 'NGO' }
+  const snapshot = buildAdopterSnapshot(profile, completion)
+  if (dto.userType !== 'NGO') return { ...snapshot, isOng: false }
+  return { ...snapshot, isOng: true, lifestyleSummary: 'Pedido de uma ONG — o quiz do AUmatch é só para pessoas' }
 }
 
 export function toFrontendRequest(dto) {
