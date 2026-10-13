@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getErrorMessage } from '../../../core/utils/apiError'
 import { quizQuestions } from '../data/quizQuestions'
 import { isAnswered, nextAnswer } from '../utils/quizAnswers'
 
@@ -9,6 +10,7 @@ export function useOnboardingQuiz(onComplete) {
   const [direction, setDirection] = useState('forward')
   const [answers, setAnswers] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
 
   const isLastStep = currentStep === quizQuestions.length - 1
   const currentQuestion = quizQuestions[currentStep]
@@ -42,12 +44,15 @@ export function useOnboardingQuiz(onComplete) {
     setCurrentStep((step) => step - 1)
   }
 
+  // onComplete grava as respostas (PUT /match/profile) e rejeita se a API
+  // recusar: o quiz fica aberto, com as respostas, e mostra o motivo
   const handleSubmit = async () => {
     setIsSubmitting(true)
+    setSubmitError(null)
     try {
-      // 🔴 Aqui entra a chamada real: onboardingService.submitProfile(answers)
-      await new Promise((resolve) => setTimeout(resolve, 900))
-      onComplete?.(answers)
+      await onComplete?.(answers)
+    } catch (error) {
+      setSubmitError(getErrorMessage(error, 'Não foi possível salvar suas respostas. Tente novamente.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -62,6 +67,7 @@ export function useOnboardingQuiz(onComplete) {
     isCurrentAnswered,
     isLastStep,
     isSubmitting,
+    submitError,
     handleSelect,
     handleNext,
     handleBack,

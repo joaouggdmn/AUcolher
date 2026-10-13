@@ -14,6 +14,7 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
     isCurrentAnswered,
     isLastStep,
     isSubmitting,
+    submitError,
     handleSelect,
     handleNext,
     handleBack,
@@ -70,6 +71,12 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
             Continuar
             <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
           </button>
+        )}
+
+        {isLastStep && submitError && (
+          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {submitError}
+          </p>
         )}
 
         {isLastStep && (

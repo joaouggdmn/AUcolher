@@ -27,7 +27,7 @@ import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 function AumatchPage() {
   const { animals: pets } = useAnimals()
   const { isAccountBanned } = useModeration()
-  const { user, isAuthenticated, updateProfile } = useAuth()
+  const { user, isAuthenticated, saveMatchProfile } = useAuth()
   const { requests, createRequest } = useAdoptionRequests()
   const { percentage: profileCompletion } = useProfileCompletion(user)
   const navigate = useNavigate()
@@ -110,8 +110,10 @@ function AumatchPage() {
 
   const topPet = visiblePets[0]
 
-  const handleQuizComplete = (answers) => {
-    updateProfile(answers)
+  // Grava no banco antes de fechar: se a API recusar, o erro sobe para o
+  // quiz, que continua aberto com as respostas
+  const handleQuizComplete = async (answers) => {
+    await saveMatchProfile(answers)
     setIsQuizOpen(false)
     setIsPreparingMatches(true)
     setTimeout(() => setIsPreparingMatches(false), 900)
