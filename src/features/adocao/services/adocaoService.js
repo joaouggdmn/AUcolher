@@ -118,3 +118,26 @@ export async function saveRequestReview(id, { rating, comment }) {
 export function deleteRequestReview(id) {
   return adocaoApi.deleteReview(id)
 }
+
+// Avaliações recebidas por um perfil, no formato do ReviewCard, mais média,
+// quantas de cada nota (de 5 a 1) e as adoções concluídas da conta
+export async function getUserReviews(userId) {
+  const dto = await adocaoApi.getUserReviews(userId)
+  return {
+    reviews: dto.reviews.map((review) => ({
+      id: review.id,
+      authorId: review.author.id,
+      authorName: review.author.name,
+      authorPhotoUrl: review.author.photoUrl ?? null,
+      authorIsOng: review.author.isOng,
+      rating: review.rating,
+      comment: review.comment ?? '',
+      animalName: review.animalName,
+      createdAt: review.updatedAt ?? review.createdAt,
+    })),
+    count: dto.count,
+    average: dto.average,
+    distribution: [5, 4, 3, 2, 1].map((stars) => ({ stars, count: dto.distribution[stars] ?? 0 })),
+    adoptionsCount: dto.adoptionsCount,
+  }
+}
