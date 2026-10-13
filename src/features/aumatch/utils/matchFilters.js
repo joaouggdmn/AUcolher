@@ -17,7 +17,7 @@ export function applyMatchPreferences({ pets, filters }) {
     return [...filtered].sort(compareByRecency)
   }
 
-  // MATCH: a lista já chega ordenada por matchScore de sortPetsByMatchScore;
-  // reordenar aqui só desfaria esse trabalho
+  // MATCH: o deck já chega da API ordenado pelo score; reordenar aqui só
+  // desfaria esse trabalho
   return filtered
 }
