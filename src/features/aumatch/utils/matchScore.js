@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────
 // Cópia do algoritmo do backend (MatchScoreCalculator.java): os pesos e as
-// regras são os mesmos — mudou lá, muda aqui. O deck do AUmatch já chega
-// com o score calculado pela API; este arquivo serve aos cards de pedidos
-// recebidos (score do adotante) e aos textos do "Por que deu match?".
+// regras são os mesmos — mudou lá, muda aqui. O deck do AUmatch e os
+// pedidos recebidos já chegam com o score calculado pela API; este arquivo
+// serve aos textos do "Por que deu match?" (e à home, enquanto o deck carrega).
 //
 // Normalização defensiva: aceita tanto os valores enum que o quiz e a API
 // realmente salvam (ex: 'SEDENTARIO', 'PLAYFUL') quanto eventuais rótulos em

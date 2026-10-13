@@ -13,9 +13,35 @@ import {
 import { useAuth } from "../../../core/context/AuthContext";
 import { useChatMessages } from "../hooks/useChatMessages";
 import { useConcludeAdoption } from "../../../core/hooks/useConcludeAdoption";
+import { getErrorMessage } from "../../../core/utils/apiError";
 import { markConversationSeen } from "../../../core/utils/chatReadState";
 import ConfirmAdoptionModal from "../../adocao/components/ConfirmAdoptionModal";
 import AdoptionConcludedPanel from "./AdoptionConcludedPanel";
+
+// Por que a conversa foi encerrada, do ponto de vista de quem está lendo
+function closedConversationMessage(contact) {
+  const animal = contact.animalName;
+  switch (contact.cancelReason) {
+    case "LISTING_REMOVED":
+      return `Conversa encerrada: o anúncio de ${animal} foi removido pela moderação do AUcolher e o pedido de adoção foi cancelado.`;
+    case "ACCOUNT_BANNED":
+      return `Conversa encerrada: a conta de ${contact.name} foi suspensa pela moderação do AUcolher e o pedido de adoção foi cancelado.`;
+    case "ADOPTER_WITHDREW":
+      return contact.isOwnerView
+        ? `Conversa encerrada: ${contact.name} cancelou o pedido de adoção de ${animal}.`
+        : `Conversa encerrada: você cancelou o pedido de adoção de ${animal}.`;
+    case "OWNER_WITHDREW":
+      return contact.isOwnerView
+        ? `Conversa encerrada: você desistiu da adoção de ${animal}.`
+        : `Conversa encerrada: ${contact.name} desistiu da adoção de ${animal}.`;
+    case "ANIMAL_ADOPTED":
+      return `Conversa encerrada: ${animal} foi adotado por outra pessoa.`;
+    case "ANIMAL_UNAVAILABLE":
+      return `Conversa encerrada: o anúncio de ${animal} saiu do ar e o pedido de adoção foi cancelado.`;
+    default:
+      return "Conversa encerrada: o pedido de adoção foi cancelado.";
+  }
+}
 
 function formatTime(timestamp) {
   return new Date(timestamp).toLocaleTimeString("pt-BR", {
@@ -27,11 +53,13 @@ function formatTime(timestamp) {
 function ChatConversationPanel({ contact, onBack }) {
   const { user } = useAuth();
   const { messages, sendMessage } = useChatMessages(contact.requestId);
-  const { requestDelivery, concludeAdoption } = useConcludeAdoption();
+  const { requestDelivery, concludeAdoption, cancelAdoption } = useConcludeAdoption();
   const [draft, setDraft] = useState("");
   // null | 'request-delivery' (passo 1, doador) | 'conclude' (passo 2, adotante)
+  // | 'owner-withdraw' | 'adopter-cancel' (desistência de qualquer lado)
   const [confirmModalMode, setConfirmModalMode] = useState(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState(null);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -50,32 +78,41 @@ function ChatConversationPanel({ contact, onBack }) {
     setDraft("");
   };
 
+  const openConfirm = (mode) => {
+    setConfirmError(null);
+    setConfirmModalMode(mode);
+  };
+
+  // A API valida cada passo: se recusar, o modal continua aberto com o motivo
   const handleConfirmModalConfirm = async () => {
+    const target = { requestId: contact.requestId, animalName: contact.animalName };
     setIsConfirming(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    if (confirmModalMode === "request-delivery") {
-      requestDelivery({
-        requestId: contact.requestId,
-        animalName: contact.animalName,
-      });
-    } else if (confirmModalMode === "conclude") {
-      concludeAdoption({
-        requestId: contact.requestId,
-        animalName: contact.animalName,
-      });
+    setConfirmError(null);
+    try {
+      if (confirmModalMode === "request-delivery") {
+        await requestDelivery(target);
+      } else if (confirmModalMode === "conclude") {
+        await concludeAdoption(target);
+      } else {
+        await cancelAdoption({ ...target, byOwner: contact.isOwnerView });
+      }
+      setConfirmModalMode(null);
+    } catch (error) {
+      setConfirmError(getErrorMessage(error, "Não foi possível concluir. Tente novamente."));
+    } finally {
+      setIsConfirming(false);
     }
-
-    setIsConfirming(false);
-    setConfirmModalMode(null);
   };
 
   // Chat vira somente leitura assim que o doador confirma a entrega
   // (AWAITING_DELIVERY) — o histórico continua visível, só o input some
   const isAwaitingDelivery = contact.status === "AWAITING_DELIVERY";
   const isConcluded = contact.status === "CONCLUDED";
-  // A moderação baniu uma das contas ou removeu o anúncio, e o pedido foi cancelado
-  const isClosedByModeration = contact.status === "CANCELLED";
+  // Pedido cancelado durante o andamento (desistência, outra adoção, anúncio
+  // fora do ar ou moderação): o histórico fica, travado, com o motivo
+  const isClosed = contact.status === "CANCELLED";
+  // Qualquer uma das partes pode desistir enquanto o pedido não foi concluído
+  const canCancel = contact.status === "ACCEPTED" || isAwaitingDelivery;
   const initial = contact.name?.charAt(0)?.toUpperCase() ?? "?";
 
   return (
@@ -117,7 +154,7 @@ function ChatConversationPanel({ contact, onBack }) {
         {contact.isOwnerView && contact.status === "ACCEPTED" && (
           <button
             type="button"
-            onClick={() => setConfirmModalMode("request-delivery")}
+            onClick={() => openConfirm("request-delivery")}
             title="Confirmar Entrega"
             aria-label="Confirmar Entrega"
             className="flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-2 text-xs font-extrabold text-emerald-950 shadow-md shadow-amber-500/30 transition-all duration-300 hover:from-amber-300 hover:to-amber-400 sm:px-4"
@@ -141,6 +178,19 @@ function ChatConversationPanel({ contact, onBack }) {
             <span className="hidden sm:inline">Adoção Concluída</span>
           </span>
         )}
+
+        {canCancel && (
+          <button
+            type="button"
+            onClick={() => openConfirm(contact.isOwnerView ? "owner-withdraw" : "adopter-cancel")}
+            title={contact.isOwnerView ? "Desistir da adoção" : "Cancelar pedido"}
+            aria-label={contact.isOwnerView ? "Desistir da adoção" : "Cancelar pedido"}
+            className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold text-slate-400 transition-colors duration-300 hover:bg-rose-50 hover:text-rose-600"
+          >
+            <FaBan size={12} />
+            <span className="hidden lg:inline">{contact.isOwnerView ? "Desistir" : "Cancelar pedido"}</span>
+          </button>
+        )}
       </div>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
@@ -150,7 +200,7 @@ function ChatConversationPanel({ contact, onBack }) {
               <FaComments size={18} />
             </span>
             <p className="text-sm text-slate-500">
-              {isClosedByModeration
+              {isClosed
                 ? "Nenhuma mensagem nesta conversa."
                 : `Nenhuma mensagem ainda. Diga oi para ${contact.name.split(" ")[0]}!`}
             </p>
@@ -197,12 +247,10 @@ function ChatConversationPanel({ contact, onBack }) {
         <div ref={bottomRef} />
       </div>
 
-      {isClosedByModeration ? (
+      {isClosed ? (
         <p className="flex shrink-0 items-center justify-center gap-2 border-t bg-rose-50 px-4 py-3.5 text-center text-xs font-semibold text-rose-700">
           <FaBan size={11} className="shrink-0" />
-          {contact.cancelReason === "LISTING_REMOVED"
-            ? `Conversa encerrada: o anúncio de ${contact.animalName} foi removido pela moderação do AUcolher e o pedido de adoção foi cancelado.`
-            : `Conversa encerrada: a conta de ${contact.name} foi suspensa pela moderação do AUcolher e o pedido de adoção foi cancelado.`}
+          {closedConversationMessage(contact)}
         </p>
       ) : isConcluded ? (
         <AdoptionConcludedPanel contact={contact} />
@@ -217,7 +265,7 @@ function ChatConversationPanel({ contact, onBack }) {
           {!contact.isOwnerView && (
             <button
               type="button"
-              onClick={() => setConfirmModalMode("conclude")}
+              onClick={() => openConfirm("conclude")}
               className="relative flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 py-3.5 text-sm font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400"
             >
               <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5">
@@ -257,6 +305,7 @@ function ChatConversationPanel({ contact, onBack }) {
           mode={confirmModalMode}
           animalName={contact.animalName}
           isProcessing={isConfirming}
+          error={confirmError}
           onConfirm={handleConfirmModalConfirm}
           onCancel={() => setConfirmModalMode(null)}
         />
