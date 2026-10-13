@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { quizQuestions } from '../data/quizQuestions'
+import { isAnswered, nextAnswer } from '../utils/quizAnswers'
 
 const ADVANCE_DELAY = 400 // tempo para o usuário "ver" a seleção antes de trocar de pergunta
 
@@ -12,15 +13,27 @@ export function useOnboardingQuiz(onComplete) {
   const isLastStep = currentStep === quizQuestions.length - 1
   const currentQuestion = quizQuestions[currentStep]
   const selectedValue = answers[currentQuestion.key]
+  const isCurrentAnswered = isAnswered(selectedValue)
+
+  const goForward = () => {
+    setDirection('forward')
+    setCurrentStep((step) => step + 1)
+  }
 
   const handleSelect = (value) => {
-    setAnswers((prev) => ({ ...prev, [currentQuestion.key]: value }))
+    setAnswers((prev) => ({ ...prev, [currentQuestion.key]: nextAnswer(currentQuestion, prev[currentQuestion.key], value) }))
 
-    // Última pergunta não avança sozinha — só habilita o botão "Concluir"
-    if (!isLastStep) {
-      setDirection('forward')
-      setTimeout(() => setCurrentStep((step) => step + 1), ADVANCE_DELAY)
+    // Múltipla escolha espera o "Continuar"; a última pergunta não avança
+    // sozinha — só habilita o botão "Concluir"
+    if (!currentQuestion.multiple && !isLastStep) {
+      setTimeout(goForward, ADVANCE_DELAY)
     }
+  }
+
+  // "Continuar" das perguntas de múltipla escolha
+  const handleNext = () => {
+    if (isLastStep || !isCurrentAnswered) return
+    goForward()
   }
 
   const handleBack = () => {
@@ -46,9 +59,11 @@ export function useOnboardingQuiz(onComplete) {
     direction,
     currentQuestion,
     selectedValue,
+    isCurrentAnswered,
     isLastStep,
     isSubmitting,
     handleSelect,
+    handleNext,
     handleBack,
     handleSubmit,
   }

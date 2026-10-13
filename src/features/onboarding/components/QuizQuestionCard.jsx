@@ -1,12 +1,13 @@
 import QuizOptionCard from './QuizOptionCard'
+import { isOptionSelected } from '../utils/quizAnswers'
 
 // Uma pergunta do quiz: enunciado + grade de opções. Recebe a pergunta
 // inteira do OnboardingQuiz e delega cada alternativa ao QuizOptionCard
 function QuizQuestionCard({ question, selectedValue, onSelect }) {
   if (!question) return null
 
-  // Perguntas de 2 alternativas (sim/não) ficam melhor em 2 colunas fixas
-  const gridCols = question.options.length <= 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'
+  // 3 alternativas cabem numa linha; 2 ou 4 ficam melhor em 2 colunas fixas
+  const gridCols = question.options.length === 3 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2'
 
   return (
     <div className="flex flex-col gap-4">
@@ -23,7 +24,7 @@ function QuizQuestionCard({ question, selectedValue, onSelect }) {
             label={option.label}
             description={option.description}
             icon={option.icon}
-            isSelected={selectedValue === option.value}
+            isSelected={isOptionSelected(question, selectedValue, option.value)}
             onClick={() => onSelect(option.value)}
           />
         ))}

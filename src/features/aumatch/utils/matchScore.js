@@ -124,7 +124,10 @@ export function buildMatchCriteria(user, pet) {
   const petIndependence = resolveCanonical(pet.independenceLevel, LEVEL_RULES)
 
   // Crianças/outros pets em casa × sociabilidade — 15 pts
-  const hasKidsOrPets = resolveBoolean(user.temCriancasOuPets)
+  // Pedidos antigos guardam o sim/não de antes; os novos, a lista do quiz
+  const hasKidsOrPets = Array.isArray(user.convivencia)
+    ? (user.convivencia.length === 0 ? null : !user.convivencia.includes('NINGUEM'))
+    : resolveBoolean(user.temCriancasOuPets)
   const petGoodWithChildren = resolveBoolean(pet.goodWithChildren)
   const livingPoints = hasKidsOrPets ? (petGoodWithChildren ? 15 : 0) : 15
 

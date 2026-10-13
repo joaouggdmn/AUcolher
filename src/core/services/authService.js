@@ -107,7 +107,7 @@ function toFrontendUser(backendUser) {
     moradia: '',
     rotinaExercicio: '',
     tempoForaCasa: '',
-    temCriancasOuPets: null,
+    convivencia: null,
     speciesPreference: null,
     idealPetProfile: null,
     portePreferido: null,

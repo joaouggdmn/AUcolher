@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { hasCompletedLifestyleQuiz } from '../../features/onboarding/utils/quizStatus'
 
 const PERSON_CHECKLIST = [
   { key: 'nome', label: 'Nome completo', check: (p) => !!p?.name?.trim() },
@@ -7,15 +8,8 @@ const PERSON_CHECKLIST = [
   {
     key: 'estiloDeVida',
     label: 'Perfil AUmatch',
-    check: (p) =>
-      !!p?.moradia &&
-      !!p?.rotinaExercicio &&
-      !!p?.tempoForaCasa &&
-      p?.temCriancasOuPets !== null &&
-      p?.temCriancasOuPets !== undefined &&
-      !!p?.speciesPreference &&
-      !!p?.idealPetProfile &&
-      !!p?.portePreferido, // 🆕 pelagemPreferida removido daqui
+    // As 7 perguntas do quiz — a mesma regra que reabre o quiz no AUmatch
+    check: (p) => hasCompletedLifestyleQuiz(p),
   },
 ]
 
