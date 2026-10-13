@@ -1,14 +1,26 @@
 import { useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 import { updateMyProfile } from '../services/userService'
 import { toApiPayload } from '../utils/accountForm'
+import { saveMatchProfile } from '../../aumatch/services/aumatchService'
+import { matchDeckKeys } from '../../aumatch/hooks/useAumatchDeck'
+import { quizQuestions } from '../../onboarding/data/quizQuestions'
+
+// O form de pessoa também edita o Perfil AUmatch (as respostas do quiz)
+function hasMatchProfileChanges(user, next) {
+  return quizQuestions.some(
+    (question) => JSON.stringify(user[question.key] ?? null) !== JSON.stringify(next[question.key] ?? null)
+  )
+}
 
 // Estado do formulário de "Minha conta", igual para os dois tipos de conta.
 // Compara os patches normalizados (toUpdates) em vez do form cru: um espaço
 // sobrando ou uma linha em branco na equipe não conta como "não salvo"
 export function useAccountForm({ buildForm, toUpdates }) {
   const { user, updateProfile } = useAuth()
+  const queryClient = useQueryClient()
   const [formData, setFormData] = useState(() => buildForm(user))
 
   const updates = useMemo(() => toUpdates(formData), [formData, toUpdates])
@@ -31,11 +43,17 @@ export function useAccountForm({ buildForm, toUpdates }) {
   async function save(extraUpdates = {}) {
     const next = { ...updates, ...extraUpdates }
     // O PUT substitui o perfil inteiro: o corpo sai do usuário completo, senão
-    // um dado que não está no form (ex: o Perfil AUmatch) seria apagado
+    // um dado que não está no form seria apagado
     const savedProfile = await updateMyProfile(toApiPayload({ ...user, ...next }, user.userType))
-    // O que o banco guarda volta normalizado na resposta; o resto (Perfil
-    // AUmatch, coordenadas) segue como o form mandou
-    const saved = { ...next, ...savedProfile }
+    // As respostas do quiz têm rota própria e só vão quando alguma mudou
+    let savedMatchProfile = {}
+    if (user.userType === 'PESSOA' && hasMatchProfileChanges(user, next)) {
+      savedMatchProfile = await saveMatchProfile({ ...user, ...next })
+      // Respostas novas = score novo: o deck do AUmatch recalcula
+      queryClient.invalidateQueries({ queryKey: matchDeckKeys.all })
+    }
+    // O que o banco guarda volta normalizado nas respostas
+    const saved = { ...next, ...savedProfile, ...savedMatchProfile }
     updateProfile(saved)
     // Recarrega o form já normalizado (sem linhas em branco, espaços etc.)
     setFormData(buildForm({ ...user, ...saved }))

@@ -102,12 +102,12 @@ export function toFrontendProfile(backendUser) {
 function toFrontendUser(backendUser) {
   return {
     ...toFrontendProfile(backendUser),
-    // Ainda sem coluna no banco: começam vazios e o AuthContext reaplica o
-    // que está salvo localmente (as respostas do Perfil AUmatch)
+    // As respostas do Perfil AUmatch vêm de outra rota (GET /match/profile):
+    // começam vazias e o AuthContext completa no login
     moradia: '',
     rotinaExercicio: '',
     tempoForaCasa: '',
-    temCriancasOuPets: null,
+    convivencia: null,
     speciesPreference: null,
     idealPetProfile: null,
     portePreferido: null,

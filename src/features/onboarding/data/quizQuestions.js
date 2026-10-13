@@ -44,13 +44,18 @@ export const quizQuestions = [
     ],
   },
   {
-    key: 'temCriancasOuPets',
+    // Múltipla escolha: a resposta é a lista do que foi marcado. "Ninguém" é
+    // exclusiva — marcá-la desmarca as outras (ver utils/quizAnswers.js)
+    key: 'convivencia',
     section: 'estiloDeVida',
-    title: 'Tem crianças ou outros pets em casa?',
-    subtitle: 'Vamos priorizar animais com o temperamento certo para conviver bem.',
+    multiple: true,
+    title: 'Quem mora com você?',
+    subtitle: 'Marque todas as opções que se aplicam. Sem crianças nem outros pets, escolha "Ninguém".',
     options: [
-      { value: true, label: 'Sim', icon: FaChildren },
-      { value: false, label: 'Não', icon: FaXmark },
+      { value: 'CRIANCAS', label: 'Crianças', icon: FaChildren },
+      { value: 'CAES', label: 'Cães', icon: FaDog },
+      { value: 'GATOS', label: 'Gatos', icon: FaCat },
+      { value: 'NINGUEM', label: 'Ninguém', icon: FaXmark, exclusive: true },
     ],
   },
 

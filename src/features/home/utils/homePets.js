@@ -26,6 +26,4 @@ export function uniqueByPhoto(pets) {
 }
 
 // Resposta do quiz preenchida: `false` conta (ex.: "não tenho crianças nem pets")
-export function isAnswered(value) {
-  return value !== undefined && value !== null && value !== ''
-}
+export { isAnswered } from '../../onboarding/utils/quizAnswers'

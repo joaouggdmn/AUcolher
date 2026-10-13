@@ -1,6 +1,7 @@
 import { FaHouseUser, FaPaw } from 'react-icons/fa6'
 import { quizQuestions } from '../../onboarding/data/quizQuestions'
 import QuizOptionCard from '../../onboarding/components/QuizOptionCard'
+import { isOptionSelected, nextAnswer } from '../../onboarding/utils/quizAnswers'
 
 const SECTIONS = [
   {
@@ -44,7 +45,7 @@ function LifestyleForm({ values, onChange }) {
 
             <div className="flex flex-col gap-8">
               {questions.map((question) => {
-                const gridCols = question.options.length <= 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'
+                const gridCols = question.options.length === 3 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2'
 
                 return (
                   <div key={question.key} className="flex flex-col gap-3">
@@ -60,8 +61,8 @@ function LifestyleForm({ values, onChange }) {
                           label={option.label}
                           description={option.description}
                           icon={option.icon}
-                          isSelected={values[question.key] === option.value}
-                          onClick={() => onChange(question.key, option.value)}
+                          isSelected={isOptionSelected(question, values[question.key], option.value)}
+                          onClick={() => onChange(question.key, nextAnswer(question, values[question.key], option.value))}
                         />
                       ))}
                     </div>

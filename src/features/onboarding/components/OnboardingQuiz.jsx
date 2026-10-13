@@ -11,9 +11,12 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
     direction,
     currentQuestion,
     selectedValue,
+    isCurrentAnswered,
     isLastStep,
     isSubmitting,
+    submitError,
     handleSelect,
+    handleNext,
     handleBack,
     handleSubmit,
   } = useOnboardingQuiz(onComplete)
@@ -58,11 +61,29 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
           </div>
         </div>
 
+        {currentQuestion.multiple && !isLastStep && (
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={!isCurrentAnswered}
+            className="group flex items-center justify-center gap-2 rounded-full bg-emerald-800 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40"
+          >
+            Continuar
+            <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
+          </button>
+        )}
+
+        {isLastStep && submitError && (
+          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {submitError}
+          </p>
+        )}
+
         {isLastStep && (
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={selectedValue === undefined || isSubmitting}
+            disabled={!isCurrentAnswered || isSubmitting}
             className="group flex items-center justify-center gap-2 rounded-full bg-emerald-800 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40"
           >
             {isSubmitting ? 'Preparando seus matches...' : 'Concluir e ver meus Matches'}

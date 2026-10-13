@@ -1,15 +1,29 @@
 import { quizQuestions } from '../../onboarding/data/quizQuestions'
+import { selectedLabels } from '../../onboarding/utils/quizAnswers'
+
+function findQuestion(questionKey) {
+  return quizQuestions.find((q) => q.key === questionKey)
+}
 
 function findOptionLabel(questionKey, value) {
-  const question = quizQuestions.find((q) => q.key === questionKey)
-  return question?.options.find((opt) => opt.value === value)?.label
+  return findQuestion(questionKey)?.options.find((opt) => opt.value === value)?.label
+}
+
+// "Com crianças e gatos" / "Sem crianças ou pets" — nada se não respondeu
+function householdSummary(convivencia) {
+  if (!Array.isArray(convivencia) || convivencia.length === 0) return undefined
+  if (convivencia.includes('NINGUEM')) return 'Sem crianças ou pets'
+
+  const labels = selectedLabels(findQuestion('convivencia'), convivencia).map((label) => label.toLowerCase())
+  const last = labels.pop()
+  return `Com ${labels.length > 0 ? `${labels.join(', ')} e ${last}` : last}`
 }
 
 export function buildAdopterSnapshot(user, profileCompletion) {
   const lifestyleParts = [
     findOptionLabel('moradia', user.moradia),
     findOptionLabel('rotinaExercicio', user.rotinaExercicio),
-    findOptionLabel('temCriancasOuPets', user.temCriancasOuPets),
+    householdSummary(user.convivencia),
   ].filter(Boolean)
 
   return {
@@ -27,7 +41,8 @@ export function buildAdopterSnapshot(user, profileCompletion) {
     moradia: user.moradia,
     rotinaExercicio: user.rotinaExercicio,
     tempoForaCasa: user.tempoForaCasa,
-    temCriancasOuPets: user.temCriancasOuPets,
+    convivencia: user.convivencia,
     idealPetProfile: user.idealPetProfile,
+    portePreferido: user.portePreferido,
   }
 }

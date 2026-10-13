@@ -8,9 +8,10 @@ function httpUrlOrNull(url) {
 }
 
 // Cópia do animal guardada no pedido, como já acontece com `adopter`.
-// `source` diz de onde ele veio: 'api' (página do animal) ou 'legacy'
-// (AUmatch, que ainda usa o AnimalContext). Os ids das duas fontes se
-// repetem, então só o id não basta para achar o animal
+// `source` diz de onde ele veio: 'api' (página do animal e AUmatch) ou
+// 'legacy' (pedidos antigos do AUmatch, de quando ele usava o
+// AnimalContext). Os ids das duas fontes se repetem, então só o id não
+// basta para achar o animal
 export function buildAnimalSnapshot(animal, source) {
   return {
     source,
