@@ -129,7 +129,7 @@ export function AuthProvider({ children }) {
 // local sobrescreveria no login o que a API acabou de devolver
 const LIFESTYLE_FIELDS = [
   'moradia', 'rotinaExercicio', 'tempoForaCasa',
-  'temCriancasOuPets', 'speciesPreference', 'idealPetProfile', 'portePreferido',
+  'convivencia', 'speciesPreference', 'idealPetProfile', 'portePreferido',
 ]
 
 // Só devolve os campos da lista acima — descarta chaves que versões antigas

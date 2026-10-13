@@ -35,7 +35,7 @@ export function buildPersonForm(user) {
     moradia: user?.moradia ?? '',
     rotinaExercicio: user?.rotinaExercicio ?? '',
     tempoForaCasa: user?.tempoForaCasa ?? '',
-    temCriancasOuPets: user?.temCriancasOuPets ?? null,
+    convivencia: user?.convivencia ?? null,
     speciesPreference: user?.speciesPreference ?? null,
     idealPetProfile: user?.idealPetProfile ?? null,
     portePreferido: user?.portePreferido ?? null,
