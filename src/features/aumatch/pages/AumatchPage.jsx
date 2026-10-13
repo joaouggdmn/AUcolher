@@ -17,7 +17,6 @@ import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 import { useModeration } from '../../admin/hooks/useModeration'
 import { buildAdopterSnapshot } from '../../adocao/utils/buildAdopterSnapshot'
 import { buildAnimalSnapshot } from '../../adocao/utils/requestAnimal'
-import { registerPass } from '../services/aumatchService'
 import { sortPetsByMatchScore } from '../utils/matchScore'
 import { applyMatchPreferences } from '../utils/matchFilters'
 import { useMatchPreferences } from '../hooks/useMatchPreferences'
@@ -139,11 +138,8 @@ function AumatchPage() {
     })
   }
 
-  const handleSwipeLeft = () => {
-    const passedPet = topPet
-    markAsSwiped(passedPet.id)
-    registerPass(passedPet.id).catch((err) => console.error('Falha ao registrar pass:', err))
-  }
+  // O "passar" não é gravado: vale só nesta sessão, e o "Recomeçar" traz o pet de volta
+  const handleSwipeLeft = () => markAsSwiped(topPet.id)
 
   const handleSwipeRight = () => {
     const likedPet = topPet
