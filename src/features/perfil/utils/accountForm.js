@@ -110,8 +110,8 @@ export function toOngUpdates(form) {
 // Corpo do PUT /users/me (ProfileUpdateDTO no backend): espelha as colunas
 // de docs/script_banco_aucolher.sql em camelCase, como o NgoRegistrationDTO.
 // É uma substituição completa — passe o usuário inteiro já com as alterações.
-// O Perfil AUmatch não vai: o banco ainda não tem colunas para ele, e o
-// AuthContext o guarda localmente
+// O Perfil AUmatch não vai: ele tem rota própria (PUT /match/profile), que o
+// useAccountForm chama quando alguma resposta muda
 export function toApiPayload(updates, userType) {
   const basePayload = {
     name: updates.name,

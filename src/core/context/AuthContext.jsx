@@ -2,11 +2,15 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { loginRequest, registerRequest } from '../services/authService'
 import { isAccountBanned, subscribeModeration } from '../../features/admin/services/moderationMock'
 import {
+  getMatchProfile,
+  saveMatchProfile as saveMatchProfileRequest,
+} from '../../features/aumatch/services/aumatchService'
+import {
   ACCOUNT_SUSPENDED_FLAG_KEY,
   TOKEN_STORAGE_KEY,
   TOKEN_TYPE_STORAGE_KEY,
   USER_STORAGE_KEY,
-  LIFESTYLE_PROFILE_STORAGE_KEY,
+  LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY,
 } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
@@ -19,12 +23,42 @@ function isStoredSessionOf(user) {
   }
 }
 
+// O Perfil AUmatch (respostas do quiz) mora na API e é só de pessoa física.
+// null = não deu para carregar agora (a sessão segue com o que já tinha)
+async function fetchMatchProfile(sessionUser) {
+  if (sessionUser?.userType !== 'PESSOA') return null
+  try {
+    return await getMatchProfile()
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  // Id da conta cujo Perfil AUmatch já veio da API nesta visita: até lá, o
+  // AUmatch não sabe se a pessoa já fez o quiz (pode ter feito em outro aparelho)
+  const [matchProfileLoadedFor, setMatchProfileLoadedFor] = useState(null)
+
+  // Mescla o Perfil AUmatch na sessão — só se ela ainda for da mesma conta
+  function mergeMatchProfile(userId, profile) {
+    setUser((prev) => {
+      if (!prev || String(prev.id) !== String(userId)) return prev
+      const updatedUser = { ...prev, ...profile }
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser))
+      return updatedUser
+    })
+    setMatchProfileLoadedFor(userId)
+  }
 
   useEffect(() => {
+    // Versões anteriores guardavam as respostas do quiz nesta chave, solta da
+    // conta (outra pessoa no mesmo navegador herdava as respostas). Agora elas
+    // vêm do banco: quem não tiver perfil lá responde o quiz de novo
+    localStorage.removeItem(LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY)
+
     const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
     const storedUser = localStorage.getItem(USER_STORAGE_KEY)
 
@@ -39,8 +73,15 @@ export function AuthProvider({ children }) {
           sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
           throw new Error('conta suspensa')
         }
+        // Resposta de antes da pergunta "Quem mora com você?" (era sim/não)
+        delete parsedUser.temCriancasOuPets
         setUser(parsedUser)
         setIsAuthenticated(true)
+        // A sessão salva já traz as últimas respostas; a API confirma (ou
+        // atualiza, se o quiz foi respondido em outro aparelho)
+        fetchMatchProfile(parsedUser).then((profile) => {
+          if (profile) mergeMatchProfile(parsedUser.id, profile)
+        })
       } catch {
         localStorage.removeItem(TOKEN_STORAGE_KEY)
         localStorage.removeItem(TOKEN_TYPE_STORAGE_KEY)
@@ -80,21 +121,21 @@ export function AuthProvider({ children }) {
   async function login({ email, password }) {
     const { token, tokenType, user: loggedUser } = await loginRequest({ email, password })
 
-    // 🆕 Sem isso, cada novo login apagava silenciosamente as respostas do
-    // quiz que o usuário já tinha dado — o backend não devolve esses
-    // campos (toFrontendUser sempre reseta para vazio)
-    // O perfil público (bio, redes, endereço, cidade/UF, equipe...) vem
-    // inteiro da API: "Minha conta" salva pelo PUT /users/me
-    const storedLifestyle = loadStoredLifestyleProfile()
-    const mergedUser = { ...loggedUser, ...storedLifestyle }
-
+    // O token vai antes: a busca do Perfil AUmatch já precisa dele
     localStorage.setItem(TOKEN_STORAGE_KEY, token)
     localStorage.setItem(TOKEN_TYPE_STORAGE_KEY, tokenType)
+
+    // O perfil público (bio, redes, endereço, cidade/UF, equipe...) vem do
+    // login; as respostas do quiz, da rota do AUmatch
+    const matchProfile = await fetchMatchProfile(loggedUser)
+    const mergedUser = { ...loggedUser, ...matchProfile }
+
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(mergedUser))
     sessionStorage.removeItem(ACCOUNT_SUSPENDED_FLAG_KEY)
 
     setUser(mergedUser)
     setIsAuthenticated(true)
+    setMatchProfileLoadedFor(matchProfile ? mergedUser.id : null)
 
     return mergedUser
   }
@@ -109,13 +150,12 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(USER_STORAGE_KEY)
     setUser(null)
     setIsAuthenticated(false)
+    setMatchProfileLoadedFor(null)
   }
 
   // Só atualiza a sessão local — quem precisa gravar no banco chama a API
-  // antes (ver useAccountForm, que usa o PUT /users/me)
+  // antes (ver useAccountForm, que usa o PUT /users/me e o PUT /match/profile)
   function updateProfile(updates) {
-    persistLifestyleFields(updates)
-
     setUser((prev) => {
       const updatedUser = { ...prev, ...updates }
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser))
@@ -123,42 +163,33 @@ export function AuthProvider({ children }) {
     })
   }
 
-  // 🆕 Campos que o backend ainda não guarda (as respostas do Perfil AUmatch),
-// persistidos numa chave própria, independente da sessão de autenticação.
-// Cidade, UF e CEP NÃO entram aqui: eles têm coluna no banco, e uma cópia
-// local sobrescreveria no login o que a API acabou de devolver
-const LIFESTYLE_FIELDS = [
-  'moradia', 'rotinaExercicio', 'tempoForaCasa',
-  'convivencia', 'speciesPreference', 'idealPetProfile', 'portePreferido',
-]
-
-// Só devolve os campos da lista acima — descarta chaves que versões antigas
-// guardaram aqui (cidade, estado, cep, latitude, longitude) e que agora vêm
-// do banco ou nem existem mais
-function loadStoredLifestyleProfile() {
-  try {
-    const stored = localStorage.getItem(LIFESTYLE_PROFILE_STORAGE_KEY)
-    if (stored) {
-      const parsed = JSON.parse(stored)
-      return Object.fromEntries(Object.entries(parsed).filter(([key]) => LIFESTYLE_FIELDS.includes(key)))
-    }
-  } catch {
-    // payload corrompido — ignora
+  // Grava as respostas do quiz no banco e atualiza a sessão com o que voltou.
+  // Se a API recusar, o erro sobe para quem chamou (o quiz mostra a mensagem)
+  async function saveMatchProfile(answers) {
+    const saved = await saveMatchProfileRequest(answers)
+    updateProfile(saved)
+    setMatchProfileLoadedFor(user?.id ?? null)
+    return saved
   }
-  return {}
-}
 
-function persistLifestyleFields(updates) {
-  const relevant = Object.fromEntries(
-    Object.entries(updates).filter(([key]) => LIFESTYLE_FIELDS.includes(key))
-  )
-  if (Object.keys(relevant).length === 0) return
-  const current = loadStoredLifestyleProfile()
-  localStorage.setItem(LIFESTYLE_PROFILE_STORAGE_KEY, JSON.stringify({ ...current, ...relevant }))
-}
+  // Pronto = já se sabe se a pessoa fez o quiz. ONG e admin não têm perfil
+  const isMatchProfileReady =
+    !!user && (user.userType !== 'PESSOA' || String(matchProfileLoadedFor) === String(user.id))
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, register, logout, updateProfile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoading,
+        isMatchProfileReady,
+        login,
+        register,
+        logout,
+        updateProfile,
+        saveMatchProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
