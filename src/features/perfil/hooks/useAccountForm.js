@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 import { updateMyProfile } from '../services/userService'
 import { toApiPayload } from '../utils/accountForm'
 import { saveMatchProfile } from '../../aumatch/services/aumatchService'
+import { matchDeckKeys } from '../../aumatch/hooks/useAumatchDeck'
 import { quizQuestions } from '../../onboarding/data/quizQuestions'
 
 // O form de pessoa também edita o Perfil AUmatch (as respostas do quiz)
@@ -18,6 +20,7 @@ function hasMatchProfileChanges(user, next) {
 // sobrando ou uma linha em branco na equipe não conta como "não salvo"
 export function useAccountForm({ buildForm, toUpdates }) {
   const { user, updateProfile } = useAuth()
+  const queryClient = useQueryClient()
   const [formData, setFormData] = useState(() => buildForm(user))
 
   const updates = useMemo(() => toUpdates(formData), [formData, toUpdates])
@@ -43,10 +46,12 @@ export function useAccountForm({ buildForm, toUpdates }) {
     // um dado que não está no form seria apagado
     const savedProfile = await updateMyProfile(toApiPayload({ ...user, ...next }, user.userType))
     // As respostas do quiz têm rota própria e só vão quando alguma mudou
-    const savedMatchProfile =
-      user.userType === 'PESSOA' && hasMatchProfileChanges(user, next)
-        ? await saveMatchProfile({ ...user, ...next })
-        : {}
+    let savedMatchProfile = {}
+    if (user.userType === 'PESSOA' && hasMatchProfileChanges(user, next)) {
+      savedMatchProfile = await saveMatchProfile({ ...user, ...next })
+      // Respostas novas = score novo: o deck do AUmatch recalcula
+      queryClient.invalidateQueries({ queryKey: matchDeckKeys.all })
+    }
     // O que o banco guarda volta normalizado nas respostas
     const saved = { ...next, ...savedProfile, ...savedMatchProfile }
     updateProfile(saved)
