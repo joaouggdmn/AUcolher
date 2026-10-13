@@ -1,57 +1,27 @@
-import { useMemo } from 'react'
-import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
-import { mockReviews } from '../data/mockReviews'
+import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from '../../../core/services/queryKeys'
+import { getUserReviews } from '../../adocao/services/adocaoService'
 
-// Avaliações feitas no fim do ciclo de adoção: reviews.adopter avalia o
-// dono do animal; reviews.owner avalia o adotante
-function collectAdoptionReviews(profileId, requests) {
-  const id = String(profileId)
-  const collected = []
-
-  requests.forEach((request) => {
-    if (request.status !== 'CONCLUDED' || !request.reviews) return
-    const animalName = request.animal.name ?? null
-
-    const entries = [
-      [String(request.ownerId) === id, request.reviews.adopter, 'adopter'],
-      [request.adopter?.userId != null && String(request.adopter.userId) === id, request.reviews.owner, 'owner'],
-    ]
-
-    entries.forEach(([isTarget, review, authorRole]) => {
-      if (!isTarget || !review) return
-      collected.push({
-        id: `${request.id}-${authorRole}`,
-        authorName: review.authorName,
-        authorPhotoUrl: review.authorPhotoUrl,
-        authorIsOng: review.authorIsOng,
-        rating: review.rating,
-        comment: review.comment,
-        animalName,
-        createdAt: review.updatedAt ?? review.createdAt,
-      })
-    })
-  })
-
-  return collected
+// Perfil sem avaliações (ou que a API não encontrou): tudo zerado
+const EMPTY_REVIEWS = {
+  reviews: [],
+  count: 0,
+  average: 0,
+  distribution: [5, 4, 3, 2, 1].map((stars) => ({ stars, count: 0 })),
+  adoptionsCount: 0,
 }
 
-// 🔴 Com a API real, vira uma única chamada: GET /users/{id}/reviews
+// Avaliações feitas no fim de cada adoção sobre um perfil — o que adotantes
+// disseram dele como dono do animal e o que donos disseram dele como
+// adotante — com média, distribuição e as adoções concluídas
+// (GET /users/{id}/reviews). Salvar ou apagar uma avaliação invalida a chave
 export function useUserReviews(profileId) {
-  const { requests } = useAdoptionRequests()
+  const { data } = useQuery({
+    queryKey: queryKeys.adocao.userReviews(profileId),
+    queryFn: () => getUserReviews(profileId),
+    enabled: profileId != null,
+    staleTime: 30_000,
+  })
 
-  return useMemo(() => {
-    const reviews = [
-      ...mockReviews.filter((review) => String(review.targetId) === String(profileId)),
-      ...collectAdoptionReviews(profileId, requests),
-    ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-
-    const count = reviews.length
-    const average = count > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / count : 0
-    const distribution = [5, 4, 3, 2, 1].map((stars) => ({
-      stars,
-      count: reviews.filter((review) => review.rating === stars).length,
-    }))
-
-    return { reviews, count, average, distribution }
-  }, [profileId, requests])
+  return data ?? EMPTY_REVIEWS
 }

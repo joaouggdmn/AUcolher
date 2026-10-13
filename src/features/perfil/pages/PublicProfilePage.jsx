@@ -1,8 +1,6 @@
-import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FaPaw, FaStar, FaEye, FaUserPen, FaUserSlash, FaCalendarDays, FaHandHoldingHeart } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import Spinner from '../../../core/components/ui/Spinner'
 import ModerationNotice from '../../../core/components/ui/ModerationNotice'
 import { useModeration } from '../../admin/hooks/useModeration'
@@ -23,7 +21,6 @@ import ReportButton from '../../denuncias/components/ReportButton'
 function PublicProfilePage() {
   const { id } = useParams()
   const { user } = useAuth()
-  const { requests } = useAdoptionRequests()
   const { profile, isLoading } = usePublicProfile(id)
   const { isAccountBanned } = useModeration()
   const reviewsData = useUserReviews(id)
@@ -34,17 +31,6 @@ function PublicProfilePage() {
 
   // GET /users/{id}/animals: a API já devolve só os disponíveis
   const { data: availableAnimals = [] } = useUserAnimals(id)
-
-  const liveConcludedAdoptions = useMemo(
-    () =>
-      requests.filter(
-        (request) =>
-          request.status === 'CONCLUDED' &&
-          (String(request.ownerId) === id ||
-            (request.adopter?.userId != null && String(request.adopter.userId) === id)),
-      ).length,
-    [requests, id],
-  )
 
   if (isLoading) {
     return (
@@ -97,9 +83,9 @@ function PublicProfilePage() {
   const isOwnProfile = Boolean(user) && String(user.id) === id
   const firstName = isOng ? profile.name : profile.name.split(' ')[0]
 
-  // Mock: contagem histórica do seed + adoções concluídas nos testes locais
+  // Adoções concluídas em que a conta participou (GET /users/{id}/reviews)
   const stats = {
-    adoptionsCount: (profile.adoptionsCount ?? 0) + liveConcludedAdoptions,
+    adoptionsCount: reviewsData.adoptionsCount,
     availableAnimalsCount: availableAnimals.length,
     rating: { average: reviewsData.average, count: reviewsData.count },
   }
