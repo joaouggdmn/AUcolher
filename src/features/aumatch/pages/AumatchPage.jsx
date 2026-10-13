@@ -1,36 +1,47 @@
 import { useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { LuSparkles } from 'react-icons/lu'
-import { FaSliders } from 'react-icons/fa6'
+import { FaArrowRotateRight, FaSliders, FaTriangleExclamation } from 'react-icons/fa6'
 import PetCardStack from '../components/PetCardStack'
 import SwipeActionButtons from '../components/SwipeActionButtons'
 import EmptyStackState from '../components/EmptyStackState'
 import MatchToast from '../components/MatchToast'
 import PetDetailModal from '../components/PetDetailModal'
 import MatchReasonsModal from '../components/MatchReasonsModal'
+import AdoptersOnlyModal from '../components/AdoptersOnlyModal'
 import MatchPreferencesSidebar from '../components/filters/MatchPreferencesSidebar'
 import MatchPreferencesDrawer from '../components/filters/MatchPreferencesDrawer'
-import { useAnimals } from '../../../core/context/AnimalContext'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
+import { isSameId } from '../../../core/utils/ids'
 import { useModeration } from '../../admin/hooks/useModeration'
 import { buildAdopterSnapshot } from '../../adocao/utils/buildAdopterSnapshot'
 import { buildAnimalSnapshot } from '../../adocao/utils/requestAnimal'
-import { registerPass } from '../services/aumatchService'
-import { sortPetsByMatchScore } from '../utils/matchScore'
 import { applyMatchPreferences } from '../utils/matchFilters'
 import { useMatchPreferences } from '../hooks/useMatchPreferences'
+import { matchDeckKeys, useAumatchDeck } from '../hooks/useAumatchDeck'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
 import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
 
+// Cartão que ocupa o lugar do deck enquanto ele carrega ou recalcula
+function DeckStatusCard({ children }) {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
+      {children}
+    </div>
+  )
+}
+
 function AumatchPage() {
-  const { animals: pets } = useAnimals()
   const { isAccountBanned } = useModeration()
-  const { user, isAuthenticated, updateProfile } = useAuth()
+  const { user, isAuthenticated, isMatchProfileReady, saveMatchProfile } = useAuth()
+  const { pets, isAdopter, isLoading, isError, refetch } = useAumatchDeck()
   const { requests, createRequest } = useAdoptionRequests()
   const { percentage: profileCompletion } = useProfileCompletion(user)
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -45,15 +56,19 @@ function AumatchPage() {
   const [detailsPet, setDetailsPet] = useState(null)
   const [reasonsPet, setReasonsPet] = useState(null)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isAdoptersOnlyOpen, setIsAdoptersOnlyOpen] = useState(false)
   const [isPreferencesDrawerOpen, setIsPreferencesDrawerOpen] = useState(false)
+  const [isPreparingMatches, setIsPreparingMatches] = useState(false)
   const stackRef = useRef(null)
 
   const hasCompletedQuiz = hasCompletedLifestyleQuiz(user)
 
-  // Só abre o quiz automaticamente para quem já está logado — para
-  // visitantes anônimos não há perfil algum para salvar as respostas
-  const [isQuizOpen, setIsQuizOpen] = useState(() => isAuthenticated && !hasCompletedQuiz)
-  const [isPreparingMatches, setIsPreparingMatches] = useState(false)
+  // 'auto': o quiz abre sozinho para a pessoa que ainda não respondeu — só
+  // depois que o perfil veio da API, senão abriria para quem já respondeu em
+  // outro aparelho. Fechado ou concluído, só volta pelo botão
+  const [quizMode, setQuizMode] = useState('auto')
+  const isQuizOpen =
+    quizMode === 'open' || (quizMode === 'auto' && isAdopter && isMatchProfileReady && !hasCompletedQuiz)
 
   const {
     filters,
@@ -64,39 +79,31 @@ function AumatchPage() {
     hasActiveFilters,
   } = useMatchPreferences()
 
+  // A API já tira do deck os adotados, os inativos, os próprios anúncios e
+  // as outras espécies. Aqui ficam as regras que ela ainda não conhece
   const eligiblePets = useMemo(() => {
-    // 1. IDs de pets que o usuário logado já solicitou — um pedido
-    // recusado (REJECTED) libera o pet de volta no deck; qualquer outro
-    // status (PENDING, ACCEPTED, CONCLUDED) mantém o pet oculto
-    const requestedAnimalIds = isAuthenticated
-      ? requests
-          .filter((r) => r.adopter?.userId === user?.id && r.status !== 'REJECTED')
-          .map((r) => r.animalId)
-      : []
+    // 🔴 Pedidos de adoção ainda são mock (localStorage): o pet que esta
+    // conta já pediu sai do deck — um pedido recusado (REJECTED) libera o pet
+    // de volta. Pedidos antigos de animais do AnimalContext têm ids que se
+    // repetem na API, então só contam os pedidos de animais da API
+    const requestedAnimalIds = new Set(
+      isAuthenticated
+        ? requests
+            .filter((r) => r.adopter?.userId === user?.id && r.status !== 'REJECTED' && r.animalSource === 'api')
+            .map((r) => String(r.animalId))
+        : []
+    )
 
-    // 2. Filtro base: espécie preferida + já solicitados + já adotados.
-    // 🆕 O filtro de ADOPTED não depende de QUEM pediu — uma vez que o
-    // pet foi adotado por qualquer pessoa, ele nunca mais aparece no
-    // deck de ninguém.
-    const baseFiltered = pets.filter((pet) => {
-      if (requestedAnimalIds.includes(pet.id)) return false
-      if (pet.status === 'ADOPTED') return false
-      // Dono banido pela moderação: os animais dele saem do deck
-      if (isAccountBanned({ id: pet.ownerId, name: pet.organizationName ?? pet.ownerName })) return false
-
-      if (user?.speciesPreference && user.speciesPreference !== 'BOTH') {
-        return pet.species === user.speciesPreference
-      }
-      return true
+    return pets.filter((pet) => {
+      if (requestedAnimalIds.has(String(pet.id))) return false
+      // Na prévia de uma ONG, os anúncios dela mesma não entram
+      if (user && isSameId(pet.ownerId, user.id)) return false
+      // Dono banido pela moderação: sai na hora, sem esperar o deck recarregar
+      return !isAccountBanned({ id: pet.ownerId, name: pet.organizationName ?? pet.ownerName })
     })
-
-    if (!user) return baseFiltered
-
-    // 3. Aplica o algoritmo de match e oculta os próprios animais do doador
-    return sortPetsByMatchScore(user, baseFiltered, user.id)
   }, [pets, user, isAuthenticated, requests, isAccountBanned])
 
-  // 4. Preferências do painel esquerdo por último: elas filtram e reordenam
+  // Preferências do painel esquerdo por último: elas filtram e reordenam
   // o resultado do algoritmo, sem interferir nas regras de elegibilidade
   const preferredPets = useMemo(
     () => applyMatchPreferences({ pets: eligiblePets, filters }),
@@ -111,15 +118,22 @@ function AumatchPage() {
 
   const topPet = visiblePets[0]
 
-  const handleQuizComplete = (answers) => {
-    updateProfile(answers)
-    setIsQuizOpen(false)
+  // Grava no banco antes de fechar: se a API recusar, o erro sobe para o
+  // quiz, que continua aberto com as respostas. Depois, o deck volta da API
+  // com o score recalculado
+  const handleQuizComplete = async (answers) => {
+    await saveMatchProfile(answers)
+    setQuizMode('closed')
     setIsPreparingMatches(true)
-    setTimeout(() => setIsPreparingMatches(false), 900)
+    try {
+      await queryClient.invalidateQueries({ queryKey: matchDeckKeys.all })
+    } finally {
+      setIsPreparingMatches(false)
+    }
   }
 
   // Sem sessão não há perfil onde salvar as respostas, então o convite de
-  // login entra no lugar do quiz
+  // login entra no lugar do quiz; ONG e admin não usam o AUmatch
   const handleOpenQuiz = () => {
     setIsPreferencesDrawerOpen(false)
     setReasonsPet(null)
@@ -128,7 +142,16 @@ function AumatchPage() {
       setIsAuthModalOpen(true)
       return
     }
-    setIsQuizOpen(true)
+    if (!isAdopter) {
+      setIsAdoptersOnlyOpen(true)
+      return
+    }
+    setQuizMode('open')
+  }
+
+  const handleBlockedInteraction = () => {
+    if (isAuthenticated) setIsAdoptersOnlyOpen(true)
+    else setIsAuthModalOpen(true)
   }
 
   const markAsSwiped = (petId) => {
@@ -139,11 +162,8 @@ function AumatchPage() {
     })
   }
 
-  const handleSwipeLeft = () => {
-    const passedPet = topPet
-    markAsSwiped(passedPet.id)
-    registerPass(passedPet.id).catch((err) => console.error('Falha ao registrar pass:', err))
-  }
+  // O "passar" não é gravado: vale só nesta sessão, e o "Recomeçar" traz o pet de volta
+  const handleSwipeLeft = () => markAsSwiped(topPet.id)
 
   const handleSwipeRight = () => {
     const likedPet = topPet
@@ -156,8 +176,7 @@ function AumatchPage() {
       animalId: likedPet.id,
       ownerId: likedPet.ownerId,
       adopter: buildAdopterSnapshot(user, profileCompletion),
-      // O deck do AUmatch ainda vem do AnimalContext, não da API
-      animal: buildAnimalSnapshot(likedPet, 'legacy'),
+      animal: buildAnimalSnapshot(likedPet, 'api'),
     })
   }
 
@@ -176,6 +195,57 @@ function AumatchPage() {
     hasActiveFilters,
     onOpenQuiz: handleOpenQuiz,
     hasCompletedQuiz,
+    isQuizAvailable: !isAuthenticated || isAdopter,
+  }
+
+  const renderDeck = () => {
+    if (isPreparingMatches || isLoading) {
+      return (
+        <DeckStatusCard>
+          <span className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-amber-400/20 text-amber-300">
+            <LuSparkles size={24} />
+          </span>
+          <p className="text-sm font-semibold text-emerald-100">
+            {isAdopter ? 'Calculando seus melhores matches...' : 'Carregando os pets...'}
+          </p>
+        </DeckStatusCard>
+      )
+    }
+
+    if (isError) {
+      return (
+        <DeckStatusCard>
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-400/15 text-rose-300">
+            <FaTriangleExclamation size={22} />
+          </span>
+          <p className="text-sm font-semibold text-emerald-100">Não foi possível carregar o AUmatch agora.</p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="flex items-center gap-2 rounded-full bg-amber-400 px-6 py-2.5 text-sm font-bold text-emerald-950 transition-all duration-300 hover:bg-amber-300"
+          >
+            <FaArrowRotateRight size={13} />
+            Tentar de novo
+          </button>
+        </DeckStatusCard>
+      )
+    }
+
+    if (!topPet) {
+      return <EmptyStackState onReset={handleReset} hasActiveFilters={hasActiveFilters} onClearFilters={clearFilters} />
+    }
+
+    return (
+      <PetCardStack
+        ref={stackRef}
+        pets={visiblePets}
+        onSwipeLeft={handleSwipeLeft}
+        onSwipeRight={handleSwipeRight}
+        isInteractionAllowed={isAdopter}
+        onBlockedInteraction={handleBlockedInteraction}
+        onExplainMatch={() => topPet && setReasonsPet(topPet)}
+      />
+    )
   }
 
   return (
@@ -199,6 +269,11 @@ function AumatchPage() {
           <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
             Arraste para encontrar seu match
           </h1>
+          {isAuthenticated && !isAdopter && (
+            <p className="text-sm text-emerald-100/70">
+              Prévia: curtir e responder o quiz é para contas de pessoa física.
+            </p>
+          )}
         </header>
 
         {/* Split view: ~30% de painel de controle, ~70% de modo foco */}
@@ -223,35 +298,14 @@ function AumatchPage() {
 
             {/* Modo foco: um pet por vez, e com mais largura no desktop —
                 agora o card tem 70% da página só para ele */}
-            <div className="h-[70vh] w-full max-w-md sm:h-[75vh] sm:max-h-[640px] lg:max-w-lg">
-              {isPreparingMatches ? (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-sm">
-                  <span className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-amber-400/20 text-amber-300">
-                    <LuSparkles size={24} />
-                  </span>
-                  <p className="text-sm font-semibold text-emerald-100">Calculando seus melhores matches...</p>
-                </div>
-              ) : topPet ? (
-                <PetCardStack
-                  ref={stackRef}
-                  pets={visiblePets}
-                  onSwipeLeft={handleSwipeLeft}
-                  onSwipeRight={handleSwipeRight}
-                  isInteractionAllowed={isAuthenticated}
-                  onBlockedInteraction={() => setIsAuthModalOpen(true)}
-                  onExplainMatch={() => topPet && setReasonsPet(topPet)}
-                />
-              ) : (
-                <EmptyStackState onReset={handleReset} hasActiveFilters={hasActiveFilters} onClearFilters={clearFilters} />
-              )}
-            </div>
+            <div className="h-[70vh] w-full max-w-md sm:h-[75vh] sm:max-h-[640px] lg:max-w-lg">{renderDeck()}</div>
 
             <SwipeActionButtons
               onPass={() => stackRef.current?.triggerPass()}
               onLike={() => stackRef.current?.triggerLike()}
               onInfo={() => topPet && setDetailsPet(topPet)}
               isTopOng={topPet?.listingType === 'NGO'}
-              disabled={!topPet || isPreparingMatches}
+              disabled={!topPet || isPreparingMatches || isLoading || isError}
             />
           </main>
         </div>
@@ -272,7 +326,7 @@ function AumatchPage() {
         <MatchReasonsModal pet={reasonsPet} onClose={() => setReasonsPet(null)} onOpenQuiz={handleOpenQuiz} />
       )}
 
-      <OnboardingQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} onComplete={handleQuizComplete} />
+      <OnboardingQuiz isOpen={isQuizOpen} onClose={() => setQuizMode('closed')} onComplete={handleQuizComplete} />
 
       {isAuthModalOpen && (
         <AuthRequiredModal
@@ -281,6 +335,8 @@ function AumatchPage() {
           onLogin={handleGoToLogin}
         />
       )}
+
+      {isAdoptersOnlyOpen && <AdoptersOnlyModal onClose={() => setIsAdoptersOnlyOpen(false)} />}
     </div>
   )
 }

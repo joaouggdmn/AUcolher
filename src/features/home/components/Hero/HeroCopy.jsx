@@ -48,6 +48,15 @@ function getCopy({ kind, firstName, quizProgress }, { ranked, eligibleCount }) {
     }
   }
 
+  if (kind === 'admin') {
+    return {
+      eyebrow: `Olá${greeting}! Você entrou como administrador`,
+      title: PERSON_TITLE,
+      subtitle:
+        'O AUmatch é de quem quer adotar: essas pessoas respondem o quiz e curtem os pets. Pelo painel, você acompanha a plataforma.',
+    }
+  }
+
   if (kind === 'ong') {
     return {
       eyebrow: 'AUmatch para ONGs',
