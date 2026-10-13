@@ -17,7 +17,7 @@ function EmptyStackState({ onReset, hasActiveFilters, onClearFilters }) {
         </h3>
         <p className="mt-1 max-w-xs text-sm text-slate-500">
           {hasActiveFilters
-            ? 'Tente ampliar o raio de distância ou liberar os filtros de convivência.'
+            ? 'Tente escolher outra cidade ou limpar as preferências.'
             : 'Volte mais tarde para novos pets, ou reveja os perfis que já passaram.'}
         </p>
       </div>
