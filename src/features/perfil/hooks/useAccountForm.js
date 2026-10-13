@@ -22,7 +22,7 @@ export function useAccountForm({ buildForm, toUpdates }) {
   const setField = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }))
 
   // Aceita um patch ou uma função (prev) => patch — a segunda forma é a
-  // segura para callbacks assíncronos, como a busca de CEP
+  // segura para callbacks assíncronos
   const setFields = (patch) =>
     setFormData((prev) => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }))
 
@@ -31,7 +31,7 @@ export function useAccountForm({ buildForm, toUpdates }) {
   async function save(extraUpdates = {}) {
     const next = { ...updates, ...extraUpdates }
     // O PUT substitui o perfil inteiro: o corpo sai do usuário completo, senão
-    // um dado que não está no form (ex: o CEP da pessoa) seria apagado
+    // um dado que não está no form (ex: o Perfil AUmatch) seria apagado
     const savedProfile = await updateMyProfile(toApiPayload({ ...user, ...next }, user.userType))
     // O que o banco guarda volta normalizado na resposta; o resto (Perfil
     // AUmatch, coordenadas) segue como o form mandou

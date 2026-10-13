@@ -1,8 +1,6 @@
 import FormField from '../../../../core/components/ui/FormField'
 import PillToggleGroup from '../../../../core/components/ui/filters/PillToggleGroup'
-import { BRAZILIAN_STATES } from '../../../../core/utils/brazilianStates'
-import { useCepLookup } from '../../../../core/hooks/useCepLookup' // 🆕
-import CepField from '../../../../core/components/ui/CepField' // 🆕
+import CityStateFields from '../../../../core/components/ui/CityStateFields'
 import { AGE_RULE_HINT, isValidAge } from '../../utils/ageHelpers'
 import { BREED_MAX_LENGTH, NAME_MAX_LENGTH } from '../../hooks/useAnimalForm'
 
@@ -16,13 +14,10 @@ const SIZE_OPTIONS = [
 const AGE_UNIT_OPTIONS = [{ value: 'YEARS', label: 'Anos' }, { value: 'MONTHS', label: 'Meses' }]
 
 function StepBasicInfo({ formData, onChange, showLocationFields }) {
-  // 🆕 Preenche cidade/estado automaticamente assim que o CEP é resolvido —
-  // os campos continuam editáveis manualmente, caso o CEP falhe ou o
-  // usuário prefira ajustar
-  const { cep, status: cepStatus, errorMessage: cepError, handleCepChange } = useCepLookup((address) => {
-    onChange('city', address.city)
-    onChange('state', address.state)
-  })
+  // O seletor devolve um patch ({ state, city }); o form de animal troca um campo por vez
+  const handleLocationChange = (patch) => {
+    Object.entries(patch).forEach(([field, value]) => onChange(field, value))
+  }
 
   // Só acusa depois que algo foi digitado — campo vazio já trava o "Próximo"
   const showAgeError = formData.ageValue !== '' && !isValidAge(formData.ageValue, formData.ageUnit)
@@ -67,28 +62,7 @@ function StepBasicInfo({ formData, onChange, showLocationFields }) {
             Não encontramos sua localização — ela será usada neste anúncio e salva no seu perfil.
           </p>
 
-          {/* 🆕 */}
-          <CepField cep={cep} status={cepStatus} errorMessage={cepError} onChange={handleCepChange} />
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              label="Cidade"
-              value={formData.city}
-              onChange={(e) => onChange('city', e.target.value)}
-              placeholder="Preenchido automaticamente pelo CEP"
-            />
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-slate-700">Estado</label>
-              <select
-                value={formData.state}
-                onChange={(e) => onChange('state', e.target.value)}
-                className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
-              >
-                <option value="">Selecione</option>
-                {BRAZILIAN_STATES.map((uf) => <option key={uf.value} value={uf.value}>{uf.label}</option>)}
-              </select>
-            </div>
-          </div>
+          <CityStateFields state={formData.state} city={formData.city} onChange={handleLocationChange} />
         </div>
       )}
     </div>

@@ -96,7 +96,6 @@ export function toFrontendProfile(backendUser) {
     visitingHours: backendUser.visitingHours ?? [],
     city: backendUser.city ?? '',
     state: backendUser.state ?? '',
-    cep: backendUser.cep ?? '',
   }
 }
 
@@ -104,9 +103,7 @@ function toFrontendUser(backendUser) {
   return {
     ...toFrontendProfile(backendUser),
     // Ainda sem coluna no banco: começam vazios e o AuthContext reaplica o
-    // que está salvo localmente (coordenadas e respostas do Perfil AUmatch)
-    latitude: backendUser.latitude ?? null,   // 🆕
-    longitude: backendUser.longitude ?? null, // 🆕
+    // que está salvo localmente (as respostas do Perfil AUmatch)
     moradia: '',
     rotinaExercicio: '',
     tempoForaCasa: '',

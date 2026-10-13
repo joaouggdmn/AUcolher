@@ -32,8 +32,6 @@ export function buildPersonForm(user) {
     bio: user?.bio ?? '',
     city: user?.city ?? '',
     state: user?.state ?? '',
-    latitude: user?.latitude ?? null, // 🆕 oculto — nunca vira input visível
-    longitude: user?.longitude ?? null, // 🆕
     moradia: user?.moradia ?? '',
     rotinaExercicio: user?.rotinaExercicio ?? '',
     tempoForaCasa: user?.tempoForaCasa ?? '',
@@ -101,7 +99,7 @@ export function toOngUpdates(form) {
     },
     // Sem logradouro o bloco "Visitas" do perfil público não tem o que mostrar
     address: address.street ? address : null,
-    // Cidade/UF da ONG = sede: é o que os anúncios dela e a busca por distância usam
+    // Cidade/UF da ONG = sede: é o que os anúncios dela usam
     city: address.city,
     state: address.state,
     visitingHours: cleanRows(form.visitingHours),
@@ -112,8 +110,8 @@ export function toOngUpdates(form) {
 // Corpo do PUT /users/me (ProfileUpdateDTO no backend): espelha as colunas
 // de docs/script_banco_aucolher.sql em camelCase, como o NgoRegistrationDTO.
 // É uma substituição completa — passe o usuário inteiro já com as alterações.
-// Coordenadas e Perfil AUmatch não vão: o banco ainda não tem colunas para
-// eles, e o AuthContext os guarda localmente
+// O Perfil AUmatch não vai: o banco ainda não tem colunas para ele, e o
+// AuthContext o guarda localmente
 export function toApiPayload(updates, userType) {
   const basePayload = {
     name: updates.name,
@@ -124,7 +122,6 @@ export function toApiPayload(updates, userType) {
   if (userType !== 'ONG') {
     return {
       ...basePayload,
-      cep: updates.cep?.replace(/\D/g, '') || null,
       city: updates.city || null,
       state: updates.state || null,
     }
