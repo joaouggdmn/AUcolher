@@ -16,6 +16,8 @@ import { useAuth } from "../../../core/context/AuthContext";
 import { getErrorMessage } from "../../../core/utils/apiError";
 import Spinner from "../../../core/components/ui/Spinner";
 import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContext";
+import { useSentRequests } from "../../../core/hooks/useSentRequests";
+import { SENT_STATUS_META } from "../../adocao/utils/requestStatus";
 import { isSameId } from "../../../core/utils/ids";
 import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
 import SuccessToast from "../../../core/components/ui/SuccessToast";
@@ -37,7 +39,10 @@ function AnimalDetailsPage() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { data: animal, isLoading, error } = useAnimal(id);
-  const { requests, createRequest } = useAdoptionRequests();
+  const { createRequest } = useAdoptionRequests();
+  const { sentRequests } = useSentRequests();
+  const [isSending, setIsSending] = useState(false);
+  const [requestError, setRequestError] = useState(null);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
@@ -96,25 +101,29 @@ function AnimalDetailsPage() {
   const isOwner = isAuthenticated && isSameId(animal.ownerId, user?.id);
   const isAdopted = animal.status === "ADOPTED";
 
-  // Evita pedidos duplicados enquanto testamos o fluxo com contas reais
-  const alreadyRequested =
-    isAuthenticated &&
-    requests.some(
-      (r) =>
-        isSameId(r.animalId, animal.id) &&
-        isSameId(r.adopter?.userId, user.id) &&
-        r.status !== "REJECTED",
-    );
+  // Pessoa e ONG pedem; o admin não adota
+  const canRequest = !isAuthenticated || user?.userType === "PESSOA" || user?.userType === "ONG";
+  // O meu pedido mais recente para este animal (a lista vem do mais novo).
+  // Cancelado libera um pedido novo; recusado é definitivo
+  const myRequest = sentRequests.find((request) => isSameId(request.animalId, animal.id));
+  const myRequestStatus = myRequest && myRequest.status !== "CANCELLED" ? myRequest.status : null;
 
-  const handleInterestClick = () => {
+  const handleInterestClick = async () => {
     if (!isAuthenticated) {
       setIsAuthModalOpen(true);
       return;
     }
 
-    createRequest(animal.id)
-      .then(() => setSuccessMessage("Pedido enviado com sucesso! Aguarde a avaliação da ONG/Protetor."))
-      .catch((error) => setSuccessMessage(getErrorMessage(error, "Não foi possível enviar o pedido.")));
+    setIsSending(true);
+    setRequestError(null);
+    try {
+      await createRequest(animal.id);
+      setSuccessMessage("Pedido enviado com sucesso! Aguarde a avaliação da ONG/Protetor.");
+    } catch (error) {
+      setRequestError(getErrorMessage(error, "Não foi possível enviar o pedido."));
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleGoToLogin = () => {
@@ -236,6 +245,15 @@ function AnimalDetailsPage() {
                 animal={animal}
                 onStatusChanged={setSuccessMessage}
               />
+            ) : myRequestStatus === "CONCLUDED" ? (
+              <div className="rounded-2xl bg-emerald-50 px-5 py-4 text-center">
+                <p className="text-sm font-bold text-emerald-900">
+                  Você adotou {animal.name}! 🎉
+                </p>
+                <p className="mt-1 text-sm text-emerald-800/80">
+                  Que tal contar como foi a adoção avaliando o doador no chat?
+                </p>
+              </div>
             ) : isAdopted ? (
               <div className="rounded-2xl bg-amber-50 px-5 py-4 text-center">
                 <p className="text-sm font-bold text-amber-900">
@@ -251,6 +269,39 @@ function AnimalDetailsPage() {
                   Ver outros animais
                 </Link>
               </div>
+            ) : !canRequest ? null : myRequestStatus ? (
+              <div
+                className={`rounded-2xl px-5 py-4 text-center ${
+                  myRequestStatus === "REJECTED" ? "bg-slate-100" : "bg-emerald-50"
+                }`}
+              >
+                <p className="flex items-center justify-center gap-2 text-sm font-bold text-emerald-950">
+                  <FaCircleCheck size={14} className="text-emerald-600" />
+                  {myRequestStatus === "REJECTED"
+                    ? "O doador recusou o seu pedido"
+                    : `Seu pedido: ${SENT_STATUS_META[myRequestStatus].label.toLowerCase()}`}
+                </p>
+                <p className="mt-1 text-sm text-slate-600">{SENT_STATUS_META[myRequestStatus].description}</p>
+                {myRequestStatus !== "REJECTED" && (
+                  <div className="mt-3 flex flex-wrap justify-center gap-2">
+                    {myRequestStatus !== "PENDING" && (
+                      <button
+                        type="button"
+                        onClick={() => navigate("/chat", { state: { requestId: myRequest.id } })}
+                        className="rounded-full bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+                      >
+                        Ir para o chat
+                      </button>
+                    )}
+                    <Link
+                      to="/meus-interesses"
+                      className="rounded-full border border-emerald-200 px-5 py-2 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-white"
+                    >
+                      Acompanhar em Meus interesses
+                    </Link>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <InterestInfoBubble />
@@ -258,22 +309,18 @@ function AnimalDetailsPage() {
                 <button
                   type="button"
                   onClick={handleInterestClick}
-                  disabled={alreadyRequested}
-                  className={`flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base font-extrabold shadow-lg transition-all duration-300 ${
-                    alreadyRequested
-                      ? "cursor-not-allowed bg-emerald-50 text-emerald-700"
-                      : "bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-amber-500/30 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400 hover:shadow-amber-500/40"
-                  }`}
+                  disabled={isSending}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-4 text-base font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400 hover:shadow-amber-500/40 disabled:pointer-events-none disabled:opacity-60"
                 >
-                  {alreadyRequested ? (
-                    <FaCircleCheck size={16} />
-                  ) : (
-                    <FaHeart size={16} />
-                  )}
-                  {alreadyRequested
-                    ? "Pedido já enviado"
-                    : "Enviar Pedido de Interesse"}
+                  <FaHeart size={16} />
+                  {isSending ? "Enviando..." : "Enviar Pedido de Interesse"}
                 </button>
+
+                {requestError && (
+                  <p role="alert" className="rounded-xl bg-rose-50 px-4 py-2.5 text-center text-sm font-semibold text-rose-600">
+                    {requestError}
+                  </p>
+                )}
               </>
             )}
           </div>

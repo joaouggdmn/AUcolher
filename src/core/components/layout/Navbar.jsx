@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useProfileCompletion } from '../../hooks/useProfileCompletion'
 import { useReceivedRequests } from '../../hooks/useReceivedRequests'
+import { useSentRequests } from '../../hooks/useSentRequests'
 import { useChatUnread } from '../../hooks/useChatUnread'
 import { getPanelLink } from '../../utils/panelLinks'
 import UserAvatarMenu from './UserAvatarMenu'
@@ -27,6 +28,7 @@ function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { pendingCount } = useReceivedRequests()
+  const { activeCount: activeSentCount } = useSentRequests()
   const { unreadCount: unreadChatCount } = useChatUnread()
   const closeSidebar = useCallback(() => setIsSidebarOpen(false), [])
   const panelLink = getPanelLink(user?.userType)
@@ -280,6 +282,7 @@ function Navbar() {
           onClose={closeSidebar}
           panelLink={panelLink}
           totalFavoritos={totalFavoritos}
+          activeSentCount={activeSentCount}
           pendingCount={pendingCount}
           unreadChatCount={unreadChatCount}
         />

@@ -14,6 +14,7 @@ import MatchPreferencesSidebar from '../components/filters/MatchPreferencesSideb
 import MatchPreferencesDrawer from '../components/filters/MatchPreferencesDrawer'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
+import { getErrorMessage } from '../../../core/utils/apiError'
 import { isSameId } from '../../../core/utils/ids'
 import { useModeration } from '../../admin/hooks/useModeration'
 import { applyMatchPreferences } from '../utils/matchFilters'
@@ -36,7 +37,7 @@ function AumatchPage() {
   const { isAccountBanned } = useModeration()
   const { user, isAuthenticated, isMatchProfileReady, saveMatchProfile } = useAuth()
   const { pets, isAdopter, isLoading, isError, refetch } = useAumatchDeck()
-  const { requests, createRequest } = useAdoptionRequests()
+  const { createRequest } = useAdoptionRequests()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const location = useLocation()
@@ -55,6 +56,7 @@ function AumatchPage() {
   const [isAdoptersOnlyOpen, setIsAdoptersOnlyOpen] = useState(false)
   const [isPreferencesDrawerOpen, setIsPreferencesDrawerOpen] = useState(false)
   const [isPreparingMatches, setIsPreparingMatches] = useState(false)
+  const [likeError, setLikeError] = useState(null)
   const stackRef = useRef(null)
 
   const hasCompletedQuiz = hasCompletedLifestyleQuiz(user)
@@ -75,29 +77,19 @@ function AumatchPage() {
     hasActiveFilters,
   } = useMatchPreferences()
 
-  // A API já tira do deck os adotados, os inativos, os próprios anúncios e
-  // as outras espécies. Aqui ficam as regras que ela ainda não conhece
-  const eligiblePets = useMemo(() => {
-    // 🔴 Pedidos de adoção ainda são mock (localStorage): o pet que esta
-    // conta já pediu sai do deck — um pedido recusado (REJECTED) libera o pet
-    // de volta. Pedidos antigos de animais do AnimalContext têm ids que se
-    // repetem na API, então só contam os pedidos de animais da API
-    const requestedAnimalIds = new Set(
-      isAuthenticated
-        ? requests
-            .filter((r) => r.adopter?.userId === user?.id && r.status !== 'REJECTED' && r.animalSource === 'api')
-            .map((r) => String(r.animalId))
-        : []
-    )
-
-    return pets.filter((pet) => {
-      if (requestedAnimalIds.has(String(pet.id))) return false
-      // Na prévia de uma ONG, os anúncios dela mesma não entram
-      if (user && isSameId(pet.ownerId, user.id)) return false
-      // Dono banido pela moderação: sai na hora, sem esperar o deck recarregar
-      return !isAccountBanned({ id: pet.ownerId, name: pet.organizationName ?? pet.ownerName })
-    })
-  }, [pets, user, isAuthenticated, requests, isAccountBanned])
+  // A API já tira do deck os adotados, os inativos, os próprios anúncios, as
+  // outras espécies e os pets que a pessoa já pediu. Aqui ficam as regras
+  // que ela ainda não conhece
+  const eligiblePets = useMemo(
+    () =>
+      pets.filter((pet) => {
+        // Na prévia de uma ONG, os anúncios dela mesma não entram
+        if (user && isSameId(pet.ownerId, user.id)) return false
+        // Dono banido pela moderação: sai na hora, sem esperar o deck recarregar
+        return !isAccountBanned({ id: pet.ownerId, name: pet.organizationName ?? pet.ownerName })
+      }),
+    [pets, user, isAccountBanned]
+  )
 
   // Preferências do painel esquerdo por último: elas filtram e reordenam
   // o resultado do algoritmo, sem interferir nas regras de elegibilidade
@@ -168,7 +160,10 @@ function AumatchPage() {
     setMatchedPet(likedPet)
     setTimeout(() => setMatchedPet(null), 1800)
 
-    createRequest(likedPet.id).catch((error) => console.error('Falha ao enviar o pedido:', error))
+    // O pet já saiu da fila; se a API recusar (ex.: já pedido em outra aba), avisa
+    createRequest(likedPet.id).catch((error) =>
+      setLikeError(getErrorMessage(error, `Não foi possível enviar o pedido para ${likedPet.name}.`))
+    )
   }
 
   const handleReset = () => setSwipedIds(new Set())
@@ -310,6 +305,16 @@ function AumatchPage() {
       />
 
       <MatchToast pet={matchedPet} />
+      {likeError && (
+        <div role="alert" className="fixed inset-x-0 top-24 z-[110] flex justify-center px-4">
+          <p className="flex items-center gap-3 rounded-full bg-rose-600 px-5 py-3 text-sm font-bold text-white shadow-2xl">
+            {likeError}
+            <button type="button" onClick={() => setLikeError(null)} className="font-black" aria-label="Fechar aviso">
+              ×
+            </button>
+          </p>
+        </div>
+      )}
 
       {detailsPet && <PetDetailModal pet={detailsPet} onClose={() => setDetailsPet(null)} />}
 
