@@ -1,5 +1,5 @@
-// Perfis públicos mockados — mesmos ids dos donos (ownerId) em animalsSeed,
-// para que os anúncios do seed apontem para um perfil completo.
+// Perfis públicos mockados — mesmos ids dos donos (ownerId) do antigo seed
+// de animais do AUmatch, para que aqueles anúncios apontassem para um perfil completo.
 // 🔴 Some quando o endpoint GET /users/{id}/public-profile existir
 export const mockPublicProfiles = [
   {

@@ -33,14 +33,6 @@ export function requestAnimalSource(request, apiAnimal) {
   return apiAnimal && isSameId(apiAnimal.ownerId, request.ownerId) ? 'api' : 'legacy'
 }
 
-// O animal atual da fonte certa (nome, foto e dados do AUmatch em dia); sem
-// ele, a cópia do pedido; sem nenhum dos dois, só o id
-export function resolveRequestAnimal(request, { apiAnimal, legacyAnimal }) {
-  const live = requestAnimalSource(request, apiAnimal) === 'api' ? apiAnimal : legacyAnimal
-  if (live && isSameId(live.ownerId, request.ownerId)) return live
-  return { id: request.animalId, name: null, photoUrl: null, ...request.animal }
-}
-
 export function animalDisplayName(animal) {
   return animal?.name ?? MISSING_ANIMAL_NAME
 }

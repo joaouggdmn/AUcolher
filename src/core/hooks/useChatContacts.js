@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useAdoptionRequests } from "../context/AdoptionRequestContext";
+import { isSameId } from "../utils/ids";
 import { animalDisplayName } from "../../features/adocao/utils/requestAnimal";
 
 const MODERATION_REASONS = ["ACCOUNT_BANNED", "LISTING_REMOVED"];
@@ -37,10 +38,8 @@ export function useChatContacts() {
         )
         .map((request) => {
           const { animal } = request;
-          const isOwner = request.ownerId === user.id;
-          const isAdopter =
-            request.adopterId === user.id ||
-            request.adopter?.userId === user.id;
+          const isOwner = isSameId(request.ownerId, user.id);
+          const isAdopter = isSameId(request.adopter?.userId, user.id);
 
           if (!isOwner && !isAdopter) return null;
 

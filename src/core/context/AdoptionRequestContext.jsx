@@ -1,303 +1,107 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useQueries } from "@tanstack/react-query";
-import { adoptionRequestsSeed } from "../../features/adocao/data/adoptionRequestsSeed";
-import { requestAnimalSource, resolveRequestAnimal } from "../../features/adocao/utils/requestAnimal";
-import { animalKeys, useMyAnimals } from "../../features/animais/hooks/useAnimais";
-import { getAnimal } from "../../features/animais/services/animalService";
-import { matchesAccount } from "../../features/admin/services/moderationMock";
-import { useSyncAdoptedAnimals } from "../hooks/useSyncAdoptedAnimals";
-import { isSameId } from "../utils/ids";
-import { ADOPTION_REQUESTS_STORAGE_KEY } from "../utils/storageKeys";
+import { createContext, useContext, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import * as adocaoService from "../../features/adocao/services/adocaoService";
+import { animalKeys } from "../../features/animais/hooks/useAnimais";
+import { useModeration } from "../../features/admin/hooks/useModeration";
+import { queryKeys } from "../services/queryKeys";
 import { useAuth } from "./AuthContext";
-import { useAnimals } from "./AnimalContext";
 
 const AdoptionRequestContext = createContext(null);
 
-const NO_ANIMALS = [];
+const NO_REQUESTS = [];
 
-// Fora do componente: com a mesma referência, o useQueries só recombina
-// quando algum resultado muda
-function collectAnimals(results) {
-  return results.map((result) => result.data).filter(Boolean);
-}
+// Sem notificações, o dono só vê um pedido novo quando a lista recarrega:
+// as duas se atualizam sozinhas de tempos em tempos (e ao voltar para a aba)
+const REFRESH_INTERVAL = 30_000;
 
-// Cada pedido CONCLUDED guarda no máximo 1 avaliação por lado, indexada
-// pelo papel de quem escreveu: reviews.adopter avalia o doador,
-// reviews.owner avalia o adotante
-const REVIEW_AUTHOR_ROLES = ["adopter", "owner"];
-
-// Pedidos que ainda podem andar — os que um banimento cancela
-const ACTIVE_STATUSES = ["PENDING", "ACCEPTED", "AWAITING_DELIVERY"];
-
-// A conta banida é a dona do animal ou a adotante? O nome vem da cópia
-// guardada no pedido (pedido antigo, sem cópia, compara só o id)
-function bannedSide(request, account) {
-  const ownerName = request.animal?.organizationName ?? request.animal?.ownerName ?? null;
-  if (matchesAccount(account, { id: request.ownerId, name: ownerName })) return "owner";
-  if (matchesAccount(account, { id: request.adopter?.userId, name: request.adopter?.name })) return "adopter";
-  return null;
-}
-
-function loadInitialRequests() {
-  try {
-    const stored = localStorage.getItem(ADOPTION_REQUESTS_STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {
-    // localStorage corrompido ou indisponível — cai para o seed
-  }
-  return adoptionRequestsSeed;
-}
-
+// Os pedidos da conta logada, vindos da API (docs/api-adocao.md): os que ela
+// enviou e os que recebeu pelos animais dela, numa lista só — cada tela
+// filtra pelo lado que interessa (adopter.userId ou ownerId). A API valida
+// cada ação; aqui as funções só chamam a API e atualizam as listas
 export function AdoptionRequestProvider({ children }) {
-  const [requests, setRequests] = useState(loadInitialRequests);
-  const { user } = useAuth();
-  const { animals: legacyAnimals, markAnimalAsAdopted } = useAnimals();
-  const { data: myApiAnimals = NO_ANIMALS } = useMyAnimals();
+  const { user, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  const { isAccountBanned } = useModeration();
 
-  // Pedidos em que a conta logada é a adotante e o animal não é dela: busca
-  // o animal na API para ter foto e dados atuais (pedidos antigos nem têm cópia)
-  const animalIdsToFetch = useMemo(() => {
-    if (!user) return [];
-    const mine = new Set(myApiAnimals.map((animal) => String(animal.id)));
-    const ids = requests
-      .filter((request) => isSameId(request.adopter?.userId ?? request.adopterId, user.id))
-      .filter((request) => request.animal?.source !== "legacy" && !mine.has(String(request.animalId)))
-      .map((request) => String(request.animalId));
-    return [...new Set(ids)];
-  }, [user, requests, myApiAnimals]);
+  // Admin não pede nem recebe pedidos
+  const takesPart = isAuthenticated && (user?.userType === "PESSOA" || user?.userType === "ONG");
 
-  const fetchedAnimals = useQueries({
-    queries: animalIdsToFetch.map((id) => ({
-      queryKey: animalKeys.detail(id),
-      queryFn: () => getAnimal(id),
-    })),
-    combine: collectAnimals,
+  const { data: sent = NO_REQUESTS } = useQuery({
+    queryKey: queryKeys.adocao.sent(user?.id),
+    queryFn: adocaoService.listSentRequests,
+    enabled: takesPart,
+    refetchInterval: REFRESH_INTERVAL,
   });
 
-  // O que as telas recebem: cada pedido com o animal certo em `animal` e a
-  // origem dele em `animalSource`. O que vai para o localStorage continua
-  // sendo só o pedido como foi gravado
-  const resolvedRequests = useMemo(() => {
-    const apiById = new Map([...fetchedAnimals, ...myApiAnimals].map((animal) => [String(animal.id), animal]));
-    const legacyById = new Map(legacyAnimals.map((animal) => [String(animal.id), animal]));
+  const { data: received = NO_REQUESTS } = useQuery({
+    queryKey: queryKeys.adocao.received(user?.id),
+    queryFn: adocaoService.listReceivedRequests,
+    enabled: takesPart,
+    refetchInterval: REFRESH_INTERVAL,
+  });
 
-    return requests.map((request) => {
-      const apiAnimal = apiById.get(String(request.animalId));
-      return {
-        ...request,
-        animalSource: requestAnimalSource(request, apiAnimal),
-        animal: resolveRequestAnimal(request, { apiAnimal, legacyAnimal: legacyById.get(String(request.animalId)) }),
-      };
-    });
-  }, [requests, fetchedAnimals, myApiAnimals, legacyAnimals]);
+  // 🔴 A camada de moderação do mock entra aqui, e não na busca: banir ou
+  // remover um anúncio (nesta aba ou em outra) atualiza as telas na hora
+  const requests = useMemo(() => {
+    if (!takesPart) return NO_REQUESTS;
+    const byId = new Map([...received, ...sent].map((request) => [request.id, request]));
+    return [...byId.values()].map((request) => adocaoService.withModeration(request, isAccountBanned));
+  }, [takesPart, sent, received, isAccountBanned]);
 
-  useSyncAdoptedAnimals({ userId: user?.id, requests: resolvedRequests, myAnimals: myApiAnimals });
-
-  // Persiste toda alteração — o localStorage funciona como um "banco de
-  // dados" mockado, compartilhado entre abas do mesmo navegador
-  useEffect(() => {
-    localStorage.setItem(
-      ADOPTION_REQUESTS_STORAGE_KEY,
-      JSON.stringify(requests),
-    );
-  }, [requests]);
-
-  // Sincroniza em tempo real quando OUTRA aba grava uma mudança — sem
-  // isso, a aba do doador só veria o pedido novo após um F5 manual
-  useEffect(() => {
-    function handleStorageChange(event) {
-      if (event.key !== ADOPTION_REQUESTS_STORAGE_KEY || !event.newValue)
-        return;
-      try {
-        setRequests(JSON.parse(event.newValue));
-      } catch {
-        // ignora payload inválido
-      }
+  // Troca o pedido nas duas listas pelo que a API devolveu (a tela muda na
+  // hora) e manda buscar de novo — uma conclusão também cancela outros pedidos
+  function applyResult(updated) {
+    for (const key of [queryKeys.adocao.sent(user?.id), queryKeys.adocao.received(user?.id)]) {
+      queryClient.setQueryData(key, (list) => list?.map((request) => (request.id === updated.id ? updated : request)));
     }
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
-
-  // `animal` é a cópia de buildAnimalSnapshot (features/adocao/utils/requestAnimal)
-  function createRequest({ animalId, ownerId, adopter, animal }) {
-    const newRequest = {
-      id: Date.now(),
-      animalId,
-      ownerId,
-      status: "PENDING",
-      createdAt: new Date().toISOString(),
-      adopter,
-      animal,
-    };
-    setRequests((prev) => [newRequest, ...prev]);
-    return newRequest;
+    queryClient.invalidateQueries({ queryKey: queryKeys.adocao.all });
   }
 
-  function acceptRequest(requestId) {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === requestId ? { ...request, status: "ACCEPTED" } : request,
-      ),
-    );
+  // Rejeita com o erro da API (ex.: "Você já enviou um pedido para este animal")
+  async function createRequest(animalId) {
+    const created = await adocaoService.createAdoptionRequest(animalId);
+    queryClient.setQueryData(queryKeys.adocao.sent(user?.id), (list) => [created, ...(list ?? [])]);
+    queryClient.invalidateQueries({ queryKey: queryKeys.adocao.all });
+    // O deck do AUmatch e a home deixam de mostrar o animal pedido
+    queryClient.invalidateQueries({ queryKey: animalKeys.all });
+    return created;
   }
 
-  function rejectRequest(requestId) {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === requestId ? { ...request, status: "REJECTED" } : request,
-      ),
-    );
+  async function changeStatus(requestId, status) {
+    const updated = await adocaoService.changeRequestStatus(requestId, status);
+    applyResult(updated);
+    // Concluir adota o animal; cancelar pode devolvê-lo ao deck de quem desistiu
+    if (status === "CONCLUDED" || status === "CANCELLED") {
+      queryClient.invalidateQueries({ queryKey: animalKeys.all });
+    }
+    return updated;
   }
 
-  // Passo 1 do handshake de conclusão: o doador confirma que quer entregar
-  // o pet a este adotante. Trava o chat para novas mensagens, mas ainda
-  // NÃO finaliza o pedido nem inativa o animal — isso só acontece quando o
-  // adotante confirmar o recebimento (concludeRequest)
-  function requestDeliveryConfirmation(requestId) {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === requestId && request.status === "ACCEPTED"
-          ? { ...request, status: "AWAITING_DELIVERY" }
-          : request,
-      ),
-    );
+  // Avaliação do lado de quem está logado (a API sabe qual é pelo pedido)
+  async function saveReview(requestId, { rating, comment }) {
+    const updated = await adocaoService.saveRequestReview(requestId, { rating, comment });
+    applyResult(updated);
+    return updated;
   }
 
-  // Passo 2 do handshake: o adotante confirma o recebimento. Concluir,
-  // cancelar os pedidos concorrentes e tirar o animal das buscas públicas
-  // acontecem sempre juntos aqui, para nenhum chamador esquecer um deles.
-  // Retorna false se o pedido não estava em AWAITING_DELIVERY
-  function concludeRequest(requestId) {
-    const target = requests.find((r) => r.id === requestId);
-    if (!target || target.status !== "AWAITING_DELIVERY") return false;
-
-    setRequests((prev) =>
-      prev.map((request) => {
-        if (request.id === requestId) {
-          // concludedAt data a linha do tempo de "Meu impacto" em Minha conta
-          return { ...request, status: "CONCLUDED", concludedAt: new Date().toISOString() };
-        }
-        // Exclusão mútua: qualquer OUTRO pedido para o MESMO animal que
-        // ainda não tinha sido recusado vira CANCELLED — o animal não
-        // está mais disponível, então esse pedido nunca mais avança.
-        // O dono também precisa bater: ids da API e do AnimalContext se repetem
-        if (
-          request.animalId === target.animalId &&
-          isSameId(request.ownerId, target.ownerId) &&
-          request.status !== "REJECTED"
-        ) {
-          return { ...request, status: "CANCELLED" };
-        }
-        return request;
-      }),
-    );
-    // Animal da API vira ADOPTED quando o dono entrar (useSyncAdoptedAnimals);
-    // aqui só o do AnimalContext, que é o que o AUmatch mostra
-    const resolved = resolvedRequests.find((request) => request.id === requestId);
-    if (resolved?.animalSource === "legacy") markAnimalAsAdopted(target.animalId);
-    return true;
-  }
-
-  // 🔴 Moderação: banir uma conta cancela os pedidos ativos dela, como dona
-  // ou como adotante, e a outra parte vê o motivo (cancelReason). Com os
-  // pedidos no backend, o próprio banimento faz isso no servidor
-  function cancelRequestsOfBannedAccount(account) {
-    const cancelledAt = new Date().toISOString();
-    setRequests((prev) =>
-      prev.map((request) => {
-        if (!ACTIVE_STATUSES.includes(request.status)) return request;
-        const side = bannedSide(request, account);
-        if (!side) return request;
-        return {
-          ...request,
-          status: "CANCELLED",
-          cancelReason: "ACCOUNT_BANNED",
-          bannedSide: side,
-          // A conversa (aceito ou aguardando entrega) continua visível, travada
-          cancelledFromStatus: request.status,
-          cancelledAt,
-        };
-      }),
-    );
-  }
-
-  // 🔴 Moderação: remover um anúncio cancela os pedidos ativos do animal, e
-  // as duas partes veem o motivo. Os ids do AUmatch antigo se repetem com os
-  // da API, então o dono também precisa bater e o pedido não pode ser de lá
-  function cancelRequestsOfRemovedAnimal(animal) {
-    const cancelledAt = new Date().toISOString();
-    setRequests((prev) =>
-      prev.map((request) => {
-        const isForAnimal =
-          ACTIVE_STATUSES.includes(request.status) &&
-          request.animal?.source !== "legacy" &&
-          isSameId(request.animalId, animal.id) &&
-          isSameId(request.ownerId, animal.ownerId);
-        if (!isForAnimal) return request;
-        return {
-          ...request,
-          status: "CANCELLED",
-          cancelReason: "LISTING_REMOVED",
-          cancelledFromStatus: request.status,
-          cancelledAt,
-        };
-      }),
-    );
-  }
-
-  function saveReview(requestId, authorRole, { rating, comment, author }) {
-    if (!REVIEW_AUTHOR_ROLES.includes(authorRole)) return;
-    if (!Number.isInteger(rating) || rating < 1 || rating > 5) return;
-
-    const now = new Date().toISOString();
-    setRequests((prev) =>
-      prev.map((request) => {
-        if (request.id !== requestId || request.status !== "CONCLUDED") {
-          return request;
-        }
-        const previous = request.reviews?.[authorRole];
-        return {
-          ...request,
-          reviews: {
-            ...request.reviews,
-            [authorRole]: {
-              rating,
-              comment: comment?.trim() ?? "",
-              authorId: author.id,
-              authorName: author.name,
-              authorPhotoUrl: author.photoUrl ?? null,
-              authorIsOng: author.isOng,
-              createdAt: previous?.createdAt ?? now,
-              updatedAt: previous ? now : null,
-            },
-          },
-        };
-      }),
-    );
-  }
-
-  function deleteReview(requestId, authorRole) {
-    setRequests((prev) =>
-      prev.map((request) =>
-        request.id === requestId && request.reviews?.[authorRole]
-          ? { ...request, reviews: { ...request.reviews, [authorRole]: null } }
-          : request,
-      ),
-    );
+  async function deleteReview(requestId) {
+    await adocaoService.deleteRequestReview(requestId);
+    queryClient.invalidateQueries({ queryKey: queryKeys.adocao.all });
   }
 
   return (
     <AdoptionRequestContext.Provider
       value={{
-        requests: resolvedRequests,
+        requests,
         createRequest,
-        acceptRequest,
-        rejectRequest,
-        requestDeliveryConfirmation,
-        concludeRequest,
-        cancelRequestsOfBannedAccount,
-        cancelRequestsOfRemovedAnimal,
+        // Dono
+        acceptRequest: (requestId) => changeStatus(requestId, "ACCEPTED"),
+        rejectRequest: (requestId) => changeStatus(requestId, "REJECTED"),
+        requestDeliveryConfirmation: (requestId) => changeStatus(requestId, "AWAITING_DELIVERY"),
+        // Adotante
+        concludeRequest: (requestId) => changeStatus(requestId, "CONCLUDED"),
+        // As duas partes: quem desistiu vai no motivo (a API decide pelo papel)
+        cancelRequest: (requestId) => changeStatus(requestId, "CANCELLED"),
         saveReview,
         deleteReview,
       }}
