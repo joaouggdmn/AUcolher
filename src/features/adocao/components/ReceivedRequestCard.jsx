@@ -8,10 +8,10 @@ import {
   FaClock,
   FaHandHoldingHeart,
   FaPaw,
+  FaBan,
 } from "react-icons/fa6";
 import { LuSparkles } from "react-icons/lu";
 import Avatar from "../../../core/components/ui/Avatar";
-import { computeMatchScore } from "../../aumatch/utils/matchScore";
 import { animalDisplayName } from "../utils/requestAnimal";
 
 function ReceivedRequestCard({
@@ -20,13 +20,12 @@ function ReceivedRequestCard({
   onReject,
   onGoToChat,
   onRequestDelivery,
+  onWithdraw,
   isProcessing,
 }) {
-  const { animal, adopter, status } = request;
-  const matchScore = computeMatchScore(adopter, animal);
+  const { animal, adopter, status, matchScore } = request;
   const isConcluded = status === "CONCLUDED";
-  // Animal do AUmatch (AnimalContext) não tem página: /animais/:id é da API
-  const AnimalHeader = request.animalSource === "api" ? Link : "div";
+  const canWithdraw = (status === "ACCEPTED" || status === "AWAITING_DELIVERY") && onWithdraw;
 
   return (
     <div
@@ -34,8 +33,8 @@ function ReceivedRequestCard({
         isConcluded ? "border-emerald-200" : "border-slate-100"
       }`}
     >
-      <AnimalHeader
-        to={request.animalSource === "api" ? `/animais/${animal.id}` : undefined}
+      <Link
+        to={`/animais/${animal.id}`}
         className="flex items-center gap-3 border-b border-slate-100 bg-emerald-50/60 px-5 py-3 transition-colors duration-300 hover:bg-emerald-50"
       >
         {animal.photoUrl ? (
@@ -65,7 +64,7 @@ function ReceivedRequestCard({
           <LuSparkles size={12} className="text-amber-300" />
           {matchScore}% Match
         </span>
-      </AnimalHeader>
+      </Link>
 
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="flex items-start gap-3">
@@ -94,13 +93,20 @@ function ReceivedRequestCard({
             </p>
           </div>
 
-          <span
-            title="Completude do perfil do adotante"
-            className="flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500"
-          >
-            <FaUser size={10} />
-            {adopter.profileCompletion}%
-          </span>
+          {/* ONG não tem checklist de pessoa: mostra o tipo da conta no lugar */}
+          {adopter.profileCompletion != null ? (
+            <span
+              title="Completude do perfil do adotante"
+              className="flex shrink-0 items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500"
+            >
+              <FaUser size={10} />
+              {adopter.profileCompletion}%
+            </span>
+          ) : (
+            adopter.isOng && (
+              <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700">ONG</span>
+            )
+          )}
         </div>
 
         <p className="rounded-xl bg-slate-50 px-3.5 py-2.5 text-xs font-medium text-slate-600">
@@ -174,6 +180,17 @@ function ReceivedRequestCard({
               <FaCircleCheck size={13} />
               Adoção Concluída
             </div>
+          )}
+
+          {canWithdraw && (
+            <button
+              type="button"
+              onClick={() => onWithdraw(request)}
+              className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold text-slate-400 transition-colors duration-300 hover:bg-rose-50 hover:text-rose-600"
+            >
+              <FaBan size={11} />
+              Desistir da adoção
+            </button>
           )}
         </div>
       </div>

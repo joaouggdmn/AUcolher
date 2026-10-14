@@ -1,17 +1,15 @@
 import { useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useAdoptionRequests } from "../context/AdoptionRequestContext";
+import { isSameId } from "../utils/ids";
 import { animalDisplayName } from "../../features/adocao/utils/requestAnimal";
 
-const MODERATION_REASONS = ["ACCOUNT_BANNED", "LISTING_REMOVED"];
-
 // Conversa que já existia (pedido aceito ou aguardando entrega) e foi
-// cancelada pela moderação (conta banida ou anúncio removido): continua
-// visível, travada
-function isChatClosedByModeration(request) {
+// cancelada — por uma das partes, pela adoção de outro pedido, pelo anúncio
+// fora do ar ou pela moderação: continua visível, travada, com o motivo
+function isClosedConversation(request) {
   return (
     request.status === "CANCELLED" &&
-    MODERATION_REASONS.includes(request.cancelReason) &&
     ["ACCEPTED", "AWAITING_DELIVERY"].includes(request.cancelledFromStatus)
   );
 }
@@ -33,14 +31,12 @@ export function useChatContacts() {
             request.status === "ACCEPTED" ||
             request.status === "AWAITING_DELIVERY" ||
             request.status === "CONCLUDED" ||
-            isChatClosedByModeration(request),
+            isClosedConversation(request),
         )
         .map((request) => {
           const { animal } = request;
-          const isOwner = request.ownerId === user.id;
-          const isAdopter =
-            request.adopterId === user.id ||
-            request.adopter?.userId === user.id;
+          const isOwner = isSameId(request.ownerId, user.id);
+          const isAdopter = isSameId(request.adopter?.userId, user.id);
 
           if (!isOwner && !isAdopter) return null;
 

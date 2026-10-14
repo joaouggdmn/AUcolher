@@ -28,23 +28,27 @@ const ONG_CHECKLIST = [
   },
 ]
 
+// Fora de componente também: o card de um pedido recebido calcula a
+// completude do adotante a partir dos dados que a API devolve
+export function computeProfileCompletion(profile) {
+  // Admin não tem perfil público a completar: sem checklist, conta como completo
+  if (profile?.userType === 'ADMIN') return { checklist: [], percentage: 100 }
+
+  const definitions = profile?.userType === 'ONG' ? ONG_CHECKLIST : PERSON_CHECKLIST
+
+  const checklist = definitions.map((item) => ({
+    key: item.key,
+    label: item.label,
+    isComplete: item.check(profile),
+  }))
+
+  const percentage = Math.round(
+    (checklist.filter((item) => item.isComplete).length / checklist.length) * 100
+  )
+
+  return { checklist, percentage }
+}
+
 export function useProfileCompletion(profile) {
-  return useMemo(() => {
-    // Admin não tem perfil público a completar: sem checklist, conta como completo
-    if (profile?.userType === 'ADMIN') return { checklist: [], percentage: 100 }
-
-    const definitions = profile?.userType === 'ONG' ? ONG_CHECKLIST : PERSON_CHECKLIST
-
-    const checklist = definitions.map((item) => ({
-      key: item.key,
-      label: item.label,
-      isComplete: item.check(profile),
-    }))
-
-    const percentage = Math.round(
-      (checklist.filter((item) => item.isComplete).length / checklist.length) * 100
-    )
-
-    return { checklist, percentage }
-  }, [profile])
+  return useMemo(() => computeProfileCompletion(profile), [profile])
 }

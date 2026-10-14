@@ -4,6 +4,7 @@ import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { sortPetsByMatchScore } from '../../aumatch/utils/matchScore'
 import { matchDeckQuery } from '../../aumatch/hooks/useAumatchDeck'
+import { isSameId } from '../../../core/utils/ids'
 import { uniqueByPhoto } from '../utils/homePets'
 import { useBrokenPhotos } from './useBrokenPhotos'
 import { useHomeAnimals } from './useHomeAnimals'
@@ -23,15 +24,12 @@ export function useRankedPets(profile, { excludeRequested = false } = {}) {
   const { data: deck } = useQuery({ ...matchDeckQuery(user?.id), enabled: usesDeck })
 
   return useMemo(() => {
-    // Pedidos antigos de animais do AnimalContext têm ids que se repetem na
-    // API, então só contam os pedidos de animais da API
+    // Pedidos que impedem um novo: qualquer um que não esteja cancelado
+    // (recusado é definitivo) — o mesmo critério do deck da API
     const requestedIds = new Set(
       excludeRequested && user
         ? requests
-            .filter(
-              (request) =>
-                request.adopter?.userId === user.id && request.status !== 'REJECTED' && request.animalSource === 'api'
-            )
+            .filter((request) => isSameId(request.adopter?.userId, user.id) && request.status !== 'CANCELLED')
             .map((request) => String(request.animalId))
         : []
     )

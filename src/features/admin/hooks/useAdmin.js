@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useAuth } from '../../../core/context/AuthContext'
 import { queryKeys } from '../../../core/services/queryKeys'
 import { ADMIN_STALE_TIME } from '../../../core/utils/constants'
@@ -17,7 +16,6 @@ import {
   removeAdminEvent,
   setAdminUserStatus,
 } from '../services/adminService'
-import { reportedAccount } from '../utils/reportCases'
 
 // Só a conta admin busca: para as outras o "servidor" responderia 403
 function useAdminQuery(queryKey, queryFn) {
@@ -84,51 +82,35 @@ export function useDismissReports() {
   })
 }
 
-// 🔴 Os pedidos de adoção ainda moram no navegador (AdoptionRequestProvider):
-// quem cancela os da conta banida é o front. Com os pedidos no backend, o
-// próprio PATCH/POST de banimento faz isso
-function useCancelRequestsOfBanned() {
-  const { cancelRequestsOfBannedAccount } = useAdoptionRequests()
-  return cancelRequestsOfBannedAccount
-}
+// 🔴 Banir ou remover um anúncio também "cancela" os pedidos ativos
+// envolvidos: no mock, quem mostra isso é a camada de moderação do
+// AdoptionRequestProvider (o servidor não muda). Com a moderação no backend,
+// o próprio banimento cancela os pedidos no servidor
 
 // Banir a conta de um caso de denúncia (o perfil ou quem anunciou)
 export function useBanReportedAccount() {
   const invalidate = useInvalidateModeration()
-  const cancelRequests = useCancelRequestsOfBanned()
   return useMutation({
     mutationFn: (reportCase) => banReportedAccount(reportCase.reports[0].id),
-    onSuccess: (_, reportCase) => {
-      cancelRequests(reportedAccount(reportCase))
-      return invalidate()
-    },
+    onSuccess: invalidate,
   })
 }
 
 // { user, active }: banir (false) ou reativar (true) pela lista de Usuários
 export function useSetUserStatus() {
   const invalidate = useInvalidateModeration()
-  const cancelRequests = useCancelRequestsOfBanned()
   return useMutation({
     mutationFn: ({ user, active }) => setAdminUserStatus(user.id, active),
-    onSuccess: (_, { user, active }) => {
-      if (!active) cancelRequests(user)
-      return invalidate()
-    },
+    onSuccess: invalidate,
   })
 }
 
-// 🔴 Remover um anúncio também cancela os pedidos ativos do animal: no mock,
-// quem faz isso é o AdoptionRequestProvider. `animal`: { id, ownerId }
+// `animal`: { id, ownerId }
 export function useRemoveAnimal() {
   const invalidate = useInvalidateModeration()
-  const { cancelRequestsOfRemovedAnimal } = useAdoptionRequests()
   return useMutation({
     mutationFn: (animal) => removeAdminAnimal(animal.id),
-    onSuccess: (_, animal) => {
-      cancelRequestsOfRemovedAnimal(animal)
-      return invalidate()
-    },
+    onSuccess: invalidate,
   })
 }
 

@@ -25,6 +25,15 @@ export const queryKeys = {
     mine: (userId) => ['doacoes', 'mine', String(userId)],
     received: (userId) => ['doacoes', 'received', String(userId)],
   },
+  // Pedidos de adoção: os enviados e os recebidos são da conta logada (levam o
+  // userId); as avaliações de um perfil são públicas
+  adocao: {
+    all: ['adocao'],
+    sent: (userId) => ['adocao', 'sent', String(userId)],
+    received: (userId) => ['adocao', 'received', String(userId)],
+    userReviews: (userId) => ['adocao', 'user-reviews', String(userId)],
+    admin: ['adocao', 'admin'],
+  },
   // Denúncias da conta logada: dizem se já existe uma em análise para o alvo
   denuncias: {
     all: ['denuncias'],
