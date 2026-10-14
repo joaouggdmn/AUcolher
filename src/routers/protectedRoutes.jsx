@@ -7,6 +7,7 @@ import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
+import MyInterestsPage from '../features/adocao/pages/MyInterestsPage'
 import ChatPage from '../features/chat/pages/ChatPage'
 import FavoritosPage from '../features/favoritos/pages/FavoritosPage'
 import OngPanelLayout from '../features/ong/panel/OngPanelLayout'
@@ -45,7 +46,7 @@ export const protectedRoutes = [
           { path: 'animais/criar', element: <CreateAnimalPage /> },
           { path: 'animais/editar/:id', element: <PlaceholderPage title="Editar animal" /> },
           { path: 'meus-anuncios', element: <PlaceholderPage title="Meus anuncios" /> },
-          { path: 'meus-interesses', element: <PlaceholderPage title="Meus interesses" /> },
+          { path: 'meus-interesses', element: <MyInterestsPage /> },
           { path: 'favoritos', element: <FavoritosPage /> },
           { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
           { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },

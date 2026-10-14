@@ -12,7 +12,9 @@ const RATING_LABELS = {
   5: 'Excelente',
 }
 
-function ReviewForm({ targetName, initialReview, onSubmit, onDelete, onCancel }) {
+// `isSaving` trava os botões enquanto a API responde; `error` é a mensagem
+// dela quando recusa — o formulário continua aberto com o que foi escrito
+function ReviewForm({ targetName, initialReview, onSubmit, onDelete, onCancel, isSaving = false, error }) {
   const [rating, setRating] = useState(initialReview?.rating ?? 0)
   const [comment, setComment] = useState(initialReview?.comment ?? '')
   const isEditing = Boolean(initialReview)
@@ -68,19 +70,26 @@ function ReviewForm({ targetName, initialReview, onSubmit, onDelete, onCancel })
             </span>
           </label>
 
+          {error && (
+            <p role="alert" className="w-full rounded-xl bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-600">
+              {error}
+            </p>
+          )}
+
           <div className="flex w-full flex-col gap-2.5">
             <button
               type="submit"
-              disabled={!rating}
+              disabled={!rating || isSaving}
               className="rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isEditing ? 'Salvar alterações' : 'Enviar avaliação'}
+              {isSaving ? 'Salvando...' : isEditing ? 'Salvar alterações' : 'Enviar avaliação'}
             </button>
 
             {onDelete && (
               <button
                 type="button"
                 onClick={onDelete}
+                disabled={isSaving}
                 className="flex items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold text-rose-600 transition-colors duration-300 hover:bg-rose-50"
               >
                 <FaTrashCan size={12} />

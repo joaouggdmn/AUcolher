@@ -1,12 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
-import { useAnimals } from '../../../core/context/AnimalContext'
-import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { getPublicProfile } from '../services/userService'
 
 // Perfil da própria conta: sai exatamente do que ela salvou em "Minha conta",
-// com os mesmos campos que outra pessoa veria. 🔴 Com a API real, o
-// GET /users/{id}/public-profile devolve este mesmo formato
+// com os mesmos campos que outra pessoa veria (o GET
+// /users/{id}/public-profile devolve este mesmo formato)
 function buildOwnProfile(user) {
   return {
     id: user.id,
@@ -30,50 +28,11 @@ function buildOwnProfile(user) {
   }
 }
 
-// Contas reais criadas nos testes não estão no mock — monta um perfil
-// básico com o que já existe localmente (anúncios e pedidos). Some junto
-// com o mock quando a API real responder por qualquer id
-function buildLocalProfile(profileId, { animals, requests }) {
-  const id = String(profileId)
-
-  const ownedAnimal = animals.find((animal) => String(animal.ownerId) === id)
-  if (ownedAnimal) {
-    const isOng = ownedAnimal.listingType === 'NGO'
-    return {
-      id: ownedAnimal.ownerId,
-      userType: isOng ? 'ONG' : 'PESSOA',
-      name: isOng ? (ownedAnimal.organizationName ?? ownedAnimal.ownerName) : ownedAnimal.ownerName,
-      photoUrl: ownedAnimal.ownerPhotoUrl ?? null,
-      city: ownedAnimal.city,
-      state: ownedAnimal.state,
-      bio: '',
-      isVerified: isOng,
-    }
-  }
-
-  const request = requests.find((r) => r.adopter?.userId != null && String(r.adopter.userId) === id)
-  if (request) {
-    return {
-      id: request.adopter.userId,
-      userType: 'PESSOA',
-      name: request.adopter.name,
-      photoUrl: request.adopter.photoUrl ?? null,
-      city: request.adopter.city,
-      state: request.adopter.state,
-      bio: '',
-    }
-  }
-
-  return null
-}
-
 export function usePublicProfile(profileId) {
   const { user } = useAuth()
-  const { animals } = useAnimals()
-  const { requests } = useAdoptionRequests()
 
-  // Os ids do mock (1, 2, 4...) coincidem com ids reais do banco — sem este
-  // desvio, "Meu perfil público" podia abrir o perfil mockado de outra pessoa
+  // O próprio perfil sai do que a conta acabou de salvar em "Minha conta",
+  // sem esperar a API
   const isOwnProfile = user != null && String(user.id) === String(profileId)
 
   const { data, isLoading } = useQuery({
@@ -86,7 +45,6 @@ export function usePublicProfile(profileId) {
     return { profile: buildOwnProfile(user), isLoading: false }
   }
 
-  const profile = data ?? (isLoading ? null : buildLocalProfile(profileId, { animals, requests }))
-
-  return { profile, isLoading }
+  // null = a API respondeu 404 (conta inexistente, desativada ou admin)
+  return { profile: data ?? null, isLoading }
 }

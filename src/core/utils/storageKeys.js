@@ -1,10 +1,9 @@
 export const TOKEN_STORAGE_KEY = 'aucolher_token'
 export const TOKEN_TYPE_STORAGE_KEY = 'aucolher_token_type'
 export const USER_STORAGE_KEY = 'aucolher_user'
+// Os pedidos de adoção agora vêm da API; esta chave só guarda os pedidos de
+// demonstração do painel do admin (adminDemoData, só em dev)
 export const ADOPTION_REQUESTS_STORAGE_KEY = 'aucolher_adoption_requests'
-// _v2: os animais salvos pela versão anterior usavam M/F, ANOS/MESES e ADOTADO;
-// com a chave nova eles são descartados e o mock recomeça do seed atual
-export const ANIMALS_STORAGE_KEY = 'aucolher_animals_v2'
 // Antigo: as respostas do quiz agora vêm da API (GET /match/profile). O
 // AuthContext só apaga o que versões anteriores deixaram nesta chave
 export const LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile'

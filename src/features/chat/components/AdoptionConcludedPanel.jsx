@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { FaHeart, FaPen, FaStar } from 'react-icons/fa6'
-import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
+import { getErrorMessage } from '../../../core/utils/apiError'
 import RatingStars from '../../avaliacoes/components/RatingStars'
 import ReviewForm from '../../avaliacoes/components/ReviewForm'
 
 function AdoptionConcludedPanel({ contact }) {
-  const { user } = useAuth()
   const { saveReview, deleteReview } = useAdoptionRequests()
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [formError, setFormError] = useState(null)
 
   const myRole = contact.isOwnerView ? 'owner' : 'adopter'
   const otherRole = contact.isOwnerView ? 'adopter' : 'owner'
@@ -16,23 +17,30 @@ function AdoptionConcludedPanel({ contact }) {
   const receivedReview = contact.reviews?.[otherRole] ?? null
   const firstName = contact.name.split(' ')[0]
 
-  const handleSubmit = ({ rating, comment }) => {
-    saveReview(contact.requestId, myRole, {
-      rating,
-      comment,
-      author: {
-        id: user?.id,
-        name: user?.name,
-        photoUrl: user?.photoUrl,
-        isOng: user?.userType === 'ONG',
-      },
-    })
-    setIsFormOpen(false)
+  // A API sabe de que lado é a avaliação pelo pedido; se recusar, o
+  // formulário continua aberto com a mensagem
+  async function runReviewAction(action, fallbackMessage) {
+    setIsSaving(true)
+    setFormError(null)
+    try {
+      await action()
+      setIsFormOpen(false)
+    } catch (error) {
+      setFormError(getErrorMessage(error, fallbackMessage))
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  const handleDelete = () => {
-    deleteReview(contact.requestId, myRole)
-    setIsFormOpen(false)
+  const handleSubmit = ({ rating, comment }) =>
+    runReviewAction(() => saveReview(contact.requestId, { rating, comment }), 'Não foi possível salvar a avaliação.')
+
+  const handleDelete = () =>
+    runReviewAction(() => deleteReview(contact.requestId), 'Não foi possível apagar a avaliação.')
+
+  const openForm = () => {
+    setFormError(null)
+    setIsFormOpen(true)
   }
 
   return (
@@ -61,7 +69,7 @@ function AdoptionConcludedPanel({ contact }) {
             </div>
             <button
               type="button"
-              onClick={() => setIsFormOpen(true)}
+              onClick={openForm}
               className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors duration-300 hover:bg-emerald-50"
             >
               <FaPen size={10} />
@@ -76,7 +84,7 @@ function AdoptionConcludedPanel({ contact }) {
             </div>
             <button
               type="button"
-              onClick={() => setIsFormOpen(true)}
+              onClick={openForm}
               className="flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-emerald-800 px-4 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
             >
               <FaStar size={12} className="text-amber-300" />
@@ -105,6 +113,8 @@ function AdoptionConcludedPanel({ contact }) {
           onSubmit={handleSubmit}
           onDelete={myReview ? handleDelete : undefined}
           onCancel={() => setIsFormOpen(false)}
+          isSaving={isSaving}
+          error={formError}
         />
       )}
     </div>
