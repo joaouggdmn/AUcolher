@@ -12,9 +12,12 @@ import AuthRequiredModal from './AuthRequiredModal'
 function FavoriteButton({ animalId, animalName, className = '', iconSize = 15 }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const { isFavorito, toggleFavorito } = useFavorites()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+
+  // O admin modera, mas não favorita: o coração nem aparece para ele
+  if (user?.userType === 'ADMIN') return null
 
   const isFavorited = isFavorito(animalId)
   const label = isFavorited ? `Remover ${animalName} dos favoritos` : `Salvar ${animalName} nos favoritos`

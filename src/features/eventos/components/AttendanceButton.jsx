@@ -37,6 +37,10 @@ function AttendanceButton({ event, size = 'md', className = '' }) {
   const isOwnEvent = user != null && String(user.id) === String(event.organizer.id)
   const sizeClasses = SIZES[size]
 
+  // O admin modera, mas não participa: não confirma presença (no detalhe ele
+  // vê "Remover evento" no lugar)
+  if (user?.userType === 'ADMIN') return null
+
   if (isOwnEvent) {
     return (
       <p className={`flex items-center justify-center bg-slate-50 font-semibold text-slate-500 ${sizeClasses} ${className}`}>

@@ -13,7 +13,7 @@ import { useAuth } from '../../../core/context/AuthContext'
 import CampaignCover from './CampaignCover'
 import DonationProgress from './DonationProgress'
 import { getCategoriaMeta } from './filters/filterOptions'
-import { formatDonationsCount, getDeadlineSummary, isCampaignOwner } from '../utils/campaignDisplay'
+import { formatDonationsCount, getDeadlineSummary, isAdminAccount, isCampaignOwner } from '../utils/campaignDisplay'
 
 const DEADLINE_TONES = {
   neutral: 'text-slate-500',
@@ -22,7 +22,7 @@ const DEADLINE_TONES = {
 }
 
 // Botão do rodapé: doar (padrão), gerenciar (a própria ONG) ou só ver (encerrada)
-function CardAction({ campaign, isOwner, onDonate }) {
+function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
   const linkClass =
     'mt-auto flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-bold transition-all duration-300'
 
@@ -35,7 +35,8 @@ function CardAction({ campaign, isOwner, onDonate }) {
     )
   }
 
-  if (campaign.isClosed) {
+  // Encerrada, ou o admin (que modera, mas não doa): só abre a campanha
+  if (campaign.isClosed || isAdmin) {
     return (
       <Link to={`/campanhas/${campaign.id}`} className={`${linkClass} border-slate-200 text-slate-500 hover:bg-slate-50`}>
         Ver campanha
@@ -139,7 +140,7 @@ function CampaignCard({ campaign, onDonate }) {
           </span>
         </div>
 
-        <CardAction campaign={campaign} isOwner={isOwner} onDonate={onDonate} />
+        <CardAction campaign={campaign} isOwner={isOwner} isAdmin={isAdminAccount(user)} onDonate={onDonate} />
       </div>
     </div>
   )

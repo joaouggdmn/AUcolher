@@ -3,6 +3,7 @@ import PrivateRoute from '../core/guards/PrivateRoute'
 import OngRoute from '../core/guards/OngRoute'
 import AdminRoute from '../core/guards/AdminRoute'
 import PessoaRoute from '../core/guards/PessoaRoute'
+import ParticipantRoute from '../core/guards/ParticipantRoute'
 import UserLayout from '../core/components/layout/UserLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
@@ -48,7 +49,17 @@ export const protectedRoutes = [
       {
         element: <UserLayout />,
         children: [
-          { path: 'animais/criar', element: <CreateAnimalPage /> },
+          {
+            // O admin modera, mas não participa: estas telas não são para ele
+            element: <ParticipantRoute />,
+            children: [
+              { path: 'animais/criar', element: <CreateAnimalPage /> },
+              { path: 'meus-interesses', element: <MyInterestsPage /> },
+              { path: 'favoritos', element: <FavoritosPage /> },
+              { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
+              { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
+            ],
+          },
           { path: 'animais/editar/:id', element: <EditAnimalPage /> },
           // "Meus anúncios" virou a aba "Anunciados por mim" de Meus animais
           { path: 'meus-anuncios', element: <Navigate to={MY_ANIMALS_PATH} replace /> },
@@ -59,10 +70,6 @@ export const protectedRoutes = [
               { path: 'meus-animais/republicar/:requestId', element: <RehomeAnimalPage /> },
             ],
           },
-          { path: 'meus-interesses', element: <MyInterestsPage /> },
-          { path: 'favoritos', element: <FavoritosPage /> },
-          { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
-          { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
           { path: 'perfil', element: <UserProfilePage /> },
         ],
       },
@@ -124,7 +131,7 @@ export const protectedRoutes = [
     ],
   },
   {
-  element: <PrivateRoute />,
+  element: <ParticipantRoute />,
   children: [
     {
       element: <ChatLayout />,
