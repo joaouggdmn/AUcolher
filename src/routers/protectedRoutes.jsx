@@ -6,6 +6,7 @@ import UserLayout from '../core/components/layout/UserLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
+import EditAnimalPage from '../features/animais/pages/EditAnimalPage'
 import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
 import MyInterestsPage from '../features/adocao/pages/MyInterestsPage'
 import ChatPage from '../features/chat/pages/ChatPage'
@@ -44,7 +45,7 @@ export const protectedRoutes = [
         element: <UserLayout />,
         children: [
           { path: 'animais/criar', element: <CreateAnimalPage /> },
-          { path: 'animais/editar/:id', element: <PlaceholderPage title="Editar animal" /> },
+          { path: 'animais/editar/:id', element: <EditAnimalPage /> },
           { path: 'meus-anuncios', element: <PlaceholderPage title="Meus anuncios" /> },
           { path: 'meus-interesses', element: <MyInterestsPage /> },
           { path: 'favoritos', element: <FavoritosPage /> },
