@@ -6,6 +6,7 @@ import { useMyAttendance } from '../../eventos/hooks/useEventos'
 import { useMyDonations } from '../../doacoes/hooks/useDoacoes'
 import { useMyAnimals } from '../../animais/hooks/useAnimais'
 import { IN_PROGRESS_STATUSES, withAdoptionStatus } from '../../animais/utils/listingStatus'
+import { ADOPTION_HAPPENED_STATUSES } from '../../adocao/utils/requestStatus'
 
 const NO_EVENTS = []
 const NO_DONATIONS = []
@@ -37,7 +38,7 @@ export function useAccountActivity(user) {
     )
 
     const adoptions = myRequests
-      .filter((request) => request.status === 'CONCLUDED')
+      .filter((request) => ADOPTION_HAPPENED_STATUSES.includes(request.status))
       .map((request) => {
         const { animal } = request
         const animalName = animal.name ?? 'um animal'

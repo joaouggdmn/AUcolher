@@ -9,6 +9,8 @@ import {
   FaLock,
   FaHandHoldingHeart,
   FaBan,
+  FaRotateLeft,
+  FaBullhorn,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { useChatMessages } from "../hooks/useChatMessages";
@@ -17,6 +19,17 @@ import { getErrorMessage } from "../../../core/utils/apiError";
 import { markConversationSeen } from "../../../core/utils/chatReadState";
 import ConfirmAdoptionModal from "../../adocao/components/ConfirmAdoptionModal";
 import AdoptionConcludedPanel from "./AdoptionConcludedPanel";
+
+// Linha de sistema do retorno ou do repasse (regras §3.3). Por enquanto só
+// de exibição, derivada do pedido: com o chat na API, a própria API grava
+// ANIMAL_RETURNED / ANIMAL_REHOMED na conversa
+function returnSystemMessage(contact) {
+  const animal = contact.animalName;
+  if (contact.returnInfo?.type === "RETURNED") return `${animal} voltou para quem doou.`;
+  return contact.isOwnerView
+    ? `${contact.name} anunciou ${animal} para uma nova adoção.`
+    : `Você anunciou ${animal} para uma nova adoção.`;
+}
 
 // Por que a conversa foi encerrada, do ponto de vista de quem está lendo
 function closedConversationMessage(contact) {
@@ -107,7 +120,10 @@ function ChatConversationPanel({ contact, onBack }) {
   // Chat vira somente leitura assim que o doador confirma a entrega
   // (AWAITING_DELIVERY) — o histórico continua visível, só o input some
   const isAwaitingDelivery = contact.status === "AWAITING_DELIVERY";
-  const isConcluded = contact.status === "CONCLUDED";
+  // Depois de um retorno ou repasse a adoção continua tendo acontecido: o
+  // chat segue travado e as avaliações continuam liberadas
+  const hasReturn = contact.status === "RETURNED" || contact.status === "REHOMED";
+  const isConcluded = contact.status === "CONCLUDED" || hasReturn;
   // Pedido cancelado durante o andamento (desistência, outra adoção, anúncio
   // fora do ar ou moderação): o histórico fica, travado, com o motivo
   const isClosed = contact.status === "CANCELLED";
@@ -172,10 +188,19 @@ function ChatConversationPanel({ contact, onBack }) {
           </span>
         )}
 
-        {isConcluded && (
+        {isConcluded && !hasReturn && (
           <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-2 text-xs font-extrabold text-emerald-700">
             <FaCircleCheck size={13} />
             <span className="hidden sm:inline">Adoção Concluída</span>
+          </span>
+        )}
+
+        {hasReturn && (
+          <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-sky-50 px-3 py-2 text-xs font-extrabold text-sky-700">
+            {contact.status === "RETURNED" ? <FaRotateLeft size={12} /> : <FaBullhorn size={12} />}
+            <span className="hidden sm:inline">
+              {contact.status === "RETURNED" ? "Devolvido ao doador" : "Repassado"}
+            </span>
           </span>
         )}
 
@@ -243,6 +268,18 @@ function ChatConversationPanel({ contact, onBack }) {
               </div>
             );
           })
+        )}
+        {hasReturn && contact.returnInfo && (
+          <div className="flex justify-center">
+            <div className="flex max-w-[85%] items-center gap-2 rounded-2xl bg-sky-50 px-4 py-2 text-center text-xs font-bold text-sky-700 shadow-sm sm:max-w-[70%]">
+              {contact.status === "RETURNED" ? (
+                <FaRotateLeft size={11} className="shrink-0 text-sky-500" />
+              ) : (
+                <FaBullhorn size={11} className="shrink-0 text-sky-500" />
+              )}
+              {returnSystemMessage(contact)}
+            </div>
+          </div>
         )}
         <div ref={bottomRef} />
       </div>

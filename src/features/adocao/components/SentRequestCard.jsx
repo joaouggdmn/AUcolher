@@ -2,9 +2,10 @@ import { Link } from 'react-router-dom'
 import { FaBan, FaComments, FaPaw } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 import { animalDisplayName } from '../utils/requestAnimal'
-import { SENT_STATUS_META, TONE_CLASSES, sentStatusDescription } from '../utils/requestStatus'
+import { RETURN_STATUSES, SENT_STATUS_META, TONE_CLASSES, sentStatusDescription } from '../utils/requestStatus'
+import ReturnInfo from './ReturnInfo'
 
-const CHAT_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED']
+const CHAT_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED', ...RETURN_STATUSES]
 const CANCELLABLE_STATUSES = ['PENDING', 'ACCEPTED', 'AWAITING_DELIVERY']
 
 function formatDate(isoDate) {
@@ -58,13 +59,17 @@ function SentRequestCard({ request, onGoToChat, onCancel }) {
           · enviado em {formatDate(request.createdAt)}
         </p>
 
-        <div className={`flex items-start gap-2.5 rounded-xl px-3.5 py-2.5 ${TONE_CLASSES[meta.tone]}`}>
-          <StatusIcon size={13} className="mt-0.5 shrink-0" />
-          <div>
-            <p className="text-sm font-extrabold">{meta.label}</p>
-            <p className="text-xs font-medium opacity-90">{sentStatusDescription(request, animalName)}</p>
+        {RETURN_STATUSES.includes(status) ? (
+          <ReturnInfo request={request} viewer="adopter" />
+        ) : (
+          <div className={`flex items-start gap-2.5 rounded-xl px-3.5 py-2.5 ${TONE_CLASSES[meta.tone]}`}>
+            <StatusIcon size={13} className="mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-extrabold">{meta.label}</p>
+              <p className="text-xs font-medium opacity-90">{sentStatusDescription(request, animalName)}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         {(CHAT_STATUSES.includes(status) || CANCELLABLE_STATUSES.includes(status)) && (
           <div className="mt-auto flex flex-col gap-2 pt-1">

@@ -1,9 +1,10 @@
-import { FaPaw, FaCircleCheck, FaClock } from "react-icons/fa6";
+import { FaPaw, FaCircleCheck, FaClock, FaRotateLeft } from "react-icons/fa6";
 
 function ContactListItem({ contact, isSelected, onClick }) {
   const initial = contact.name?.charAt(0)?.toUpperCase() ?? "?";
   const isAwaitingDelivery = contact.status === "AWAITING_DELIVERY";
   const isConcluded = contact.status === "CONCLUDED";
+  const hasReturn = contact.status === "RETURNED" || contact.status === "REHOMED";
 
   return (
     <button
@@ -58,6 +59,14 @@ function ContactListItem({ contact, isSelected, onClick }) {
           size={14}
           className="shrink-0 text-emerald-500"
           title="Adoção concluída"
+        />
+      )}
+
+      {hasReturn && (
+        <FaRotateLeft
+          size={13}
+          className="shrink-0 text-sky-500"
+          title={contact.status === "RETURNED" ? "Devolvido ao doador" : "Repassado pelo adotante"}
         />
       )}
     </button>

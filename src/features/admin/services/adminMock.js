@@ -9,6 +9,8 @@ import {
 import { ADOPTION_REQUESTS_STORAGE_KEY, MOCK_ADMIN_STORE_KEY } from '../../../core/utils/storageKeys'
 import { toLocalIsoDate, todayLocalIso } from '../../../core/utils/localDate'
 import * as adocaoApi from '../../adocao/services/adocaoApi'
+import { withReturnRecord } from '../../adocao/services/adocaoService'
+import { ADOPTION_HAPPENED_STATUSES } from '../../adocao/utils/requestStatus'
 import * as animaisApi from '../../animais/services/animaisApi'
 import { withAdoptionStatus } from '../../animais/utils/listingStatus'
 import {
@@ -50,8 +52,13 @@ const ANIMALS_PAGE_SIZE = 50
 const RANKING_LIMIT = 5
 const RECENT_ACTIVITY_LIMIT = 8
 
-const ACCEPTED_OR_LATER = ['ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED']
-const DELIVERY_OR_LATER = ['AWAITING_DELIVERY', 'CONCLUDED']
+// Retorno e repasse vêm depois da conclusão: a adoção aconteceu igual
+const ACCEPTED_OR_LATER = ['ACCEPTED', 'AWAITING_DELIVERY', ...ADOPTION_HAPPENED_STATUSES]
+const DELIVERY_OR_LATER = ['AWAITING_DELIVERY', ...ADOPTION_HAPPENED_STATUSES]
+
+function adoptionHappened(request) {
+  return ADOPTION_HAPPENED_STATUSES.includes(request.status)
+}
 
 // ---------- helpers do "backend" ----------
 
@@ -88,7 +95,19 @@ function toStatsRequest(dto) {
       ownerPhotoUrl: null,
       organizationName: ownerIsNgo ? dto.owner.name : null,
     },
-    adopter: { userId: dto.adopter.id, name: dto.adopter.name, photoUrl: null, city: null, state: null },
+    adopter: {
+      userId: dto.adopter.id,
+      name: dto.adopter.name,
+      photoUrl: null,
+      city: null,
+      state: null,
+      // ONG adotando é resgate: fica fora da taxa de reabandono
+      isOng: dto.adopter.userType === 'NGO',
+    },
+    // Retorno e repasse (migração 012); no mock do reabandono, a camada
+    // `withReturnRecord` preenche os três a partir do localStorage
+    matchScoreAtAdoption: dto.matchScoreAtAdoption ?? null,
+    returnInfo: dto.return ?? null,
   }
 }
 
@@ -106,7 +125,7 @@ function readDemoRequests() {
 // Todos os pedidos da plataforma
 async function loadRequests() {
   const real = await adocaoApi.listAllForAdmin()
-  return [...real.map(toStatsRequest), ...readDemoRequests()]
+  return [...real.map((dto) => withReturnRecord(toStatsRequest(dto))), ...readDemoRequests()]
 }
 
 // A vitrine pública só lista disponíveis, de página em página
@@ -132,7 +151,9 @@ function adoptedFromRequests(requests, availableById) {
   for (const request of requests) {
     const snapshot = request.animal
     const key = String(request.animalId)
-    if (request.status !== 'CONCLUDED' || !snapshot || availableById.has(key) || adopted.has(key)) continue
+    // Animal devolvido (RETURNED) voltou para o doador: não está adotado
+    const stillAdopted = request.status === 'CONCLUDED' || request.status === 'REHOMED'
+    if (!stillAdopted || !snapshot || availableById.has(key) || adopted.has(key)) continue
     if (sourceOf(request) !== 'api') continue
 
     adopted.set(key, {
@@ -297,7 +318,7 @@ function animalsStats(animals) {
 
 // Todos os pedidos da plataforma, de animais da API e do AUmatch
 function adoptionsStats(requests, months) {
-  const concluded = requests.filter((request) => request.status === 'CONCLUDED')
+  const concluded = requests.filter(adoptionHappened)
   return {
     funnel: {
       received: requests.length,
@@ -341,7 +362,7 @@ function ngoRanking(accounts, requests, donations) {
     if (donation.ngo) entry(donation.ngo.id, donation.ngo.name).raised += donation.amount
   }
   for (const request of requests) {
-    if (request.status !== 'CONCLUDED') continue
+    if (!adoptionHappened(request)) continue
     const owner = accounts.find((account) => isSameId(account.id, request.ownerId))
     const isNgo = request.animal?.organizationName ? true : owner?.userType === 'NGO'
     if (isNgo) entry(request.ownerId, request.animal?.organizationName ?? request.animal?.ownerName).adoptions += 1
@@ -402,7 +423,7 @@ function recentActivity(accounts, requests, campaigns, events) {
         detail: account.userType,
       })),
     ...requests
-      .filter((request) => request.status === 'CONCLUDED')
+      .filter(adoptionHappened)
       .map((request) => ({
         type: 'ADOPTION_CONCLUDED',
         at: request.concludedAt ?? request.createdAt,
