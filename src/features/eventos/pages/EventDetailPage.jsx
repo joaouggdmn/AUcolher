@@ -17,7 +17,9 @@ import Spinner from '../../../core/components/ui/Spinner'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
 import VerifiedBadge from '../../ong/components/VerifiedBadge'
+import ModeratedNote from '../../../core/components/ui/ModeratedNote'
 import ModerationAction from '../../admin/components/ModerationAction'
+import { ADMIN_PATHS } from '../../admin/panel/adminPaths'
 import { useRemoveEvent } from '../../admin/hooks/useAdmin'
 import { removeEventDescription } from '../../admin/utils/moderationText'
 import AttendanceButton from '../components/AttendanceButton'
@@ -132,6 +134,9 @@ function EventDetailPage() {
         Todos os eventos
       </Link>
 
+      {/* Só a ONG dona e o admin sabem que a moderação editou o evento */}
+      {(isOwner || isAdmin) && <ModeratedNote moderatedAt={event.moderatedAt} size="md" className="mb-6" />}
+
       <div className="relative h-56 overflow-hidden rounded-3xl shadow-lg shadow-emerald-950/10 sm:h-80">
         <EventCover event={event} />
         <div className="absolute left-5 top-5">
@@ -199,7 +204,18 @@ function EventDetailPage() {
             </div>
 
             {/* O admin modera, mas não participa: no lugar da presença, a
-                remoção. O evento removido sai do site, então volta à lista */}
+                edição e a remoção. O evento removido sai do site, então volta
+                à lista. Evento que já aconteceu não é editado */}
+            {isAdmin && !event.isPast && (
+              <Link
+                to={ADMIN_PATHS.eventEdit(event.id)}
+                state={{ from: location.pathname }}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white py-3.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+              >
+                <FaPen size={12} />
+                Editar evento
+              </Link>
+            )}
             {isAdmin && (
               <ModerationAction
                 icon={FaTrashCan}

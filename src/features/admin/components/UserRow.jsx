@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { FaBan, FaEye, FaRotateLeft, FaShieldHalved } from 'react-icons/fa6'
+import { FaBan, FaEye, FaPen, FaRotateLeft, FaShieldHalved } from 'react-icons/fa6'
 import Avatar from '../../../core/components/ui/Avatar'
+import { ADMIN_PATHS } from '../panel/adminPaths'
 
 const TYPE_META = {
   ONG: { label: 'ONG', className: 'bg-amber-50 text-amber-700' },
@@ -60,6 +61,10 @@ function UserRow({ user, onBan, onReactivate }) {
         <Link to={profilePath(user)} className={ACTION_CLASSES}>
           <FaEye size={11} />
           Ver perfil
+        </Link>
+        <Link to={ADMIN_PATHS.userEdit(user.id)} className={ACTION_CLASSES}>
+          <FaPen size={10} />
+          Editar
         </Link>
         {user.isActive ? (
           <button type="button" onClick={() => onBan(user)} className={BAN_CLASSES}>
