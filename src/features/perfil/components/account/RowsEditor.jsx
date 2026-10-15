@@ -1,7 +1,7 @@
 import { FaPlus, FaTrashCan } from 'react-icons/fa6'
 
-// Lista editável de linhas curtas — equipe (nome + função) e horários de
-// visita (dias + horário) da ONG. fields: [{ key, label, placeholder, required }]
+// Lista editável de linhas curtas — a equipe da ONG (nome + função).
+// fields: [{ key, label, placeholder, required }]
 // Linha totalmente em branco é descartada ao salvar (toOngUpdates); uma
 // preenchida pela metade esbarra no `required` do campo obrigatório
 function RowsEditor({ rows, onChange, fields, addLabel, emptyText, maxRows = 10 }) {
