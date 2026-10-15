@@ -132,6 +132,13 @@ export function deleteRequestReview(id) {
 
 export const withReturnRecord = USE_MOCK_REABANDONO ? returnsMock.withReturnRecord : (request) => request
 
+// O pedido de onde veio um anúncio republicado (nulo nos demais). `returnsData`
+// vem do useReturnsMock, para a tela reagir a um repasse novo
+export function originRequestIdOf(animal, returnsData) {
+  if (USE_MOCK_REABANDONO) return returnsMock.originRequestIdOf(animal, returnsData)
+  return animal.originRequestId ?? null
+}
+
 export async function registerReturn(request, { returnDate, reason, note }) {
   const body = { returnDate, reason, note: note?.trim() || null }
   if (USE_MOCK_REABANDONO) return returnsMock.registerReturn(request, body)

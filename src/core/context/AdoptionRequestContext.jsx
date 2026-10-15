@@ -29,14 +29,14 @@ export function AdoptionRequestProvider({ children }) {
   // Admin não pede nem recebe pedidos
   const takesPart = isAuthenticated && (user?.userType === "PESSOA" || user?.userType === "ONG");
 
-  const { data: sent = NO_REQUESTS } = useQuery({
+  const { data: sent = NO_REQUESTS, isLoading: isLoadingSent } = useQuery({
     queryKey: queryKeys.adocao.sent(user?.id),
     queryFn: adocaoService.listSentRequests,
     enabled: takesPart,
     refetchInterval: REFRESH_INTERVAL,
   });
 
-  const { data: received = NO_REQUESTS } = useQuery({
+  const { data: received = NO_REQUESTS, isLoading: isLoadingReceived } = useQuery({
     queryKey: queryKeys.adocao.received(user?.id),
     queryFn: adocaoService.listReceivedRequests,
     enabled: takesPart,
@@ -124,6 +124,8 @@ export function AdoptionRequestProvider({ children }) {
     <AdoptionRequestContext.Provider
       value={{
         requests,
+        // Primeira carga das listas (telas que abrem um pedido pelo id esperam por ela)
+        isLoading: isLoadingSent || isLoadingReceived,
         createRequest,
         // Dono
         acceptRequest: (requestId) => changeStatus(requestId, "ACCEPTED"),

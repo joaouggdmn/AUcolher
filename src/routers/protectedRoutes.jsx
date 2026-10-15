@@ -9,6 +9,7 @@ import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 import EditAnimalPage from '../features/animais/pages/EditAnimalPage'
 import MyAnimalsPage from '../features/animais/pages/MyAnimalsPage'
+import RehomeAnimalPage from '../features/animais/pages/RehomeAnimalPage'
 import { MY_ANIMALS_PATH } from '../features/animais/utils/myAnimalsPaths'
 import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
 import MyInterestsPage from '../features/adocao/pages/MyInterestsPage'
@@ -53,7 +54,10 @@ export const protectedRoutes = [
           { path: 'meus-anuncios', element: <Navigate to={MY_ANIMALS_PATH} replace /> },
           {
             element: <PessoaRoute />,
-            children: [{ path: 'meus-animais', element: <MyAnimalsPage /> }],
+            children: [
+              { path: 'meus-animais', element: <MyAnimalsPage /> },
+              { path: 'meus-animais/republicar/:requestId', element: <RehomeAnimalPage /> },
+            ],
           },
           { path: 'meus-interesses', element: <MyInterestsPage /> },
           { path: 'favoritos', element: <FavoritosPage /> },
