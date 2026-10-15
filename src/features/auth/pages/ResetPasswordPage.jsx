@@ -73,7 +73,7 @@ function ResetPasswordPage() {
     e.preventDefault()
     if (isSubmitting) return
 
-    const errors = validateNewPassword(formData, { requireCurrent: false })
+    const errors = validateNewPassword(formData)
     setFieldErrors(errors)
     setSubmitError(null)
     if (Object.keys(errors).length > 0) return

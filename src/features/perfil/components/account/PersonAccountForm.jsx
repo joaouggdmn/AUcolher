@@ -1,4 +1,4 @@
-import { FaUser, FaEnvelope, FaLocationDot, FaHeartCircleCheck } from 'react-icons/fa6'
+import { FaUser, FaLocationDot, FaHeartCircleCheck } from 'react-icons/fa6'
 import AvatarUploadInput from '../../../../core/components/ui/AvatarUploadInput'
 import CityStateFields from '../../../../core/components/ui/CityStateFields'
 import FormField from '../../../../core/components/ui/FormField'
@@ -7,14 +7,15 @@ import { buildPersonForm, toPersonUpdates } from '../../utils/accountForm'
 import ProfileCompletionBar from '../ProfileCompletionBar'
 import ProfileSection from '../ProfileSection'
 import LifestyleForm from '../LifestyleForm'
+import AccessSection from './AccessSection'
 import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
 import TextAreaField from './TextAreaField'
 
 // Pessoa física (seção 6.1): o perfil público é enxuto — foto, nome, bio e
-// cidade. O resto (e-mail, Perfil AUmatch) é privado
+// cidade. O resto (e-mail, senha, Perfil AUmatch) é privado
 function PersonAccountForm() {
-  const { user, formData, setField, setFields, isDirty, checklist, percentage, save, discard } = useAccountForm({
+  const { formData, setField, setFields, isDirty, checklist, percentage, save, discard } = useAccountForm({
     buildForm: buildPersonForm,
     toUpdates: toPersonUpdates,
   })
@@ -65,14 +66,7 @@ function PersonAccountForm() {
             description="Só você vê. Usados para entrar na plataforma e alimentar as recomendações do AUmatch."
           />
 
-          <ProfileSection icon={FaEnvelope} title="Acesso">
-            <FormField
-              label="E-mail"
-              value={user?.email ?? ''}
-              disabled
-              hint="Usado para login — não pode ser alterado por aqui."
-            />
-          </ProfileSection>
+          <AccessSection emailHint="Usado para login — não pode ser alterado por aqui." />
 
           <ProfileSection icon={FaLocationDot} title="Localização" description="Sua cidade e estado aparecem no perfil público">
             <CityStateFields state={formData.state} city={formData.city} onChange={setFields} />
