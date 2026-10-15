@@ -10,12 +10,12 @@ import BarList from '../../../../core/components/charts/BarList'
 import ChartCard from '../../../../core/components/charts/ChartCard'
 import PanelPage from '../../../../core/components/panel/PanelPage'
 import SearchBar from '../../../animais/components/SearchBar'
+import OwnerAnimalRow from '../../../animais/components/owner/OwnerAnimalRow'
 import { useChangeAnimalStatus } from '../../../animais/hooks/useAnimais'
 import { LISTING_STATUS_META } from '../../../animais/utils/listingStatus'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
 import AnimalStatusChart from '../../components/dashboard/charts/AnimalStatusChart'
 import { animalStatusSegments, speciesBars } from '../../utils/panelCharts'
-import AnimalRow from '../animals/AnimalRow'
 import { PANEL_PATHS } from '../panelPaths'
 import { useOngPanel } from '../useOngPanel'
 
@@ -107,9 +107,11 @@ function AnimalsPage() {
           ) : (
             <ul className="flex flex-col gap-3">
               {visible.map((animal) => (
-                <AnimalRow
+                <OwnerAnimalRow
                   key={animal.id}
                   animal={animal}
+                  editTo={(row) => PANEL_PATHS.animalEdit(row.id)}
+                  requestsTo={PANEL_PATHS.requests}
                   pendingStatus={isPending && variables?.id === animal.id ? variables.status : null}
                   onChangeStatus={handleChangeStatus}
                   onMarkAdopted={setAdoptionCandidate}
