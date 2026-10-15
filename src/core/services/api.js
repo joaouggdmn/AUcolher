@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { TOKEN_STORAGE_KEY, TOKEN_TYPE_STORAGE_KEY } from '../utils/storageKeys'
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 export const api = axios.create({
-  baseURL,
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 })
 

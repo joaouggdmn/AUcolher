@@ -19,8 +19,13 @@ export const MOCK_DENUNCIAS_STORE_KEY = 'aucolher_mock_denuncias'
 // Decisões de moderação do modo mock: contas banidas (mesmo mockStore)
 export const MOCK_MODERACAO_STORE_KEY = 'aucolher_mock_moderacao'
 export const MOCK_REABANDONO_STORE_KEY = 'aucolher_mock_reabandono'
+// Links de "Esqueci minha senha" do modo mock (mesmo mockStore)
+export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'
 // sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)
 export const ACCOUNT_SUSPENDED_FLAG_KEY = 'aucolher_account_suspended'
+// sessionStorage: a API recusou o token (ex.: a senha foi trocada em outro
+// aparelho) e a sessão caiu (o login avisa)
+export const SESSION_EXPIRED_FLAG_KEY = 'aucolher_session_expired'
 
 // Chave dinâmica: cada conversa (match aceito) tem seu próprio histórico
 // isolado no localStorage — centralizado aqui para não haver 2 lugares

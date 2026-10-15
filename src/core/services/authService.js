@@ -82,6 +82,9 @@ export function toFrontendProfile(backendUser) {
     photoUrl: backendUser.photoUrl ?? null,
     bio: backendUser.bio ?? "",
     isVerified: backendUser.isVerified ?? false,
+    // Conta do Google sem senha: "Definir senha" em vez de "Trocar senha".
+    // A API ainda não manda o campo; sem ele, a conta tem senha
+    hasPassword: backendUser.hasPassword ?? true,
     // Perfil de ONG — socialLinks/address no formato do perfil público
     cnpj: backendUser.cnpj ?? null,
     institutionalEmail: backendUser.institutionalEmail ?? null,
