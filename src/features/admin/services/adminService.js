@@ -57,6 +57,8 @@ export function toFrontendAdminStats(dto) {
       detail: item.type === 'ACCOUNT_CREATED' ? FRONTEND_USER_TYPES[item.detail] ?? item.detail : item.detail,
     })),
     reports: dto.reports ?? { pending: 0, pendingTargets: 0 },
+    // Taxa de reabandono; `isSample` só vem do mock (números de exemplo)
+    returns: dto.returns ? { ...dto.returns, isSample: Boolean(dto.returns.isSample) } : null,
   }
 }
 

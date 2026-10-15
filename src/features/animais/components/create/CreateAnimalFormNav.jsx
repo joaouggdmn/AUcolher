@@ -7,10 +7,10 @@ const SECONDARY_BUTTON =
 
 // No cadastro só a última etapa salva. Na edição o anúncio já está completo,
 // então "Salvar alterações" aparece em todas as etapas
-function CreateAnimalFormNav({ isFirstStep, isLastStep, isStepValid, isFormValid, isEditing, isSubmitting, onBack, onNext, onSubmit }) {
-  const submitLabel = isEditing
-    ? isSubmitting ? 'Salvando...' : 'Salvar alterações'
-    : isSubmitting ? 'Cadastrando...' : 'Cadastrar Pet'
+// `submitLabels` ({ idle, busy }) troca o texto quando a tela pede (republicar)
+function CreateAnimalFormNav({ isFirstStep, isLastStep, isStepValid, isFormValid, isEditing, isSubmitting, submitLabels, onBack, onNext, onSubmit }) {
+  const labels = submitLabels ?? (isEditing ? { idle: 'Salvar alterações', busy: 'Salvando...' } : { idle: 'Cadastrar Pet', busy: 'Cadastrando...' })
+  const submitLabel = isSubmitting ? labels.busy : labels.idle
 
   const submitButton = (
     <button type="button" onClick={onSubmit} disabled={!isFormValid || isSubmitting} className={PRIMARY_BUTTON}>

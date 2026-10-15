@@ -34,6 +34,7 @@ function AnimalFormWizard({ form }) {
     handleSubmit,
     submitError,
     needsLocationInput,
+    submitLabels,
   } = form
 
   const { title, subtitle } = STEP_CONTENT[currentStep]
@@ -72,6 +73,7 @@ function AnimalFormWizard({ form }) {
           isFormValid={isFormValid}
           isEditing={isEditing}
           isSubmitting={isSubmitting}
+          submitLabels={submitLabels}
           onBack={goBack}
           onNext={goNext}
           onSubmit={handleSubmit}

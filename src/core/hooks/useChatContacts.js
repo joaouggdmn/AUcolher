@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useAdoptionRequests } from "../context/AdoptionRequestContext";
 import { isSameId } from "../utils/ids";
 import { animalDisplayName } from "../../features/adocao/utils/requestAnimal";
+import { ADOPTION_HAPPENED_STATUSES } from "../../features/adocao/utils/requestStatus";
 
 // Conversa que já existia (pedido aceito ou aguardando entrega) e foi
 // cancelada — por uma das partes, pela adoção de outro pedido, pelo anúncio
@@ -30,7 +31,8 @@ export function useChatContacts() {
           (request) =>
             request.status === "ACCEPTED" ||
             request.status === "AWAITING_DELIVERY" ||
-            request.status === "CONCLUDED" ||
+            // Concluída, e também a que voltou ou foi repassada depois
+            ADOPTION_HAPPENED_STATUSES.includes(request.status) ||
             isClosedConversation(request),
         )
         .map((request) => {
@@ -49,6 +51,7 @@ export function useChatContacts() {
             cancelReason: request.cancelReason ?? null,
             isOwnerView: isOwner, // 🆕 só o doador vê o botão "Confirmar Entrega"
             reviews: request.reviews ?? {},
+            returnInfo: request.returnInfo ?? null,
           };
 
           if (isOwner) {

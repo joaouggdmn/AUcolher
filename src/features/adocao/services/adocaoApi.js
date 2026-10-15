@@ -28,6 +28,32 @@ export async function changeStatus(id, status) {
   return data
 }
 
+// ---------- retorno e repasse (docs/entrega-final/api-devolucao-reabandono.md) ----------
+
+// Dono: registra (ou corrige) que o animal voltou — { returnDate, reason, note }
+export async function registerReturn(id, body) {
+  const { data } = await api.post(`/adoption-requests/${id}/return`, body)
+  return data
+}
+
+// Adotante: o anúncio original no formato do cadastro (AnimalRequestDTO)
+export async function getRehomeDraft(id) {
+  const { data } = await api.get(`/adoption-requests/${id}/rehome-draft`)
+  return data
+}
+
+// Adotante: cria o anúncio novo e marca o pedido como REHOMED — { reason, note, animal }
+export async function rehome(id, body) {
+  const { data } = await api.post(`/adoption-requests/${id}/rehome`, body)
+  return data
+}
+
+// Adotante: "Desisti de doar"
+export async function undoRehome(id) {
+  const { data } = await api.post(`/adoption-requests/${id}/rehome/undo`)
+  return data
+}
+
 // Cria ou edita a minha avaliação; responde com o pedido atualizado
 export async function saveReview(id, { rating, comment }) {
   const { data } = await api.put(`/adoption-requests/${id}/review`, { rating, comment })

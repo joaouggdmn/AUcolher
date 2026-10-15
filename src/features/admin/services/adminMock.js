@@ -9,6 +9,8 @@ import {
 import { ADOPTION_REQUESTS_STORAGE_KEY, MOCK_ADMIN_STORE_KEY } from '../../../core/utils/storageKeys'
 import { toLocalIsoDate, todayLocalIso } from '../../../core/utils/localDate'
 import * as adocaoApi from '../../adocao/services/adocaoApi'
+import { withReturnRecord } from '../../adocao/services/adocaoService'
+import { ADOPTION_HAPPENED_STATUSES } from '../../adocao/utils/requestStatus'
 import * as animaisApi from '../../animais/services/animaisApi'
 import { withAdoptionStatus } from '../../animais/utils/listingStatus'
 import {
@@ -50,8 +52,13 @@ const ANIMALS_PAGE_SIZE = 50
 const RANKING_LIMIT = 5
 const RECENT_ACTIVITY_LIMIT = 8
 
-const ACCEPTED_OR_LATER = ['ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED']
-const DELIVERY_OR_LATER = ['AWAITING_DELIVERY', 'CONCLUDED']
+// Retorno e repasse vêm depois da conclusão: a adoção aconteceu igual
+const ACCEPTED_OR_LATER = ['ACCEPTED', 'AWAITING_DELIVERY', ...ADOPTION_HAPPENED_STATUSES]
+const DELIVERY_OR_LATER = ['AWAITING_DELIVERY', ...ADOPTION_HAPPENED_STATUSES]
+
+function adoptionHappened(request) {
+  return ADOPTION_HAPPENED_STATUSES.includes(request.status)
+}
 
 // ---------- helpers do "backend" ----------
 
@@ -88,7 +95,19 @@ function toStatsRequest(dto) {
       ownerPhotoUrl: null,
       organizationName: ownerIsNgo ? dto.owner.name : null,
     },
-    adopter: { userId: dto.adopter.id, name: dto.adopter.name, photoUrl: null, city: null, state: null },
+    adopter: {
+      userId: dto.adopter.id,
+      name: dto.adopter.name,
+      photoUrl: null,
+      city: null,
+      state: null,
+      // ONG adotando é resgate: fica fora da taxa de reabandono
+      isOng: dto.adopter.userType === 'NGO',
+    },
+    // Retorno e repasse (migração 012); no mock do reabandono, a camada
+    // `withReturnRecord` preenche os três a partir do localStorage
+    matchScoreAtAdoption: dto.matchScoreAtAdoption ?? null,
+    returnInfo: dto.return ?? null,
   }
 }
 
@@ -106,7 +125,7 @@ function readDemoRequests() {
 // Todos os pedidos da plataforma
 async function loadRequests() {
   const real = await adocaoApi.listAllForAdmin()
-  return [...real.map(toStatsRequest), ...readDemoRequests()]
+  return [...real.map((dto) => withReturnRecord(toStatsRequest(dto))), ...readDemoRequests()]
 }
 
 // A vitrine pública só lista disponíveis, de página em página
@@ -132,7 +151,9 @@ function adoptedFromRequests(requests, availableById) {
   for (const request of requests) {
     const snapshot = request.animal
     const key = String(request.animalId)
-    if (request.status !== 'CONCLUDED' || !snapshot || availableById.has(key) || adopted.has(key)) continue
+    // Animal devolvido (RETURNED) voltou para o doador: não está adotado
+    const stillAdopted = request.status === 'CONCLUDED' || request.status === 'REHOMED'
+    if (!stillAdopted || !snapshot || availableById.has(key) || adopted.has(key)) continue
     if (sourceOf(request) !== 'api') continue
 
     adopted.set(key, {
@@ -297,7 +318,7 @@ function animalsStats(animals) {
 
 // Todos os pedidos da plataforma, de animais da API e do AUmatch
 function adoptionsStats(requests, months) {
-  const concluded = requests.filter((request) => request.status === 'CONCLUDED')
+  const concluded = requests.filter(adoptionHappened)
   return {
     funnel: {
       received: requests.length,
@@ -309,6 +330,73 @@ function adoptionsStats(requests, months) {
       month,
       count: countBy(concluded, (request) => monthOf(request.concludedAt ?? request.createdAt) === month),
     })),
+  }
+}
+
+// ---------- taxa de reabandono (contrato do reabandono §4) ----------
+
+const RETURN_REASONS = ['BEHAVIOR', 'OTHER_PETS', 'CHILDREN', 'HOUSING_OR_ROUTINE', 'COSTS', 'ANIMAL_HEALTH', 'OTHER']
+const SCORE_RANGES = [
+  { range: 'HIGH', min: 80, max: 100 },
+  { range: 'MEDIUM', min: 50, max: 79 },
+  { range: 'LOW', min: 0, max: 49 },
+]
+// Com menos adoções que isto, o card mostra os números de exemplo do contrato
+// (com o selo "Dados de exemplo"), para a apresentação não ficar vazia
+const MIN_ADOPTIONS_FOR_RATE = 5
+
+// Exemplo do contrato §4, igual ao que a API vai devolver
+const SAMPLE_RETURNS = {
+  adoptions: 40,
+  returned: 4,
+  rehomed: 2,
+  rate: 15.0,
+  byRange: [
+    { range: 'HIGH', min: 80, max: 100, adoptions: 20, returns: 1, rate: 5.0 },
+    { range: 'MEDIUM', min: 50, max: 79, adoptions: 12, returns: 2, rate: 16.7 },
+    { range: 'LOW', min: 0, max: 49, adoptions: 6, returns: 3, rate: 50.0 },
+  ],
+  noScore: { adoptions: 2, returns: 0 },
+  byReason: { BEHAVIOR: 3, OTHER_PETS: 1, CHILDREN: 0, HOUSING_OR_ROUTINE: 1, COSTS: 1, ANIMAL_HEALTH: 0, OTHER: 0 },
+}
+
+function rateOf(returns, adoptions) {
+  return adoptions > 0 ? Math.round((returns / adoptions) * 1000) / 10 : null
+}
+
+function isReturn(request) {
+  return request.status === 'RETURNED' || request.status === 'REHOMED'
+}
+
+// Todas as adoções que aconteceram, menos as de adotante ONG (resgate não é
+// adoção final, regras §3.3), divididas pelo score congelado na conclusão
+function returnsStats(requests) {
+  const adoptions = requests.filter((request) => adoptionHappened(request) && !request.adopter?.isOng)
+  if (adoptions.length < MIN_ADOPTIONS_FOR_RATE) return { ...SAMPLE_RETURNS, isSample: true }
+
+  const returns = adoptions.filter(isReturn)
+  const scored = (range) =>
+    adoptions.filter((request) => {
+      const score = request.matchScoreAtAdoption
+      return score != null && score >= range.min && score <= range.max
+    })
+  const noScore = adoptions.filter((request) => request.matchScoreAtAdoption == null)
+
+  return {
+    adoptions: adoptions.length,
+    returned: countBy(adoptions, (request) => request.status === 'RETURNED'),
+    rehomed: countBy(adoptions, (request) => request.status === 'REHOMED'),
+    rate: rateOf(returns.length, adoptions.length),
+    byRange: SCORE_RANGES.map((range) => {
+      const inRange = scored(range)
+      const inRangeReturns = countBy(inRange, isReturn)
+      return { ...range, adoptions: inRange.length, returns: inRangeReturns, rate: rateOf(inRangeReturns, inRange.length) }
+    }),
+    noScore: { adoptions: noScore.length, returns: countBy(noScore, isReturn) },
+    byReason: Object.fromEntries(
+      RETURN_REASONS.map((reason) => [reason, countBy(returns, (request) => request.returnInfo?.reason === reason)])
+    ),
+    isSample: false,
   }
 }
 
@@ -341,7 +429,7 @@ function ngoRanking(accounts, requests, donations) {
     if (donation.ngo) entry(donation.ngo.id, donation.ngo.name).raised += donation.amount
   }
   for (const request of requests) {
-    if (request.status !== 'CONCLUDED') continue
+    if (!adoptionHappened(request)) continue
     const owner = accounts.find((account) => isSameId(account.id, request.ownerId))
     const isNgo = request.animal?.organizationName ? true : owner?.userType === 'NGO'
     if (isNgo) entry(request.ownerId, request.animal?.organizationName ?? request.animal?.ownerName).adoptions += 1
@@ -402,7 +490,7 @@ function recentActivity(accounts, requests, campaigns, events) {
         detail: account.userType,
       })),
     ...requests
-      .filter((request) => request.status === 'CONCLUDED')
+      .filter(adoptionHappened)
       .map((request) => ({
         type: 'ADOPTION_CONCLUDED',
         at: request.concludedAt ?? request.createdAt,
@@ -454,6 +542,7 @@ export async function getStats() {
     users: usersStats(accounts, months),
     animals: animalsStats(animals),
     adoptions: adoptionsStats(requests, months),
+    returns: returnsStats(requests),
     donations: donationsStats(donations, months),
     // `suspended`: de ONG banida (some do site, mas o dinheiro arrecadado fica)
     campaigns: {
