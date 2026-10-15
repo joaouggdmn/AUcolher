@@ -11,6 +11,7 @@ import {
   FaCircleCheck,
   FaArrowRight,
   FaHouseChimney,
+  FaTrashCan,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { getErrorMessage } from "../../../core/utils/apiError";
@@ -31,6 +32,9 @@ import OwnerListingPanel from "../components/OwnerListingPanel";
 import { useAnimal } from "../hooks/useAnimais";
 import ReportButton from "../../denuncias/components/ReportButton";
 import ListingUnavailable from "../components/ListingUnavailable";
+import ModerationAction from "../../admin/components/ModerationAction";
+import { useRemoveAnimal } from "../../admin/hooks/useAdmin";
+import { removeListingDescription } from "../../admin/utils/moderationText";
 
 const SIZE_LABELS = { SMALL: "Pequeno", MEDIUM: "Médio", LARGE: "Grande" };
 
@@ -42,6 +46,7 @@ function AnimalDetailsPage() {
   const { data: animal, isLoading, error } = useAnimal(id);
   const { createRequest } = useAdoptionRequests();
   const { sentRequests } = useSentRequests();
+  const removeAnimal = useRemoveAnimal();
   const [isSending, setIsSending] = useState(false);
   const [requestError, setRequestError] = useState(null);
 
@@ -140,6 +145,9 @@ function AnimalDetailsPage() {
             ? "Anúncio removido pela moderação: ele não aparece mais para ninguém no site."
             : "A conta de quem anunciou foi banida: este anúncio não aparece mais para ninguém no site."}
         </ModerationNotice>
+      )}
+      {isAdmin && !animal.moderation && animal.status === "INACTIVE" && (
+        <ModerationNotice>Quem anunciou tirou este anúncio do ar: ele não aparece para ninguém no site.</ModerationNotice>
       )}
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
@@ -257,6 +265,27 @@ function AnimalDetailsPage() {
               </div>
             ) : myRequestStatus === "RETURNED" || myRequestStatus === "REHOMED" ? (
               <ReturnInfo request={myRequest} viewer="adopter" />
+            ) : isAdmin && !isAdopted ? (
+              // O admin modera, mas não adota: no lugar do pedido, a moderação.
+              // Removido não volta; adotado fica como histórico
+              animal.status === "REMOVED" ? null : (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Moderação</p>
+                  <ModerationAction
+                    icon={FaTrashCan}
+                    label="Remover anúncio"
+                    dialog={{
+                      title: `Remover o anúncio de ${animal.name}?`,
+                      description: removeListingDescription(animal.name),
+                      confirmLabel: "Remover anúncio",
+                      processingLabel: "Removendo...",
+                    }}
+                    mutation={removeAnimal}
+                    variables={{ id: animal.id, ownerId: animal.ownerId }}
+                    onDone={() => setSuccessMessage("Anúncio removido.")}
+                  />
+                </div>
+              )
             ) : isAdopted ? (
               <div className="rounded-2xl bg-amber-50 px-5 py-4 text-center">
                 <p className="text-sm font-bold text-amber-900">

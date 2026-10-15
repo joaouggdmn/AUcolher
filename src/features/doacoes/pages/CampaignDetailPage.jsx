@@ -20,6 +20,9 @@ import Spinner from '../../../core/components/ui/Spinner'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
 import VerifiedBadge from '../../ong/components/VerifiedBadge'
+import ModerationAction from '../../admin/components/ModerationAction'
+import { useRemoveCampaign } from '../../admin/hooks/useAdmin'
+import { removeCampaignDescription } from '../../admin/utils/moderationText'
 import CampaignCover from '../components/CampaignCover'
 import CampaignUnavailableState from '../components/CampaignUnavailableState'
 import CloseCampaignDialog from '../components/CloseCampaignDialog'
@@ -28,7 +31,7 @@ import DonationModal from '../components/DonationModal'
 import DonationProgress from '../components/DonationProgress'
 import { getCategoriaMeta } from '../components/filters/filterOptions'
 import { useCampaign } from '../hooks/useCampanhas'
-import { formatDonationsCount, getDeadlineSummary, isCampaignOwner } from '../utils/campaignDisplay'
+import { formatDonationsCount, getDeadlineSummary, isAdminAccount, isCampaignOwner } from '../utils/campaignDisplay'
 import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 
 const DEADLINE_TONES = {
@@ -126,9 +129,11 @@ function OwnerActions({ campaign, onCloseCampaign, onDelete }) {
   )
 }
 
-// Ação principal do painel lateral: doar, aviso de encerrada ou ações da dona
-function MainAction({ campaign, isOwner, onDonate, ownerActions }) {
+// Ação principal do painel lateral: doar, aviso de encerrada, ações da dona
+// ou, para o admin (que modera, mas não doa), a remoção
+function MainAction({ campaign, isOwner, onDonate, ownerActions, adminAction }) {
   if (isOwner) return <OwnerActions campaign={campaign} {...ownerActions} />
+  if (adminAction) return adminAction
 
   if (campaign.isClosed) {
     return (
@@ -157,6 +162,7 @@ function CampaignDetailPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { data: campaign, isLoading, isError, error, refetch } = useCampaign(id)
+  const removeCampaign = useRemoveCampaign()
   const [isDonationOpen, setIsDonationOpen] = useState(false)
   const [ownerDialog, setOwnerDialog] = useState(null) // 'close' | 'delete' | null
   // "Campanha publicada!" / "Campanha atualizada!" vindo do formulário
@@ -268,6 +274,23 @@ function CampaignDetailPage() {
               isOwner={isOwner}
               onDonate={() => setIsDonationOpen(true)}
               ownerActions={{ onCloseCampaign: () => setOwnerDialog('close'), onDelete: () => setOwnerDialog('delete') }}
+              adminAction={
+                isAdminAccount(user) && (
+                  <ModerationAction
+                    icon={FaTrashCan}
+                    label="Remover campanha"
+                    dialog={{
+                      title: 'Remover a campanha?',
+                      description: removeCampaignDescription(campaign.title),
+                      confirmLabel: 'Remover campanha',
+                      processingLabel: 'Removendo...',
+                    }}
+                    mutation={removeCampaign}
+                    variables={{ id: campaign.id }}
+                    onDone={() => navigate('/campanhas')}
+                  />
+                )
+              }
             />
           </div>
 

@@ -10,11 +10,11 @@ export async function updateMyProfile(payload) {
 
 // GET /users/{id}/public-profile — mesmos campos do usuário logado, sem
 // e-mail. Conta inexistente, desativada ou admin responde 404: a tela mostra
-// "Perfil não encontrado"
+// "Perfil não encontrado". Só o admin recebe a conta banida (`isActive` false)
 export async function getPublicProfile(id) {
   try {
     const { data } = await api.get(`/users/${id}/public-profile`)
-    return toFrontendProfile(data)
+    return { ...toFrontendProfile(data), isActive: data.active !== false }
   } catch (error) {
     if (error.response?.status === 404) return null
     throw error
