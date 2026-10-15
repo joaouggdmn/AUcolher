@@ -23,6 +23,7 @@ import { FOUNDED_YEAR_FIELD_ID, buildOngForm, toOngUpdates } from '../../utils/a
 import ProfileCompletionBar from '../ProfileCompletionBar'
 import ProfileSection from '../ProfileSection'
 import AccessSection from './AccessSection'
+import ModerationEmailSection from './ModerationEmailSection'
 import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
 import TextAreaField from './TextAreaField'
@@ -38,10 +39,14 @@ const TEAM_FIELDS = [
 // ONG (seção 6.2): o perfil público é institucional — logo, apresentação,
 // endereço e horários de visita, contatos, redes e equipe. Não passa pelo
 // Perfil AUmatch, que descreve a rotina de uma pessoa adotante
-function OngAccountForm() {
+// `account` + `onSave`: o admin editando a ONG pela moderação (ver useAccountForm)
+function OngAccountForm({ account = null, onSave = null }) {
+  const isModeration = account != null
   const { user, formData, setField, setFields, isDirty, checklist, percentage, save, discard } = useAccountForm({
     buildForm: buildOngForm,
     toUpdates: toOngUpdates,
+    account,
+    onSave,
   })
 
   const setAddressField = (field, value) => setFields((prev) => ({ address: { ...prev.address, [field]: value } }))
@@ -69,11 +74,13 @@ function OngAccountForm() {
 
   return (
     <>
-      <ProfileCompletionBar
-        checklist={checklist}
-        percentage={percentage}
-        description="Um perfil institucional completo passa confiança para quem quer adotar, visitar ou doar."
-      />
+      {!isModeration && (
+        <ProfileCompletionBar
+          checklist={checklist}
+          percentage={percentage}
+          description="Um perfil institucional completo passa confiança para quem quer adotar, visitar ou doar."
+        />
+      )}
 
       <div className="mt-10">
         <AccountFormShell isDirty={isDirty} onSave={handleSave} onDiscard={discard}>
@@ -290,7 +297,16 @@ function OngAccountForm() {
             description="Só a instituição vê. Usados para entrar na plataforma — o e-mail também é o contato público."
           />
 
-          <AccessSection emailHint="Aparece no perfil público como contato. Não pode ser alterado por aqui." />
+          {isModeration ? (
+            <ModerationEmailSection
+              value={formData.email}
+              onChange={(value) => setField('email', value)}
+              isGoogleAccount={user.provider === 'GOOGLE'}
+              isOng
+            />
+          ) : (
+            <AccessSection emailHint="Aparece no perfil público como contato. Não pode ser alterado por aqui." />
+          )}
         </AccountFormShell>
       </div>
     </>

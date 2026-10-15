@@ -8,21 +8,27 @@ import ProfileCompletionBar from '../ProfileCompletionBar'
 import ProfileSection from '../ProfileSection'
 import LifestyleForm from '../LifestyleForm'
 import AccessSection from './AccessSection'
+import ModerationEmailSection from './ModerationEmailSection'
 import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
 import TextAreaField from './TextAreaField'
 
 // Pessoa física (seção 6.1): o perfil público é enxuto — foto, nome, bio e
 // cidade. O resto (e-mail, senha, Perfil AUmatch) é privado
-function PersonAccountForm() {
-  const { formData, setField, setFields, isDirty, checklist, percentage, save, discard } = useAccountForm({
+// `account` + `onSave`: o admin editando a conta pela moderação (ver
+// useAccountForm). As respostas do quiz ficam de fora: são da pessoa
+function PersonAccountForm({ account = null, onSave = null }) {
+  const isModeration = account != null
+  const { user, formData, setField, setFields, isDirty, checklist, percentage, save, discard } = useAccountForm({
     buildForm: buildPersonForm,
     toUpdates: toPersonUpdates,
+    account,
+    onSave,
   })
 
   return (
     <>
-      <ProfileCompletionBar checklist={checklist} percentage={percentage} />
+      {!isModeration && <ProfileCompletionBar checklist={checklist} percentage={percentage} />}
 
       <div className="mt-10">
         <AccountFormShell isDirty={isDirty} onSave={() => save()} onDiscard={discard}>
@@ -66,19 +72,29 @@ function PersonAccountForm() {
             description="Só você vê. Usados para entrar na plataforma e alimentar as recomendações do AUmatch."
           />
 
-          <AccessSection emailHint="Usado para login — não pode ser alterado por aqui." />
+          {isModeration ? (
+            <ModerationEmailSection
+              value={formData.email}
+              onChange={(value) => setField('email', value)}
+              isGoogleAccount={user.provider === 'GOOGLE'}
+            />
+          ) : (
+            <AccessSection emailHint="Usado para login — não pode ser alterado por aqui." />
+          )}
 
           <ProfileSection icon={FaLocationDot} title="Localização" description="Sua cidade e estado aparecem no perfil público">
             <CityStateFields state={formData.state} city={formData.city} onChange={setFields} />
           </ProfileSection>
 
-          <ProfileSection
-            icon={FaHeartCircleCheck}
-            title="Perfil AUmatch"
-            description="Isso alimenta o algoritmo que encontra seus matches"
-          >
-            <LifestyleForm values={formData} onChange={setField} />
-          </ProfileSection>
+          {!isModeration && (
+            <ProfileSection
+              icon={FaHeartCircleCheck}
+              title="Perfil AUmatch"
+              description="Isso alimenta o algoritmo que encontra seus matches"
+            >
+              <LifestyleForm values={formData} onChange={setField} />
+            </ProfileSection>
+          )}
         </AccountFormShell>
       </div>
     </>

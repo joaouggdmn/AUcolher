@@ -40,6 +40,10 @@ import AdminAnimalsPage from '../features/admin/pages/AdminAnimalsPage'
 import AdminCampaignsPage from '../features/admin/pages/AdminCampaignsPage'
 import AdminEventsPage from '../features/admin/pages/AdminEventsPage'
 import AdminReportsPage from '../features/admin/pages/AdminReportsPage'
+import AdminUserEditPage from '../features/admin/pages/AdminUserEditPage'
+import AdminAnimalEditPage from '../features/admin/pages/AdminAnimalEditPage'
+import AdminEventEditPage from '../features/admin/pages/AdminEventEditPage'
+import AdminCampaignEditPage from '../features/admin/pages/AdminCampaignEditPage'
 
 
 export const protectedRoutes = [
@@ -122,6 +126,11 @@ export const protectedRoutes = [
           { path: 'campanhas', element: <AdminCampaignsPage /> },
           { path: 'eventos', element: <AdminEventsPage /> },
           { path: 'denuncias', element: <AdminReportsPage /> },
+          // Edição pela moderação (o conteúdo segue em nome do dono)
+          { path: 'usuarios/:id/editar', element: <AdminUserEditPage /> },
+          { path: 'animais/:id/editar', element: <AdminAnimalEditPage /> },
+          { path: 'eventos/:id/editar', element: <AdminEventEditPage /> },
+          { path: 'campanhas/:id/editar', element: <AdminCampaignEditPage /> },
         ],
       },
       // Endereços dos antigos placeholders (a aprovação de ONG deixou de existir)
