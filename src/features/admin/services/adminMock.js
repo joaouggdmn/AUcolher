@@ -27,6 +27,16 @@ import { reportTargetKey } from '../../denuncias/utils/reportRules'
 import { readAllEventsForAdmin, removeEventForAdmin } from '../../eventos/services/eventosMock'
 import { buildSeedAdmin } from '../data/seedAdmin'
 import {
+  byNewest,
+  campaignActivity,
+  campaignsStats,
+  countBy,
+  donationsStats,
+  monthOf,
+  RANKING_LIMIT,
+  RECENT_ACTIVITY_LIMIT,
+} from './campaignAdminStats'
+import {
   banAccount,
   isAccountBanned,
   isAnimalRemoved,
@@ -49,8 +59,6 @@ const store = createMockStore({ key: MOCK_ADMIN_STORE_KEY, version: 1, seed: bui
 const SERIES_MONTHS = 12
 // Máximo que a API aceita por página
 const ANIMALS_PAGE_SIZE = 50
-const RANKING_LIMIT = 5
-const RECENT_ACTIVITY_LIMIT = 8
 
 // Retorno e repasse vêm depois da conclusão: a adoção aconteceu igual
 const ACCEPTED_OR_LATER = ['ACCEPTED', 'AWAITING_DELIVERY', ...ADOPTION_HAPPENED_STATUSES]
@@ -67,10 +75,6 @@ function requireAdmin() {
   if (!user) throw mockHttpError(401, 'Faça login para continuar.')
   if (user.userType !== 'ADMIN') throw mockHttpError(403, 'Apenas o admin pode ver os dados da plataforma.')
   return user
-}
-
-function byNewest(field) {
-  return (a, b) => (b[field] ?? '').localeCompare(a[field] ?? '')
 }
 
 // Pedido da API no formato que as estatísticas daqui leem (o mesmo dos
@@ -274,14 +278,6 @@ function lastMonthKeys(count) {
   )
 }
 
-function monthOf(isoDate) {
-  return isoDate ? isoDate.slice(0, 7) : null
-}
-
-function countBy(items, predicate) {
-  return items.reduce((total, item) => total + (predicate(item) ? 1 : 0), 0)
-}
-
 function usersStats(accounts, months) {
   return {
     total: accounts.length,
@@ -400,17 +396,6 @@ function returnsStats(requests) {
   }
 }
 
-function donationsStats(donations, months) {
-  return {
-    totalRaised: donations.reduce((sum, donation) => sum + donation.amount, 0),
-    approvedCount: donations.length,
-    raisedByMonth: months.map((month) => {
-      const inMonth = donations.filter((donation) => monthOf(donation.approvedAt) === month)
-      return { month, amount: inMonth.reduce((sum, donation) => sum + donation.amount, 0), count: inMonth.length }
-    }),
-  }
-}
-
 // Ranking das ONGs: arrecadado (doações aprovadas) e adoções concluídas
 // de animais delas. O nome vem do próprio dado (campanha ou cópia do
 // animal no pedido), que é de quem de fato arrecadou ou doou o animal
@@ -443,10 +428,6 @@ function ngoRanking(accounts, requests, donations) {
       .sort((a, b) => b.adoptions - a.adoptions)
       .slice(0, RANKING_LIMIT),
   }
-}
-
-function isListedCampaign(campaign) {
-  return !campaign.removed && !isAccountBanned(campaign.ngo)
 }
 
 function isListedEvent(event) {
@@ -498,15 +479,7 @@ function recentActivity(accounts, requests, campaigns, events) {
         title: request.animal?.name ?? null,
         detail: request.adopter?.name ?? null,
       })),
-    ...campaigns
-      .filter((campaign) => !campaign.removed)
-      .map((campaign) => ({
-        type: 'CAMPAIGN_CREATED',
-        at: campaign.createdAt,
-        id: campaign.id,
-        title: campaign.title,
-        detail: campaign.ngo?.name ?? null,
-      })),
+    ...campaignActivity(campaigns),
     ...events
       .filter((event) => event.createdAt)
       .map((event) => ({
@@ -544,13 +517,7 @@ export async function getStats() {
     adoptions: adoptionsStats(requests, months),
     returns: returnsStats(requests),
     donations: donationsStats(donations, months),
-    // `suspended`: de ONG banida (some do site, mas o dinheiro arrecadado fica)
-    campaigns: {
-      active: countBy(campaigns, (campaign) => isListedCampaign(campaign) && campaign.status === 'ACTIVE'),
-      closed: countBy(campaigns, (campaign) => isListedCampaign(campaign) && campaign.status === 'CLOSED'),
-      removed: countBy(campaigns, (campaign) => campaign.removed),
-      suspended: countBy(campaigns, (campaign) => !campaign.removed && isAccountBanned(campaign.ngo)),
-    },
+    campaigns: campaignsStats(campaigns),
     events: {
       upcoming: countBy(events, (event) => isListedEvent(event) && event.date >= today),
       past: countBy(events, (event) => isListedEvent(event) && event.date < today),

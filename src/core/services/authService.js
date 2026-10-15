@@ -1,4 +1,4 @@
-import api from "./api";
+import api, { ACCOUNT_SUSPENDED_MESSAGE } from "./api";
 import { mockHttpError } from "./mock/mockStore";
 import { isAccountBanned } from "../../features/admin/services/moderationMock";
 import { instagramUrl, normalizeFacebookUrl, xUrl } from "../utils/socialLinks";
@@ -118,7 +118,7 @@ function toFrontendUser(backendUser) {
   }
 }
 
-export const ACCOUNT_SUSPENDED_MESSAGE = "Esta conta foi suspensa pela moderação do AUcolher.";
+export { ACCOUNT_SUSPENDED_MESSAGE };
 
 // Rota única para qualquer tipo de conta — o papel vem em user.userType
 export async function loginRequest({ email, password }) {

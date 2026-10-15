@@ -84,9 +84,11 @@ function isOnSite(dto) {
   return !isAccountBanned(dto.owner) && !isAnimalRemoved(dto)
 }
 
+// Com a moderação no backend, só o admin recebe esses anúncios: o status
+// REMOVED e o `owner.active` vêm da própria API
 function moderationOf(dto) {
-  if (isAnimalRemoved(dto)) return 'REMOVED'
-  return isAccountBanned(dto.owner) ? 'OWNER_BANNED' : null
+  if (isAnimalRemoved(dto) || dto.status === 'REMOVED') return 'REMOVED'
+  return isAccountBanned(dto.owner) || dto.owner?.active === false ? 'OWNER_BANNED' : null
 }
 
 // Removido é definitivo: o dono não edita, não tira do ar nem reativa
