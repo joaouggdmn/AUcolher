@@ -42,7 +42,7 @@ function AccountActivity({ user }) {
       caption: `${availableCount} ${plural(availableCount, 'disponível', 'disponíveis')}`,
       description: 'Os disponíveis aparecem no seu perfil público. Os adotados ficam só no seu histórico.',
       actions: [{ to: '/animais/criar', label: 'Cadastrar animal', icon: FaPlus }],
-      content: <MyAnimalsPanel animals={animals} />,
+      content: <MyAnimalsPanel animals={animals} isOng={isOng} />,
     },
     {
       key: 'avaliacoes',
