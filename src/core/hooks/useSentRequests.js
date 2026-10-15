@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useAdoptionRequests } from '../context/AdoptionRequestContext'
 import { isSameId } from '../utils/ids'
+import { ADOPTION_HAPPENED_STATUSES } from '../../features/adocao/utils/requestStatus'
 
 const ACTIVE_STATUSES = ['PENDING', 'ACCEPTED', 'AWAITING_DELIVERY']
 
@@ -23,7 +24,8 @@ export function useSentRequests() {
   return {
     sentRequests,
     activeRequests,
-    concludedRequests: sentRequests.filter((request) => request.status === 'CONCLUDED'),
+    // Adoções que aconteceram: concluídas e as que depois voltaram ou foram repassadas
+    adoptedRequests: sentRequests.filter((request) => ADOPTION_HAPPENED_STATUSES.includes(request.status)),
     closedRequests: sentRequests.filter((request) => request.status === 'REJECTED' || request.status === 'CANCELLED'),
     activeCount: activeRequests.length,
   }

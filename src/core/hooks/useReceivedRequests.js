@@ -27,7 +27,10 @@ export function useReceivedRequests() {
     (r) =>
       r.status === "ACCEPTED" ||
       r.status === "AWAITING_DELIVERY" ||
-      r.status === "CONCLUDED",
+      r.status === "CONCLUDED" ||
+      // A adoção aconteceu e depois o animal voltou ou foi repassado
+      r.status === "RETURNED" ||
+      r.status === "REHOMED",
   );
 
   // 🆕 Histórico: estados finais que não avançaram

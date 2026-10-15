@@ -13,6 +13,7 @@ import {
 import { LuSparkles } from "react-icons/lu";
 import Avatar from "../../../core/components/ui/Avatar";
 import { animalDisplayName } from "../utils/requestAnimal";
+import ReturnInfo from "./ReturnInfo";
 
 function ReceivedRequestCard({
   request,
@@ -25,12 +26,14 @@ function ReceivedRequestCard({
 }) {
   const { animal, adopter, status, matchScore } = request;
   const isConcluded = status === "CONCLUDED";
+  // A adoção aconteceu e depois o animal voltou ou foi repassado
+  const hasReturn = status === "RETURNED" || status === "REHOMED";
   const canWithdraw = (status === "ACCEPTED" || status === "AWAITING_DELIVERY") && onWithdraw;
 
   return (
     <div
       className={`flex flex-col overflow-hidden rounded-3xl border bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-emerald-950/5 ${
-        isConcluded ? "border-emerald-200" : "border-slate-100"
+        isConcluded ? "border-emerald-200" : hasReturn ? "border-sky-200" : "border-slate-100"
       }`}
     >
       <Link
@@ -181,6 +184,8 @@ function ReceivedRequestCard({
               Adoção Concluída
             </div>
           )}
+
+          {hasReturn && <ReturnInfo request={request} viewer="owner" />}
 
           {canWithdraw && (
             <button

@@ -4,14 +4,15 @@ import { useSentRequests } from '../../../../core/hooks/useSentRequests'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
 import AdoptedAnimalCard from './AdoptedAnimalCard'
 
-// "Meus animais" → Adotados por mim: as adoções que a pessoa concluiu
+// "Meus animais" → Adotados por mim: as adoções que a pessoa concluiu,
+// inclusive as que depois voltaram ao doador ou foram repassadas
 function AdoptedAnimalsTab() {
   const navigate = useNavigate()
-  const { concludedRequests } = useSentRequests()
+  const { adoptedRequests } = useSentRequests()
 
   const goToChat = (requestId) => navigate('/chat', { state: { requestId } })
 
-  if (concludedRequests.length === 0) {
+  if (adoptedRequests.length === 0) {
     return (
       <ActivityEmptyState
         icon={FaHeart}
@@ -24,7 +25,7 @@ function AdoptedAnimalsTab() {
 
   return (
     <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-      {concludedRequests.map((request) => (
+      {adoptedRequests.map((request) => (
         <AdoptedAnimalCard key={request.id} request={request} onGoToChat={goToChat} />
       ))}
     </ul>

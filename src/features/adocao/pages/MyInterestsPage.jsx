@@ -29,7 +29,7 @@ function Section({ title, requests, onGoToChat, onCancel }) {
 // adoção. Daqui o adotante vai para o chat ou desiste do pedido
 function MyInterestsPage() {
   const navigate = useNavigate()
-  const { sentRequests, activeRequests, concludedRequests, closedRequests } = useSentRequests()
+  const { sentRequests, activeRequests, adoptedRequests, closedRequests } = useSentRequests()
   const { cancelAdoption } = useConcludeAdoption()
 
   const [cancelling, setCancelling] = useState(null)
@@ -102,7 +102,7 @@ function MyInterestsPage() {
       ) : (
         <>
           <Section title="Em andamento" requests={activeRequests} onGoToChat={goToChat} onCancel={openCancel} />
-          <Section title="Adoções concluídas" requests={concludedRequests} onGoToChat={goToChat} onCancel={openCancel} />
+          <Section title="Adoções concluídas" requests={adoptedRequests} onGoToChat={goToChat} onCancel={openCancel} />
           <Section title="Encerrados" requests={closedRequests} onGoToChat={goToChat} onCancel={openCancel} />
         </>
       )}

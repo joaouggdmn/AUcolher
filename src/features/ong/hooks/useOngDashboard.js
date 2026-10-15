@@ -6,6 +6,7 @@ import { useChatUnread } from '../../../core/hooks/useChatUnread'
 import { isSameId } from '../../../core/utils/ids'
 import { useMyAnimals } from '../../animais/hooks/useAnimais'
 import { IN_PROGRESS_STATUSES, withAdoptionStatus } from '../../animais/utils/listingStatus'
+import { ADOPTION_HAPPENED_STATUSES } from '../../adocao/utils/requestStatus'
 import { useMyEvents } from '../../eventos/hooks/useEventos'
 import { useMyCampaigns } from '../../doacoes/hooks/useCampanhas'
 import { useReceivedDonations } from '../../doacoes/hooks/useDoacoes'
@@ -102,7 +103,7 @@ export function useOngDashboard() {
       ...animalTimelineItems(animals),
       ...requests.map((request) => ({ id: `pedido-${request.id}`, type: 'PEDIDO', request, date: request.createdAt })),
       ...requests
-        .filter((request) => request.status === 'CONCLUDED')
+        .filter((request) => ADOPTION_HAPPENED_STATUSES.includes(request.status))
         .map((request) => ({ id: `adocao-${request.id}`, type: 'ADOCAO', request, date: request.concludedAt })),
       ...donations.map((donation) => ({ id: `doacao-${donation.id}`, type: 'DOACAO', donation, date: donation.approvedAt })),
       ...myEvents.map((event) => ({ id: `evento-${event.id}`, type: 'EVENTO', event, date: event.createdAt })),
@@ -118,7 +119,7 @@ export function useOngDashboard() {
       requestsReceived: requests.length,
       pendingRequests: countWhere(requests, (request) => request.status === 'PENDING'),
       adoptionsInProgress: countWhere(requests, (request) => IN_PROGRESS_STATUSES.includes(request.status)),
-      adoptionsConcluded: countWhere(requests, (request) => request.status === 'CONCLUDED'),
+      adoptionsConcluded: countWhere(requests, (request) => ADOPTION_HAPPENED_STATUSES.includes(request.status)),
       conversations: conversations.length,
       unreadMessages: conversations.reduce((sum, conversation) => sum + conversation.unread, 0),
       upcomingEvents: events.upcoming.length,

@@ -18,6 +18,7 @@ import Spinner from "../../../core/components/ui/Spinner";
 import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContext";
 import { useSentRequests } from "../../../core/hooks/useSentRequests";
 import { SENT_STATUS_META } from "../../adocao/utils/requestStatus";
+import ReturnInfo from "../../adocao/components/ReturnInfo";
 import { isSameId } from "../../../core/utils/ids";
 import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
 import SuccessToast from "../../../core/components/ui/SuccessToast";
@@ -254,6 +255,8 @@ function AnimalDetailsPage() {
                   Que tal contar como foi a adoção avaliando o doador no chat?
                 </p>
               </div>
+            ) : myRequestStatus === "RETURNED" || myRequestStatus === "REHOMED" ? (
+              <ReturnInfo request={myRequest} viewer="adopter" />
             ) : isAdopted ? (
               <div className="rounded-2xl bg-amber-50 px-5 py-4 text-center">
                 <p className="text-sm font-bold text-amber-900">
