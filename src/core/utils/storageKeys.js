@@ -18,6 +18,7 @@ export const MOCK_ADMIN_STORE_KEY = 'aucolher_mock_admin'
 export const MOCK_DENUNCIAS_STORE_KEY = 'aucolher_mock_denuncias'
 // Decisões de moderação do modo mock: contas banidas (mesmo mockStore)
 export const MOCK_MODERACAO_STORE_KEY = 'aucolher_mock_moderacao'
+export const MOCK_REABANDONO_STORE_KEY = 'aucolher_mock_reabandono'
 // sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)
 export const ACCOUNT_SUSPENDED_FLAG_KEY = 'aucolher_account_suspended'
 
