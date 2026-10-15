@@ -320,6 +320,8 @@ export async function listMyCampaigns() {
 export async function createDonation(campaignId, { amount } = {}) {
   await mockDelay(600)
   const user = requireSession()
+  // O admin modera, mas não participa (regras de negócio: o que o admin faz no site)
+  if (user.userType === 'ADMIN') throw mockHttpError(403, 'Contas de admin não fazem doações.')
   const db = store.read()
   const row = findCampaignRow(db, campaignId)
 

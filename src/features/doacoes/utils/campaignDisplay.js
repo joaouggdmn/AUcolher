@@ -34,6 +34,11 @@ export function pickSosCampaign(campaigns) {
   return campaigns.find((campaign) => campaign.isUrgent && !campaign.isClosed) ?? null
 }
 
+// O admin modera, mas não doa: no lugar do "Doar" ele vê a campanha
+export function isAdminAccount(user) {
+  return user?.userType === 'ADMIN'
+}
+
 export function isCampaignOwner(campaign, user) {
   return user != null && campaign.ong.id != null && String(user.id) === String(campaign.ong.id)
 }

@@ -23,9 +23,12 @@ function formatBadge(count) {
 function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos, activeSentCount, pendingCount, unreadChatCount }) {
   const closeButtonRef = useRef(null)
 
-  const shortcuts = [
+  const panelShortcut = panelLink ? [{ ...panelLink, iconClass: 'text-amber-500' }] : []
+  // O admin modera, mas não participa (não favorita, não anuncia, não pede
+  // nem conversa): no menu dele fica só o painel
+  const shortcuts = userType === 'ADMIN' ? panelShortcut : [
     // ONG e admin gerenciam tudo no painel próprio (tela sem a navbar do site)
-    ...(panelLink ? [{ ...panelLink, iconClass: 'text-amber-500' }] : []),
+    ...panelShortcut,
     {
       label: 'Meus favoritos',
       to: '/favoritos',
