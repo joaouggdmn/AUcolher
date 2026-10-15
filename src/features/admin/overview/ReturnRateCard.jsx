@@ -1,4 +1,3 @@
-import BarList from '../../../core/components/charts/BarList'
 import ChartCard from '../../../core/components/charts/ChartCard'
 import { RETURN_REASON_LABELS } from '../../adocao/utils/requestStatus'
 
@@ -14,6 +13,35 @@ function formatRate(rate) {
 
 function plural(count, singular, pluralForm) {
   return count === 1 ? singular : pluralForm
+}
+
+// Uma linha: rótulo e valor em cima (o rótulo quebra linha se faltar
+// espaço, o valor nunca), a barra embaixo ocupando a largura toda. Assim
+// nada se sobrepõe, nem numa coluna estreita nem no PDF
+function MeterList({ items, scaleMax }) {
+  return (
+    <ul className="flex flex-col gap-3">
+      {items.map((item) => (
+        <li key={item.key}>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="min-w-0 text-xs font-semibold text-slate-600">{item.label}</span>
+            <span className="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-950">
+              {item.valueText ?? item.value}
+              {item.note && <span className="font-normal text-slate-400"> · {item.note}</span>}
+            </span>
+          </div>
+          <div aria-hidden="true" className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-slate-100">
+            {item.value > 0 && (
+              <div
+                className={`h-full min-w-1 rounded-full ${item.colorClass}`}
+                style={{ width: `${Math.min(item.value / scaleMax, 1) * 100}%` }}
+              />
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
 }
 
 // Taxa de reabandono (regras §3.3): quantas adoções voltaram ao doador ou
@@ -54,31 +82,31 @@ function ReturnRateCard({ returns }) {
         </p>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(10rem,auto)_1fr_1fr] print:grid-cols-[minmax(10rem,auto)_1fr_1fr]">
-        <div className="flex flex-col gap-1">
-          <span className="text-4xl font-black tracking-tight text-emerald-950">{formatRate(returns.rate)}</span>
-          <span className="text-sm font-semibold text-slate-500">
-            {totalReturns} de {returns.adoptions} {plural(returns.adoptions, 'adoção', 'adoções')}
-          </span>
-          <span className="mt-2 text-xs text-slate-500">
-            {returns.returned} {plural(returns.returned, 'devolvida', 'devolvidas')} ao doador ·{' '}
-            {returns.rehomed} {plural(returns.rehomed, 'repassada', 'repassadas')} pelo adotante
-          </span>
-        </div>
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="text-4xl font-black tracking-tight text-emerald-950">{formatRate(returns.rate)}</span>
+        <span className="text-sm font-semibold text-slate-500">
+          {totalReturns} de {returns.adoptions} {plural(returns.adoptions, 'adoção', 'adoções')}
+        </span>
+        <span className="basis-full text-xs text-slate-500">
+          {returns.returned} {plural(returns.returned, 'devolvida', 'devolvidas')} ao doador ·{' '}
+          {returns.rehomed} {plural(returns.rehomed, 'repassada', 'repassadas')} pelo adotante
+        </span>
+      </div>
 
-        <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-1 gap-6 border-t border-slate-100 pt-4 lg:grid-cols-2 print:grid-cols-2">
+        <div className="flex min-w-0 flex-col gap-3">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Por compatibilidade no AUmatch</p>
-          <BarList items={rangeItems} scaleMax={100} />
+          <MeterList items={rangeItems} scaleMax={100} />
           <p className="text-[11px] text-slate-400">
             Sem score (quiz incompleto ou adoção antiga): {returns.noScore.returns} de {returns.noScore.adoptions}{' '}
             {plural(returns.noScore.adoptions, 'adoção', 'adoções')}
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex min-w-0 flex-col gap-3">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Motivos</p>
           {totalReturns > 0 ? (
-            <BarList items={reasonItems} />
+            <MeterList items={reasonItems} scaleMax={Math.max(...reasonItems.map((item) => item.value), 1)} />
           ) : (
             <p className="text-xs text-slate-400">Nenhum retorno ou repasse registrado.</p>
           )}
