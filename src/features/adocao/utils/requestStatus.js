@@ -1,4 +1,19 @@
-import { FaBan, FaCircleCheck, FaClock, FaComments, FaHandHoldingHeart, FaXmark } from 'react-icons/fa6'
+import {
+  FaBan,
+  FaBullhorn,
+  FaCircleCheck,
+  FaClock,
+  FaComments,
+  FaHandHoldingHeart,
+  FaRotateLeft,
+  FaXmark,
+} from 'react-icons/fa6'
+
+// Adoções que aconteceram: a concluída e as que depois voltaram ao doador ou
+// foram repassadas pelo adotante (regras §3.3). Avaliações, contagem de
+// adoções e o histórico tratam as três igual
+export const ADOPTION_HAPPENED_STATUSES = ['CONCLUDED', 'RETURNED', 'REHOMED']
+export const RETURN_STATUSES = ['RETURNED', 'REHOMED']
 
 // Etapas de um pedido vistas por quem pediu (Meus interesses e a página do
 // animal). `tone` escolhe as cores do selo e do aviso
@@ -38,6 +53,39 @@ export const SENT_STATUS_META = {
     icon: FaBan,
     tone: 'slate',
   },
+  RETURNED: {
+    label: 'Devolvido ao doador',
+    description: 'O animal voltou para quem doou.',
+    icon: FaRotateLeft,
+    tone: 'sky',
+  },
+  REHOMED: {
+    label: 'Republicado por você',
+    description: 'Você anunciou o animal para uma nova adoção.',
+    icon: FaBullhorn,
+    tone: 'sky',
+  },
+}
+
+// Motivos do retorno e do repasse (returnReason), na ordem do formulário
+export const RETURN_REASON_OPTIONS = [
+  { value: 'BEHAVIOR', label: 'Comportamento do animal' },
+  { value: 'OTHER_PETS', label: 'Incompatibilidade com outros animais da casa' },
+  { value: 'CHILDREN', label: 'Incompatibilidade com crianças' },
+  { value: 'HOUSING_OR_ROUTINE', label: 'Mudança de moradia ou de rotina' },
+  { value: 'COSTS', label: 'Custos' },
+  { value: 'ANIMAL_HEALTH', label: 'Saúde do animal' },
+  { value: 'OTHER', label: 'Outro motivo' },
+]
+
+export const RETURN_REASON_LABELS = Object.fromEntries(RETURN_REASON_OPTIONS.map(({ value, label }) => [value, label]))
+
+export const RETURN_NOTE_MAX_LENGTH = 500
+
+// Adoção feita por ONG é resgate: não tem retorno nem repasse e fica fora
+// da taxa de reabandono (regras §3.3)
+export function canHaveReturn(request) {
+  return !request.adopter?.isOng
 }
 
 // Por que um pedido enviado foi cancelado. ACCOUNT_BANNED e LISTING_REMOVED
@@ -60,4 +108,5 @@ export const TONE_CLASSES = {
   amber: 'bg-amber-50 text-amber-700',
   emerald: 'bg-emerald-50 text-emerald-700',
   slate: 'bg-slate-100 text-slate-500',
+  sky: 'bg-sky-50 text-sky-700',
 }
