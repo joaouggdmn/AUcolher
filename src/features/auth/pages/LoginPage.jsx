@@ -6,7 +6,7 @@ import AuthInput from '../components/AuthInput'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { getHomePath } from '../../../core/utils/panelLinks'
-import { ACCOUNT_SUSPENDED_FLAG_KEY } from '../../../core/utils/storageKeys'
+import { ACCOUNT_SUSPENDED_FLAG_KEY, SESSION_EXPIRED_FLAG_KEY } from '../../../core/utils/storageKeys'
 
 function LoginPage() {
   const { login } = useAuth()
@@ -20,6 +20,8 @@ function LoginPage() {
   const [error, setError] = useState(null)
   // A sessão caiu porque o admin baniu a conta (AuthContext)
   const [wasSuspended] = useState(() => sessionStorage.getItem(ACCOUNT_SUSPENDED_FLAG_KEY) === '1')
+  // A API recusou o token da sessão salva (a senha foi trocada em outro aparelho)
+  const [sessionExpired] = useState(() => sessionStorage.getItem(SESSION_EXPIRED_FLAG_KEY) === '1')
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -62,6 +64,19 @@ function LoginPage() {
       {wasSuspended && !error && (
         <div className="mt-4 rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm font-medium text-rose-700">
           Sua conta foi suspensa pela moderação do AUcolher e a sessão foi encerrada.
+        </div>
+      )}
+
+      {sessionExpired && !wasSuspended && !location.state?.passwordReset && !error && (
+        <div className="mt-4 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm font-medium text-amber-800">
+          Sua sessão terminou. Entre novamente.
+        </div>
+      )}
+
+      {location.state?.passwordReset && (
+        <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-700">
+          <FaCircleCheck size={14} />
+          Senha redefinida. Entre com a nova senha.
         </div>
       )}
 
@@ -108,6 +123,7 @@ function LoginPage() {
         <div className="flex justify-end">
           <Link
             to="/recuperar-senha"
+            state={{ email: formData.email }}
             className="text-sm font-semibold text-emerald-700 transition-colors hover:text-emerald-900"
           >
             Esqueci minha senha

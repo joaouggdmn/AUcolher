@@ -1,8 +1,9 @@
 import { Navigate } from 'react-router-dom'
 import AuthLayout from './AuthLayout'
-import PlaceholderPage from '../core/components/PlaceholderPage'
 import LoginPage from '../features/auth/pages/LoginPage'
 import RegisterPage from '../features/auth/pages/RegisterPage'
+import ForgotPasswordPage from '../features/auth/pages/ForgotPasswordPage'
+import ResetPasswordPage from '../features/auth/pages/ResetPasswordPage'
 import GuestRoute from '../core/guards/GuestRoute'
 
 export const authRoutes = [
@@ -22,7 +23,7 @@ export const authRoutes = [
           },
           {
             path: 'recuperar-senha',
-            element: <PlaceholderPage title="Recuperar senha" />,
+            element: <ForgotPasswordPage />,
           },
           {
             // Link do rodapé: o cadastro de ONG é a aba ONG do /cadastro
@@ -30,6 +31,17 @@ export const authRoutes = [
             element: <Navigate to="/cadastro" state={{ preselectUserType: 'ONG' }} replace />,
           },
         ],
+      },
+    ],
+  },
+  {
+    // Link do e-mail de "Esqueci minha senha": fora do GuestRoute, para quem
+    // estiver logado neste navegador não ser mandado para a home sem o token
+    element: <AuthLayout />,
+    children: [
+      {
+        path: 'redefinir-senha',
+        element: <ResetPasswordPage />,
       },
     ],
   },

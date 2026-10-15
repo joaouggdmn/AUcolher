@@ -13,6 +13,10 @@ export const USE_MOCK_DENUNCIAS = import.meta.env.VITE_USE_MOCK_DENUNCIAS !== 'f
 // sem as rotas da migração 012, um "servidor falso" guarda os registros por
 // pedido e os sobrepõe aos pedidos reais
 export const USE_MOCK_REABANDONO = import.meta.env.VITE_USE_MOCK_REABANDONO !== 'false'
+// Recuperar senha (docs/entrega-final/api-senha.md): sem as rotas da
+// migração 010, os links de "Esqueci minha senha" e do "Alterar senha" de
+// Minha conta ficam num servidor falso
+export const USE_MOCK_SENHA = import.meta.env.VITE_USE_MOCK_SENHA !== 'false'
 
 // Listas públicas mudam pouco: 30 s evita refazer a busca a cada navegação
 export const EVENTOS_STALE_TIME = 30_000

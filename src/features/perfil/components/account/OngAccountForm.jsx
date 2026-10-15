@@ -22,17 +22,14 @@ import { useAccountForm } from '../../hooks/useAccountForm'
 import { FOUNDED_YEAR_FIELD_ID, buildOngForm, toOngUpdates } from '../../utils/accountForm'
 import ProfileCompletionBar from '../ProfileCompletionBar'
 import ProfileSection from '../ProfileSection'
+import AccessSection from './AccessSection'
 import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
 import TextAreaField from './TextAreaField'
 import RowsEditor from './RowsEditor'
+import VisitingHoursEditor from './VisitingHoursEditor'
 
-// Colunas NOT NULL em ong_horarios_visita (dias, horario) e ong_equipe (nome)
-const VISITING_HOURS_FIELDS = [
-  { key: 'days', label: 'Dias', placeholder: 'Ex: Terça a sexta', required: true },
-  { key: 'hours', label: 'Horário', placeholder: 'Ex: 14h às 18h', required: true },
-]
-
+// Coluna NOT NULL em ong_equipe (nome)
 const TEAM_FIELDS = [
   { key: 'name', label: 'Nome', placeholder: 'Ex: Marina Costa', required: true },
   { key: 'role', label: 'Função', placeholder: 'Ex: Coordenadora de adoções' },
@@ -217,30 +214,22 @@ function OngAccountForm() {
                 <FaClock size={13} className="text-emerald-600" />
                 Horário de visitas
               </p>
-              <RowsEditor
-                rows={formData.visitingHours}
-                onChange={(rows) => setField('visitingHours', rows)}
-                fields={VISITING_HOURS_FIELDS}
-                addLabel="Adicionar horário"
-                emptyText="Nenhum horário cadastrado. Se as visitas forem só com agendamento, diga isso aqui."
+              <VisitingHoursEditor
+                value={formData.visitingHours}
+                onChange={(value) => setField('visitingHours', value)}
               />
             </div>
           </ProfileSection>
 
           <ProfileSection icon={FaShareNodes} title="Contato e redes sociais" description="Canais públicos para falar com a instituição">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <AuthInput
-                  id="institutionalEmail"
-                  label="E-mail institucional"
-                  type="email"
-                  icon={FaEnvelope}
-                  placeholder="contato@suaong.org"
-                  value={formData.institutionalEmail}
-                  onChange={(e) => setField('institutionalEmail', e.target.value)}
-                  hint="Opcional. Pode ser diferente do e-mail de login, que continua privado."
-                />
-              </div>
+              <p className="flex items-start gap-2 rounded-xl bg-emerald-50/60 px-3.5 py-2.5 text-xs text-emerald-900 sm:col-span-2">
+                <FaEnvelope size={12} className="mt-0.5 shrink-0 text-emerald-600" />
+                <span>
+                  O e-mail da conta, <strong className="break-all">{user?.email}</strong>, aparece no perfil público como
+                  contato da instituição.
+                </span>
+              </p>
               <AuthInput
                 id="instagram"
                 label="Instagram"
@@ -298,17 +287,10 @@ function OngAccountForm() {
           <AccountGroupHeading
             visibility="private"
             title="Dados da conta"
-            description="Só a instituição vê. Usados para entrar na plataforma."
+            description="Só a instituição vê. Usados para entrar na plataforma — o e-mail também é o contato público."
           />
 
-          <ProfileSection icon={FaEnvelope} title="Acesso">
-            <FormField
-              label="E-mail de login"
-              value={user?.email ?? ''}
-              disabled
-              hint="Não aparece no perfil público e não pode ser alterado por aqui."
-            />
-          </ProfileSection>
+          <AccessSection emailHint="Aparece no perfil público como contato. Não pode ser alterado por aqui." />
         </AccountFormShell>
       </div>
     </>

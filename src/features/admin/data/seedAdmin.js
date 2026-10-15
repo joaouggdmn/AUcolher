@@ -57,7 +57,7 @@ function profileAccount(profile) {
   return {
     id: profile.id,
     name: profile.name,
-    email: profile.institutionalEmail ?? emailFor(profile.name, userType),
+    email: profile.email ?? emailFor(profile.name, userType),
     userType,
     photoUrl: profile.photoUrl ?? null,
     city: profile.city ?? null,

@@ -19,7 +19,7 @@ function buildMapsUrl(address) {
 function OngDetails({ profile }) {
   const { address, visitingHours = [], team = [] } = profile
   const hasVisitInfo = Boolean(address) || visitingHours.length > 0
-  const hasContactInfo = Boolean(profile.institutionalEmail || profile.cnpj)
+  const hasContactInfo = Boolean(profile.email || profile.cnpj)
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -82,8 +82,9 @@ function OngDetails({ profile }) {
 
               {visitingHours.length > 0 && (
                 <ul className="flex flex-col gap-2 border-t border-slate-100 pt-4">
-                  {visitingHours.map((slot) => (
-                    <li key={slot.days} className="flex items-start gap-2.5 text-sm">
+                  {/* Por índice: duas faixas podem ter os mesmos dias (manhã e tarde) */}
+                  {visitingHours.map((slot, index) => (
+                    <li key={index} className="flex items-start gap-2.5 text-sm">
                       <FaClock size={12} className="mt-1 shrink-0 text-emerald-600" />
                       <span>
                         <span className="font-semibold text-emerald-950">{slot.days}</span>
@@ -100,14 +101,14 @@ function OngDetails({ profile }) {
         {hasContactInfo && (
           <ProfileSection icon={FaEnvelope} title="Contato">
             <ul className="flex flex-col gap-3 text-sm">
-              {profile.institutionalEmail && (
+              {profile.email && (
                 <li className="flex items-center gap-2.5">
                   <FaEnvelope size={12} className="shrink-0 text-emerald-600" />
                   <a
-                    href={`mailto:${profile.institutionalEmail}`}
+                    href={`mailto:${profile.email}`}
                     className="truncate font-semibold text-emerald-800 hover:text-emerald-950 hover:underline"
                   >
-                    {profile.institutionalEmail}
+                    {profile.email}
                   </a>
                 </li>
               )}
