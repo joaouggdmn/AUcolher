@@ -105,6 +105,20 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
+  useEffect(() => {
+    // A API recusou o token porque a conta foi banida pela moderação: a sessão
+    // cai e o login explica o motivo. Sem sessão salva é o próprio login
+    // recusado, e a tela de login já mostra a frase
+    const handleSuspended = () => {
+      if (!localStorage.getItem(TOKEN_STORAGE_KEY)) return
+      sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
+      logout()
+      window.location.assign('/login')
+    }
+    window.addEventListener('auth:suspended', handleSuspended)
+    return () => window.removeEventListener('auth:suspended', handleSuspended)
+  }, [])
+
   // 🔴 Moderação no modo mock: se o admin banir a conta logada (em outra
   // aba), a sessão cai na hora e o login explica o motivo. As abas dividem a
   // mesma sessão salva: se outra conta já entrou por cima (o próprio admin,
