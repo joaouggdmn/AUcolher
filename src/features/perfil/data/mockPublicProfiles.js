@@ -36,7 +36,7 @@ export const mockPublicProfiles = [
       { name: 'Diego Ramos', role: 'Voluntário de resgate' },
     ],
     cnpj: '12345678000190',
-    institutionalEmail: 'contato@patinhascarentes.org.br',
+    email: 'contato@patinhascarentes.org.br',
     socialLinks: {
       instagram: 'https://instagram.com/patinhascarentes_aucolher',
       facebook: 'https://facebook.com/patinhascarentes_aucolher',
@@ -72,7 +72,7 @@ export const mockPublicProfiles = [
       { name: 'Carlos Menezes', role: 'Cuidador' },
     ],
     cnpj: '98765432000110',
-    institutionalEmail: null,
+    email: 'abrigoamigofiel@gmail.com',
     socialLinks: {
       instagram: 'https://instagram.com/amigofiel_aucolher',
       facebook: null,
@@ -105,7 +105,7 @@ export const mockPublicProfiles = [
     visitingHours: [{ days: 'Somente com agendamento', hours: 'Combine pelo chat' }],
     team: [{ name: 'Gabriel Nunes', role: 'Coordenador' }],
     cnpj: '11222333000181',
-    institutionalEmail: 'patasunidas@patasunidas.org',
+    email: 'patasunidas@patasunidas.org',
     socialLinks: {
       instagram: 'https://instagram.com/patasunidas_aucolher',
       facebook: 'https://facebook.com/patasunidas_aucolher',
