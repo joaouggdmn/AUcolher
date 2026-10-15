@@ -6,6 +6,7 @@ import { FOUNDED_YEAR_FIELD_ID } from '../utils/accountForm'
 import PersonAccountForm from '../components/account/PersonAccountForm'
 import OngAccountForm from '../components/account/OngAccountForm'
 import AccountActivity from '../components/activity/AccountActivity'
+import SecuritySection from '../components/security/SecuritySection'
 
 const TAG_CLASSES = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide'
 
@@ -96,6 +97,8 @@ function UserProfilePage() {
 
       {/* key: outra conta logando no mesmo navegador remonta o form com os dados dela */}
       <AccountForm key={user?.id} />
+
+      <SecuritySection key={`security-${user?.id}`} />
 
       <AccountActivity user={user} />
     </div>
