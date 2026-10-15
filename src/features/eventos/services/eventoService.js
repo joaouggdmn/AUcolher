@@ -48,6 +48,8 @@ export function toFrontendEvent(dto) {
     // null = sem capa; a tela escolhe a imagem padrão da categoria
     coverUrl: dto.coverUrl ?? null,
     createdAt: dto.createdAt ?? null,
+    // Última edição feita pelo admin (o dono vê "Editado pela moderação")
+    moderatedAt: dto.moderatedAt ?? null,
     organizer: {
       id: dto.ngo?.id ?? null,
       name: dto.ngo?.name ?? '',

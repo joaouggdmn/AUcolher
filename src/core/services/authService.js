@@ -98,6 +98,10 @@ export function toFrontendProfile(backendUser) {
     visitingHours: backendUser.visitingHours ?? [],
     city: backendUser.city ?? '',
     state: backendUser.state ?? '',
+    // Última edição do perfil feita pelo admin (o dono vê "Editado pela moderação")
+    moderatedAt: backendUser.moderatedAt ?? null,
+    // LOCAL ou GOOGLE: conta do Google não troca de e-mail
+    provider: backendUser.provider ?? 'LOCAL',
   }
 }
 
