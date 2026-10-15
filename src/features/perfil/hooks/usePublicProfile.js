@@ -19,7 +19,8 @@ function buildOwnProfile(user) {
     visitingHours: user.visitingHours ?? [],
     team: user.team ?? [],
     cnpj: user.cnpj ?? null,
-    institutionalEmail: user.institutionalEmail ?? null,
+    // ONG: o e-mail de login é o contato público. O de pessoa nunca aparece
+    email: user.userType === 'ONG' ? user.email : null,
     foundedYear: user.foundedYear ?? null,
     memberSince: user.memberSince ?? null,
     // Selo real do backend (is_verificado) — sem a etapa de aprovação do

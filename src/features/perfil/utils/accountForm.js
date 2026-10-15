@@ -6,6 +6,7 @@ import {
   xUrl,
 } from '../../../core/utils/socialLinks'
 import { parseFoundedYear } from '../../../core/utils/foundedYear'
+import { toVisitingHourRows, toVisitingHoursForm } from './visitingHours'
 
 // Cada tipo de conta tem um par de funções:
 //   build*(user)      → campos editáveis do formulário de "Minha conta"
@@ -63,7 +64,6 @@ export function buildOngForm(user) {
     name: user?.name ?? '',
     photoUrl: user?.photoUrl ?? null,
     bio: user?.bio ?? '',
-    institutionalEmail: user?.institutionalEmail ?? '',
     // Texto, como todo input controlado — volta a ser número no toOngUpdates
     foundedYear: user?.foundedYear != null ? String(user.foundedYear) : '',
     // Redes editadas como @usuario, igual ao cadastro; o perfil guarda o link
@@ -78,7 +78,8 @@ export function buildOngForm(user) {
       state: user?.state ?? '',
       ...Object.fromEntries(Object.entries(user?.address ?? {}).filter(([, value]) => value != null)),
     },
-    visitingHours: user?.visitingHours ?? [],
+    // Dias marcados + abre/fecha; o texto do banco é montado no toOngUpdates
+    visitingHours: toVisitingHoursForm(user?.visitingHours ?? []),
     team: user?.team ?? [],
   }
 }
@@ -90,7 +91,6 @@ export function toOngUpdates(form) {
     name: form.name.trim(),
     photoUrl: form.photoUrl,
     bio: form.bio.trim(),
-    institutionalEmail: form.institutionalEmail.trim() || null,
     foundedYear: parseFoundedYear(form.foundedYear),
     socialLinks: {
       instagram: instagramUrl(form.instagram),
@@ -102,7 +102,7 @@ export function toOngUpdates(form) {
     // Cidade/UF da ONG = sede: é o que os anúncios dela usam
     city: address.city,
     state: address.state,
-    visitingHours: cleanRows(form.visitingHours),
+    visitingHours: toVisitingHourRows(form.visitingHours),
     team: cleanRows(form.team),
   }
 }
@@ -131,7 +131,6 @@ export function toApiPayload(updates, userType) {
 
   return {
     ...basePayload,
-    institutionalEmail: updates.institutionalEmail,
     foundedYear: updates.foundedYear ?? null,
     instagram: sanitizeInstagramHandle(updates.socialLinks.instagram ?? '') || null,
     twitter: sanitizeXHandle(updates.socialLinks.x ?? '') || null,

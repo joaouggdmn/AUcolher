@@ -21,11 +21,8 @@ const ONG_CHECKLIST = [
   { key: 'bio', label: 'Sobre a instituição', check: (p) => !!p?.bio?.trim() },
   { key: 'endereco', label: 'Endereço', check: (p) => !!p?.address?.street && !!p?.address?.city },
   { key: 'visitas', label: 'Horário de visitas', check: (p) => (p?.visitingHours?.length ?? 0) > 0 },
-  {
-    key: 'contato',
-    label: 'Contato ou redes',
-    check: (p) => !!p?.institutionalEmail || Object.values(p?.socialLinks ?? {}).some(Boolean),
-  },
+  // O contato por e-mail sempre existe (é o de login): o que falta são as redes
+  { key: 'redes', label: 'Redes sociais', check: (p) => Object.values(p?.socialLinks ?? {}).some(Boolean) },
 ]
 
 // Fora de componente também: o card de um pedido recebido calcula a
