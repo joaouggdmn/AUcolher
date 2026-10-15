@@ -1,8 +1,11 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as adocaoService from "../../features/adocao/services/adocaoService";
 import { animalKeys } from "../../features/animais/hooks/useAnimais";
 import { useModeration } from "../../features/admin/hooks/useModeration";
+import { useReturnsMock } from "../../features/adocao/hooks/useReturnsMock";
+import { freezeConcludedScores } from "../../features/adocao/services/returnsMock";
+import { USE_MOCK_REABANDONO } from "../utils/constants";
 import { queryKeys } from "../services/queryKeys";
 import { useAuth } from "./AuthContext";
 
@@ -26,14 +29,14 @@ export function AdoptionRequestProvider({ children }) {
   // Admin não pede nem recebe pedidos
   const takesPart = isAuthenticated && (user?.userType === "PESSOA" || user?.userType === "ONG");
 
-  const { data: sent = NO_REQUESTS } = useQuery({
+  const { data: sent = NO_REQUESTS, isLoading: isLoadingSent } = useQuery({
     queryKey: queryKeys.adocao.sent(user?.id),
     queryFn: adocaoService.listSentRequests,
     enabled: takesPart,
     refetchInterval: REFRESH_INTERVAL,
   });
 
-  const { data: received = NO_REQUESTS } = useQuery({
+  const { data: received = NO_REQUESTS, isLoading: isLoadingReceived } = useQuery({
     queryKey: queryKeys.adocao.received(user?.id),
     queryFn: adocaoService.listReceivedRequests,
     enabled: takesPart,
@@ -42,11 +45,28 @@ export function AdoptionRequestProvider({ children }) {
 
   // 🔴 A camada de moderação do mock entra aqui, e não na busca: banir ou
   // remover um anúncio (nesta aba ou em outra) atualiza as telas na hora
+  // Os pedidos como a API devolveu: as ações de retorno e repasse usam estes
+  const rawById = useMemo(
+    () => new Map([...received, ...sent].map((request) => [request.id, request])),
+    [sent, received],
+  );
+
+  // 🔴 Mock do reabandono: o retorno e o repasse registrados neste navegador
+  // entram por cima dos pedidos, como a API vai devolver depois da 012
+  const returnsData = useReturnsMock();
+
   const requests = useMemo(() => {
     if (!takesPart) return NO_REQUESTS;
-    const byId = new Map([...received, ...sent].map((request) => [request.id, request]));
-    return [...byId.values()].map((request) => adocaoService.withModeration(request, isAccountBanned));
-  }, [takesPart, sent, received, isAccountBanned]);
+    return [...rawById.values()].map((request) =>
+      adocaoService.withModeration(adocaoService.withReturnRecord(request, returnsData), isAccountBanned),
+    );
+  }, [takesPart, rawById, returnsData, isAccountBanned]);
+
+  // O score congelado na conclusão: no mock, guardado na primeira vez que o
+  // pedido aparece concluído (a API vai gravar no próprio `conclude`)
+  useEffect(() => {
+    if (takesPart) freezeConcludedScores([...rawById.values()]);
+  }, [takesPart, rawById]);
 
   // Troca o pedido nas duas listas pelo que a API devolveu (a tela muda na
   // hora) e manda buscar de novo — uma conclusão também cancela outros pedidos
@@ -84,6 +104,17 @@ export function AdoptionRequestProvider({ children }) {
     return updated;
   }
 
+  // Retorno e repasse: a API devolve o pedido atualizado; no mock, a camada
+  // do returnsMock já muda as telas, e o cache fica com o pedido da API
+  async function runReturnAction(requestId, action) {
+    const updated = await action(rawById.get(requestId));
+    if (USE_MOCK_REABANDONO) queryClient.invalidateQueries({ queryKey: queryKeys.adocao.all });
+    else applyResult(updated);
+    // O animal sai do ar (retorno), nasce (repasse) ou sai do ar de novo (desfazer)
+    queryClient.invalidateQueries({ queryKey: animalKeys.all });
+    return updated;
+  }
+
   async function deleteReview(requestId) {
     await adocaoService.deleteRequestReview(requestId);
     queryClient.invalidateQueries({ queryKey: queryKeys.adocao.all });
@@ -93,6 +124,8 @@ export function AdoptionRequestProvider({ children }) {
     <AdoptionRequestContext.Provider
       value={{
         requests,
+        // Primeira carga das listas (telas que abrem um pedido pelo id esperam por ela)
+        isLoading: isLoadingSent || isLoadingReceived,
         createRequest,
         // Dono
         acceptRequest: (requestId) => changeStatus(requestId, "ACCEPTED"),
@@ -104,6 +137,14 @@ export function AdoptionRequestProvider({ children }) {
         cancelRequest: (requestId) => changeStatus(requestId, "CANCELLED"),
         saveReview,
         deleteReview,
+        // Doador: "Animal retornado" (também corrige um retorno já registrado)
+        registerReturn: (requestId, body) =>
+          runReturnAction(requestId, (request) => adocaoService.registerReturn(request, body)),
+        // Adotante: o anúncio original para o formulário de republicar
+        getRehomeDraft: (requestId) => adocaoService.getRehomeDraft(rawById.get(requestId)),
+        // Adotante: "Republicar anúncio" e "Desisti de doar"
+        rehome: (requestId, payload) => runReturnAction(requestId, (request) => adocaoService.rehome(request, payload)),
+        undoRehome: (requestId) => runReturnAction(requestId, (request) => adocaoService.undoRehome(request)),
       }}
     >
       {children}

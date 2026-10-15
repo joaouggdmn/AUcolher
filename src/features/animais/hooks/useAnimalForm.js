@@ -74,9 +74,12 @@ async function saveLocationToProfile(user, city, state) {
 }
 
 // Cadastro e edição do anúncio. Com `animal`, edita (PUT); sem, cadastra
-// (POST). `onSaved(animalSalvo)` decide para onde ir depois — cada tela tem o
-// seu destino (página do animal, lista do painel)
-export function useAnimalForm({ animal = null, onSaved }) {
+// (POST). `onSaved(resultado)` decide para onde ir depois — cada tela tem o
+// seu destino (página do animal, lista do painel).
+// Republicar (cadastro a partir de outro anúncio): `draft` é o animal que
+// preenche o formulário, e `onSubmit(form, photos)` troca o POST de sempre
+// pela rota da tela; `submitLabels` ({ idle, busy }) troca o texto do botão
+export function useAnimalForm({ animal = null, draft = null, onSubmit = null, submitLabels = null, onSaved }) {
   const { user, updateProfile } = useAuth()
   const { mutateAsync: createAnimal } = useCreateAnimal()
   const { mutateAsync: updateAnimal } = useUpdateAnimal()
@@ -88,8 +91,9 @@ export function useAnimalForm({ animal = null, onSaved }) {
   const [needsLocationInput] = useState(() => !isEditing && (!user?.city || !user?.state))
 
   const [stepIndex, setStepIndex] = useState(0)
-  const [formData, setFormData] = useState(() => (isEditing ? toFormValues(animal) : INITIAL_FORM))
-  const [images, setImages] = useState(() => (isEditing ? animal.images : []))
+  const base = animal ?? draft
+  const [formData, setFormData] = useState(() => (base ? toFormValues(base) : INITIAL_FORM))
+  const [images, setImages] = useState(() => (base ? base.images : []))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState(null)
 
@@ -162,10 +166,11 @@ export function useAnimalForm({ animal = null, onSaved }) {
         updateProfile(await saveLocationToProfile(user, formData.city.trim(), formData.state))
       }
 
-      const savedAnimal = isEditing
-        ? await updateAnimal({ id: animal.id, form: formData, photos: images })
-        : await createAnimal({ form: formData, photos: images })
-      onSaved(savedAnimal)
+      let saved
+      if (onSubmit) saved = await onSubmit(formData, images)
+      else if (isEditing) saved = await updateAnimal({ id: animal.id, form: formData, photos: images })
+      else saved = await createAnimal({ form: formData, photos: images })
+      onSaved(saved)
     } catch (error) {
       const fallback = isEditing
         ? 'Não foi possível salvar as alterações. Tente novamente.'
@@ -177,7 +182,7 @@ export function useAnimalForm({ animal = null, onSaved }) {
 
   return {
     stepIndex, currentStep, isFirstStep, isLastStep, formData, images, setImages,
-    updateField, isStepValid, isFormValid, isEditing, isSubmitting, submitError, needsLocationInput,
+    updateField, isStepValid, isFormValid, isEditing, isSubmitting, submitError, needsLocationInput, submitLabels,
     goNext, goBack, goToStep, handleSubmit,
   }
 }

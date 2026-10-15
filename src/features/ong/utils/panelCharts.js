@@ -1,6 +1,7 @@
 import { formatCurrency } from '../../../core/utils/currency'
 import { toLocalIsoDate } from '../../../core/utils/localDate'
 import { LISTING_STATUS_META } from '../../animais/utils/listingStatus'
+import { ADOPTION_HAPPENED_STATUSES } from '../../adocao/utils/requestStatus'
 
 // Dados prontos para os gráficos do painel (charts/*). As cores foram
 // conferidas para daltonismo e contraste: categorias com esmeralda, âmbar e
@@ -28,9 +29,9 @@ const SPECIES = [
 // Cada etapa conta quem chegou nela ou passou dela
 const FUNNEL_STAGES = [
   { key: 'received', label: 'Pedidos recebidos', statuses: null, colorClass: 'bg-emerald-500' },
-  { key: 'accepted', label: 'Aceitos', statuses: ['ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED'], colorClass: 'bg-emerald-600' },
-  { key: 'delivery', label: 'Entrega confirmada', statuses: ['AWAITING_DELIVERY', 'CONCLUDED'], colorClass: 'bg-emerald-700' },
-  { key: 'concluded', label: 'Adoções concluídas', statuses: ['CONCLUDED'], colorClass: 'bg-emerald-800' },
+  { key: 'accepted', label: 'Aceitos', statuses: ['ACCEPTED', 'AWAITING_DELIVERY', ...ADOPTION_HAPPENED_STATUSES], colorClass: 'bg-emerald-600' },
+  { key: 'delivery', label: 'Entrega confirmada', statuses: ['AWAITING_DELIVERY', ...ADOPTION_HAPPENED_STATUSES], colorClass: 'bg-emerald-700' },
+  { key: 'concluded', label: 'Adoções concluídas', statuses: ADOPTION_HAPPENED_STATUSES, colorClass: 'bg-emerald-800' },
 ]
 
 export const CHART_MONTHS = 6

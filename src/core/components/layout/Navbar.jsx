@@ -281,6 +281,7 @@ function Navbar() {
           isOpen={isSidebarOpen}
           onClose={closeSidebar}
           panelLink={panelLink}
+          userType={user?.userType}
           totalFavoritos={totalFavoritos}
           activeSentCount={activeSentCount}
           pendingCount={pendingCount}

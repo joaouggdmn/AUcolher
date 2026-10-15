@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom'
 import { FaCircleCheck, FaEye, FaEyeSlash, FaHeart, FaPaw, FaPen, FaShieldHalved } from 'react-icons/fa6'
-import { SPECIES_OPTIONS } from '../../../animais/components/filters/filterOptions'
-import { LISTING_STATUS_META } from '../../../animais/utils/listingStatus'
-import { PANEL_PATHS } from '../panelPaths'
+import { SPECIES_OPTIONS } from '../filters/filterOptions'
+import { LISTING_STATUS_META } from '../../utils/listingStatus'
 
-const ACTION_CLASSES =
+export const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 disabled:cursor-wait disabled:opacity-60'
 
 function speciesLabel(species) {
@@ -15,10 +14,21 @@ function Spinner() {
   return <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
 }
 
-// Uma linha da lista de animais do painel. As ações seguem o status na API:
-// adotado é definitivo (só dá para ver); fora do ar pode voltar; removido
-// pela moderação não tem ação nenhuma
-function AnimalRow({ animal, pendingStatus, onChangeStatus, onMarkAdopted }) {
+// Uma linha da lista de animais do dono: painel da ONG e "Meus animais" da
+// pessoa. As ações seguem o status na API: adotado é definitivo (só dá para
+// ver); fora do ar pode voltar; removido pela moderação não tem ação nenhuma.
+// `editTo` e `requestsTo` apontam para as telas de cada lado; `details`
+// entra embaixo do nome e `children` são ações extras, antes de "Ver no site"
+function OwnerAnimalRow({
+  animal,
+  editTo,
+  requestsTo,
+  pendingStatus,
+  onChangeStatus,
+  onMarkAdopted,
+  details,
+  children,
+}) {
   const status = LISTING_STATUS_META[animal.listingStatus]
   const isBusy = pendingStatus != null
   const adoptedWord = animal.sex === 'FEMALE' ? 'adotada' : 'adotado'
@@ -43,13 +53,14 @@ function AnimalRow({ animal, pendingStatus, onChangeStatus, onMarkAdopted }) {
           </p>
           {animal.pendingInterests > 0 && (
             <Link
-              to={PANEL_PATHS.requests}
+              to={requestsTo}
               className="mt-1 flex w-fit items-center gap-1 text-[11px] font-bold text-rose-500 hover:underline"
             >
               <FaHeart size={9} />
               {animal.pendingInterests} {animal.pendingInterests === 1 ? 'pedido aguardando resposta' : 'pedidos aguardando resposta'}
             </Link>
           )}
+          {details}
         </div>
       </div>
 
@@ -62,7 +73,7 @@ function AnimalRow({ animal, pendingStatus, onChangeStatus, onMarkAdopted }) {
         <div className="flex shrink-0 flex-wrap gap-2">
           {animal.status !== 'ADOPTED' && (
             <Link
-              to={PANEL_PATHS.animalEdit(animal.id)}
+              to={editTo(animal)}
               className={`${ACTION_CLASSES} border-slate-200 text-slate-600 hover:bg-slate-50`}
             >
               <FaPen size={10} />
@@ -106,6 +117,8 @@ function AnimalRow({ animal, pendingStatus, onChangeStatus, onMarkAdopted }) {
             </button>
           )}
 
+          {children}
+
           <Link
             to={`/animais/${animal.id}`}
             className={`${ACTION_CLASSES} border-slate-200 text-slate-500 hover:bg-slate-50`}
@@ -119,4 +132,4 @@ function AnimalRow({ animal, pendingStatus, onChangeStatus, onMarkAdopted }) {
   )
 }
 
-export default AnimalRow
+export default OwnerAnimalRow

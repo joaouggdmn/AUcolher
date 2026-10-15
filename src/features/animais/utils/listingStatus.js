@@ -25,6 +25,11 @@ function isRequestFor(request, animal) {
 function deriveListingStatus(animal, statuses) {
   // Removido pelo admin é definitivo e vale mais que qualquer pedido
   if (animal.status === 'REMOVED') return 'REMOVED'
+  // Voltou para o doador (RETURNED) sem adoção nova: o anúncio fica fora do
+  // ar. A API já devolve o animal INACTIVE; no mock do reabandono ele ainda
+  // vem ADOPTED, e só a tela mostra a volta
+  const returned = statuses.includes('RETURNED') && !statuses.includes('CONCLUDED') && !statuses.includes('REHOMED')
+  if (animal.status === 'ADOPTED' && returned) return 'INACTIVE'
   if (animal.status === 'ADOPTED' || statuses.includes('CONCLUDED')) return 'ADOPTED'
   if (animal.status === 'INACTIVE') return 'INACTIVE'
   return statuses.some((status) => IN_PROGRESS_STATUSES.includes(status)) ? 'IN_PROGRESS' : 'AVAILABLE'
