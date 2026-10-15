@@ -2,11 +2,14 @@ import { Navigate } from 'react-router-dom'
 import PrivateRoute from '../core/guards/PrivateRoute'
 import OngRoute from '../core/guards/OngRoute'
 import AdminRoute from '../core/guards/AdminRoute'
+import PessoaRoute from '../core/guards/PessoaRoute'
 import UserLayout from '../core/components/layout/UserLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 import EditAnimalPage from '../features/animais/pages/EditAnimalPage'
+import MyAnimalsPage from '../features/animais/pages/MyAnimalsPage'
+import { MY_ANIMALS_PATH } from '../features/animais/utils/myAnimalsPaths'
 import ReceivedRequestsPage from '../features/adocao/pages/ReceivedInterestsPage'
 import MyInterestsPage from '../features/adocao/pages/MyInterestsPage'
 import ChatPage from '../features/chat/pages/ChatPage'
@@ -46,7 +49,12 @@ export const protectedRoutes = [
         children: [
           { path: 'animais/criar', element: <CreateAnimalPage /> },
           { path: 'animais/editar/:id', element: <EditAnimalPage /> },
-          { path: 'meus-anuncios', element: <PlaceholderPage title="Meus anuncios" /> },
+          // "Meus anúncios" virou a aba "Anunciados por mim" de Meus animais
+          { path: 'meus-anuncios', element: <Navigate to={MY_ANIMALS_PATH} replace /> },
+          {
+            element: <PessoaRoute />,
+            children: [{ path: 'meus-animais', element: <MyAnimalsPage /> }],
+          },
           { path: 'meus-interesses', element: <MyInterestsPage /> },
           { path: 'favoritos', element: <FavoritosPage /> },
           { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { FiX } from 'react-icons/fi'
-import { FaHeart, FaPaw, FaInbox, FaComments, FaPaperPlane } from 'react-icons/fa6'
+import { FaHeart, FaPaw, FaInbox, FaComments, FaPaperPlane, FaHouseChimney } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 
 // Links principais só aparecem aqui no mobile — no desktop eles já estão
@@ -20,7 +20,7 @@ function formatBadge(count) {
 
 // Ações do dia a dia na plataforma. O menu do avatar ficou só com o que é
 // da conta em si (perfil e sair).
-function PlatformSidebar({ isOpen, onClose, panelLink, totalFavoritos, activeSentCount, pendingCount, unreadChatCount }) {
+function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos, activeSentCount, pendingCount, unreadChatCount }) {
   const closeButtonRef = useRef(null)
 
   const shortcuts = [
@@ -36,6 +36,10 @@ function PlatformSidebar({ isOpen, onClose, panelLink, totalFavoritos, activeSen
       countVariant: 'neutral',
     },
     { label: 'Cadastrar animal', to: '/animais/criar', icon: FaPaw, iconClass: 'text-emerald-600' },
+    // A pessoa gerencia anúncios e adoções em "Meus animais"; a ONG, no painel
+    ...(userType === 'PESSOA'
+      ? [{ label: 'Meus animais', to: '/meus-animais', icon: FaHouseChimney, iconClass: 'text-emerald-600' }]
+      : []),
     {
       label: 'Meus interesses',
       to: '/meus-interesses',
