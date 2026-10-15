@@ -7,6 +7,10 @@ import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../../core/components/ui/Spinner'
 import PillToggleGroup from '../../../../core/components/ui/filters/PillToggleGroup'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
+import ReturnInfo from '../../../adocao/components/ReturnInfo'
+import OwnerReturnButton from '../../../adocao/components/returns/OwnerReturnButton'
+import OwnerReturnDialogs from '../../../adocao/components/returns/OwnerReturnDialogs'
+import { RETURN_STATUSES, ownerReturnRequestFor } from '../../../adocao/utils/requestStatus'
 import { useChangeAnimalStatus, useMyAnimals } from '../../hooks/useAnimais'
 import { LISTING_STATUS_META, withAdoptionStatus } from '../../utils/listingStatus'
 import OwnerAnimalRow from '../owner/OwnerAnimalRow'
@@ -21,13 +25,15 @@ const SUCCESS_MESSAGES = {
 
 // "Meus animais" → Anunciados por mim: os anúncios da pessoa em qualquer
 // status, com as mesmas ações do painel da ONG (editar, tirar do ar,
-// reativar, marcar como adotado). `onNotify` mostra o aviso de sucesso
+// reativar, marcar como adotado) e, nos adotados, o "Animal retornado".
+// `onNotify` mostra o aviso de sucesso
 function ListedAnimalsTab({ onNotify }) {
   const { data: animals = [], isLoading, error, refetch } = useMyAnimals()
   const { requests } = useAdoptionRequests()
   const [statusFilter, setStatusFilter] = useState('')
   const [adoptionCandidate, setAdoptionCandidate] = useState(null)
   const [statusError, setStatusError] = useState(null)
+  const [returningRequest, setReturningRequest] = useState(null)
   const { mutate: changeStatus, isPending, variables } = useChangeAnimalStatus()
 
   const handleChangeStatus = (animal, status) => {
@@ -94,18 +100,39 @@ function ListedAnimalsTab({ onNotify }) {
         <p className="py-8 text-center text-sm text-slate-400">Nenhum anúncio com esse status.</p>
       ) : (
         <ul className="flex flex-col gap-3">
-          {visible.map((animal) => (
-            <OwnerAnimalRow
-              key={animal.id}
-              animal={animal}
-              editTo={(row) => `/animais/editar/${row.id}`}
-              requestsTo="/interesses-recebidos"
-              pendingStatus={isPending && variables?.id === animal.id ? variables.status : null}
-              onChangeStatus={handleChangeStatus}
-              onMarkAdopted={setAdoptionCandidate}
-            />
-          ))}
+          {visible.map((animal) => {
+            const adoption = ownerReturnRequestFor(animal, requests)
+            return (
+              <OwnerAnimalRow
+                key={animal.id}
+                animal={animal}
+                editTo={(row) => `/animais/editar/${row.id}`}
+                requestsTo="/interesses-recebidos"
+                pendingStatus={isPending && variables?.id === animal.id ? variables.status : null}
+                onChangeStatus={handleChangeStatus}
+                onMarkAdopted={setAdoptionCandidate}
+                details={
+                  adoption && RETURN_STATUSES.includes(adoption.status) ? (
+                    <div className="mt-2">
+                      <ReturnInfo request={adoption} viewer="owner" />
+                    </div>
+                  ) : null
+                }
+              >
+                {adoption && <OwnerReturnButton request={adoption} onOpen={setReturningRequest} />}
+              </OwnerAnimalRow>
+            )
+          })}
         </ul>
+      )}
+
+      {returningRequest && (
+        <OwnerReturnDialogs
+          request={returningRequest}
+          editTo={(animalId) => `/animais/editar/${animalId}`}
+          onNotify={onNotify}
+          onClose={() => setReturningRequest(null)}
+        />
       )}
 
       {adoptionCandidate && (

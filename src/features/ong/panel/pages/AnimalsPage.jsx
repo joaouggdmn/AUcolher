@@ -11,6 +11,11 @@ import ChartCard from '../../../../core/components/charts/ChartCard'
 import PanelPage from '../../../../core/components/panel/PanelPage'
 import SearchBar from '../../../animais/components/SearchBar'
 import OwnerAnimalRow from '../../../animais/components/owner/OwnerAnimalRow'
+import { useAdoptionRequests } from '../../../../core/context/AdoptionRequestContext'
+import ReturnInfo from '../../../adocao/components/ReturnInfo'
+import OwnerReturnButton from '../../../adocao/components/returns/OwnerReturnButton'
+import OwnerReturnDialogs from '../../../adocao/components/returns/OwnerReturnDialogs'
+import { RETURN_STATUSES, ownerReturnRequestFor } from '../../../adocao/utils/requestStatus'
 import { useChangeAnimalStatus } from '../../../animais/hooks/useAnimais'
 import { LISTING_STATUS_META } from '../../../animais/utils/listingStatus'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
@@ -32,6 +37,9 @@ function AnimalsPage() {
   const [search, setSearch] = useState('')
   const [adoptionCandidate, setAdoptionCandidate] = useState(null)
   const [statusError, setStatusError] = useState(null)
+  // "Animal retornado": a adoção cujo retorno a ONG está registrando
+  const [returningRequest, setReturningRequest] = useState(null)
+  const { requests } = useAdoptionRequests()
   const { mutate: changeStatus, isPending, variables } = useChangeAnimalStatus()
 
   const handleChangeStatus = (animal, status) => {
@@ -106,17 +114,29 @@ function AnimalsPage() {
             <p className="py-8 text-center text-sm text-slate-400">Nenhum animal encontrado com esses filtros.</p>
           ) : (
             <ul className="flex flex-col gap-3">
-              {visible.map((animal) => (
-                <OwnerAnimalRow
-                  key={animal.id}
-                  animal={animal}
-                  editTo={(row) => PANEL_PATHS.animalEdit(row.id)}
-                  requestsTo={PANEL_PATHS.requests}
-                  pendingStatus={isPending && variables?.id === animal.id ? variables.status : null}
-                  onChangeStatus={handleChangeStatus}
-                  onMarkAdopted={setAdoptionCandidate}
-                />
-              ))}
+              {visible.map((animal) => {
+                const adoption = ownerReturnRequestFor(animal, requests)
+                return (
+                  <OwnerAnimalRow
+                    key={animal.id}
+                    animal={animal}
+                    editTo={(row) => PANEL_PATHS.animalEdit(row.id)}
+                    requestsTo={PANEL_PATHS.requests}
+                    pendingStatus={isPending && variables?.id === animal.id ? variables.status : null}
+                    onChangeStatus={handleChangeStatus}
+                    onMarkAdopted={setAdoptionCandidate}
+                    details={
+                      adoption && RETURN_STATUSES.includes(adoption.status) ? (
+                        <div className="mt-2">
+                          <ReturnInfo request={adoption} viewer="owner" />
+                        </div>
+                      ) : null
+                    }
+                  >
+                    {adoption && <OwnerReturnButton request={adoption} onOpen={setReturningRequest} />}
+                  </OwnerAnimalRow>
+                )
+              })}
             </ul>
           )}
         </div>
@@ -133,6 +153,15 @@ function AnimalsPage() {
       actions={[{ to: PANEL_PATHS.animalNew, label: 'Cadastrar animal', icon: FaPlus }]}
     >
       {content}
+
+      {returningRequest && (
+        <OwnerReturnDialogs
+          request={returningRequest}
+          editTo={PANEL_PATHS.animalEdit}
+          onNotify={notify}
+          onClose={() => setReturningRequest(null)}
+        />
+      )}
 
       {adoptionCandidate && (
         <ConfirmDialog
