@@ -116,6 +116,7 @@ function LoginPage() {
         <div className="flex justify-end">
           <Link
             to="/recuperar-senha"
+            state={{ email: formData.email }}
             className="text-sm font-semibold text-emerald-700 transition-colors hover:text-emerald-900"
           >
             Esqueci minha senha
