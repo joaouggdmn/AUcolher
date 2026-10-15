@@ -22,6 +22,7 @@ import AdminStatTiles from '../overview/AdminStatTiles'
 import NgoRankingCard from '../overview/NgoRankingCard'
 import PendingReportsNotice from '../overview/PendingReportsNotice'
 import PrintReportHeader from '../overview/PrintReportHeader'
+import ReturnRateCard from '../overview/ReturnRateCard'
 
 function plural(count, singular, pluralForm) {
   return count === 1 ? singular : pluralForm
@@ -151,6 +152,8 @@ function OverviewContent({ stats }) {
 
         <NgoRankingCard ranking={stats.ngoRanking} />
       </div>
+
+      <ReturnRateCard returns={stats.returns} />
 
       <AdminRecentActivity items={stats.recentActivity} />
     </div>
