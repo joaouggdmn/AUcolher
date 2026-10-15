@@ -17,6 +17,9 @@ import Spinner from '../../../core/components/ui/Spinner'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
 import VerifiedBadge from '../../ong/components/VerifiedBadge'
+import ModerationAction from '../../admin/components/ModerationAction'
+import { useRemoveEvent } from '../../admin/hooks/useAdmin'
+import { removeEventDescription } from '../../admin/utils/moderationText'
 import AttendanceButton from '../components/AttendanceButton'
 import CalendarDateBadge from '../components/CalendarDateBadge'
 import DeleteEventDialog from '../components/DeleteEventDialog'
@@ -82,6 +85,7 @@ function EventDetailPage() {
   const { user } = useAuth()
   const { data: event, isLoading, isError, error, refetch } = useEvent(id)
   const navigate = useNavigate()
+  const removeEvent = useRemoveEvent()
   const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   // "Evento publicado!" / "Evento atualizado!" vindo do formulário
@@ -116,6 +120,7 @@ function EventDetailPage() {
   const summary = getAttendanceSummary(event)
   const address = formatEventAddress(event.location)
   const isOwner = user != null && String(user.id) === String(event.organizer.id)
+  const isAdmin = user?.userType === 'ADMIN'
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
@@ -192,6 +197,24 @@ function EventDetailPage() {
               <AttendanceButton event={event} size="lg" className="flex-1" />
               <SaveToCalendarMenu event={event} isOpen={isCalendarMenuOpen} onToggle={setIsCalendarMenuOpen} />
             </div>
+
+            {/* O admin modera, mas não participa: no lugar da presença, a
+                remoção. O evento removido sai do site, então volta à lista */}
+            {isAdmin && (
+              <ModerationAction
+                icon={FaTrashCan}
+                label="Remover evento"
+                dialog={{
+                  title: 'Remover o evento?',
+                  description: removeEventDescription(event.title, event.confirmedCount),
+                  confirmLabel: 'Remover evento',
+                  processingLabel: 'Removendo...',
+                }}
+                mutation={removeEvent}
+                variables={{ id: event.id }}
+                onDone={() => navigate('/eventos')}
+              />
+            )}
 
             {isOwner && !event.isPast && (
               <div className="grid grid-cols-2 gap-2">
