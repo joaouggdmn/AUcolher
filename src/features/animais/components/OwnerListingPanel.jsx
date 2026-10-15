@@ -128,14 +128,14 @@ function OwnerListingPanel({ animal, onStatusChanged }) {
         </div>
       )}
 
-      {/* Edição existe só no painel da ONG; pessoa física ainda não edita anúncios */}
-      {user?.userType === 'ONG' && animal.status !== 'ADOPTED' && (
+      {/* A ONG edita pelo painel; a pessoa, pela página de edição de "Meus animais" */}
+      {animal.status !== 'ADOPTED' && (
         <Link
-          to={PANEL_PATHS.animalEdit(animal.id)}
+          to={user?.userType === 'ONG' ? PANEL_PATHS.animalEdit(animal.id) : `/animais/editar/${animal.id}`}
           className="mt-3 flex w-fit items-center gap-1.5 text-sm font-bold text-emerald-700 hover:underline"
         >
           <FaPen size={11} />
-          Editar no painel da ONG
+          {user?.userType === 'ONG' ? 'Editar no painel da ONG' : 'Editar anúncio'}
         </Link>
       )}
 
