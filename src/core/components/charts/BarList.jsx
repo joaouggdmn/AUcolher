@@ -3,9 +3,10 @@
 // Uma grade só para a lista inteira: a coluna dos rótulos tem a largura do
 // maior, e todas as barras partem da mesma linha. A barra para 4.5rem antes
 // do fim, que é o espaço do valor da maior. No celular o rótulo sobe para
-// cima da barra, senão ela some de tão curta
-function BarList({ items }) {
-  const max = Math.max(...items.map((item) => item.value), 1)
+// cima da barra, senão ela some de tão curta. `scaleMax` fixa o fim da escala
+// (ex.: 100 para porcentagens); sem ele, a maior barra ocupa tudo
+function BarList({ items, scaleMax }) {
+  const max = scaleMax ?? Math.max(...items.map((item) => item.value), 1)
 
   return (
     <ul className="grid grid-cols-1 items-center gap-x-3 gap-y-1 sm:grid-cols-[max-content_1fr] sm:gap-y-3">
