@@ -82,10 +82,33 @@ export const RETURN_REASON_LABELS = Object.fromEntries(RETURN_REASON_OPTIONS.map
 
 export const RETURN_NOTE_MAX_LENGTH = 500
 
+// O formulário do retorno/repasse só libera o envio com motivo e, no
+// "Outro", com a descrição
+export function isReturnReasonValid({ reason, note }) {
+  if (!reason) return false
+  return reason !== 'OTHER' || note.trim().length > 0
+}
+
 // Adoção feita por ONG é resgate: não tem retorno nem repasse e fica fora
 // da taxa de reabandono (regras §3.3)
 export function canHaveReturn(request) {
   return !request.adopter?.isOng
+}
+
+// A adoção mais recente de um animal do dono, quando ela admite retorno: é
+// por ela que o doador registra (ou corrige) o "Animal retornado"
+export function ownerReturnRequestFor(animal, requests) {
+  return (
+    requests
+      .filter(
+        (request) =>
+          String(request.animalId) === String(animal.id) &&
+          String(request.ownerId) === String(animal.ownerId) &&
+          ADOPTION_HAPPENED_STATUSES.includes(request.status) &&
+          canHaveReturn(request)
+      )
+      .sort((a, b) => (b.concludedAt ?? '').localeCompare(a.concludedAt ?? ''))[0] ?? null
+  )
 }
 
 // Por que um pedido enviado foi cancelado. ACCOUNT_BANNED e LISTING_REMOVED
