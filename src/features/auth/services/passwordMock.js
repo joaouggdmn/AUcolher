@@ -1,25 +1,18 @@
-import axios from 'axios'
-import { API_BASE_URL } from '../../../core/services/api'
-import { createMockStore, getMockSession, mockDelay, mockHttpError, nextId } from '../../../core/services/mock/mockStore'
-import { MOCK_SENHA_STORE_KEY, TOKEN_STORAGE_KEY, TOKEN_TYPE_STORAGE_KEY } from '../../../core/utils/storageKeys'
+import { createMockStore, mockDelay, mockHttpError, nextId } from '../../../core/services/mock/mockStore'
+import { MOCK_SENHA_STORE_KEY } from '../../../core/utils/storageKeys'
 import {
-  CURRENT_PASSWORD_REQUIRED_MESSAGE,
   INVALID_EMAIL_MESSAGE,
   INVALID_RESET_LINK_MESSAGE,
   PASSWORD_MIN_LENGTH,
   PASSWORD_TOO_SHORT_MESSAGE,
-  SAME_PASSWORD_MESSAGE,
-  WRONG_CURRENT_PASSWORD_MESSAGE,
 } from '../utils/passwordRules'
 
 // 🔴 "Servidor falso" da senha (USE_MOCK_SENHA), até as rotas da migração 010
-// existirem (docs/entrega-final/api-senha.md).
-// - Trocar senha: a senha atual é conferida de verdade no POST /auth/login, e
-//   o token que ele devolve faz o papel do "token novo". A nova senha NÃO é
-//   gravada: o login continua com a senha de antes.
-// - Esqueci/redefinir: os links ficam aqui, com as regras do contrato (só o
-//   hash, 30 min, uso único, um por minuto). O link que iria por e-mail volta
-//   para a tela mostrar. Limitação: o mock não sabe quais e-mails têm conta
+// existirem (docs/entrega-final/api-senha.md). Os links de "Esqueci minha
+// senha" (também pedidos pelo botão "Alterar senha" de Minha conta) ficam
+// aqui, com as regras do contrato (só o hash, 30 min, uso único, um por
+// minuto). O link que iria por e-mail volta para a tela mostrar. A nova senha
+// NÃO é gravada, e o mock não sabe quais e-mails têm conta
 const store = createMockStore({
   key: MOCK_SENHA_STORE_KEY,
   version: 1,
@@ -29,45 +22,6 @@ const store = createMockStore({
 const RESET_TOKEN_TTL_MS = 30 * 60 * 1000
 const RESET_RATE_LIMIT_MS = 60 * 1000
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-// Sem os interceptors do `api`: senha atual errada responde 401, e o
-// interceptor deslogaria a pessoa no meio da troca
-const plainApi = axios.create({
-  baseURL: API_BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
-})
-
-// ---------- trocar senha ----------
-
-export async function changePassword({ currentPassword, newPassword }) {
-  const session = getMockSession()
-  if (!session) throw mockHttpError(401, 'Sessão expirada. Entre novamente.')
-
-  const hasPassword = session.hasPassword ?? true
-  if (hasPassword && !currentPassword) throw mockHttpError(400, CURRENT_PASSWORD_REQUIRED_MESSAGE)
-  if ((newPassword ?? '').length < PASSWORD_MIN_LENGTH) throw mockHttpError(400, PASSWORD_TOO_SHORT_MESSAGE)
-  if (hasPassword && newPassword === currentPassword) throw mockHttpError(400, SAME_PASSWORD_MESSAGE)
-
-  // Conta sem senha (Google) não tem o que conferir: segue com o token atual
-  if (!hasPassword) {
-    await mockDelay()
-    return {
-      token: localStorage.getItem(TOKEN_STORAGE_KEY),
-      type: localStorage.getItem(TOKEN_TYPE_STORAGE_KEY) ?? 'Bearer',
-      user: null,
-    }
-  }
-
-  try {
-    const { data } = await plainApi.post('/auth/login', { email: session.email, password: currentPassword })
-    return data
-  } catch (error) {
-    if (error.response?.status === 401) throw mockHttpError(400, WRONG_CURRENT_PASSWORD_MESSAGE)
-    throw error
-  }
-}
-
-// ---------- esqueci / redefinir ----------
 
 function randomToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(32))

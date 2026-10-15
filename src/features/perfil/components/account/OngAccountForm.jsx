@@ -22,6 +22,7 @@ import { useAccountForm } from '../../hooks/useAccountForm'
 import { FOUNDED_YEAR_FIELD_ID, buildOngForm, toOngUpdates } from '../../utils/accountForm'
 import ProfileCompletionBar from '../ProfileCompletionBar'
 import ProfileSection from '../ProfileSection'
+import AccessSection from './AccessSection'
 import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
 import TextAreaField from './TextAreaField'
@@ -301,14 +302,7 @@ function OngAccountForm() {
             description="Só a instituição vê. Usados para entrar na plataforma."
           />
 
-          <ProfileSection icon={FaEnvelope} title="Acesso">
-            <FormField
-              label="E-mail de login"
-              value={user?.email ?? ''}
-              disabled
-              hint="Não aparece no perfil público e não pode ser alterado por aqui."
-            />
-          </ProfileSection>
+          <AccessSection emailHint="Não aparece no perfil público e não pode ser alterado por aqui." />
         </AccountFormShell>
       </div>
     </>

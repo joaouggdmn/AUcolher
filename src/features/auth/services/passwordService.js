@@ -1,26 +1,11 @@
 import api from '../../../core/services/api'
-import { toFrontendProfile } from '../../../core/services/authService'
 import { USE_MOCK_SENHA } from '../../../core/utils/constants'
 import * as passwordMock from './passwordMock'
 
-// Trocar e recuperar senha (docs/entrega-final/api-senha.md §3). Com
-// USE_MOCK_SENHA, quem responde é o passwordMock
-
-// PUT /users/me/password → AuthResponseDTO: o token NOVO (os anteriores, de
-// todas as sessões, deixam de valer) e o usuário. `currentPassword` é
-// ignorado em conta sem senha (Google)
-export async function changePassword({ currentPassword, newPassword }) {
-  const payload = { currentPassword: currentPassword || null, newPassword }
-  const data = USE_MOCK_SENHA
-    ? await passwordMock.changePassword(payload)
-    : (await api.put('/users/me/password', payload)).data
-
-  return {
-    token: data.token,
-    tokenType: data.type ?? 'Bearer',
-    user: data.user ? toFrontendProfile(data.user) : null,
-  }
-}
+// Recuperar senha (docs/entrega-final/api-senha.md §3). Trocar a senha logado
+// também passa por aqui: "Alterar senha" de Minha conta pede o mesmo link de
+// redefinição para o e-mail da conta. Com USE_MOCK_SENHA, quem responde é o
+// passwordMock
 
 // A resposta é sempre a mesma, exista conta ou não. No mock, volta também o
 // link que iria por e-mail ({ testLink, throttled }); com a API, null

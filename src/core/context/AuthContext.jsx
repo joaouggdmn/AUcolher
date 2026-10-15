@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { loginRequest, registerRequest } from '../services/authService'
-import { changePassword as changePasswordRequest } from '../../features/auth/services/passwordService'
 import { isAccountBanned, subscribeModeration } from '../../features/admin/services/moderationMock'
 import {
   getMatchProfile,
@@ -172,16 +171,6 @@ export function AuthProvider({ children }) {
     })
   }
 
-  // A troca derruba todos os tokens emitidos antes, inclusive o desta aba: o
-  // token novo da resposta entra no lugar, senão a próxima requisição dá 401.
-  // Conta do Google que definiu senha passa a ter senha
-  async function changePassword({ currentPassword, newPassword }) {
-    const { token, tokenType, user: updatedUser } = await changePasswordRequest({ currentPassword, newPassword })
-    localStorage.setItem(TOKEN_STORAGE_KEY, token)
-    localStorage.setItem(TOKEN_TYPE_STORAGE_KEY, tokenType)
-    updateProfile({ ...updatedUser, hasPassword: true })
-  }
-
   // Grava as respostas do quiz no banco e atualiza a sessão com o que voltou.
   // Se a API recusar, o erro sobe para quem chamou (o quiz mostra a mensagem)
   async function saveMatchProfile(answers) {
@@ -207,7 +196,6 @@ export function AuthProvider({ children }) {
         logout,
         updateProfile,
         saveMatchProfile,
-        changePassword,
       }}
     >
       {children}
