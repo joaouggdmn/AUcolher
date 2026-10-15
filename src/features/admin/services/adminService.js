@@ -1,15 +1,22 @@
-import { USE_MOCK_ADMIN } from '../../../core/utils/constants'
+import { USE_MOCK_ADMIN, USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
 import { toFrontendAnimal } from '../../animais/services/animalService'
 import { toFrontendReport } from '../../denuncias/services/denunciaService'
 import { toFrontendCampaign } from '../../doacoes/services/doacaoService'
 import { toFrontendEvent } from '../../eventos/services/eventoService'
 import * as adminApi from './adminApi'
 import * as adminMock from './adminMock'
+import { withMockCampaignStats } from './campaignAdminStats'
 
 // Fachada do painel do admin: as telas só conhecem estas funções e o modelo
 // do frontend. Animais, campanhas e eventos usam os mesmos mappers das
 // outras telas; contas e números ganham os seus aqui
 const adapter = USE_MOCK_ADMIN ? adminMock : adminApi
+
+// 🔴 Campanhas e doações ainda não estão no backend: com a API real do admin
+// e VITE_USE_MOCK_CAMPANHAS ligada, a lista, a remoção e os blocos de
+// campanha da Visão geral continuam vindo do mock
+const CAMPAIGNS_FROM_MOCK = !USE_MOCK_ADMIN && USE_MOCK_CAMPANHAS
+const campaignAdapter = USE_MOCK_ADMIN || USE_MOCK_CAMPANHAS ? adminMock : adminApi
 
 const FRONTEND_USER_TYPES = { NGO: 'ONG', PERSON: 'PESSOA', ADMIN: 'ADMIN' }
 
@@ -81,7 +88,8 @@ export function toFrontendAdminUser(dto) {
 // ---------- operações ----------
 
 export async function getAdminStats() {
-  return toFrontendAdminStats(await adapter.getStats())
+  const dto = await adapter.getStats()
+  return toFrontendAdminStats(CAMPAIGNS_FROM_MOCK ? withMockCampaignStats(dto) : dto)
 }
 
 export async function listAdminUsers() {
@@ -98,7 +106,7 @@ export async function listAdminAnimals() {
 
 // `isRemoved`: excluída (pela ONG ou, com `isRemovedByModeration`, pelo admin)
 export async function listAdminCampaigns() {
-  const dtos = await adapter.listCampaigns()
+  const dtos = await campaignAdapter.listCampaigns()
   return dtos.map((dto) => ({
     ...toFrontendCampaign(dto),
     isRemoved: Boolean(dto.removed),
@@ -142,7 +150,7 @@ export function removeAdminAnimal(animalId) {
 }
 
 export function removeAdminCampaign(campaignId) {
-  return adapter.removeCampaign(campaignId)
+  return campaignAdapter.removeCampaign(campaignId)
 }
 
 export function removeAdminEvent(eventId) {
