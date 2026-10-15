@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import {
   FaBan,
   FaPaw,
   FaRotateLeft,
   FaStar,
   FaEye,
+  FaPen,
   FaUserPen,
   FaUserSlash,
   FaCalendarDays,
@@ -19,6 +20,7 @@ import ModerationAction from '../../admin/components/ModerationAction'
 import { useSetUserStatus } from '../../admin/hooks/useAdmin'
 import { useModeration } from '../../admin/hooks/useModeration'
 import { banDescription, reactivateDescription } from '../../admin/utils/moderationText'
+import { ADMIN_PATHS } from '../../admin/panel/adminPaths'
 import AnimalCard from '../../animais/components/AnimalCard'
 import { useUserAnimals } from '../../animais/hooks/useAnimais'
 import { useUserReviews } from '../../avaliacoes/hooks/useUserReviews'
@@ -35,11 +37,13 @@ import ReportButton from '../../denuncias/components/ReportButton'
 
 function PublicProfilePage() {
   const { id } = useParams()
+  const location = useLocation()
   const { user } = useAuth()
   const { profile, isLoading } = usePublicProfile(id)
   const { isAccountBanned } = useModeration()
   const setUserStatus = useSetUserStatus()
-  const [successMessage, setSuccessMessage] = useState(null)
+  // "Conta atualizada" vindo da edição pela moderação
+  const [successMessage, setSuccessMessage] = useState(location.state?.flash ?? null)
   const closeToast = useCallback(() => setSuccessMessage(null), [])
   const reviewsData = useUserReviews(id)
   // Antes dos returns antecipados (regra dos hooks); só busca quando o perfil
@@ -158,31 +162,41 @@ function PublicProfilePage() {
           stats={stats}
           action={
             isAdmin ? (
-              // O admin não denuncia: ele modera direto daqui
-              <ModerationAction
-                appearance="pill"
-                icon={isSuspended ? FaRotateLeft : FaBan}
-                label={isSuspended ? 'Reativar conta' : 'Banir conta'}
-                variant={isSuspended ? 'default' : 'danger'}
-                dialog={
-                  isSuspended
-                    ? {
-                        title: `Reativar ${profile.name}?`,
-                        description: reactivateDescription(profile.name),
-                        confirmLabel: 'Reativar conta',
-                        processingLabel: 'Reativando...',
-                      }
-                    : {
-                        title: `Banir ${profile.name}?`,
-                        description: banDescription(profile.name, profile.userType),
-                        confirmLabel: 'Banir conta',
-                        processingLabel: 'Banindo...',
-                      }
-                }
-                mutation={setUserStatus}
-                variables={{ user: { id: profile.id, name: profile.name }, active: isSuspended }}
-                onDone={() => setSuccessMessage(isSuspended ? 'Conta reativada.' : 'Conta banida.')}
-              />
+              // O admin não denuncia: ele modera direto daqui (editar e banir)
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  to={ADMIN_PATHS.userEdit(profile.id)}
+                  state={{ from: location.pathname }}
+                  className="flex h-10 items-center gap-2 rounded-full border border-emerald-200 px-4 text-xs font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+                >
+                  <FaPen size={10} />
+                  Editar conta
+                </Link>
+                <ModerationAction
+                  appearance="pill"
+                  icon={isSuspended ? FaRotateLeft : FaBan}
+                  label={isSuspended ? 'Reativar conta' : 'Banir conta'}
+                  variant={isSuspended ? 'default' : 'danger'}
+                  dialog={
+                    isSuspended
+                      ? {
+                          title: `Reativar ${profile.name}?`,
+                          description: reactivateDescription(profile.name),
+                          confirmLabel: 'Reativar conta',
+                          processingLabel: 'Reativando...',
+                        }
+                      : {
+                          title: `Banir ${profile.name}?`,
+                          description: banDescription(profile.name, profile.userType),
+                          confirmLabel: 'Banir conta',
+                          processingLabel: 'Banindo...',
+                        }
+                  }
+                  mutation={setUserStatus}
+                  variables={{ user: { id: profile.id, name: profile.name }, active: isSuspended }}
+                  onDone={() => setSuccessMessage(isSuspended ? 'Conta reativada.' : 'Conta banida.')}
+                />
+              </div>
             ) : (
               <ReportButton targetType="USER" target={profile} variant="pill" />
             )

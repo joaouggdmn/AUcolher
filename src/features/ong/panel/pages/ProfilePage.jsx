@@ -2,6 +2,7 @@ import { FaEye } from 'react-icons/fa6'
 import { useAuth } from '../../../../core/context/AuthContext'
 import PanelPage from '../../../../core/components/panel/PanelPage'
 import OngAccountForm from '../../../perfil/components/account/OngAccountForm'
+import ModeratedNote from '../../../../core/components/ui/ModeratedNote'
 
 // O mesmo formulário de "Minha conta": com alterações pendentes, a barra de
 // salvar fica fixa no rodapé e sair do painel pergunta antes
@@ -17,6 +18,8 @@ function ProfilePage() {
     >
       {/* pb-24: espaço para a barra fixa de "alterações não salvas" */}
       <div className="max-w-4xl pb-24">
+        {/* A moderação editou o perfil: a ONG fica sabendo aqui */}
+        <ModeratedNote moderatedAt={user?.moderatedAt} size="md" className="mb-6" />
         {/* key: outra conta logando no mesmo navegador remonta o form com os dados dela */}
         <OngAccountForm key={user?.id} />
       </div>

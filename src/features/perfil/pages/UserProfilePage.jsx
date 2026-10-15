@@ -6,6 +6,7 @@ import { FOUNDED_YEAR_FIELD_ID } from '../utils/accountForm'
 import PersonAccountForm from '../components/account/PersonAccountForm'
 import OngAccountForm from '../components/account/OngAccountForm'
 import AccountActivity from '../components/activity/AccountActivity'
+import ModeratedNote from '../../../core/components/ui/ModeratedNote'
 
 const TAG_CLASSES = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide'
 
@@ -93,6 +94,9 @@ function UserProfilePage() {
           </Link>
         )}
       </header>
+
+      {/* A moderação editou o perfil: o dono fica sabendo aqui */}
+      <ModeratedNote moderatedAt={user?.moderatedAt} size="md" className="mb-6" />
 
       {/* key: outra conta logando no mesmo navegador remonta o form com os dados dela */}
       <AccountForm key={user?.id} />

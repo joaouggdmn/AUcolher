@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { FaEye, FaHeart, FaPaw, FaShieldHalved, FaTrashCan } from 'react-icons/fa6'
+import { FaEye, FaHeart, FaPaw, FaPen, FaShieldHalved, FaTrashCan } from 'react-icons/fa6'
 import { SPECIES_OPTIONS } from '../../animais/components/filters/filterOptions'
 import { LISTING_STATUS_META } from '../../animais/utils/listingStatus'
+import { ADMIN_PATHS } from '../panel/adminPaths'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
@@ -67,21 +68,26 @@ function AdminAnimalRow({ animal, onRemove }) {
         </div>
       </div>
 
-      {/* Fora do ar pelo dono dá 404; de conta banida o admin ainda abre */}
-      {(animal.listingStatus !== 'INACTIVE' || animal.ownerIsBanned) && (
-        <div className="flex shrink-0 flex-wrap gap-2">
-          <Link to={`/animais/${animal.id}`} className={ACTION_CLASSES}>
-            <FaEye size={11} />
-            Ver anúncio
+      {/* O admin abre qualquer anúncio (fora do ar, removido, de conta banida)
+          e edita todos, menos o removido */}
+      <div className="flex shrink-0 flex-wrap gap-2">
+        <Link to={`/animais/${animal.id}`} className={ACTION_CLASSES}>
+          <FaEye size={11} />
+          Ver anúncio
+        </Link>
+        {animal.listingStatus !== 'REMOVED' && (
+          <Link to={ADMIN_PATHS.animalEdit(animal.id)} className={ACTION_CLASSES}>
+            <FaPen size={10} />
+            Editar
           </Link>
-          {canRemove && (
-            <button type="button" onClick={() => onRemove(animal)} className={REMOVE_CLASSES}>
-              <FaTrashCan size={11} />
-              Remover
-            </button>
-          )}
-        </div>
-      )}
+        )}
+        {canRemove && (
+          <button type="button" onClick={() => onRemove(animal)} className={REMOVE_CLASSES}>
+            <FaTrashCan size={11} />
+            Remover
+          </button>
+        )}
+      </div>
     </li>
   )
 }
