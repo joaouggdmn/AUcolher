@@ -64,7 +64,6 @@ export function buildOngForm(user) {
     name: user?.name ?? '',
     photoUrl: user?.photoUrl ?? null,
     bio: user?.bio ?? '',
-    institutionalEmail: user?.institutionalEmail ?? '',
     // Texto, como todo input controlado — volta a ser número no toOngUpdates
     foundedYear: user?.foundedYear != null ? String(user.foundedYear) : '',
     // Redes editadas como @usuario, igual ao cadastro; o perfil guarda o link
@@ -92,7 +91,6 @@ export function toOngUpdates(form) {
     name: form.name.trim(),
     photoUrl: form.photoUrl,
     bio: form.bio.trim(),
-    institutionalEmail: form.institutionalEmail.trim() || null,
     foundedYear: parseFoundedYear(form.foundedYear),
     socialLinks: {
       instagram: instagramUrl(form.instagram),
@@ -133,7 +131,6 @@ export function toApiPayload(updates, userType) {
 
   return {
     ...basePayload,
-    institutionalEmail: updates.institutionalEmail,
     foundedYear: updates.foundedYear ?? null,
     instagram: sanitizeInstagramHandle(updates.socialLinks.instagram ?? '') || null,
     twitter: sanitizeXHandle(updates.socialLinks.x ?? '') || null,

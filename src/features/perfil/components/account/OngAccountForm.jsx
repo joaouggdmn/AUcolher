@@ -223,18 +223,13 @@ function OngAccountForm() {
 
           <ProfileSection icon={FaShareNodes} title="Contato e redes sociais" description="Canais públicos para falar com a instituição">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <AuthInput
-                  id="institutionalEmail"
-                  label="E-mail institucional"
-                  type="email"
-                  icon={FaEnvelope}
-                  placeholder="contato@suaong.org"
-                  value={formData.institutionalEmail}
-                  onChange={(e) => setField('institutionalEmail', e.target.value)}
-                  hint="Opcional. Pode ser diferente do e-mail de login, que continua privado."
-                />
-              </div>
+              <p className="flex items-start gap-2 rounded-xl bg-emerald-50/60 px-3.5 py-2.5 text-xs text-emerald-900 sm:col-span-2">
+                <FaEnvelope size={12} className="mt-0.5 shrink-0 text-emerald-600" />
+                <span>
+                  O e-mail da conta, <strong className="break-all">{user?.email}</strong>, aparece no perfil público como
+                  contato da instituição.
+                </span>
+              </p>
               <AuthInput
                 id="instagram"
                 label="Instagram"
@@ -292,10 +287,10 @@ function OngAccountForm() {
           <AccountGroupHeading
             visibility="private"
             title="Dados da conta"
-            description="Só a instituição vê. Usados para entrar na plataforma."
+            description="Só a instituição vê. Usados para entrar na plataforma — o e-mail também é o contato público."
           />
 
-          <AccessSection emailHint="Não aparece no perfil público e não pode ser alterado por aqui." />
+          <AccessSection emailHint="Aparece no perfil público como contato. Não pode ser alterado por aqui." />
         </AccountFormShell>
       </div>
     </>

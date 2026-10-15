@@ -19,7 +19,7 @@ function buildMapsUrl(address) {
 function OngDetails({ profile }) {
   const { address, visitingHours = [], team = [] } = profile
   const hasVisitInfo = Boolean(address) || visitingHours.length > 0
-  const hasContactInfo = Boolean(profile.institutionalEmail || profile.cnpj)
+  const hasContactInfo = Boolean(profile.email || profile.cnpj)
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -101,14 +101,14 @@ function OngDetails({ profile }) {
         {hasContactInfo && (
           <ProfileSection icon={FaEnvelope} title="Contato">
             <ul className="flex flex-col gap-3 text-sm">
-              {profile.institutionalEmail && (
+              {profile.email && (
                 <li className="flex items-center gap-2.5">
                   <FaEnvelope size={12} className="shrink-0 text-emerald-600" />
                   <a
-                    href={`mailto:${profile.institutionalEmail}`}
+                    href={`mailto:${profile.email}`}
                     className="truncate font-semibold text-emerald-800 hover:text-emerald-950 hover:underline"
                   >
-                    {profile.institutionalEmail}
+                    {profile.email}
                   </a>
                 </li>
               )}

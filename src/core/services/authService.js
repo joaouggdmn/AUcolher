@@ -87,7 +87,6 @@ export function toFrontendProfile(backendUser) {
     hasPassword: backendUser.hasPassword ?? true,
     // Perfil de ONG — socialLinks/address no formato do perfil público
     cnpj: backendUser.cnpj ?? null,
-    institutionalEmail: backendUser.institutionalEmail ?? null,
     socialLinks: {
       instagram: instagramUrl(backendUser.instagram),
       x: xUrl(backendUser.twitter),
