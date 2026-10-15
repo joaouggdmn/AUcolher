@@ -27,13 +27,9 @@ import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
 import TextAreaField from './TextAreaField'
 import RowsEditor from './RowsEditor'
+import VisitingHoursEditor from './VisitingHoursEditor'
 
-// Colunas NOT NULL em ong_horarios_visita (dias, horario) e ong_equipe (nome)
-const VISITING_HOURS_FIELDS = [
-  { key: 'days', label: 'Dias', placeholder: 'Ex: Terça a sexta', required: true },
-  { key: 'hours', label: 'Horário', placeholder: 'Ex: 14h às 18h', required: true },
-]
-
+// Coluna NOT NULL em ong_equipe (nome)
 const TEAM_FIELDS = [
   { key: 'name', label: 'Nome', placeholder: 'Ex: Marina Costa', required: true },
   { key: 'role', label: 'Função', placeholder: 'Ex: Coordenadora de adoções' },
@@ -218,12 +214,9 @@ function OngAccountForm() {
                 <FaClock size={13} className="text-emerald-600" />
                 Horário de visitas
               </p>
-              <RowsEditor
-                rows={formData.visitingHours}
-                onChange={(rows) => setField('visitingHours', rows)}
-                fields={VISITING_HOURS_FIELDS}
-                addLabel="Adicionar horário"
-                emptyText="Nenhum horário cadastrado. Se as visitas forem só com agendamento, diga isso aqui."
+              <VisitingHoursEditor
+                value={formData.visitingHours}
+                onChange={(value) => setField('visitingHours', value)}
               />
             </div>
           </ProfileSection>

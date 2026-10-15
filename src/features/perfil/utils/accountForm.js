@@ -6,6 +6,7 @@ import {
   xUrl,
 } from '../../../core/utils/socialLinks'
 import { parseFoundedYear } from '../../../core/utils/foundedYear'
+import { toVisitingHourRows, toVisitingHoursForm } from './visitingHours'
 
 // Cada tipo de conta tem um par de funções:
 //   build*(user)      → campos editáveis do formulário de "Minha conta"
@@ -78,7 +79,8 @@ export function buildOngForm(user) {
       state: user?.state ?? '',
       ...Object.fromEntries(Object.entries(user?.address ?? {}).filter(([, value]) => value != null)),
     },
-    visitingHours: user?.visitingHours ?? [],
+    // Dias marcados + abre/fecha; o texto do banco é montado no toOngUpdates
+    visitingHours: toVisitingHoursForm(user?.visitingHours ?? []),
     team: user?.team ?? [],
   }
 }
@@ -102,7 +104,7 @@ export function toOngUpdates(form) {
     // Cidade/UF da ONG = sede: é o que os anúncios dela usam
     city: address.city,
     state: address.state,
-    visitingHours: cleanRows(form.visitingHours),
+    visitingHours: toVisitingHourRows(form.visitingHours),
     team: cleanRows(form.team),
   }
 }

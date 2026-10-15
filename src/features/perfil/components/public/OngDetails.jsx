@@ -82,8 +82,9 @@ function OngDetails({ profile }) {
 
               {visitingHours.length > 0 && (
                 <ul className="flex flex-col gap-2 border-t border-slate-100 pt-4">
-                  {visitingHours.map((slot) => (
-                    <li key={slot.days} className="flex items-start gap-2.5 text-sm">
+                  {/* Por índice: duas faixas podem ter os mesmos dias (manhã e tarde) */}
+                  {visitingHours.map((slot, index) => (
+                    <li key={index} className="flex items-start gap-2.5 text-sm">
                       <FaClock size={12} className="mt-1 shrink-0 text-emerald-600" />
                       <span>
                         <span className="font-semibold text-emerald-950">{slot.days}</span>
