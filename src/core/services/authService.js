@@ -1,6 +1,7 @@
 import api, { ACCOUNT_SUSPENDED_MESSAGE } from "./api";
 import { mockHttpError } from "./mock/mockStore";
 import { isAccountBanned } from "../../features/admin/services/moderationMock";
+import { isAccountDeleted } from "../../features/perfil/services/accountDeletionMock";
 import { instagramUrl, normalizeFacebookUrl, xUrl } from "../utils/socialLinks";
 import { maskCEP } from "../utils/masks";
 import { parseFoundedYear } from "../utils/foundedYear";
@@ -85,8 +86,9 @@ export function toFrontendProfile(backendUser) {
     bio: backendUser.bio ?? "",
     isVerified: backendUser.isVerified ?? false,
     // Conta do Google sem senha: "Criar senha" em vez de "Alterar senha".
-    // A API ainda não manda o campo; sem ele, a conta tem senha
-    hasPassword: backendUser.hasPassword ?? true,
+    // A API ainda não manda o campo (migração 010); sem ele, vale o jeito como
+    // a conta nasceu: a criada pelo Google não tem senha
+    hasPassword: backendUser.hasPassword ?? backendUser.provider !== "GOOGLE",
     // Perfil de ONG — socialLinks/address no formato do perfil público
     cnpj: backendUser.cnpj ?? null,
     socialLinks: {
@@ -132,6 +134,9 @@ export async function loginRequest({ email, password }) {
   // 🔴 Moderação no modo mock: a API ainda não sabe quem o admin baniu. Com
   // o backend, a conta banida fica com `active = false` e o próprio login recusa
   if (isAccountBanned(user)) throw mockHttpError(403, ACCOUNT_SUSPENDED_MESSAGE);
+  // 🔴 Exclusão no modo mock: com o backend, o e-mail da conta excluída é
+  // anonimizado e o login responde como a qualquer e-mail desconhecido
+  if (isAccountDeleted(user)) throw mockHttpError(401, "E-mail ou senha inválidos");
 
   // Formato da API: { token, type, user }
   return {
