@@ -1,51 +1,42 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../context/AuthContext'
 import { useChatContacts } from './useChatContacts'
-import { CHAT_SYSTEM_MESSAGE_EVENT } from '../utils/chatSystemMessage'
-import { CHAT_READ_EVENT, countUnreadMessages, loadChatMessages, loadLastSeen } from '../utils/chatReadState'
+import { queryKeys } from '../services/queryKeys'
+import { CHAT_SUMMARY_POLL_MS } from '../utils/constants'
+import * as chatService from '../../features/chat/services/chatService'
 
-// 🔴 mock: as mensagens vivem no localStorage, então o total é recalculado
-// a partir dele. Com o backend, vira um único GET de contagem de não lidas.
+const NO_CONVERSATIONS = []
+
+// Não lidas e última mensagem de cada conversa, do GET /chats/summary
+// (api-chat.md §2.4), a cada 20 s. O total soma só as conversas que estão nos
+// contatos da conta: no mock, o resumo traz as conversas de todas as contas
+// que já usaram este navegador
 export function useChatUnread() {
   const { user } = useAuth()
   const { contacts } = useChatContacts()
-  const [version, setVersion] = useState(0)
+  // Admin não tem chat
+  const takesPart = user?.userType === 'PESSOA' || user?.userType === 'ONG'
 
-  // Recalcula quando uma conversa é lida/recebe mensagem de sistema nesta
-  // aba, ou quando outra aba grava mensagens/leituras
-  useEffect(() => {
-    const refresh = () => setVersion((v) => v + 1)
-
-    function handleStorage(event) {
-      if (event.key?.startsWith('chat_messages_') || event.key?.startsWith('aucolher_chat_last_seen_')) refresh()
-    }
-
-    window.addEventListener(CHAT_READ_EVENT, refresh)
-    window.addEventListener(CHAT_SYSTEM_MESSAGE_EVENT, refresh)
-    window.addEventListener('storage', handleStorage)
-    return () => {
-      window.removeEventListener(CHAT_READ_EVENT, refresh)
-      window.removeEventListener(CHAT_SYSTEM_MESSAGE_EVENT, refresh)
-      window.removeEventListener('storage', handleStorage)
-    }
-  }, [])
+  const { data: summary = NO_CONVERSATIONS } = useQuery({
+    queryKey: queryKeys.chat.summary(user?.id),
+    queryFn: chatService.getSummary,
+    enabled: takesPart,
+    refetchInterval: CHAT_SUMMARY_POLL_MS,
+  })
 
   // `conversations`: não lidas e última mensagem de cada conversa, por requestId
-  const { unreadCount, conversations } = useMemo(() => {
-    if (!user) return { unreadCount: 0, conversations: {} }
-    const lastSeen = loadLastSeen(user.id)
-    const byRequest = {}
-    let total = 0
+  return useMemo(() => {
+    const byRequest = new Map(summary.map((conversation) => [String(conversation.requestId), conversation]))
+    const conversations = {}
+    let unreadCount = 0
     for (const contact of contacts) {
-      const messages = loadChatMessages(contact.requestId)
-      const unread = countUnreadMessages(messages, user.id, lastSeen[contact.requestId])
-      byRequest[contact.requestId] = { unread, lastMessage: messages.at(-1) ?? null }
-      total += unread
+      const conversation = byRequest.get(String(contact.requestId))
+      const unread = conversation?.unreadCount ?? 0
+      const lastMessage = conversation?.lastMessage ? chatService.withSystemText(conversation.lastMessage, contact) : null
+      conversations[contact.requestId] = { unread, lastMessage }
+      unreadCount += unread
     }
-    return { unreadCount: total, conversations: byRequest }
-    // version força a releitura do localStorage após os eventos acima
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, contacts, version])
-
-  return { unreadCount, conversations }
+    return { unreadCount, conversations }
+  }, [summary, contacts])
 }
