@@ -45,7 +45,7 @@ export function useChatContacts() {
           const base = {
             id: `request-${request.id}`,
             requestId: request.id,
-            animalId: request.animalId, // 🆕 necessário para concludeAdoption
+            animalId: request.animalId,
             animalName: animalDisplayName(animal),
             status: request.status, // 🆕 controla o estado travado do header
             cancelReason: request.cancelReason ?? null,
