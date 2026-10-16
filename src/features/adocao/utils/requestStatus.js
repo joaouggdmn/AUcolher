@@ -120,6 +120,8 @@ const CANCEL_DESCRIPTIONS = {
   ANIMAL_UNAVAILABLE: () => 'O anúncio saiu do ar.',
   ACCOUNT_BANNED: () => 'Cancelado pela moderação: uma das contas foi suspensa.',
   LISTING_REMOVED: () => 'Cancelado pela moderação: o anúncio foi removido.',
+  // Quem excluiu a conta foi a outra parte: a própria conta não vê mais nada
+  ACCOUNT_DELETED: () => 'Cancelado: a conta de quem anunciou foi excluída.',
 }
 
 export function sentStatusDescription(request, animalName) {

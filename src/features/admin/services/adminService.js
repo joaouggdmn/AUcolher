@@ -6,6 +6,7 @@ import { toCampaignPayload, toFrontendCampaign } from '../../doacoes/services/do
 import * as doacoesMock from '../../doacoes/services/doacoesMock'
 import { toEventPayload, toFrontendEvent } from '../../eventos/services/eventoService'
 import * as eventosMock from '../../eventos/services/eventosMock'
+import { readDeletedAccounts } from '../../perfil/services/accountDeletionMock'
 import { toApiPayload } from '../../perfil/utils/accountForm'
 import * as adminApi from './adminApi'
 import * as adminMock from './adminMock'
@@ -86,6 +87,8 @@ export function toFrontendAdminUser(dto) {
     isActive: dto.active !== false,
     createdAt: dto.createdAt ?? null,
     animalsCount: dto.animalsCount ?? 0,
+    // Conta excluída pela própria pessoa: não volta, nem pela moderação
+    deletedAt: dto.deletedAt ?? null,
   }
 }
 
@@ -96,9 +99,20 @@ export async function getAdminStats() {
   return toFrontendAdminStats(CAMPAIGNS_FROM_MOCK ? withMockCampaignStats(dto) : dto)
 }
 
+// 🔴 Exclusão no modo mock (USE_MOCK_EXCLUSAO): a API ainda não sabe quem
+// excluiu a conta, então a data vem do servidor falso
+function withMockDeletions(users) {
+  const deleted = readDeletedAccounts()
+  if (deleted.length === 0) return users
+  return users.map((user) => {
+    const match = deleted.find((row) => String(row.id) === String(user.id))
+    return match ? { ...user, deletedAt: match.deletedAt, isActive: false } : user
+  })
+}
+
 export async function listAdminUsers() {
   const dtos = await adapter.listUsers()
-  return dtos.map(toFrontendAdminUser)
+  return withMockDeletions(dtos.map(toFrontendAdminUser))
 }
 
 // `ownerIsBanned` / `isOngBanned`: a conta foi banida, então o site já não
