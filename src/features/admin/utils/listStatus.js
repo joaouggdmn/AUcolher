@@ -51,3 +51,9 @@ export function hasPublicPage(statusKey) {
 export function canRemove(statusKey) {
   return hasPublicPage(statusKey) || statusKey === 'SUSPENDED'
 }
+
+// O admin edita, com as regras da ONG, só o que ainda está valendo: o evento
+// que não aconteceu e a campanha que recebe doações
+export function canEdit(statusKey) {
+  return statusKey === 'UPCOMING' || statusKey === 'ACTIVE'
+}

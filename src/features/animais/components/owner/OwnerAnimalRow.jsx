@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { FaCircleCheck, FaEye, FaEyeSlash, FaHeart, FaPaw, FaPen, FaShieldHalved } from 'react-icons/fa6'
 import { SPECIES_OPTIONS } from '../filters/filterOptions'
 import { LISTING_STATUS_META } from '../../utils/listingStatus'
+import ModeratedNote from '../../../../core/components/ui/ModeratedNote'
 
 export const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 disabled:cursor-wait disabled:opacity-60'
@@ -61,6 +62,7 @@ function OwnerAnimalRow({
             </Link>
           )}
           {details}
+          <ModeratedNote moderatedAt={animal.moderatedAt} className="mt-1.5" />
         </div>
       </div>
 

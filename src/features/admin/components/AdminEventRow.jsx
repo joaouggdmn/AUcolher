@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
-import { FaEye, FaLocationDot, FaTrashCan } from 'react-icons/fa6'
+import { FaEye, FaPen, FaLocationDot, FaTrashCan } from 'react-icons/fa6'
 import CalendarDateBadge from '../../eventos/components/CalendarDateBadge'
 import { getCategoriaMeta } from '../../eventos/components/filters/filterOptions'
 import { formatTimeRange } from '../../eventos/utils/dateHelpers'
 import { getAttendanceSummary } from '../../eventos/utils/eventDisplay'
-import { canRemove, EVENT_STATUS_META, eventStatus, hasPublicPage } from '../utils/listStatus'
+import { canEdit, canRemove, EVENT_STATUS_META, eventStatus, hasPublicPage } from '../utils/listStatus'
+import { ADMIN_PATHS } from '../panel/adminPaths'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
@@ -58,6 +59,12 @@ function AdminEventRow({ event, onRemove }) {
             <Link to={`/eventos/${event.id}`} className={ACTION_CLASSES}>
               <FaEye size={11} />
               Ver evento
+            </Link>
+          )}
+          {canEdit(statusKey) && (
+            <Link to={ADMIN_PATHS.eventEdit(event.id)} className={ACTION_CLASSES}>
+              <FaPen size={10} />
+              Editar
             </Link>
           )}
           <button type="button" onClick={() => onRemove(event)} className={REMOVE_CLASSES}>

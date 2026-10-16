@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useProfileCompletion } from '../../../core/hooks/useProfileCompletion'
@@ -17,9 +17,23 @@ function hasMatchProfileChanges(user, next) {
 
 // Estado do formulário de "Minha conta", igual para os dois tipos de conta.
 // Compara os patches normalizados (toUpdates) em vez do form cru: um espaço
-// sobrando ou uma linha em branco na equipe não conta como "não salvo"
-export function useAccountForm({ buildForm, toUpdates }) {
-  const { user, updateProfile } = useAuth()
+// sobrando ou uma linha em branco na equipe não conta como "não salvo".
+//
+// Moderação: com `account` (a conta de outra pessoa, que o admin edita) e
+// `onSave` (o PUT do admin), o form edita essa conta — com o e-mail de login,
+// sem o Perfil AUmatch e sem mexer na sessão de quem está logado
+export function useAccountForm({ buildForm: buildProfileForm, toUpdates: toProfileUpdates, account = null, onSave = null }) {
+  const { user: sessionUser, updateProfile } = useAuth()
+  const isModeration = account != null
+  const user = isModeration ? account : sessionUser
+  const buildForm = useCallback(
+    (source) => (isModeration ? { ...buildProfileForm(source), email: source.email ?? '' } : buildProfileForm(source)),
+    [isModeration, buildProfileForm]
+  )
+  const toUpdates = useCallback(
+    (form) => (isModeration ? { ...toProfileUpdates(form), email: form.email.trim() } : toProfileUpdates(form)),
+    [isModeration, toProfileUpdates]
+  )
   const queryClient = useQueryClient()
   const [formData, setFormData] = useState(() => buildForm(user))
 
@@ -42,6 +56,11 @@ export function useAccountForm({ buildForm, toUpdates }) {
   // sobe para a AccountFormShell e o form continua com as alterações
   async function save(extraUpdates = {}) {
     const next = { ...updates, ...extraUpdates }
+    if (isModeration) {
+      const savedAccount = await onSave({ ...user, ...next })
+      setFormData(buildForm(savedAccount))
+      return savedAccount
+    }
     // O PUT substitui o perfil inteiro: o corpo sai do usuário completo, senão
     // um dado que não está no form seria apagado
     const savedProfile = await updateMyProfile(toApiPayload({ ...user, ...next }, user.userType))

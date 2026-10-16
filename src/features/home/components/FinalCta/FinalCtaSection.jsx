@@ -1,11 +1,22 @@
 import { Link } from 'react-router-dom'
-import { FaArrowRight, FaCalendarDays, FaComments, FaEye, FaHandHoldingHeart, FaPaw } from 'react-icons/fa6'
+import {
+  FaArrowRight,
+  FaCalendarDays,
+  FaChartPie,
+  FaComments,
+  FaEye,
+  FaFlag,
+  FaHandHoldingHeart,
+  FaPaw,
+  FaUsers,
+} from 'react-icons/fa6'
 import ActionLink from '../shared/ActionLink'
 import HomeReveal from '../shared/HomeReveal'
 import { useRankedPets } from '../../hooks/useRankedPets'
 import { getPersonaActions } from '../../data/personaActions'
 import { quizQuestions } from '../../../onboarding/data/quizQuestions'
 import { plural } from '../../utils/homePets'
+import { ADMIN_PATHS } from '../../../admin/panel/adminPaths'
 
 const DOT_PATTERN = {
   backgroundImage: 'radial-gradient(white 1.5px, transparent 1.5px)',
@@ -13,8 +24,17 @@ const DOT_PATTERN = {
 }
 
 // Atalhos da pessoa e da ONG: o mesmo painel, com as rotas de cada público.
-// O perfil público é por id; o admin não tem perfil público e fica sem ele
+// O perfil público é por id. O admin modera, mas não participa: os atalhos
+// dele são do painel
 function getShortcuts({ kind, user }) {
+  if (kind === 'admin') {
+    return [
+      { to: ADMIN_PATHS.overview, icon: FaChartPie, label: 'Abrir o painel' },
+      { to: ADMIN_PATHS.reports, icon: FaFlag, label: 'Ver denúncias' },
+      { to: ADMIN_PATHS.users, icon: FaUsers, label: 'Ver usuários' },
+    ]
+  }
+
   if (kind === 'ong') {
     return [
       { to: '/campanhas/criar', icon: FaHandHoldingHeart, label: 'Criar campanha' },
@@ -27,8 +47,8 @@ function getShortcuts({ kind, user }) {
     { to: '/campanhas', icon: FaHandHoldingHeart, label: 'Fazer uma doação' },
     { to: '/chat', icon: FaComments, label: 'Conversas' },
     { to: '/animais/criar', icon: FaPaw, label: 'Anunciar um animal' },
-    user?.userType !== 'ADMIN' && { to: `/perfil/publico/${user?.id}`, icon: FaEye, label: 'Ver perfil público' },
-  ].filter(Boolean)
+    { to: `/perfil/publico/${user?.id}`, icon: FaEye, label: 'Ver perfil público' },
+  ]
 }
 
 const PANEL_TITLE = 'text-sm font-bold uppercase tracking-wide text-amber-300'

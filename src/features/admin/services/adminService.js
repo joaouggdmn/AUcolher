@@ -1,8 +1,12 @@
-import { USE_MOCK_ADMIN, USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
-import { toFrontendAnimal } from '../../animais/services/animalService'
+import { USE_MOCK_ADMIN, USE_MOCK_CAMPANHAS, USE_MOCK_EVENTOS } from '../../../core/utils/constants'
+import { toFrontendProfile } from '../../../core/services/authService'
+import { toApiAnimal, toFrontendAnimal } from '../../animais/services/animalService'
 import { toFrontendReport } from '../../denuncias/services/denunciaService'
-import { toFrontendCampaign } from '../../doacoes/services/doacaoService'
-import { toFrontendEvent } from '../../eventos/services/eventoService'
+import { toCampaignPayload, toFrontendCampaign } from '../../doacoes/services/doacaoService'
+import * as doacoesMock from '../../doacoes/services/doacoesMock'
+import { toEventPayload, toFrontendEvent } from '../../eventos/services/eventoService'
+import * as eventosMock from '../../eventos/services/eventosMock'
+import { toApiPayload } from '../../perfil/utils/accountForm'
 import * as adminApi from './adminApi'
 import * as adminMock from './adminMock'
 import { withMockCampaignStats } from './campaignAdminStats'
@@ -155,4 +159,35 @@ export function removeAdminCampaign(campaignId) {
 
 export function removeAdminEvent(eventId) {
   return adapter.removeEvent(eventId)
+}
+
+// ---------- edição pela moderação (o conteúdo segue em nome do dono) ----------
+// Contas e animais sempre pela API real: os animais já moram nela, e o mock
+// do admin não tem as contas completas. Eventos e campanhas seguem a flag
+// de cada módulo
+
+// A conta no formato de "Minha conta" (o mesmo dos formulários), mais isActive
+export async function getAdminUser(userId) {
+  const dto = await adminApi.getUser(userId)
+  return { ...toFrontendProfile(dto), isActive: dto.active !== false }
+}
+
+// `account`: a conta no formato de "Minha conta", já com as mudanças
+export async function updateAdminUser(userId, { email, account }) {
+  const dto = await adminApi.updateUser(userId, { email, profile: toApiPayload(account, account.userType) })
+  return { ...toFrontendProfile(dto), isActive: dto.active !== false }
+}
+
+export async function updateAdminAnimal(animalId, form, photos) {
+  return toFrontendAnimal(await adminApi.updateAnimal(animalId, toApiAnimal(form, photos)))
+}
+
+export async function updateAdminEvent(eventId, values) {
+  const update = USE_MOCK_EVENTOS ? eventosMock.updateEventForAdmin : adminApi.updateEvent
+  return toFrontendEvent(await update(eventId, toEventPayload(values)))
+}
+
+export async function updateAdminCampaign(campaignId, values) {
+  const update = USE_MOCK_CAMPANHAS ? doacoesMock.updateCampaignForAdmin : adminApi.updateCampaign
+  return toFrontendCampaign(await update(campaignId, toCampaignPayload(values)))
 }

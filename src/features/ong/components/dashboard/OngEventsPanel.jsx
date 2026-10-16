@@ -11,6 +11,7 @@ import { getAttendanceSummary } from '../../../eventos/utils/eventDisplay'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
 import EventParticipantsModal from './EventParticipantsModal'
 import { PANEL_PATHS } from '../../panel/panelPaths'
+import ModeratedNote from '../../../../core/components/ui/ModeratedNote'
 
 const SUMMARY_TONES = {
   neutral: 'text-slate-500',
@@ -42,6 +43,7 @@ function OngEventRow({ event, onShowParticipants, onDelete }) {
             {formatTimeRange(event.startTime, event.endTime)} · {event.location.venue}, {event.location.city}
           </p>
           <p className={`mt-1 text-xs font-semibold ${SUMMARY_TONES[summary.tone]}`}>{summary.label}</p>
+          <ModeratedNote moderatedAt={event.moderatedAt} className="mt-1.5" />
         </div>
       </div>
 

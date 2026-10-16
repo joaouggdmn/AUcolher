@@ -55,6 +55,8 @@ function toCampaignDto(db, row) {
     donationsCount: approved.length,
     status: isClosed(row) ? 'CLOSED' : 'ACTIVE',
     closedAt: closedByDeadline ? `${row.deadline}T23:59:59` : row.closedAt,
+    // Última edição feita pelo admin (nula se nunca houve)
+    moderatedAt: row.moderatedAt ?? null,
   }
 }
 
@@ -255,12 +257,28 @@ export async function updateCampaign(id, payload) {
   const db = store.read()
   const row = findCampaignRow(db, id)
   requireOwner(row, user)
+  return saveCampaignEdit(db, row, payload, { ngo: ngoSnapshot(user) })
+}
+
+// 🔴 Moderação (PUT /api/admin/campaigns/{id}): o admin edita a campanha de
+// uma ONG. Ela continua da ONG (o `ngo` não muda), com a marca da moderação
+export async function updateCampaignForAdmin(id, payload) {
+  await mockDelay()
+  const user = requireSession()
+  if (user.userType !== 'ADMIN') throw mockHttpError(403, 'Só a moderação edita a campanha de outra conta.')
+  const db = store.read()
+  const row = db.campaigns.find((campaign) => isSameId(campaign.id, id) && !campaign.deleted)
+  if (!row) throw mockHttpError(404, 'Campanha não encontrada.')
+  return saveCampaignEdit(db, row, payload, { moderatedAt: nowLocalIso() })
+}
+
+function saveCampaignEdit(db, row, payload, extra) {
   if (isClosed(row)) throw mockHttpError(400, 'Campanhas encerradas não podem ser editadas.')
 
   const fields = normalizePayload(payload)
   validate(fields)
 
-  const updated = { ...row, ...fields, ngo: ngoSnapshot(user) }
+  const updated = { ...row, ...fields, ...extra }
   store.write({ ...db, campaigns: db.campaigns.map((campaign) => (campaign.id === row.id ? updated : campaign)) })
   return toCampaignDto(db, updated)
 }
@@ -320,6 +338,8 @@ export async function listMyCampaigns() {
 export async function createDonation(campaignId, { amount } = {}) {
   await mockDelay(600)
   const user = requireSession()
+  // O admin modera, mas não participa (regras de negócio: o que o admin faz no site)
+  if (user.userType === 'ADMIN') throw mockHttpError(403, 'Contas de admin não fazem doações.')
   const db = store.read()
   const row = findCampaignRow(db, campaignId)
 
