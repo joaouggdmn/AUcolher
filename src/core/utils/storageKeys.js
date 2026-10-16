@@ -23,6 +23,8 @@ export const MOCK_REABANDONO_STORE_KEY = 'aucolher_mock_reabandono'
 export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'
 // "Banco" falso do chat: mensagens e marcas de leitura (mesmo mockStore)
 export const MOCK_CHAT_STORE_KEY = 'aucolher_mock_chat'
+// Contas excluídas no modo mock: o login delas passa a ser recusado (mesmo mockStore)
+export const MOCK_EXCLUSAO_STORE_KEY = 'aucolher_mock_exclusao'
 // sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)
 export const ACCOUNT_SUSPENDED_FLAG_KEY = 'aucolher_account_suspended'
 // sessionStorage: a API recusou o token (ex.: a senha foi trocada em outro

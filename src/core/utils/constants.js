@@ -20,6 +20,9 @@ export const USE_MOCK_SENHA = import.meta.env.VITE_USE_MOCK_SENHA !== 'false'
 // Chat dos pedidos (docs/entrega-final/api-chat.md): sem as rotas da migração
 // 011, as conversas ficam num servidor falso no localStorage
 export const USE_MOCK_CHAT = import.meta.env.VITE_USE_MOCK_CHAT !== 'false'
+// Excluir a própria conta (docs/entrega-final/api-exclusao-conta.md): sem a
+// rota da migração 013, a exclusão fica num servidor falso no localStorage
+export const USE_MOCK_EXCLUSAO = import.meta.env.VITE_USE_MOCK_EXCLUSAO !== 'false'
 
 // Listas públicas mudam pouco: 30 s evita refazer a busca a cada navegação
 export const EVENTOS_STALE_TIME = 30_000
