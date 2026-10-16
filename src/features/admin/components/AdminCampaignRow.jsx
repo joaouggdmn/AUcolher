@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
-import { FaClock, FaEye, FaTrashCan, FaTriangleExclamation } from 'react-icons/fa6'
+import { FaClock, FaEye, FaPen, FaTrashCan, FaTriangleExclamation } from 'react-icons/fa6'
 import CampaignCover from '../../doacoes/components/CampaignCover'
 import DonationProgress from '../../doacoes/components/DonationProgress'
 import { getCategoriaMeta } from '../../doacoes/components/filters/filterOptions'
 import { formatDonationsCount, getDeadlineSummary } from '../../doacoes/utils/campaignDisplay'
-import { CAMPAIGN_STATUS_META, campaignStatus, canRemove, hasPublicPage } from '../utils/listStatus'
+import { CAMPAIGN_STATUS_META, campaignStatus, canEdit, canRemove, hasPublicPage } from '../utils/listStatus'
+import { ADMIN_PATHS } from '../panel/adminPaths'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
@@ -61,6 +62,12 @@ function AdminCampaignRow({ campaign, onRemove }) {
             <Link to={`/campanhas/${campaign.id}`} className={ACTION_CLASSES}>
               <FaEye size={11} />
               Ver campanha
+            </Link>
+          )}
+          {canEdit(statusKey) && (
+            <Link to={ADMIN_PATHS.campaignEdit(campaign.id)} className={ACTION_CLASSES}>
+              <FaPen size={10} />
+              Editar
             </Link>
           )}
           <button type="button" onClick={() => onRemove(campaign)} className={REMOVE_CLASSES}>

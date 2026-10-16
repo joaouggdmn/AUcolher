@@ -3,6 +3,7 @@ import PrivateRoute from '../core/guards/PrivateRoute'
 import OngRoute from '../core/guards/OngRoute'
 import AdminRoute from '../core/guards/AdminRoute'
 import PessoaRoute from '../core/guards/PessoaRoute'
+import ParticipantRoute from '../core/guards/ParticipantRoute'
 import UserLayout from '../core/components/layout/UserLayout'
 import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
@@ -39,6 +40,10 @@ import AdminAnimalsPage from '../features/admin/pages/AdminAnimalsPage'
 import AdminCampaignsPage from '../features/admin/pages/AdminCampaignsPage'
 import AdminEventsPage from '../features/admin/pages/AdminEventsPage'
 import AdminReportsPage from '../features/admin/pages/AdminReportsPage'
+import AdminUserEditPage from '../features/admin/pages/AdminUserEditPage'
+import AdminAnimalEditPage from '../features/admin/pages/AdminAnimalEditPage'
+import AdminEventEditPage from '../features/admin/pages/AdminEventEditPage'
+import AdminCampaignEditPage from '../features/admin/pages/AdminCampaignEditPage'
 
 
 export const protectedRoutes = [
@@ -48,7 +53,17 @@ export const protectedRoutes = [
       {
         element: <UserLayout />,
         children: [
-          { path: 'animais/criar', element: <CreateAnimalPage /> },
+          {
+            // O admin modera, mas não participa: estas telas não são para ele
+            element: <ParticipantRoute />,
+            children: [
+              { path: 'animais/criar', element: <CreateAnimalPage /> },
+              { path: 'meus-interesses', element: <MyInterestsPage /> },
+              { path: 'favoritos', element: <FavoritosPage /> },
+              { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
+              { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
+            ],
+          },
           { path: 'animais/editar/:id', element: <EditAnimalPage /> },
           // "Meus anúncios" virou a aba "Anunciados por mim" de Meus animais
           { path: 'meus-anuncios', element: <Navigate to={MY_ANIMALS_PATH} replace /> },
@@ -59,10 +74,6 @@ export const protectedRoutes = [
               { path: 'meus-animais/republicar/:requestId', element: <RehomeAnimalPage /> },
             ],
           },
-          { path: 'meus-interesses', element: <MyInterestsPage /> },
-          { path: 'favoritos', element: <FavoritosPage /> },
-          { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
-          { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
           { path: 'perfil', element: <UserProfilePage /> },
         ],
       },
@@ -115,6 +126,11 @@ export const protectedRoutes = [
           { path: 'campanhas', element: <AdminCampaignsPage /> },
           { path: 'eventos', element: <AdminEventsPage /> },
           { path: 'denuncias', element: <AdminReportsPage /> },
+          // Edição pela moderação (o conteúdo segue em nome do dono)
+          { path: 'usuarios/:id/editar', element: <AdminUserEditPage /> },
+          { path: 'animais/:id/editar', element: <AdminAnimalEditPage /> },
+          { path: 'eventos/:id/editar', element: <AdminEventEditPage /> },
+          { path: 'campanhas/:id/editar', element: <AdminCampaignEditPage /> },
         ],
       },
       // Endereços dos antigos placeholders (a aprovação de ONG deixou de existir)
@@ -124,7 +140,7 @@ export const protectedRoutes = [
     ],
   },
   {
-  element: <PrivateRoute />,
+  element: <ParticipantRoute />,
   children: [
     {
       element: <ChatLayout />,

@@ -6,6 +6,7 @@ import {
   banReportedAccount,
   dismissAdminReports,
   getAdminStats,
+  getAdminUser,
   listAdminAnimals,
   listAdminCampaigns,
   listAdminEvents,
@@ -15,6 +16,10 @@ import {
   removeAdminCampaign,
   removeAdminEvent,
   setAdminUserStatus,
+  updateAdminAnimal,
+  updateAdminCampaign,
+  updateAdminEvent,
+  updateAdminUser,
 } from '../services/adminService'
 
 // Só a conta admin busca: para as outras o "servidor" responderia 403
@@ -126,6 +131,49 @@ export function useRemoveEvent() {
   const invalidate = useInvalidateModeration()
   return useMutation({
     mutationFn: (event) => removeAdminEvent(event.id),
+    onSuccess: invalidate,
+  })
+}
+
+// ---------- edição pela moderação (o conteúdo segue em nome do dono) ----------
+
+// A conta inteira, no formato de "Minha conta", para o formulário de edição
+export function useAdminUser(userId) {
+  return useAdminQuery([...queryKeys.admin.users, String(userId)], () => getAdminUser(userId))
+}
+
+// `{ id, email, account }`
+export function useUpdateAdminUser() {
+  const invalidate = useInvalidateModeration()
+  return useMutation({
+    mutationFn: ({ id, email, account }) => updateAdminUser(id, { email, account }),
+    onSuccess: invalidate,
+  })
+}
+
+// `{ id, form, photos }`
+export function useUpdateAdminAnimal() {
+  const invalidate = useInvalidateModeration()
+  return useMutation({
+    mutationFn: ({ id, form, photos }) => updateAdminAnimal(id, form, photos),
+    onSuccess: invalidate,
+  })
+}
+
+// `{ id, values }`
+export function useUpdateAdminEvent() {
+  const invalidate = useInvalidateModeration()
+  return useMutation({
+    mutationFn: ({ id, values }) => updateAdminEvent(id, values),
+    onSuccess: invalidate,
+  })
+}
+
+// `{ id, values }`
+export function useUpdateAdminCampaign() {
+  const invalidate = useInvalidateModeration()
+  return useMutation({
+    mutationFn: ({ id, values }) => updateAdminCampaign(id, values),
     onSuccess: invalidate,
   })
 }

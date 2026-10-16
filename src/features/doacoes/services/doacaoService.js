@@ -36,6 +36,8 @@ export function toFrontendCampaign(dto) {
     isClosed: dto.status === 'CLOSED',
     createdAt: dto.createdAt ?? null,
     closedAt: dto.closedAt ?? null,
+    // Última edição feita pelo admin (o dono vê "Editado pela moderação")
+    moderatedAt: dto.moderatedAt ?? null,
     ong: {
       id: dto.ngo?.id ?? null,
       name: dto.ngo?.name ?? '',

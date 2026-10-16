@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { FaTriangleExclamation, FaHandHoldingHeart, FaArrowRight } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 import DonationProgress from './DonationProgress'
-import { isCampaignOwner } from '../utils/campaignDisplay'
+import { isAdminAccount, isCampaignOwner } from '../utils/campaignDisplay'
 
 // Destaque da campanha urgente ativa mais recente (pickSosCampaign)
 function HeroSosBanner({ campaign, onDonate }) {
@@ -39,7 +39,7 @@ function HeroSosBanner({ campaign, onDonate }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {!isOwner && (
+          {!isOwner && !isAdminAccount(user) && (
             <button
               type="button"
               onClick={() => onDonate(campaign)}

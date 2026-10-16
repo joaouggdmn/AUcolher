@@ -69,3 +69,35 @@ export async function removeCampaign(campaignId) {
 export async function removeEvent(eventId) {
   await api.delete(`/admin/events/${eventId}`)
 }
+
+// ---------- edição pela moderação (o conteúdo segue em nome do dono) ----------
+
+// A conta inteira (os campos de "Minha conta", com o e-mail de login) + `active`
+export async function getUser(userId) {
+  const { data } = await api.get(`/admin/users/${userId}`)
+  return data
+}
+
+// { email, profile: o corpo de PUT /users/me }
+export async function updateUser(userId, body) {
+  const { data } = await api.put(`/admin/users/${userId}`, body)
+  return data
+}
+
+// O corpo de PUT /animals/{id}
+export async function updateAnimal(animalId, body) {
+  const { data } = await api.put(`/admin/animals/${animalId}`, body)
+  return data
+}
+
+// O corpo de PUT /events/{id}
+export async function updateEvent(eventId, body) {
+  const { data } = await api.put(`/admin/events/${eventId}`, body)
+  return data
+}
+
+// O corpo de PUT /campaigns/{id} — para quando as campanhas estiverem no backend
+export async function updateCampaign(campaignId, body) {
+  const { data } = await api.put(`/admin/campaigns/${campaignId}`, body)
+  return data
+}

@@ -172,6 +172,22 @@ export async function updateEvent(id, payload) {
   const db = store.read()
   const row = findActiveRow(db, id)
   requireOwner(row, user)
+  return saveEventEdit(db, row, payload, { ngo: ngoSnapshot(user) })
+}
+
+// 🔴 Moderação (PUT /api/admin/events/{id}): o admin edita o evento de uma
+// ONG. Ele continua da ONG (o `ngo` não muda), com a marca da moderação
+export async function updateEventForAdmin(id, payload) {
+  await mockDelay()
+  const user = requireSession()
+  if (user.userType !== 'ADMIN') throw mockHttpError(403, 'Só a moderação edita o evento de outra conta.')
+  const db = store.read()
+  const row = db.events.find((event) => isSameId(event.id, id) && event.status !== 'CANCELLED')
+  if (!row) throw mockHttpError(404, 'Evento não encontrado.')
+  return saveEventEdit(db, row, payload, { moderatedAt: nowLocalIso() })
+}
+
+function saveEventEdit(db, row, payload, extra) {
   if (isPast(row)) throw mockHttpError(400, 'Eventos que já aconteceram não podem ser editados.')
 
   const fields = normalizePayload(payload)
@@ -181,7 +197,7 @@ export async function updateEvent(id, payload) {
     throw mockHttpError(400, `Já existem ${confirmed} presenças confirmadas: as vagas não podem ficar abaixo disso.`)
   }
 
-  const updated = { ...row, ...fields, ngo: ngoSnapshot(user) }
+  const updated = { ...row, ...fields, ...extra }
   store.write({ ...db, events: db.events.map((event) => (event.id === row.id ? updated : event)) })
   return toDto(db, updated)
 }

@@ -172,34 +172,36 @@ function Navbar() {
                   </Link>
                 )}
 
-                {/* Atalho para /favoritos com o contador global — visível para
-                    qualquer usuário logado (comum ou ONG) */}
-                <Link
-                  to="/favoritos"
-                  aria-label={
-                    totalFavoritos > 0
-                      ? `Meus favoritos — ${totalFavoritos} ${totalFavoritos === 1 ? 'pet salvo' : 'pets salvos'}`
-                      : 'Meus favoritos'
-                  }
-                  className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 ${
-                    isScrolled
-                      ? 'text-emerald-50 hover:bg-white/10 hover:text-rose-300'
-                      : 'text-slate-600 hover:bg-rose-50 hover:text-rose-500'
-                  }`}
-                >
-                  <FaHeart size={19} />
+                {/* Atalho para /favoritos com o contador global — pessoa e ONG; o
+                    admin modera, mas não favorita */}
+                {user?.userType !== 'ADMIN' && (
+                  <Link
+                    to="/favoritos"
+                    aria-label={
+                      totalFavoritos > 0
+                        ? `Meus favoritos — ${totalFavoritos} ${totalFavoritos === 1 ? 'pet salvo' : 'pets salvos'}`
+                        : 'Meus favoritos'
+                    }
+                    className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 ${
+                      isScrolled
+                        ? 'text-emerald-50 hover:bg-white/10 hover:text-rose-300'
+                        : 'text-slate-600 hover:bg-rose-50 hover:text-rose-500'
+                    }`}
+                  >
+                    <FaHeart size={19} />
 
-                  {totalFavoritos > 0 && (
-                    <span
-                      aria-hidden="true"
-                      className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
-                        isScrolled ? 'ring-emerald-800' : 'ring-white'
-                      }`}
-                    >
-                      {totalFavoritos > 9 ? '9+' : totalFavoritos}
-                    </span>
-                  )}
-                </Link>
+                    {totalFavoritos > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
+                          isScrolled ? 'ring-emerald-800' : 'ring-white'
+                        }`}
+                      >
+                        {totalFavoritos > 9 ? '9+' : totalFavoritos}
+                      </span>
+                    )}
+                  </Link>
+                )}
 
                 <UserAvatarMenu
                   user={user}

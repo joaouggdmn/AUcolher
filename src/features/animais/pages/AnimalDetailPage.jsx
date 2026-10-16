@@ -11,6 +11,8 @@ import {
   FaCircleCheck,
   FaArrowRight,
   FaHouseChimney,
+  FaPen,
+  FaTrashCan,
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { getErrorMessage } from "../../../core/utils/apiError";
@@ -23,6 +25,8 @@ import { isSameId } from "../../../core/utils/ids";
 import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
 import SuccessToast from "../../../core/components/ui/SuccessToast";
 import ModerationNotice from "../../../core/components/ui/ModerationNotice";
+import ModeratedNote from "../../../core/components/ui/ModeratedNote";
+import { ADMIN_PATHS } from "../../admin/panel/adminPaths";
 import PhotoGallery from "../components/PhotoGallery";
 import HealthBadges from "../components/HealthBadges";
 import InterestInfoBubble from "../components/InterestInfoBubble";
@@ -31,6 +35,9 @@ import OwnerListingPanel from "../components/OwnerListingPanel";
 import { useAnimal } from "../hooks/useAnimais";
 import ReportButton from "../../denuncias/components/ReportButton";
 import ListingUnavailable from "../components/ListingUnavailable";
+import ModerationAction from "../../admin/components/ModerationAction";
+import { useRemoveAnimal } from "../../admin/hooks/useAdmin";
+import { removeListingDescription } from "../../admin/utils/moderationText";
 
 const SIZE_LABELS = { SMALL: "Pequeno", MEDIUM: "Médio", LARGE: "Grande" };
 
@@ -42,12 +49,13 @@ function AnimalDetailsPage() {
   const { data: animal, isLoading, error } = useAnimal(id);
   const { createRequest } = useAdoptionRequests();
   const { sentRequests } = useSentRequests();
+  const removeAnimal = useRemoveAnimal();
   const [isSending, setIsSending] = useState(false);
   const [requestError, setRequestError] = useState(null);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
-    location.state?.justCreated ? "Pet cadastrado com sucesso!" : null,
+    location.state?.justCreated ? "Pet cadastrado com sucesso!" : (location.state?.flash ?? null),
   );
 
   if (isLoading) {
@@ -141,6 +149,11 @@ function AnimalDetailsPage() {
             : "A conta de quem anunciou foi banida: este anúncio não aparece mais para ninguém no site."}
         </ModerationNotice>
       )}
+      {isAdmin && !animal.moderation && animal.status === "INACTIVE" && (
+        <ModerationNotice>Quem anunciou tirou este anúncio do ar: ele não aparece para ninguém no site.</ModerationNotice>
+      )}
+      {/* Só o dono e o admin sabem que a moderação editou o anúncio */}
+      {(isOwner || isAdmin) && <ModeratedNote moderatedAt={animal.moderatedAt} size="md" className="mb-6" />}
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start">
         <div className="lg:sticky lg:top-28">
@@ -257,6 +270,37 @@ function AnimalDetailsPage() {
               </div>
             ) : myRequestStatus === "RETURNED" || myRequestStatus === "REHOMED" ? (
               <ReturnInfo request={myRequest} viewer="adopter" />
+            ) : isAdmin ? (
+              // O admin modera, mas não adota: no lugar do pedido, a moderação.
+              // Removido não muda mais; adotado fica como histórico (edita, não remove)
+              animal.status === "REMOVED" ? null : (
+                <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-500">Moderação</p>
+                  <Link
+                    to={ADMIN_PATHS.animalEdit(animal.id)}
+                    state={{ from: location.pathname }}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white py-3.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+                  >
+                    <FaPen size={12} />
+                    Editar anúncio
+                  </Link>
+                  {!isAdopted && (
+                    <ModerationAction
+                      icon={FaTrashCan}
+                      label="Remover anúncio"
+                      dialog={{
+                        title: `Remover o anúncio de ${animal.name}?`,
+                        description: removeListingDescription(animal.name),
+                        confirmLabel: "Remover anúncio",
+                        processingLabel: "Removendo...",
+                      }}
+                      mutation={removeAnimal}
+                      variables={{ id: animal.id, ownerId: animal.ownerId }}
+                      onDone={() => setSuccessMessage("Anúncio removido.")}
+                    />
+                  )}
+                </div>
+              )
             ) : isAdopted ? (
               <div className="rounded-2xl bg-amber-50 px-5 py-4 text-center">
                 <p className="text-sm font-bold text-amber-900">

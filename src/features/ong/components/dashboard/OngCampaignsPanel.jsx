@@ -11,6 +11,7 @@ import DonationProgress from '../../../doacoes/components/DonationProgress'
 import { formatDonationsCount, getDeadlineSummary } from '../../../doacoes/utils/campaignDisplay'
 import ActivityEmptyState from '../../../perfil/components/activity/ActivityEmptyState'
 import { PANEL_PATHS } from '../../panel/panelPaths'
+import ModeratedNote from '../../../../core/components/ui/ModeratedNote'
 
 const ACTION_CLASSES =
   'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300'
@@ -48,6 +49,7 @@ function OngCampaignRow({ campaign, onCloseCampaign, onDelete }) {
               {deadline.label}
             </span>
           </p>
+          <ModeratedNote moderatedAt={campaign.moderatedAt} className="mt-1.5" />
         </div>
       </div>
 

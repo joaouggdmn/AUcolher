@@ -21,7 +21,8 @@ export function FavoritesProvider({ children }) {
   const { data: favoritos = [] } = useQuery({
     queryKey: idsKey,
     queryFn: async () => (await listFavoriteIds()).map(String),
-    enabled: userId != null,
+    // O admin não favorita: nada a buscar para ele
+    enabled: userId != null && user?.userType !== 'ADMIN',
   })
 
   // Atualização otimista: o coração muda na hora e volta atrás se a API recusar
