@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import {
   FaInstagram,
   FaFacebookF,
-  FaWhatsapp,
   FaPaw,
   FaMagnifyingGlass,
   FaCalendarDays,
@@ -34,7 +33,6 @@ const LINK_ICON_CLASSES = 'text-emerald-400 transition-colors duration-300 group
 const socialLinks = [
   { label: 'Instagram', href: 'https://instagram.com', icon: FaInstagram },
   { label: 'Facebook', href: 'https://facebook.com', icon: FaFacebookF },
-  { label: 'WhatsApp', href: 'https://wa.me/', icon: FaWhatsapp },
 ]
 
 function Footer() {
