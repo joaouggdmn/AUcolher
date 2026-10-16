@@ -1,41 +1,48 @@
 import { useMemo } from 'react'
 import { useCampaigns } from '../../doacoes/hooks/useCampanhas'
 import { useEvents } from '../../eventos/hooks/useEventos'
-import { mockPublicProfiles } from '../../perfil/data/mockPublicProfiles'
+import { USE_MOCK_CAMPANHAS, USE_MOCK_EVENTOS } from '../../../core/utils/constants'
 import { matchesPeriod } from '../../eventos/utils/dateHelpers'
 import { useHomeAnimals } from './useHomeAnimals'
 
-// As mesmas fontes que /campanhas e /eventos usam hoje. Os perfis mock só
-// trazem o nome da ONG, então é pelo nome que tudo se junta. De cada fonte
-// sobram também a foto e a cidade reais: é com elas que a ONG sem perfil
-// mock (cadastrada só na API) ganha um cartão completo
+// As mesmas fontes que /campanhas e /eventos usam hoje, juntadas pelo nome
+// da ONG (campanhas e eventos ainda podem vir do mock). De cada fonte sobram
+// a foto, a cidade e o id da conta. O id só vale quando a fonte é a API
+// real: o id de um mock abriria o perfil de outra conta. É com ele que o
+// card busca o perfil público (banner, link "Ver perfil")
 function buildShowcase(animals, campaigns, events) {
   const byName = new Map()
-  const entryFor = (name, { photoUrl = null, city = '', state = '' } = {}) => {
+  const entryFor = (name, { id = null, photoUrl = null, city = '', state = '' } = {}) => {
     if (!byName.has(name)) {
-      byName.set(name, { name, photoUrl: null, city: '', state: '', campaigns: [], upcomingEvents: [], petCount: 0 })
+      byName.set(name, { name, id: null, photoUrl: null, city: '', state: '', campaigns: [], upcomingEvents: [], petCount: 0 })
     }
     const entry = byName.get(name)
+    entry.id ??= id
     entry.photoUrl ??= photoUrl
     if (!entry.city && city) Object.assign(entry, { city, state })
     return entry
   }
 
   for (const campaign of campaigns) {
-    if (campaign.ong?.name) entryFor(campaign.ong.name, campaign.ong).campaigns.push(campaign)
+    if (campaign.ong?.name) {
+      const ong = USE_MOCK_CAMPANHAS ? { ...campaign.ong, id: null } : campaign.ong
+      entryFor(campaign.ong.name, ong).campaigns.push(campaign)
+    }
   }
 
   // matchesPeriod(data, null) já descarta o que passou — o mesmo critério da
   // listagem de eventos. Evento vencido nunca aparece como "próximo"
   for (const event of events) {
     if (event.organizer?.name && matchesPeriod(event.date, null)) {
-      entryFor(event.organizer.name, event.organizer).upcomingEvents.push(event)
+      const organizer = USE_MOCK_EVENTOS ? { ...event.organizer, id: null } : event.organizer
+      entryFor(event.organizer.name, organizer).upcomingEvents.push(event)
     }
   }
 
   for (const pet of animals) {
     if (pet.listingType === 'NGO' && pet.organizationName) {
       entryFor(pet.organizationName, {
+        id: pet.ownerId,
         photoUrl: pet.ownerPhotoUrl,
         city: pet.city,
         state: pet.state,
@@ -49,7 +56,6 @@ function buildShowcase(animals, campaigns, events) {
       // Urgentes primeiro: é o que mais precisa de ajuda agora
       campaigns: [...ong.campaigns].sort((a, b) => Number(b.isUrgent) - Number(a.isUrgent)),
       upcomingEvents: [...ong.upcomingEvents].sort((a, b) => a.date.localeCompare(b.date)),
-      profile: mockPublicProfiles.find((profile) => profile.userType === 'ONG' && profile.name === ong.name) ?? null,
     }))
     .sort(
       (a, b) =>
@@ -58,9 +64,9 @@ function buildShowcase(animals, campaigns, events) {
     )
 }
 
-// [{ name, photoUrl, city, state, profile|null, campaigns, upcomingEvents,
-// petCount }], ONGs mais
-// ativas primeiro — é o que a seção "ONGs parceiras" da home desenha
+// [{ name, id|null, photoUrl, city, state, campaigns, upcomingEvents,
+// petCount }], ONGs mais ativas primeiro — é o que a seção "ONGs parceiras"
+// da home desenha
 export function useOngShowcase() {
   const { animals } = useHomeAnimals()
   const { data: campaigns } = useCampaigns()

@@ -18,6 +18,7 @@ const PERSON_CHECKLIST = [
 const ONG_CHECKLIST = [
   { key: 'nome', label: 'Nome da instituição', check: (p) => !!p?.name?.trim() },
   { key: 'logo', label: 'Logo', check: (p) => !!p?.photoUrl },
+  { key: 'banner', label: 'Banner', check: (p) => !!p?.coverUrl },
   { key: 'bio', label: 'Sobre a instituição', check: (p) => !!p?.bio?.trim() },
   { key: 'endereco', label: 'Endereço', check: (p) => !!p?.address?.street && !!p?.address?.city },
   { key: 'visitas', label: 'Horário de visitas', check: (p) => (p?.visitingHours?.length ?? 0) > 0 },

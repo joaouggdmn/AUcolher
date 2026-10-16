@@ -24,9 +24,11 @@ export const CAMPANHAS_STALE_TIME = 30_000
 export const ADMIN_STALE_TIME = 30_000
 export const DENUNCIAS_STALE_TIME = 30_000
 
-// Capa do evento/campanha (http ou data URL) — mesmo limite do contrato da API
+// Capa do evento/campanha e banner da ONG (http ou data URL) — mesmo limite
+// do contrato da API
 export const EVENT_COVER_MAX_LENGTH = 600_000
 export const CAMPAIGN_COVER_MAX_LENGTH = 600_000
+export const NGO_COVER_MAX_LENGTH = 600_000
 
 // Doação por PIX (plano §1): valores em reais inteiros, chips de atalho no
 // modal, QR válido por 30 min e o modal consulta o status a cada 3 s

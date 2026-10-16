@@ -64,18 +64,26 @@ function PublicProfileHeader({ profile, stats, action }) {
 
   return (
     <section className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
+      {/* Banner da ONG nítido, com um degradê suave embaixo para o logo
+          destacar; sem banner, o fundo verde da marca com textura */}
       <div className="relative h-36 overflow-hidden bg-gradient-to-br from-emerald-800 via-emerald-900 to-emerald-950 sm:h-48">
-        {profile.coverUrl && (
-          <img src={profile.coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-30" />
+        {profile.coverUrl ? (
+          <>
+            <img src={profile.coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/50 via-transparent to-transparent" />
+          </>
+        ) : (
+          <>
+            <div
+              className="absolute inset-0 opacity-[0.06]"
+              style={{
+                backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)',
+                backgroundSize: '26px 26px',
+              }}
+            />
+            <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-amber-500/20 blur-[100px]" />
+          </>
         )}
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)',
-            backgroundSize: '26px 26px',
-          }}
-        />
-        <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-amber-500/20 blur-[100px]" />
       </div>
 
       <div className="px-5 pb-6 sm:px-8 sm:pb-8">

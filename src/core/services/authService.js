@@ -80,6 +80,8 @@ export function toFrontendProfile(backendUser) {
     memberSince: backendUser.createdAt ?? null,
     foundedYear: backendUser.foundedYear ?? null,
     photoUrl: backendUser.photoUrl ?? null,
+    // Banner do perfil público: só ONG tem (pessoa sempre vem null)
+    coverUrl: backendUser.coverUrl ?? null,
     bio: backendUser.bio ?? "",
     isVerified: backendUser.isVerified ?? false,
     // Conta do Google sem senha: "Criar senha" em vez de "Alterar senha".
@@ -117,8 +119,6 @@ function toFrontendUser(backendUser) {
     speciesPreference: null,
     idealPetProfile: null,
     portePreferido: null,
-    // 🆕 Mapeamento de 'telefone' removido — a coluna telefone_whatsapp
-    // deixa de existir no banco (ver ALTER TABLE na Parte 2)
   }
 }
 
