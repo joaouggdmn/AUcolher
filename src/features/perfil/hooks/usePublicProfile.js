@@ -11,6 +11,7 @@ function buildOwnProfile(user) {
     userType: user.userType === 'ONG' ? 'ONG' : 'PESSOA',
     name: user.name,
     photoUrl: user.photoUrl ?? null,
+    coverUrl: user.userType === 'ONG' ? (user.coverUrl ?? null) : null,
     city: user.city || user.address?.city,
     state: user.state || user.address?.state,
     bio: user.bio ?? '',
