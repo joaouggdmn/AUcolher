@@ -9,7 +9,7 @@ export const USE_MOCK_CAMPANHAS = import.meta.env.VITE_USE_MOCK_CAMPANHAS !== 'f
 export const USE_MOCK_ADMIN = import.meta.env.VITE_USE_MOCK_ADMIN !== 'false'
 // Denúncias feitas no site (POST /api/reports e GET /api/reports/mine)
 export const USE_MOCK_DENUNCIAS = import.meta.env.VITE_USE_MOCK_DENUNCIAS !== 'false'
-// Retorno e repasse de adoções (docs/entrega-final/api-devolucao-reabandono.md):
+// Retorno e repasse de adoções (docs/contratos-prontos/api-devolucao-reabandono.md):
 // sem as rotas da migração 012, um "servidor falso" guarda os registros por
 // pedido e os sobrepõe aos pedidos reais
 export const USE_MOCK_REABANDONO = import.meta.env.VITE_USE_MOCK_REABANDONO !== 'false'

@@ -1,15 +1,10 @@
 # AUcolher — Contrato da API: painel do admin
 
-> Escrito em 2026-10-11, junto com o painel do admin no frontend (branch `feature/painel-admin`). O frontend já chama estas rotas por `features/admin/services/adminApi.js`. Enquanto o backend não tem as rotas, um servidor falso com as mesmas funções e os mesmos DTOs responde no lugar: `adminMock.js`, ligado por `VITE_USE_MOCK_ADMIN`, que vem ligado por padrão. Denúncias e moderação (banir, remover) têm um contrato próprio: `api-denuncias-moderacao.md` (ver §6).
-
-> **Implementado em 15/10/2026** (backend `feature/admin-api`). Além do contrato: `GET /api/admin/animals` devolve `listingStatus` (`AVAILABLE`, `IN_PROGRESS`, `ADOPTED`, `INACTIVE`, `REMOVED`), que a tela exige, e `animals.removed` no stats. **Campanhas ainda não:** `donations`, `campaigns` e `ngoRanking.byRaised` vêm zerados e `/api/admin/campaigns` não existe; o front os pega do mock (`campaignAdminStats.js`) enquanto `VITE_USE_MOCK_CAMPANHAS` estiver ligada. `AdminUserDTO.deletedAt` espera a 013.
-
-> **Edição pela moderação** (15/10/2026, back `feature/admin-limites` + migração 016):
-> - `GET`/`PUT /api/admin/users/{id}` — corpo `{ email, profile }`, com o `profile` igual ao do `PUT /users/me`;
-> - `PUT /api/admin/animals/{id}` e `PUT /api/admin/events/{id}`, com os mesmos corpos do dono;
-> - os DTOs ganham `moderatedAt`.
+> ✅ **Implementado** (pacote `admin/`; migração 016 para a edição pela moderação). O front usa estas rotas com `VITE_USE_MOCK_ADMIN=false`, por `features/admin/services/adminApi.js`. Denúncias e moderação (banir, remover) têm um contrato próprio: `api-denuncias-moderacao.md`.
 >
-> A campanha é editada no mock (`updateCampaignForAdmin`). Quando a 007 entrar, o back precisa de `PUT /api/admin/campaigns/{id}`, que o front já chama, e de `campaigns.moderated_at`/`moderated_by`.
+> Diferenças da implementação: `GET /api/admin/animals` devolve `listingStatus` (`AVAILABLE`, `IN_PROGRESS`, `ADOPTED`, `INACTIVE`, `REMOVED`), que a tela exige, e o stats tem `animals.removed`. A moderação também edita: `GET`/`PUT /api/admin/users/{id}` (corpo `{ email, profile }`, com o `profile` igual ao do `PUT /users/me`), `PUT /api/admin/animals/{id}` e `PUT /api/admin/events/{id}` (os mesmos corpos do dono); os DTOs ganham `moderatedAt`.
+>
+> **Falta a parte de campanhas,** que depende da migração 007: `/api/admin/campaigns` (lista, edição e remoção) e os blocos `donations`, `campaigns` e `ngoRanking.byRaised` do stats, que hoje saem zerados. Enquanto isso, o front completa esses blocos com o mock de campanhas (`campaignAdminStats.js`). Tudo está em `../entrega-final/api-campanhas-doacoes.md` §7. `AdminUserDTO.deletedAt` espera a exclusão de conta (013).
 
 ## 1. Regras
 
@@ -38,8 +33,8 @@
 | GET | `/api/admin/stats` | `AdminStatsDTO` (seção 3.1) |
 | GET | `/api/admin/users` | `AdminUserDTO[]`, mais recentes primeiro |
 | GET | `/api/admin/animals` | `AnimalSummaryDTO[]` (o mesmo card da vitrine), todos os status, mais recentes primeiro |
-| GET | `/api/admin/campaigns` | Campanha (`api-campanhas-eventos.md` §6.2) + `removed`, mais recentes primeiro |
-| GET | `/api/admin/events` | Evento (`api-campanhas-eventos.md` §2.1), todos os status, data mais distante primeiro |
+| GET | `/api/admin/campaigns` | Campanha (`../entrega-final/api-campanhas-doacoes.md` §2) + `removed`, mais recentes primeiro |
+| GET | `/api/admin/events` | Evento (`api-eventos.md` §2.1), todos os status, data mais distante primeiro |
 
 ## 3. Formatos (DTOs)
 
@@ -116,9 +111,8 @@
 | `CAMPAIGN_CREATED` | campanha | título | nome da ONG |
 | `EVENT_CREATED` | evento | título | nome da ONG |
 
-**Atualizado em 15/10/2026:**
-- **Bloco `returns`.** O `AdminStatsDTO` ganha a **taxa de reabandono**: geral, por faixa de compatibilidade (alta, média, baixa) e por motivo. O formato e o SQL estão em `entrega-final/api-devolucao-reabandono.md` §4. Entra na S3, junto com o resto deste contrato.
-- **`AdminUserDTO.deletedAt`.** A conta excluída pela própria pessoa aparece como "Conta excluída" e não pode ser reativada (`entrega-final/api-exclusao-conta.md` §3 e §4).
+- **Bloco `returns`.** O `AdminStatsDTO` traz a **taxa de reabandono**: geral, por faixa de compatibilidade (alta, média, baixa) e por motivo. O formato e o SQL estão em `api-devolucao-reabandono.md` §4.
+- **`AdminUserDTO.deletedAt`** (com a 013). A conta excluída pela própria pessoa aparece como "Conta excluída" e não pode ser reativada (`../entrega-final/api-exclusao-conta.md` §3 e §4).
 
 ### 3.2 `AdminUserDTO`
 
@@ -144,37 +138,19 @@
 ## 4. Notas para o backend (Spring Boot)
 
 - **Pacote**: um `admin/` com `AdminController` (`@RequestMapping("/api/admin")`) e `AdminService`. A segurança já está pronta no `SecurityConfig`.
-- **Banco**: nenhuma tabela nova, só consultas. As estatísticas dependem de `campaigns`/`donations` (`api-campanhas-eventos.md` §6.7) e de `reports` (`api-denuncias-moderacao.md` §5). Por isso este contrato entra depois de campanhas, junto com o de moderação (`plano-backend-restante.md` §3).
-- **Hoje** só existe `GET /api/admin/adoption-requests`. A página de eventos do admin ainda lê o mock, porque falta o `GET /api/admin/events`.
+- **Banco**: nenhuma tabela nova, só consultas. As estatísticas dependem de `reports` (`api-denuncias-moderacao.md` §5) e, para os blocos de campanhas, de `campaigns`/`donations` (`../entrega-final/api-campanhas-doacoes.md` §8).
 - **Consultas sugeridas**
   - Contas: `COUNT ... GROUP BY user_type` e `date_trunc('month', created_at)`.
   - Doações: `SUM(amount) ... WHERE status = 'APPROVED'`, também com `date_trunc` em `approved_at`.
   - Animais: um `COUNT` por `status`.
-  - Pedidos de adoção: `inProgress` e o funil usam os pedidos reais de `GET /api/admin/adoption-requests` (desde 2026-10-13).
+  - Pedidos de adoção: `inProgress` e o funil usam os pedidos reais de `GET /api/admin/adoption-requests`.
 - **`/admin/animals`**: é a listagem pública sem o filtro `status = AVAILABLE`. O `AnimalSpecifications` hoje força esse filtro na vitrine.
 - **Booleans**: usar `@JsonProperty("isVerified")`, como já é feito.
 
-## 5. Notas do modo mock (só frontend)
+## 5. Denúncias e moderação
 
-- **Contas**: a API ainda não lista contas, então elas vêm de `features/admin/data/seedAdmin.js`.
-  - A semente traz os 7 perfis públicos mockados (ids 1 a 7) e 25 contas geradas (ids 101 a 125), com cadastro espalhado nos últimos 12 meses.
-  - Somam-se as contas que aparecem nos dados reais: donos dos animais da API e ONGs de campanhas e eventos.
-- **Ids repetidos**: os ids 1 a 7 do mock se repetem com os do banco real.
-  - Mesmo id com outro nome é tratado como outra conta: a real ocupa o lugar da fictícia.
-  - O ranking usa o nome que está no próprio dado (campanha ou cópia do animal no pedido).
-- **Animais**
-  - Vêm da vitrine real (`GET /api/animals`, todas as páginas), que só traz os disponíveis.
-  - Os adotados vêm dos pedidos concluídos (`GET /api/admin/adoption-requests`). O mock devolve `listingStatus` em cada animal.
-  - Animais fora do ar de outras contas não aparecem.
-- **Pedidos de adoção**: vêm da API real (`GET /api/admin/adoption-requests`), mais os de demonstração do admin (`adminDemo`, só em dev, no `localStorage`).
-- **Campanhas, doações e eventos**: o `adminMock` lê os outros servidores falsos (`readAllCampaignsForAdmin`, `readApprovedDonationsForAdmin`, `readAllEventsForAdmin`). Quando esses módulos forem para a API, as rotas `/api/admin/*` precisam ir junto.
-
-## 6. Denúncias e moderação
-
-Saíram deste arquivo em 13/10/2026 e agora estão em **`api-denuncias-moderacao.md`**:
+Estão em **`api-denuncias-moderacao.md`**:
 - as denúncias do site (`/api/reports`);
 - as rotas do admin para julgar (`/api/admin/reports/*`);
 - banir e reativar contas (`PATCH /api/admin/users/{id}/status`);
 - remover anúncio, campanha ou evento (`DELETE /api/admin/{animals|campaigns|events}/{id}`).
-
-Lá estão também as notas de implementação e o SQL (`reports` e os ajustes de moderação). Como a mesma flag `VITE_USE_MOCK_ADMIN` liga as estatísticas daqui e a moderação de lá, o ideal é entregar os dois arquivos juntos.

@@ -1,9 +1,9 @@
 # AUcolher — Contrato da API: perfil da ONG (banner) e o telefone que saiu
 
-> **✅ Implementado em 15/10/2026** (back e front, branches `feature/banner-ong`; migração 008 aplicada no `aucolher_db`).
+> ✅ **Implementado** (back e front, migração 008).
 > Diferenças da implementação: o banner conta na completude do perfil da ONG; o limite de 600.000 virou a constante `PhotoUrl.COVER_MAX_LENGTH` (usada também pela capa do evento); o ícone de WhatsApp da própria AUcolher saiu do rodapé.
 >
-> Versão 1 (13/10/2026). Duas mudanças pequenas no perfil (`users`):
+> Duas mudanças pequenas no perfil (`users`):
 > - §1: o **telefone/WhatsApp** saiu do sistema e não deve voltar;
 > - §2: um **banner** no perfil público, **só para ONG**.
 
@@ -13,8 +13,8 @@
   - não existe coluna de telefone no banco: nem no `sql/schema.sql` do nosso backend, nem no do seu repositório;
   - não existe campo de telefone nos DTOs da API;
   - não existe campo de telefone nas telas do front ("Minha conta" e cadastro).
-- A coluna `telefone_whatsapp` existia só no banco antigo (`adocao_db`, com tabelas em português) e no dump `bd_adocao.sql`, que foi apagado do repositório em 29/09 (commit "Reorganize backend by feature and rename to AUcolher").
-- **Por que saiu:** o contato entre adotante e dono acontece pelo **chat do pedido aceito** (`api-chat.md`), dentro da plataforma. O contato público da ONG é o **e-mail institucional** + as **redes sociais** (Instagram, Facebook, X), que já existem.
+- A coluna `telefone_whatsapp` existia só no banco antigo (`adocao_db`, com tabelas em português) e no dump `bd_adocao.sql`, que foi apagado do repositório (commit "Reorganize backend by feature and rename to AUcolher").
+- **Por que saiu:** o contato entre adotante e dono acontece pelo **chat do pedido aceito** (`../entrega-final/api-chat.md`), dentro da plataforma. O contato público da ONG é o **e-mail institucional** + as **redes sociais** (Instagram, Facebook, X), que já existem.
 - **O que fazer:**
   - não criar coluna, campo de DTO ou validação de telefone;
   - se algum banco de teste ainda veio do `adocao_db` antigo, a migração da §2.5 apaga a coluna por segurança (`DROP COLUMN IF EXISTS`). Num banco novo, ela não faz nada.
@@ -26,7 +26,7 @@
 - **Só ONG** (`userType = NGO`) tem banner. É um diferencial do perfil institucional, ao lado de equipe, horário de visitas e redes sociais.
 - É **opcional**. Sem banner, o front mostra o fundo padrão do cabeçalho.
 - Aparece no topo do **perfil público** da ONG e no card da ONG na **home** (vitrine de ONGs).
-- Fica guardado **como a foto de perfil hoje**: URL http(s) ou data URL da imagem comprimida no navegador, dentro do JSON. Ainda não existe upload de arquivos (decisão de 13/10: o upload fica para depois).
+- Fica guardado **como a foto de perfil hoje**: URL http(s) ou data URL da imagem comprimida no navegador, dentro do JSON. Ainda não existe upload de arquivos (o upload fica para depois).
 - Limite: até **600.000 caracteres**, o mesmo da capa do evento (`EventService.MAX_COVER_LENGTH`), porque o banner é maior que o avatar.
 - Formatos: `http(s)://...` ou `data:image/(jpeg|png|webp);base64,...`. É o mesmo `PhotoUrl.FORMAT` da foto de perfil.
 - **Conteúdo impróprio no banner** é denunciado como o perfil (`targetType: USER`, motivo "Conteúdo impróprio"). O admin bane a conta se for o caso. Não existe ação de "remover só o banner".
@@ -88,7 +88,7 @@ Nenhuma rota nova. Mudam só:
 
 ### 2.5 SQL (rascunho de migração, PostgreSQL)
 
-Número sugerido: `008_ngo_cover.sql` (ver `plano-backend-restante.md` §4).
+Número: `008_ngo_cover.sql`.
 
 ```sql
 -- ============================================================
@@ -119,8 +119,8 @@ ALTER TABLE users DROP COLUMN IF EXISTS telefone_whatsapp;
 COMMIT;
 ```
 
-## 3. O que muda no front quando a API existir (lembrete)
+## 3. O que mudou no front
 
 - `OngAccountForm`: um campo de banner com o `CoverImageInput` que já existe (o mesmo das capas), com `maxLength` de 600.000.
 - `authService.toFrontendUser` e o mapeamento do perfil público: passar `coverUrl` adiante. O `PublicProfileHeader.jsx` já desenha o banner quando ele existe.
-- Home (`useOngShowcase` / `OngShowcaseSection`): trocar o `mockPublicProfiles` pelo perfil real da ONG. Assim o banner e o link "Ver perfil" usam o id verdadeiro: hoje o link usa os ids fictícios 1/4/5.
+- Home (`useOngShowcase` / `OngShowcaseSection`): trocar o `mockPublicProfiles` pelo perfil real da ONG. Assim o banner e o link "Ver perfil" usam o id verdadeiro.

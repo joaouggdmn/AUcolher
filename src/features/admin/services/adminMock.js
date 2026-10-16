@@ -46,7 +46,7 @@ import {
 } from './moderationMock'
 
 // 🔴 Servidor falso do painel do admin: mesmas funções de adminApi.js e os
-// DTOs de docs/api-admin.md. A API ainda não lista contas, então elas vivem
+// DTOs de docs/contratos-prontos/api-admin.md. A API ainda não lista contas, então elas vivem
 // aqui (seedAdmin.js); o resto vem de onde já mora hoje:
 //   animais  → API real (GET /api/animals, só os disponíveis) + adotados
 //              tirados dos pedidos concluídos

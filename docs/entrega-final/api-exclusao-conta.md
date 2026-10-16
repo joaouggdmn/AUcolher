@@ -1,8 +1,8 @@
 # AUcolher — Contrato da API: excluir a própria conta
 
-> Versão 1 (15/10/2026). Implementa a regra de negócio §2.1 ("Excluir conta"). Sprint **S2**, migração **013**.
+> Implementa a regra de negócio §2.1 ("Excluir conta"). Migração **013**.
 >
-> **Não depende da moderação** (S3): como a exclusão é definitiva, ela muda o status das coisas direto, sem precisar da cascata reversível do banimento (`api-denuncias-moderacao.md` §2).
+> **Reaproveita a moderação, que já está no backend:** o banimento já cancela os pedidos da conta (`AdoptionRequestService.cancelAllForAccount`) e o `JwtAuthenticationFilter` já recusa token de conta inativa. A exclusão usa as mesmas peças; o que ela tem de próprio é a anonimização, o `deleted_at` e o que é apagado de vez (§5).
 
 ## 1. Regras de negócio
 
@@ -14,7 +14,7 @@
 - **A linha de `users` não é apagada: é anonimizada.** Pedidos, avaliações, doações e mensagens das **outras** pessoas apontam para ela e precisam continuar legíveis.
   - O nome vira **"Conta excluída"**.
   - O e-mail vira `excluida-{id}@aucolher.invalid`. O e-mail original fica **livre para um novo cadastro**.
-  - Senha, foto, bio, CNPJ (fica livre para outra ONG), e-mail institucional, redes sociais, ano de fundação, banner e endereço viram `NULL`.
+  - Senha, foto, bio, CNPJ (fica livre para outra ONG), redes sociais, ano de fundação, banner (`cover_url`) e endereço viram `NULL`.
   - O selo de verificada sai, a conta fica `active = false` e ganha `deleted_at`.
 - **O que é apagado de vez:**
   - equipe e horários de visita da ONG;
@@ -51,7 +51,7 @@
    - os passados ficam.
 5. **Apagar** o que está na lista "apagado de vez" da seção 1.
 6. **Anonimizar** a linha de `users` (seção 1).
-7. **Denúncias** (quando a moderação existir, na S3): as `PENDING` contra o perfil da conta ou contra anúncios dela são arquivadas automaticamente (`RESOLVED`, `resolution = DISMISSED`), porque o conteúdo já saiu do ar.
+7. **Denúncias:** as `PENDING` contra o perfil da conta ou contra anúncios dela são arquivadas automaticamente (`RESOLVED`, `resolution = DISMISSED`), porque o conteúdo já saiu do ar.
 
 Depois disso, qualquer token da conta para de funcionar: o `CustomUserDetailsService` encontra a conta inativa, e o e-mail antigo nem existe mais. O front desloga na hora.
 
@@ -63,13 +63,13 @@ Corpo do pedido de exclusão:
 { "password": "minhaSenha1" }
 ```
 
-Conta sem senha (`hasPassword: false`, ver `api-senha.md` §2.3):
+Conta sem senha (`hasPassword: false`, ver `api-senha.md` §2.2):
 
 ```json
 { "confirmation": "EXCLUIR" }
 ```
 
-**Lista do admin** (`AdminUserDTO`, `api-admin.md` §3.2): ganha `deletedAt` (nulo ou data). A conta excluída aparece com `name: "Conta excluída"`, `active: false` e `deletedAt` preenchido. A tela mostra "Excluída", sem a ação de reativar.
+**Lista do admin** (`AdminUserDTO`, `../contratos-prontos/api-admin.md` §3.2): ganha `deletedAt` (nulo ou data). A conta excluída aparece com `name: "Conta excluída"`, `active: false` e `deletedAt` preenchido. A tela mostra "Excluída", sem a ação de reativar.
 
 ## 4. Endpoints
 
@@ -85,7 +85,7 @@ Conta sem senha (`hasPassword: false`, ver `api-senha.md` §2.3):
 | 400 | conta com senha, sem `password` ou com senha errada | "Senha incorreta." |
 | 400 | conta sem senha e `confirmation` diferente de `EXCLUIR` | "Digite EXCLUIR para confirmar." |
 
-**No painel do admin** (S3): `PATCH /api/admin/users/{id}/status` com `{ "active": true }` numa conta com `deleted_at` responde 400 "Contas excluídas não podem ser reativadas.".
+**No painel do admin:** `PATCH /api/admin/users/{id}/status` com `{ "active": true }` numa conta com `deleted_at` responde 400 "Contas excluídas não podem ser reativadas.".
 
 ## 5. Notas de implementação (Spring Boot)
 
@@ -96,7 +96,7 @@ Conta sem senha (`hasPassword: false`, ver `api-senha.md` §2.3):
    - `EventService.cancelUpcomingOf(ngoId)`;
    - os repositórios para apagar o resto.
 2. **Motivo novo.** Acrescente `ACCOUNT_DELETED` ao enum `CancelReason` e ao front (texto "conta excluída").
-3. **Reaproveitar na moderação.** Os métodos `cancelAllForAccount` e o filtro "dono ativo" das rotas públicas são os mesmos que o banimento (S3) vai precisar. Na S3, o banimento chama `cancelAllForAccount(userId, ACCOUNT_BANNED)` em vez de reescrever a cascata.
+3. **Reaproveitar a moderação.** O `ModerationService` já chama `cancelAllForAccount(userId, ACCOUNT_BANNED)` e as rotas públicas já escondem conteúdo de dono inativo (animais, eventos, perfil). A exclusão chama `cancelAllForAccount(userId, ACCOUNT_DELETED)` e ganha o mesmo filtro de graça, porque a conta fica `active = false`. As denúncias pendentes podem ser arquivadas como o `ReportService` já faz no banimento.
 4. **E-mail e CNPJ livres.** Como `email` e `cnpj` são `UNIQUE`, anonimizar **antes** de alguém tentar se cadastrar de novo já resolve. O e-mail anonimizado usa o domínio reservado `.invalid`, que nunca recebe correio.
 5. **Testes:**
    - pessoa com pedido ativo como adotante e como dona: os dois cancelados com `ACCOUNT_DELETED`;
@@ -125,22 +125,15 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
 
 COMMENT ON COLUMN users.deleted_at IS 'Conta excluída pela própria pessoa (anonimizada, active = false); nunca é reativada';
 
--- Motivos de cancelamento: mantém os anteriores e acrescenta ACCOUNT_DELETED.
--- A migração 014 (moderação) recria esta CHECK de novo e precisa manter ACCOUNT_DELETED.
-ALTER TABLE adoption_requests DROP CONSTRAINT IF EXISTS chk_adoption_requests_cancel_reason;
-ALTER TABLE adoption_requests ADD CONSTRAINT chk_adoption_requests_cancel_reason
-    CHECK (cancel_reason IS NULL OR cancel_reason IN
-        ('ADOPTER_WITHDREW', 'OWNER_WITHDREW', 'ANIMAL_ADOPTED', 'ANIMAL_UNAVAILABLE', 'ACCOUNT_DELETED'));
-
 COMMIT;
 ```
 
-O nome `chk_adoption_requests_cancel_reason` é o da migração 005 (conferido em 15/10).
+**Não mexa na CHECK de `adoption_requests.cancel_reason`:** a 014 já a recriou aceitando `ACCOUNT_DELETED`. Recriar aqui com menos valores apagaria `ACCOUNT_BANNED` e `LISTING_REMOVED`. No Java, falta só acrescentar `ACCOUNT_DELETED` ao enum `CancelReason`.
 
 ## 7. O que muda no front
 
 - **Serviço:** `deleteMyAccount({ password } | { confirmation })` em `core/services/authService.js` ou `features/perfil/services/userService.js`.
-- **Minha conta** (pessoa e ONG, também em `/ong/painel/perfil`): no fim da página, depois de "Dados da conta", uma **zona de perigo** "Excluir conta", em vermelho. Não existe mais aba ou seção "Segurança" (`api-senha.md` v2).
+- **Minha conta** (pessoa e ONG, também em `/ong/painel/perfil`): no fim da página, depois de "Dados da conta", uma **zona de perigo** "Excluir conta", em vermelho. Não existe aba ou seção "Segurança" (`api-senha.md`).
   - O `ConfirmDialog`, na variante perigo, explica o que acontece:
     - os anúncios saem do ar;
     - os pedidos em andamento são cancelados;
@@ -149,4 +142,4 @@ O nome `chk_adoption_requests_cancel_reason` é o da migração 005 (conferido e
   - Ele pede a senha ou que se digite `EXCLUIR` (conforme `hasPassword`).
 - **Sucesso:** logout, ida para a home e o *toast* "Sua conta foi excluída.".
 - **Textos:** `ACCOUNT_DELETED` entra nos textos de cancelamento (cards de pedido e faixa de "Conversa encerrada"): "Cancelado — conta excluída".
-- **Admin** (S3): o `UserRow` mostra o selo "Excluída" quando houver `deletedAt` e esconde "Reativar".
+- **Admin:** o `UserRow` mostra o selo "Excluída" quando houver `deletedAt` e esconde "Reativar".

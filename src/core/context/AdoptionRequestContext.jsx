@@ -17,7 +17,7 @@ const NO_REQUESTS = [];
 // as duas se atualizam sozinhas de tempos em tempos (e ao voltar para a aba)
 const REFRESH_INTERVAL = 30_000;
 
-// Os pedidos da conta logada, vindos da API (docs/api-adocao.md): os que ela
+// Os pedidos da conta logada, vindos da API (docs/contratos-prontos/api-adocao.md): os que ela
 // enviou e os que recebeu pelos animais dela, numa lista só — cada tela
 // filtra pelo lado que interessa (adopter.userId ou ownerId). A API valida
 // cada ação; aqui as funções só chamam a API e atualizam as listas
