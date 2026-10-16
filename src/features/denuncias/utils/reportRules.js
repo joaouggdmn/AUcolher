@@ -51,7 +51,7 @@ const REASON_BY_VALUE = Object.fromEntries(REPORT_REASONS.map((reason) => [reaso
 
 // Identifica o alvo de uma denúncia (agrupar, achar a que já está em
 // análise). O perfil leva também o nome: no modo mock, os ids 1 a 7 dos perfis
-// fictícios se repetem com os do banco real (plano-painel-admin.md §6), e
+// fictícios se repetem com os do banco real (docs/planos-front/plano-painel-admin.md §6), e
 // mesmo id com outro nome é outra conta
 export function reportTargetKey({ targetType, targetId, target }) {
   const name = targetType === 'USER' ? (target?.name ?? '') : ''

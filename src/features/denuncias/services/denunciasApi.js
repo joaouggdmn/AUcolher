@@ -1,6 +1,6 @@
 import api from '../../../core/services/api'
 
-// Adaptador real: é o contrato de docs/api-admin.md §6 em código.
+// Adaptador real: é o contrato de docs/contratos-prontos/api-denuncias-moderacao.md §1 em código.
 // denunciasMock.js tem as mesmas funções e devolve os mesmos DTOs
 
 // POST /api/reports — { targetType, targetId, reason, description }. O

@@ -1,13 +1,12 @@
 # AUcolher — Contrato da API: denúncias e moderação
 
-> Versão 2 (13/10/2026). As regras, rotas e DTOs foram escritos em 11/10, junto com a branch `feature/denuncias` do frontend, e moravam nas §6–8 do `api-admin.md`. Agora estão neste arquivo, com o que faltava para o backend: **notas de implementação (§4)** e **SQL (§5)**.
-> O frontend já chama estas rotas:
-> - denúncias do site: `features/denuncias/services/denunciasApi.js`, com o servidor falso `denunciasMock.js` ligado por `VITE_USE_MOCK_DENUNCIAS` (padrão: ligado);
-> - rotas do admin: `features/admin/services/adminApi.js`, com `adminMock.js` + `moderationMock.js` ligados por `VITE_USE_MOCK_ADMIN` (padrão: ligado).
+> ✅ **Implementado** (migração 014). O frontend usa estas rotas com `VITE_USE_MOCK_DENUNCIAS=false` e `VITE_USE_MOCK_ADMIN=false`:
+> - denúncias do site: `features/denuncias/services/denunciasApi.js`;
+> - rotas do admin: `features/admin/services/adminApi.js`. As estatísticas e as listas do admin estão no `api-admin.md`.
 >
-> Por isso nomes, formatos e códigos de status precisam bater exatamente com o que está aqui. As estatísticas e as listas do admin continuam no `api-admin.md`. Como a mesma flag `VITE_USE_MOCK_ADMIN` liga tudo, o ideal é entregar os dois arquivos juntos.
-
-> **Implementado em 15/10/2026** (backend `feature/admin-api` + migração 014 aplicada, sem o bloco de `campaigns`). O login recusa a conta suspensa só depois de conferir a senha. Corpo sem alvo responde 400 "Informe o que está sendo denunciado."; o dono que tenta `PATCH /status` com `REMOVED` recebe 400 "Só a moderação remove um anúncio". No front, o `api.js` reconhece o 403 da conta suspensa (`auth:suspended`) e desloga com o aviso; os filtros 🔴 do mock continuam no código e viram no-op com `VITE_USE_MOCK_ADMIN=false`. Banir uma ONG real **não** esconde as campanhas mock dela (limitação do modo híbrido).
+> Diferenças da implementação: o login recusa a conta suspensa só depois de conferir a senha. Corpo sem alvo responde 400 "Informe o que está sendo denunciado."; o dono que tenta `PATCH /status` com `REMOVED` recebe 400 "Só a moderação remove um anúncio". No front, o `api.js` reconhece o 403 da conta suspensa (`auth:suspended`) e desloga com o aviso.
+>
+> **Falta só a parte de campanhas** (remover campanha, `campaigns.removed_by_moderation`, esconder as campanhas da ONG banida). Ela entra com a migração 007: `../entrega-final/api-campanhas-doacoes.md` §7 e §8.
 
 ## 1. Denúncias
 
@@ -17,7 +16,7 @@
 - **O que pode ser denunciado** (`targetType`):
   - `ANIMAL`: um anúncio de animal (`targetId` = id do animal);
   - `USER`: o perfil de uma pessoa ou ONG (`targetId` = id da conta).
-  - Campanhas, eventos e avaliações ficam de fora (decisão de 13/10: as avaliações continuam como estão).
+  - Campanhas, eventos e avaliações ficam de fora (as avaliações continuam como estão).
 - **Ninguém denuncia o próprio conteúdo** (400): o dono do animal, ou a própria conta.
 - **Uma denúncia em análise por pessoa e alvo**: se já existe uma `PENDING` da mesma conta para o mesmo alvo, a resposta é 409. Depois de julgada, a pessoa pode denunciar de novo.
 - **Motivo** (`reason`), conforme o alvo:
@@ -148,7 +147,7 @@ Erros (todos no `ErrorResponseDTO`, com a mensagem em `message`):
   - animais da conta: vitrine (`GET /api/animals`), `GET /api/users/{id}/animals`, favoritos e deck do AUmatch; `GET /api/animals/{id}` responde 404 para todos, menos para o admin;
   - campanhas e eventos da ONG: listas, detalhe (404), doação e presença;
   - o perfil público da conta (404). Isso já acontece hoje: o `UserService` esconde contas inativas.
-  - As avaliações escritas pela conta banida **continuam aparecendo** (decisão de 13/10).
+  - As avaliações escritas pela conta banida **continuam aparecendo**.
 - **O que o admin continua vendo**: tudo, nas rotas `/api/admin/*`, com a situação da conta:
   - `/admin/users`: `active: false`;
   - `/admin/animals`: `owner.active: false`;
@@ -253,7 +252,7 @@ Erros (todos no `ErrorResponseDTO`, com a mensagem em `message`):
    1. recusar se a conta é `ADMIN` (400);
    2. `users.active = false`;
    3. resolver as denúncias (item 7);
-   4. cancelar os pedidos ativos em que a conta é adotante **ou** dona do animal: `status = 'CANCELLED'`, `cancel_reason = 'ACCOUNT_BANNED'`, `cancelled_from_status` = o status anterior, `closed_at = now`. Não gera mensagem de sistema no chat (`api-chat.md` §1).
+   4. cancelar os pedidos ativos em que a conta é adotante **ou** dona do animal: `status = 'CANCELLED'`, `cancel_reason = 'ACCOUNT_BANNED'`, `cancelled_from_status` = o status anterior, `closed_at = now`. Não gera mensagem de sistema no chat (`../entrega-final/api-chat.md` §1).
    - Os animais, eventos e campanhas da conta **não** são alterados: somem pelo filtro do item 10 e voltam sozinhos se a conta for reativada.
 9. **Remover anúncio**: `status = 'REMOVED'`, resolver as denúncias com `LISTING_REMOVED` e cancelar os pedidos ativos com `LISTING_REMOVED`.
    - O `AnimalLeftListingEvent` já cancela os pedidos quando o dono tira o animal do ar (`ANIMAL_UNAVAILABLE`). Dá para reaproveitá-lo, acrescentando o motivo no evento: `new AnimalLeftListingEvent(animalId, CancelReason.LISTING_REMOVED)`.
@@ -267,13 +266,11 @@ Erros (todos no `ErrorResponseDTO`, com a mensagem em `message`):
 
 ## 5. SQL (rascunho de migração, PostgreSQL)
 
-Número: **`014_reports_moderation.sql`** (renumerada em 15/10; ver `entrega-final/README.md` §3).
-
-**Atualizado em 15/10/2026:**
-- A CHECK de `cancel_reason` (bloco 3) precisa **manter `ACCOUNT_DELETED`**, que entra na migração 013 (`entrega-final/api-exclusao-conta.md`).
-- A CHECK de `status` de `adoption_requests` já tem `RETURNED` e `REHOMED`, da migração 012, e não deve ser recriada aqui.
-- O banimento reaproveita o `AdoptionRequestService.cancelAllForAccount(userId, reason)`, criado na exclusão de conta, em vez de reescrever a cascata dos pedidos.
-- Ao banir, as denúncias contra uma conta **já excluída** não existem mais como pendentes: a exclusão as arquiva (`api-exclusao-conta.md` §2, passo 7). Precisa rodar **depois** da migração de campanhas, porque altera a tabela `campaigns`. Se a sua migração de campanhas ainda não foi aplicada em lugar nenhum, prefira colocar a coluna `removed_by_moderation` direto no `CREATE TABLE campaigns` e apagar o bloco 4 abaixo.
+Número: **`014_reports_moderation.sql`** (aplicada).
+- A CHECK de `cancel_reason` (bloco 3) já aceita `ACCOUNT_DELETED`, da exclusão de conta (013). A 013 não precisa recriá-la.
+- A CHECK de `status` de `adoption_requests` já tem `RETURNED` e `REHOMED`, da migração 012, e não foi recriada aqui.
+- O banimento usa o `AdoptionRequestService.cancelAllForAccount(userId, reason)`, que a exclusão de conta também vai usar.
+- **O bloco 4 foi aplicado só em `events`.** A coluna `campaigns.removed_by_moderation` nasce direto no `CREATE TABLE campaigns` da 007 (`../entrega-final/api-campanhas-doacoes.md` §8).
 
 ```sql
 -- ============================================================

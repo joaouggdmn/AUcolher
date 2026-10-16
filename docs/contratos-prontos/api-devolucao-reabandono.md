@@ -1,13 +1,10 @@
 # AUcolher — Contrato da API: retorno, repasse e taxa de reabandono
 
-> Versão 1 (15/10/2026). Implementa a regra de negócio §3.3, reescrita em 15/10.
-> - **S2:** rotas e migração **012**.
-> - **S3:** o bloco `returns` do `stats`, junto com o pacote admin.
-> - **Front:** a página "Meus animais" sai na S1 (README §4); os botões desta feature entram nela na S2.
+> Implementa a regra de negócio §3.3. Migração **012**.
 >
 > **Por que existe:** é a métrica que valida a hipótese principal do TCC. Adoções com compatibilidade alta no AUmatch voltam menos?
 
-> **Implementado em 15/10/2026** (backend `feature/devolucao-reabandono` + migração 012 aplicada; front com `VITE_USE_MOCK_REABANDONO=false`). Diferenças do contrato: o `PATCH /status` recusa `RETURNED`/`REHOMED` (400); data do retorno ausente responde "Informe a data do retorno"; o repasse exige cidade e UF no perfil do adotante, como o cadastro. As mensagens de sistema do chat esperam a 011.
+> ✅ **Implementado** (back e front, com `VITE_USE_MOCK_REABANDONO=false`). Diferenças do contrato: o `PATCH /status` recusa `RETURNED`/`REHOMED` (400); data do retorno ausente responde "Informe a data do retorno"; o repasse exige cidade e UF no perfil do adotante, como o cadastro. As mensagens de sistema do chat (`ANIMAL_RETURNED`, `ANIMAL_REHOMED`) entram com o chat: `../entrega-final/api-chat.md`.
 
 ## 1. Regras de negócio
 
@@ -21,7 +18,7 @@
 - **De onde parte:** os dois só partem de um pedido `CONCLUDED`.
 - **Vale o primeiro.** Depois do retorno, o adotante não republica, porque o animal não está mais com ele. Depois do repasse, o doador não registra retorno, porque o animal está com o adotante.
 - `RETURNED` e `REHOMED` **não são ativos**, como `CONCLUDED`.
-- **Adotante ONG fica fora de tudo** (decidido em 15/10). Quando uma ONG adota, ela está resgatando o animal e depois o anuncia de novo pelo painel, como qualquer resgate. Isso não é reabandono. Então, quando o adotante do pedido é ONG:
+- **Adotante ONG fica fora de tudo.** Quando uma ONG adota, ela está resgatando o animal e depois o anuncia de novo pelo painel, como qualquer resgate. Isso não é reabandono. Então, quando o adotante do pedido é ONG:
   - nenhuma das 4 rotas aceita o pedido (400, seção 3), nem para o doador nem para a ONG;
   - o pedido fica fora da taxa: não entra em `adoptions`, `returns`, faixas nem `noScore` (seção 4).
   - A **ONG doadora** continua normal: se ela doa para uma pessoa e o animal volta, ela registra o retorno pelo painel, e conta.
@@ -168,7 +165,7 @@ Devolve o **mesmo formato do corpo de cadastro de animal** (`AnimalRequestDTO`),
 | 400 | `/return`, `/rehome` | `OTHER` sem nota | "Descreva o motivo" |
 | 400 | `/return`, `/rehome` | nota com mais de 500 caracteres | "A observação pode ter no máximo 500 caracteres" |
 
-## 4. Taxa de reabandono (`AdminStatsDTO`, S3)
+## 4. Taxa de reabandono (`AdminStatsDTO`)
 
 Bloco novo em `GET /api/admin/stats` (`api-admin.md` §3.1):
 
@@ -225,7 +222,7 @@ GROUP BY 1;
    - `returnToOwner(animal)`, de uso interno: `ADOPTED → INACTIVE`, a exceção da seção 1.3;
    - `createRehomed(adopter, dto, originRequest)`: reaproveita o `fill(...)` do cadastro.
    - O `PUT` e o `PATCH /status` públicos continuam recusando animal adotado.
-6. **Mensagens de sistema:** `ANIMAL_RETURNED` e `ANIMAL_REHOMED` entram no `SystemEvent` do chat (`api-chat.md` §1).
+6. **Mensagens de sistema:** `ANIMAL_RETURNED` e `ANIMAL_REHOMED` entram no `SystemEvent` do chat (`../entrega-final/api-chat.md` §1).
 7. **Avaliações e perfil:** `AdoptionReviewService` aceita os três status (seção 1.6), e `countByStatusInvolving` passa a receber a lista dos três.
 8. **Testes:**
    - score congelado com e sem quiz completo;
@@ -240,7 +237,7 @@ GROUP BY 1;
 
 ## 6. Ligação com a página "Meus animais"
 
-A página é só front (README §4). Esta feature acrescenta a ela:
+A página `/meus-animais` é só front (regras §5). Esta feature acrescenta a ela:
 - os botões da seção 8;
 - o `originRequestId` dos anúncios, para o diálogo de excluir.
 
@@ -316,7 +313,7 @@ COMMIT;
 
 ## 8. O que muda no front
 
-> **Feito no front em 10/2026, com mock** (flag `VITE_USE_MOCK_REABANDONO`, ligada por padrão). Enquanto as rotas não existem, um "servidor falso" no localStorage guarda o retorno e o repasse por id de pedido e os sobrepõe aos pedidos da API. O republicar já cria o anúncio novo de verdade (`POST /api/animals`), e o "Desisti de doar" o tira do ar com o `PATCH /status` de sempre. **Quando o back entregar a 012 e as 4 rotas:** pôr `VITE_USE_MOCK_REABANDONO=false` no `.env`. O admin lê o bloco `returns` do `stats` real quando `VITE_USE_MOCK_ADMIN=false`.
+> ✅ Feito no front, ligado na API (`VITE_USE_MOCK_REABANDONO=false`). O admin lê o bloco `returns` do `stats` real (`VITE_USE_MOCK_ADMIN=false`).
 >
 > Nenhum botão aparece em pedido com adotante ONG (seção 1.1).
 
@@ -355,11 +352,10 @@ COMMIT;
 - `AdoptionStatus.jsx`, `SentRequestCard`, `ReceivedRequestCard`, `ResolvedRequestRow` e `AdoptionTimeline` ganham os estados **"Devolvido ao doador"** e **"Repassado pelo adotante"**, com a data e o motivo;
 - o doador vê também o link para o anúncio novo, em `REHOMED`.
 
-**Painel do admin** (S3):
+**Painel do admin:**
 - **Card novo** em `features/admin/overview/`, por exemplo `ReturnRateCard.jsx`:
   - a taxa geral;
   - três barras por faixa (alta, média, baixa), com "x de y adoções";
   - a lista de motivos;
   - uma nota de rodapé: "Considera só retornos e repasses registrados na plataforma.".
 - **Layout de impressão:** o card entra no PDF.
-- **Mock:** o `adminMock` passa a devolver o bloco `returns` com números de exemplo, para o card funcionar antes do backend.

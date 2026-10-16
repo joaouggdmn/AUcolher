@@ -14,7 +14,7 @@ import { buildSeedEventos, DEMO_ATTENDANCE_EVENT_IDS } from '../data/seedEventos
 import { getEventPayloadErrors } from '../utils/eventoRules'
 
 // 🔴 Servidor falso de eventos: mesmas funções de eventosApi.js e mesmas
-// regras, DTOs e erros do contrato (docs/api-campanhas-eventos.md). Cada
+// regras, DTOs e erros do contrato (docs/contratos-prontos/api-eventos.md). Cada
 // função espera o "tempo de rede" e depois lê, altera e grava o localStorage
 // num bloco síncrono, para duas chamadas nunca se atropelarem.
 // Versão 2: contrato em inglês — os dados da versão 1 são descartados

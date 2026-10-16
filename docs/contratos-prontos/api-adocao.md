@@ -1,8 +1,8 @@
 # Contrato — API de pedidos de adoção e avaliações
 
-Backend: branch `feature/adoption-requests` do `api-aucolher` (pacote `adoption/`). Referência completa no README do backend, seções "Pedidos de adoção", "Avaliações" e "Admin: pedidos". Migração: `sql/migrations/005_adoption_requests.sql`.
+> ✅ **Implementado.** Backend: pacote `adoption/` do `api-aucolher`. Referência completa no README do backend, seções "Pedidos de adoção", "Avaliações" e "Admin: pedidos". Migração: `sql/migrations/005_adoption_requests.sql`.
 
-O chat continua mock: as mensagens ficam no navegador, guardadas pelo **id real** do pedido (`chat_messages_{id}`). O contrato para levar o chat ao banco está em `api-chat.md`. Com ele, as trocas de status (confirmar entrega, concluir, desistir) também passam a criar as mensagens de sistema no backend.
+O chat continua mock: as mensagens ficam no navegador, guardadas pelo **id real** do pedido (`chat_messages_{id}`). O contrato para levar o chat ao banco está em `../entrega-final/api-chat.md`. Com ele, as trocas de status (confirmar entrega, concluir, desistir) também passam a criar as mensagens de sistema no backend.
 
 ## Rotas
 

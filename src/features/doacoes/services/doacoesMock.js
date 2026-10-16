@@ -15,7 +15,7 @@ import { buildSeedCampanhas } from '../data/seedCampanhas'
 import { getCampaignPayloadErrors, getDonationAmountError } from '../utils/campanhaRules'
 
 // 🔴 Servidor falso de campanhas e doações: mesmas funções de doacoesApi.js
-// e mesmas regras, DTOs e erros do contrato (docs/api-campanhas-eventos.md).
+// e mesmas regras, DTOs e erros do contrato (docs/entrega-final/api-campanhas-doacoes.md).
 // Faz o papel do backend E do Mercado Pago: gera um PIX fictício e só
 // aprova pelo botão "Simular pagamento" (simulateDonationApproval)
 const store = createMockStore({ key: MOCK_CAMPANHAS_STORE_KEY, version: 1, seed: buildSeedCampanhas })

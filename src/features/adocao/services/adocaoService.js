@@ -9,7 +9,7 @@ import { isAccountBanned, isAnimalRemoved } from '../../admin/services/moderatio
 
 // Fachada dos pedidos de adoção: as telas só conhecem estas funções e o
 // formato de pedido que já usavam quando tudo era localStorage — o resto do
-// app (painel da ONG, Minha conta, chat) muda pouco. Contrato em docs/api-adocao.md
+// app (painel da ONG, Minha conta, chat) muda pouco. Contrato em docs/contratos-prontos/api-adocao.md
 
 const ACTIVE_STATUSES = ['PENDING', 'ACCEPTED', 'AWAITING_DELIVERY']
 

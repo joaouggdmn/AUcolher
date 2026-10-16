@@ -1,8 +1,8 @@
 # AUcolher — Contrato da API: conta Mercado Pago de cada ONG
 
-> Versão 1 (15/10/2026). Implementa a regra de negócio §10.3: **o dinheiro das doações cai direto na conta da ONG**, e a plataforma nunca guarda doações nem cobra comissão. Substitui a "conta única da plataforma" do `api-campanhas-eventos.md` §6.1. O resto daquele contrato continua valendo, com as mudanças da seção 5 deste arquivo.
+> Implementa a regra de negócio §10.3: **o dinheiro das doações cai direto na conta da ONG**, e a plataforma nunca guarda doações nem cobra comissão.
 >
-> Migrações: **007** (`donations.ngo_id`) e **009** (`mercado_pago_accounts`). Sprint **S1**, depois do teste no sandbox da preparação (seção 6).
+> Migração **009** (`mercado_pago_accounts`). O que isto muda nas campanhas (`acceptingDonations`, `donations.ngo_id`, recusas) já está escrito em `api-campanhas-doacoes.md`. **Antes de implementar, faça o teste no sandbox da seção 6.**
 
 ## 1. Regras de negócio
 
@@ -63,7 +63,7 @@ Resposta de `POST /api/ngo/mercado-pago/connect`:
 
 O front só faz `window.location.href = authorizationUrl`.
 
-### 2.3 Campanha (acréscimo ao `api-campanhas-eventos.md` §6.2)
+### 2.3 Campanha (já em `api-campanhas-doacoes.md` §2)
 
 ```json
 { "...campos de sempre": "...", "acceptingDonations": true }
@@ -115,17 +115,15 @@ O front só faz `window.location.href = authorizationUrl`.
    - **como renovar:** `POST https://api.mercadopago.com/oauth/token` com `grant_type=refresh_token`, `client_id`, `client_secret` e `refresh_token`. **O `refresh_token` muda a cada renovação: salve o novo**, senão o acesso se perde;
    - **se falhar** (`invalid_grant`, 401): `status = NEEDS_RECONNECT`. Não apague as credenciais; quem as substitui é a reconexão.
 
-## 5. Mudanças no contrato de campanhas (`api-campanhas-eventos.md` §6)
+## 5. Chamadas ao Mercado Pago
 
-| Onde | Antes | Agora |
-|---|---|---|
-| §6.1, conta | "o dinheiro cai numa conta única da plataforma" | A order é criada com o **token da ONG dona da campanha**, e o dinheiro cai na conta dela |
-| `POST /api/campaigns` | ONG cria | 400 "Conecte sua conta do Mercado Pago no painel antes de criar uma campanha." se a conta não estiver `CONNECTED` |
-| Campanha (DTO) | — | + `acceptingDonations` (seção 2.3) |
-| `POST /api/campaigns/{id}/donations` | cria o PIX | 400 "Esta ONG não está recebendo doações no momento." se a conta da ONG não estiver `CONNECTED`. Essa checagem vem **depois** das que já existem (própria, encerrada, valor) |
-| Tabela `donations` | — | + `ngo_id BIGINT NOT NULL REFERENCES users(id)`: a ONG dona no momento da doação. É ela que diz **qual token usar** para consultar a order, mesmo se a campanha for apagada de vez (`campaign_id` vira `NULL`) |
-| Consulta da order (`GET /donations/{id}` em `PENDING`) | token da plataforma | token da ONG (`donations.ngo_id`) |
-| Webhook | — | Assinatura validada e order localizada como na seção 5.2 |
+As mudanças nas campanhas já estão em `api-campanhas-doacoes.md`:
+- a order é criada com o **token da ONG dona da campanha**, e o dinheiro cai na conta dela;
+- `POST /api/campaigns` e `POST /api/campaigns/{id}/donations` recusam ONG sem conta `CONNECTED`;
+- a campanha ganha `acceptingDonations`;
+- `donations.ngo_id` diz qual token consulta a order (no `GET /donations/{id}` em `PENDING` e no webhook), mesmo se a campanha for apagada de vez.
+
+Aqui ficam os detalhes das chamadas.
 
 ### 5.1 Criação do PIX (Orders API) com o token da ONG
 
@@ -182,9 +180,9 @@ Content-Type: application/json
 | aguardando pagamento (`action_required` / `waiting_transfer`) | continua `PENDING` |
 | expirada ou cancelada | `EXPIRED` / `CANCELLED` (só se ainda estiver `PENDING`) |
 
-## 6. Teste no sandbox (preparação, 15/10–18/10)
+## 6. Teste no sandbox (fazer antes de implementar)
 
-Tem que funcionar **antes** de implementar a S1. Passos:
+Tem que funcionar **antes** de implementar campanhas e esta conexão. Passos:
 
 1. Criar a **aplicação do AUcolher** em Mercado Pago Developers, cadastrar a **URL de redirecionamento** e anotar `client_id` e `client_secret`.
 2. Criar **dois usuários de teste**: um "vendedor" (faz o papel da ONG) e um "comprador" (o doador).
@@ -242,15 +240,7 @@ Tem que funcionar **antes** de implementar a S1. Passos:
 
 ## 8. SQL (rascunho de migração, PostgreSQL)
 
-**Na 007 (campanhas)**, se ainda não foi aplicada, crie `donations` já com `ngo_id`:
-
-```sql
-ngo_id  BIGINT  NOT NULL REFERENCES users (id),
--- e o índice
-CREATE INDEX IF NOT EXISTS idx_donations_ngo_status ON donations (ngo_id, status);
-```
-
-Se a 007 já rodou, ponha na 009: `ALTER TABLE donations ADD COLUMN IF NOT EXISTS ngo_id BIGINT REFERENCES users (id);`, preencha com `UPDATE donations d SET ngo_id = c.ngo_id FROM campaigns c WHERE c.id = d.campaign_id;` e depois `ALTER COLUMN ngo_id SET NOT NULL`.
+**`donations.ngo_id`** já nasce na 007 (`api-campanhas-doacoes.md` §8). Se a sua 007 já rodou sem ela, ponha na 009: `ALTER TABLE donations ADD COLUMN IF NOT EXISTS ngo_id BIGINT REFERENCES users (id);`, preencha com `UPDATE donations d SET ngo_id = c.ngo_id FROM campaigns c WHERE c.id = d.campaign_id;` e depois `ALTER COLUMN ngo_id SET NOT NULL`.
 
 **`009_mercado_pago_accounts.sql`:**
 
@@ -293,7 +283,7 @@ COMMENT ON COLUMN mercado_pago_accounts.status        IS 'CONNECTED ou NEEDS_REC
 COMMIT;
 ```
 
-## 9. O que muda no front
+## 9. O que muda no front (a fazer)
 
 - **Serviço** (`features/doacoes/services/`):
   - `doacoesApi.js` ganha `getMercadoPagoAccount`, `connectMercadoPago` e `disconnectMercadoPago`;
