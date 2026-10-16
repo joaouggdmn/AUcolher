@@ -277,11 +277,19 @@ COMMIT;
 
 `last_read_message_id` não é chave estrangeira de propósito. Ele é só um marcador ("li até aqui") e funciona mesmo se o front mandar um id maior que o da última mensagem.
 
-## 6. O que muda no front quando a API existir (lembrete)
+## 6. O que muda no front
 
-- `features/chat/services/chatService.js`, hoje vazio, vira o adaptador destas rotas. O ideal é o trio mock/api/fachada com uma flag `VITE_USE_MOCK_CHAT`, como em eventos.
-- `useChatMessages`: troca o `localStorage` por react-query com o polling da §3.1. A mensagem da API é convertida para o modelo atual da tela: `senderId: 'system'` quando `type = SYSTEM`, o texto montado a partir do `systemEvent` e `timestamp` = `createdAt`.
-- `useChatUnread` e `chatReadState`: passam a usar `GET /chats/summary` e `PUT /chats/{id}/read`.
-- `useConcludeAdoption`: deixa de chamar `injectSystemMessage` (quem cria agora é o backend), e `core/utils/chatSystemMessage.js` sai.
-- O campo de texto do `ChatConversationPanel` ganha `maxLength={1000}`.
-- `storageKeys.js`: saem `chatMessagesStorageKey` e `chatLastSeenStorageKey`.
+> ✅ **Front pronto**, atrás de `VITE_USE_MOCK_CHAT` (ligada por padrão). Quando as rotas existirem: `VITE_USE_MOCK_CHAT=false` no `.env`.
+
+- **Serviços** (`features/chat/services/`): o trio de sempre.
+  - `chatApi.js` chama as 4 rotas da §3;
+  - `chatMock.js` responde no lugar, com os mesmos DTOs, no `localStorage` (`aucolher_mock_chat`). Na primeira vez, ele converte as conversas do formato antigo;
+  - `chatService.js` é a fachada: converte o DTO para o modelo da tela (`senderId: 'system'` quando `type = SYSTEM`, `timestamp` = `createdAt`) e monta o texto em português de cada `systemEvent`.
+- **Polling** (§3.1), com react-query:
+  - `useChatMessages`: o histórico e depois `?after=` a cada 3 s, só com a aba visível. O envio entra na lista na hora;
+  - `useChatUnread`: `GET /chats/summary` a cada 20 s (badge da sidebar e painel da ONG).
+- **Leitura:** a conversa aberta chama `PUT /chats/{id}/read` com a última mensagem que apareceu na tela.
+- **Mensagens de sistema:** o front não escreve mais nenhuma. Depois de uma troca de status, ele só recarrega a conversa; quem cria o aviso é o backend. No mock, o `recordStatusEvent` faz esse papel.
+- **Retorno e repasse:** no mock, a linha "voltou para quem doou" / "anunciou para uma nova adoção" sai do próprio pedido. Com a API, ela chega como `ANIMAL_RETURNED` / `ANIMAL_REHOMED`.
+- **Campo de texto:** `maxLength={1000}`, e o `message` da API aparece se o envio for recusado.
+- **Sem as rotas e com a flag desligada:** o badge fica em 0 e a conversa mostra "Não foi possível carregar as mensagens."; o resto do site segue normal.
