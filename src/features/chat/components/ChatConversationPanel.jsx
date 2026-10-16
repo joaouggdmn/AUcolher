@@ -12,23 +12,27 @@ import {
   FaRotateLeft,
   FaBullhorn,
 } from "react-icons/fa6";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../core/context/AuthContext";
 import { useChatMessages } from "../hooks/useChatMessages";
 import { useConcludeAdoption } from "../../../core/hooks/useConcludeAdoption";
+import { queryKeys } from "../../../core/services/queryKeys";
 import { getErrorMessage } from "../../../core/utils/apiError";
-import { markConversationSeen } from "../../../core/utils/chatReadState";
+import { CHAT_MESSAGE_MAX_LENGTH } from "../../../core/utils/constants";
+import {
+  RETURN_SYSTEM_EVENTS,
+  SHOWS_RETURN_LINE_FROM_REQUEST,
+  markRead,
+  systemMessageText,
+} from "../services/chatService";
 import ConfirmAdoptionModal from "../../adocao/components/ConfirmAdoptionModal";
 import AdoptionConcludedPanel from "./AdoptionConcludedPanel";
 
-// Linha de sistema do retorno ou do repasse (regras §3.3). Por enquanto só
-// de exibição, derivada do pedido: com o chat na API, a própria API grava
-// ANIMAL_RETURNED / ANIMAL_REHOMED na conversa
+// Linha de sistema do retorno ou do repasse (regras §3.3). No mock ela sai
+// do próprio pedido; com a API, chega como ANIMAL_RETURNED / ANIMAL_REHOMED
 function returnSystemMessage(contact) {
-  const animal = contact.animalName;
-  if (contact.returnInfo?.type === "RETURNED") return `${animal} voltou para quem doou.`;
-  return contact.isOwnerView
-    ? `${contact.name} anunciou ${animal} para uma nova adoção.`
-    : `Você anunciou ${animal} para uma nova adoção.`;
+  const systemEvent = contact.returnInfo?.type === "RETURNED" ? "ANIMAL_RETURNED" : "ANIMAL_REHOMED";
+  return systemMessageText({ systemEvent }, contact);
 }
 
 // Por que a conversa foi encerrada, do ponto de vista de quem está lendo
@@ -65,30 +69,48 @@ function formatTime(timestamp) {
 
 function ChatConversationPanel({ contact, onBack }) {
   const { user } = useAuth();
-  const { messages, sendMessage } = useChatMessages(contact.requestId);
+  const queryClient = useQueryClient();
+  const { messages, loadFailed, sendMessage, isSending } = useChatMessages(contact.requestId);
   const { requestDelivery, concludeAdoption, cancelAdoption } = useConcludeAdoption();
   const [draft, setDraft] = useState("");
+  const [sendError, setSendError] = useState(null);
   // null | 'request-delivery' (passo 1, doador) | 'conclude' (passo 2, adotante)
   // | 'owner-withdraw' | 'adopter-cancel' (desistência de qualquer lado)
   const [confirmModalMode, setConfirmModalMode] = useState(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState(null);
   const bottomRef = useRef(null);
+  const lastMarkedRef = useRef(null);
+  const lastMessageId = messages.at(-1)?.id;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  // Conversa aberta = tudo o que chegou até agora foi visto; zera o
-  // contador dela no badge da sidebar
+  // Conversa aberta = tudo o que apareceu na tela foi visto; zera o
+  // contador dela no badge da sidebar. Melhor esforço: se falhar, o badge
+  // só continua mostrando a conversa
   useEffect(() => {
-    markConversationSeen(user?.id, contact.requestId);
-  }, [user?.id, contact.requestId, messages.length]);
+    if (lastMessageId == null || !user) return;
+    const mark = `${contact.requestId}:${lastMessageId}`;
+    if (lastMarkedRef.current === mark) return;
+    lastMarkedRef.current = mark;
+    markRead(contact.requestId, lastMessageId)
+      .then(() => queryClient.invalidateQueries({ queryKey: queryKeys.chat.summary(user.id) }))
+      .catch(() => {});
+  }, [contact.requestId, lastMessageId, user, queryClient]);
 
-  const handleSubmit = (e) => {
+  // O texto só sai do campo quando a mensagem foi aceita
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    sendMessage(draft);
-    setDraft("");
+    if (!draft.trim() || isSending) return;
+    setSendError(null);
+    try {
+      await sendMessage(draft);
+      setDraft("");
+    } catch (error) {
+      setSendError(getErrorMessage(error, "Não foi possível enviar a mensagem. Tente novamente."));
+    }
   };
 
   const openConfirm = (mode) => {
@@ -219,7 +241,14 @@ function ChatConversationPanel({ contact, onBack }) {
       </div>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-        {messages.length === 0 ? (
+        {loadFailed ? (
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-rose-500 shadow-sm">
+              <FaComments size={18} />
+            </span>
+            <p className="text-sm text-slate-500">Não foi possível carregar as mensagens.</p>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-emerald-600 shadow-sm">
               <FaComments size={18} />
@@ -232,14 +261,26 @@ function ChatConversationPanel({ contact, onBack }) {
           </div>
         ) : (
           messages.map((message) => {
-            // Mensagem de sistema (celebração de adoção) — bolha
-            // centralizada, visualmente distinta das mensagens normais
+            // Mensagem de sistema (entrega, adoção, desistência) — bolha
+            // centralizada, visualmente distinta das mensagens normais. O
+            // retorno e o repasse ficam em azul, como a linha do mock
             if (message.senderId === "system") {
+              const isReturn = RETURN_SYSTEM_EVENTS.includes(message.systemEvent);
               return (
                 <div key={message.id} className="flex justify-center">
-                  <div className="flex max-w-[85%] items-center gap-2 rounded-2xl bg-amber-50 px-4 py-2 text-center text-xs font-bold text-amber-700 shadow-sm sm:max-w-[70%]">
-                    <FaPaw size={11} className="shrink-0 text-amber-500" />
-                    {message.text}
+                  <div
+                    className={`flex max-w-[85%] items-center gap-2 rounded-2xl px-4 py-2 text-center text-xs font-bold shadow-sm sm:max-w-[70%] ${
+                      isReturn ? "bg-sky-50 text-sky-700" : "bg-amber-50 text-amber-700"
+                    }`}
+                  >
+                    {message.systemEvent === "ANIMAL_RETURNED" ? (
+                      <FaRotateLeft size={11} className="shrink-0 text-sky-500" />
+                    ) : message.systemEvent === "ANIMAL_REHOMED" ? (
+                      <FaBullhorn size={11} className="shrink-0 text-sky-500" />
+                    ) : (
+                      <FaPaw size={11} className="shrink-0 text-amber-500" />
+                    )}
+                    {systemMessageText(message, contact)}
                   </div>
                 </div>
               );
@@ -269,7 +310,7 @@ function ChatConversationPanel({ contact, onBack }) {
             );
           })
         )}
-        {hasReturn && contact.returnInfo && (
+        {SHOWS_RETURN_LINE_FROM_REQUEST && hasReturn && contact.returnInfo && (
           <div className="flex justify-center">
             <div className="flex max-w-[85%] items-center gap-2 rounded-2xl bg-sky-50 px-4 py-2 text-center text-xs font-bold text-sky-700 shadow-sm sm:max-w-[70%]">
               {contact.status === "RETURNED" ? (
@@ -317,18 +358,24 @@ function ChatConversationPanel({ contact, onBack }) {
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="flex shrink-0 items-center gap-2 border-t bg-white p-3"
+          className="flex shrink-0 flex-wrap items-center gap-2 border-t bg-white p-3"
         >
+          {sendError && (
+            <p role="alert" className="w-full px-2 text-xs font-semibold text-rose-600">
+              {sendError}
+            </p>
+          )}
           <input
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
+            maxLength={CHAT_MESSAGE_MAX_LENGTH}
             placeholder="Digite uma mensagem..."
             className="min-h-11 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-emerald-600 focus:bg-white focus:ring-4 focus:ring-emerald-600/10"
           />
           <button
             type="submit"
-            disabled={!draft.trim()}
+            disabled={!draft.trim() || isSending}
             aria-label="Enviar mensagem"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-white transition-all duration-300 hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
           >
