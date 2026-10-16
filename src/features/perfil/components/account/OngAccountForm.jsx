@@ -14,7 +14,9 @@ import { BRAZILIAN_STATES } from '../../../../core/utils/brazilianStates'
 import { maskCEP, maskCNPJ } from '../../../../core/utils/masks'
 import { FACEBOOK_URL_PATTERN, sanitizeInstagramHandle, sanitizeXHandle } from '../../../../core/utils/socialLinks'
 import { FOUNDED_YEAR_MIN, getCurrentYear } from '../../../../core/utils/foundedYear'
+import { NGO_COVER_MAX_LENGTH } from '../../../../core/utils/constants'
 import AvatarUploadInput from '../../../../core/components/ui/AvatarUploadInput'
+import CoverImageInput from '../../../../core/components/ui/CoverImageInput'
 import CepField from '../../../../core/components/ui/CepField'
 import FormField from '../../../../core/components/ui/FormField'
 import AuthInput from '../../../auth/components/AuthInput'
@@ -90,7 +92,20 @@ function OngAccountForm({ account = null, onSave = null }) {
             description="Tudo aqui aparece na página da ONG. É o que adotantes e doadores usam para conhecer e confiar em vocês."
           />
 
-          <ProfileSection icon={FaBuildingNgo} title="Identidade" description="Logo, nome e apresentação da instituição">
+          <ProfileSection icon={FaBuildingNgo} title="Identidade" description="Banner, logo, nome e apresentação da instituição">
+            <div className="mb-6 flex flex-col gap-1.5">
+              <p className="text-sm font-semibold text-slate-700">Banner</p>
+              <CoverImageInput
+                id="account-cover"
+                value={formData.coverUrl}
+                onChange={(dataUrl) => setField('coverUrl', dataUrl)}
+                maxLength={NGO_COVER_MAX_LENGTH}
+                maxSize={1400}
+                label="Escolher banner"
+                emptyHint="Opcional. Aparece no topo do perfil público e no card da ONG na página inicial. Prefira uma imagem horizontal."
+              />
+            </div>
+
             <div className="mb-6 flex justify-center sm:justify-start">
               <AvatarUploadInput
                 value={formData.photoUrl}
