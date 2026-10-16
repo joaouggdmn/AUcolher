@@ -63,6 +63,7 @@ export function buildOngForm(user) {
   return {
     name: user?.name ?? '',
     photoUrl: user?.photoUrl ?? null,
+    coverUrl: user?.coverUrl ?? null,
     bio: user?.bio ?? '',
     // Texto, como todo input controlado — volta a ser número no toOngUpdates
     foundedYear: user?.foundedYear != null ? String(user.foundedYear) : '',
@@ -90,6 +91,7 @@ export function toOngUpdates(form) {
   return {
     name: form.name.trim(),
     photoUrl: form.photoUrl,
+    coverUrl: form.coverUrl,
     bio: form.bio.trim(),
     foundedYear: parseFoundedYear(form.foundedYear),
     socialLinks: {
@@ -131,6 +133,8 @@ export function toApiPayload(updates, userType) {
 
   return {
     ...basePayload,
+    // Só ONG: a API recusa banner de pessoa. Sem ele (null), o banner é apagado
+    coverUrl: updates.coverUrl ?? null,
     foundedYear: updates.foundedYear ?? null,
     instagram: sanitizeInstagramHandle(updates.socialLinks.instagram ?? '') || null,
     twitter: sanitizeXHandle(updates.socialLinks.x ?? '') || null,

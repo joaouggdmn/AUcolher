@@ -15,8 +15,8 @@ function initials(name) {
     .toUpperCase()
 }
 
-// Foto do perfil público quando existe (ou a que veio da API); sem foto, as
-// iniciais da ONG
+// Foto do perfil público quando o card já o buscou (ou a que veio com os
+// animais e eventos); sem foto, as iniciais da ONG
 function OngAvatar({ ong, size = 'sm', className = '' }) {
   const photoUrl = ong.profile?.photoUrl ?? ong.photoUrl
 

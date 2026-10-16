@@ -11,6 +11,7 @@ function buildOwnProfile(user) {
     userType: user.userType === 'ONG' ? 'ONG' : 'PESSOA',
     name: user.name,
     photoUrl: user.photoUrl ?? null,
+    coverUrl: user.userType === 'ONG' ? (user.coverUrl ?? null) : null,
     city: user.city || user.address?.city,
     state: user.state || user.address?.state,
     bio: user.bio ?? '',
@@ -29,17 +30,18 @@ function buildOwnProfile(user) {
   }
 }
 
+// `profileId` null = não há conta para buscar (a home mostra a ONG sem perfil)
 export function usePublicProfile(profileId) {
   const { user } = useAuth()
 
   // O próprio perfil sai do que a conta acabou de salvar em "Minha conta",
   // sem esperar a API
-  const isOwnProfile = user != null && String(user.id) === String(profileId)
+  const isOwnProfile = user != null && profileId != null && String(user.id) === String(profileId)
 
   const { data, isLoading } = useQuery({
     queryKey: ['public-profile', String(profileId)],
     queryFn: () => getPublicProfile(profileId),
-    enabled: !isOwnProfile,
+    enabled: profileId != null && !isOwnProfile,
   })
 
   if (isOwnProfile) {

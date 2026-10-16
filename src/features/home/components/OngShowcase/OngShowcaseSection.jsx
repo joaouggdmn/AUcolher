@@ -11,6 +11,7 @@ import OngSelector from './OngSelector'
 import OngCampaignRow from './OngCampaignRow'
 import OngEventItem from './OngEventItem'
 import { useOngShowcase } from '../../hooks/useOngShowcase'
+import { usePublicProfile } from '../../../perfil/hooks/usePublicProfile'
 import { plural } from '../../utils/homePets'
 
 const PANEL_ID = 'ong-showcase-panel'
@@ -52,14 +53,14 @@ function EmptyBlock({ children }) {
   )
 }
 
-// Cidade e foto vêm do perfil mock quando existe e, senão, do que a API
-// trouxe da ONG. Os links de perfil só usam o perfil mock: a página
-// /ong/:id ainda lê os perfis do mock, e o id real de uma ONG da API pode
-// abrir o perfil de outra conta. O perfil abre na aba "Animais para Adoção",
-// então "Ver pets" leva aos pets desta ONG quando há perfil
+// Banner, cidade e foto vêm do perfil público da ONG (GET
+// /users/{id}/public-profile, só da ONG selecionada) e, enquanto ele carrega
+// ou se a ONG não tem id real, do que os animais e eventos trouxeram. O
+// perfil abre na aba "Animais para Adoção", então "Ver pets" leva aos pets
+// desta ONG quando há perfil
 function OngCard({ ong }) {
-  const { profile } = ong
-  const city = profile?.city ?? ong.city
+  const { profile } = usePublicProfile(ong.id)
+  const city = profile?.city || ong.city
   const state = profile?.city ? profile.state : ong.state
   const stats = [
     { label: plural(ong.petCount, 'pet', 'pets'), value: ong.petCount },
@@ -70,12 +71,17 @@ function OngCard({ ong }) {
   return (
     <div className="overflow-hidden rounded-3xl bg-white shadow-sm shadow-emerald-950/5 ring-1 ring-slate-200/70">
       <div className="relative h-28 bg-gradient-to-br from-emerald-700 to-emerald-900">
-        {profile?.coverUrl && <PetPhoto src={profile.coverUrl} width={800} className="h-full w-full" />}
+        {profile?.coverUrl && (
+          <>
+            <PetPhoto src={profile.coverUrl} width={800} className="h-full w-full" />
+            <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/40 to-transparent" />
+          </>
+        )}
       </div>
 
       <div className="px-5 pb-5">
         {/* relative: sem ele o banner (relative) é pintado por cima do avatar */}
-        <OngAvatar ong={ong} size="lg" className="relative -mt-8" />
+        <OngAvatar ong={{ ...ong, profile }} size="lg" className="relative -mt-8" />
 
         <p className="mt-3 flex items-center gap-2 text-xl font-black tracking-tight text-emerald-950">
           {ong.name}

@@ -2,11 +2,20 @@ import { useRef, useState } from 'react'
 import { FaImage, FaRotate, FaTrashCan } from 'react-icons/fa6'
 import { compressImage } from '../../utils/compressImage'
 
-// Imagem de capa (evento, campanha). 🔴 Vai como data URL no JSON, como a
-// foto de perfil: reduzida a ~1000 px para caber no limite da API
-// (`maxLength`) e no localStorage do mock. Com upload próprio, o backend
-// passaria a guardar só a URL pública
-function CoverImageInput({ id, value, onChange, maxLength, error, emptyHint }) {
+// Imagem de capa (evento, campanha, banner da ONG). 🔴 Vai como data URL no
+// JSON, como a foto de perfil: reduzida a `maxSize` px (~1000 por padrão)
+// para caber no limite da API (`maxLength`) e no localStorage do mock. Com
+// upload próprio, o backend passaria a guardar só a URL pública
+function CoverImageInput({
+  id,
+  value,
+  onChange,
+  maxLength,
+  error,
+  emptyHint,
+  maxSize = 1000,
+  label = 'Escolher imagem de capa',
+}) {
   const inputRef = useRef(null)
   const [fileError, setFileError] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -26,7 +35,7 @@ function CoverImageInput({ id, value, onChange, maxLength, error, emptyHint }) {
     setFileError(null)
     setIsProcessing(true)
     try {
-      const dataUrl = await compressImage(file, { maxSize: 1000, quality: 0.7 })
+      const dataUrl = await compressImage(file, { maxSize, quality: 0.7 })
       if (maxLength && dataUrl.length > maxLength) {
         setFileError('Mesmo reduzida, essa imagem ficou grande demais. Tente outra.')
       } else {
@@ -85,7 +94,7 @@ function CoverImageInput({ id, value, onChange, maxLength, error, emptyHint }) {
             )}
           </span>
           <span className="text-sm font-bold text-emerald-900">
-            {isProcessing ? 'Preparando imagem...' : 'Escolher imagem de capa'}
+            {isProcessing ? 'Preparando imagem...' : label}
           </span>
           {emptyHint && <span className="max-w-xs text-xs text-slate-400">{emptyHint}</span>}
         </button>
