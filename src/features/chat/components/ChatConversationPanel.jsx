@@ -120,7 +120,7 @@ function ChatConversationPanel({ contact, onBack }) {
 
   // A API valida cada passo: se recusar, o modal continua aberto com o motivo
   const handleConfirmModalConfirm = async () => {
-    const target = { requestId: contact.requestId, animalName: contact.animalName };
+    const target = { requestId: contact.requestId };
     setIsConfirming(true);
     setConfirmError(null);
     try {
@@ -129,7 +129,7 @@ function ChatConversationPanel({ contact, onBack }) {
       } else if (confirmModalMode === "conclude") {
         await concludeAdoption(target);
       } else {
-        await cancelAdoption({ ...target, byOwner: contact.isOwnerView });
+        await cancelAdoption({ ...target, byOwner: contact.isOwnerView, fromStatus: contact.status });
       }
       setConfirmModalMode(null);
     } catch (error) {
