@@ -21,21 +21,20 @@ export const MOCK_MODERACAO_STORE_KEY = 'aucolher_mock_moderacao'
 export const MOCK_REABANDONO_STORE_KEY = 'aucolher_mock_reabandono'
 // Links de "Esqueci minha senha" do modo mock (mesmo mockStore)
 export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'
+// "Banco" falso do chat: mensagens e marcas de leitura (mesmo mockStore)
+export const MOCK_CHAT_STORE_KEY = 'aucolher_mock_chat'
 // sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)
 export const ACCOUNT_SUSPENDED_FLAG_KEY = 'aucolher_account_suspended'
 // sessionStorage: a API recusou o token (ex.: a senha foi trocada em outro
 // aparelho) e a sessão caiu (o login avisa)
 export const SESSION_EXPIRED_FLAG_KEY = 'aucolher_session_expired'
 
-// Chave dinâmica: cada conversa (match aceito) tem seu próprio histórico
-// isolado no localStorage — centralizado aqui para não haver 2 lugares
-// construindo essa string de formas diferentes
+// Formato antigo do chat (uma chave por conversa e uma de leitura por conta):
+// só o chatMock lê, uma vez, para converter as conversas para o banco falso
 export function chatMessagesStorageKey(requestId) {
   return `chat_messages_${requestId}`
 }
 
-// Última leitura de cada conversa (requestId → ISO timestamp), por conta —
-// é o que permite contar mensagens não lidas no badge da sidebar
 export function chatLastSeenStorageKey(userId) {
   return `aucolher_chat_last_seen_${userId}`
 }
