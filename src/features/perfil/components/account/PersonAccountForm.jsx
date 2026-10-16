@@ -8,6 +8,7 @@ import ProfileCompletionBar from '../ProfileCompletionBar'
 import ProfileSection from '../ProfileSection'
 import LifestyleForm from '../LifestyleForm'
 import AccessSection from './AccessSection'
+import DeleteAccountSection from './DeleteAccountSection'
 import ModerationEmailSection from './ModerationEmailSection'
 import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
@@ -95,6 +96,8 @@ function PersonAccountForm({ account = null, onSave = null }) {
               <LifestyleForm values={formData} onChange={setField} />
             </ProfileSection>
           )}
+
+          {!isModeration && <DeleteAccountSection />}
         </AccountFormShell>
       </div>
     </>
