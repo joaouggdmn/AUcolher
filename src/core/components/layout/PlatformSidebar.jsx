@@ -1,8 +1,18 @@
 import { useEffect, useRef } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { FiX } from 'react-icons/fi'
-import { FaHeart, FaPaw, FaInbox, FaComments, FaPaperPlane, FaHouseChimney } from 'react-icons/fa6'
+import {
+  FaHeart,
+  FaPaw,
+  FaInbox,
+  FaComments,
+  FaPaperPlane,
+  FaHouseChimney,
+  FaCalendarPlus,
+  FaHandHoldingHeart,
+} from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
+import { PANEL_PATHS } from '../../../features/ong/panel/panelPaths'
 
 // Links principais só aparecem aqui no mobile — no desktop eles já estão
 // centralizados na navbar
@@ -36,11 +46,19 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
       iconClass: 'text-rose-500',
       count: totalFavoritos,
     },
-    { label: 'Cadastrar animal', to: '/animais/criar', icon: FaPaw, iconClass: 'text-emerald-600' },
-    // A pessoa gerencia anúncios e adoções em "Meus animais"; a ONG, no painel
-    ...(userType === 'PESSOA'
-      ? [{ label: 'Meus animais', to: '/meus-animais', icon: FaHouseChimney, iconClass: 'text-emerald-600' }]
-      : []),
+    // A pessoa gerencia anúncios e adoções em "Meus animais"; a ONG, no
+    // painel, e por isso os atalhos dela levam direto para lá
+    ...(userType === 'ONG'
+      ? [
+          { label: 'Meus animais', to: PANEL_PATHS.animals, icon: FaHouseChimney, iconClass: 'text-emerald-600' },
+          { label: 'Cadastrar animal', to: PANEL_PATHS.animalNew, icon: FaPaw, iconClass: 'text-emerald-600' },
+          { label: 'Criar evento', to: PANEL_PATHS.eventNew, icon: FaCalendarPlus, iconClass: 'text-emerald-600' },
+          { label: 'Criar campanha', to: PANEL_PATHS.campaignNew, icon: FaHandHoldingHeart, iconClass: 'text-emerald-600' },
+        ]
+      : [
+          { label: 'Cadastrar animal', to: '/animais/criar', icon: FaPaw, iconClass: 'text-emerald-600' },
+          { label: 'Meus animais', to: '/meus-animais', icon: FaHouseChimney, iconClass: 'text-emerald-600' },
+        ]),
     {
       label: 'Meus interesses',
       to: '/meus-interesses',
