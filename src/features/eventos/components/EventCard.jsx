@@ -17,7 +17,7 @@ const SUMMARY_TONES = {
 
 function EventCard({ event, layout = 'grid' }) {
   const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false)
-  const categoria = getCategoriaMeta(event.category)
+  const categoria = getCategoriaMeta(event.category, event.customCategory)
   const CategoriaIcon = categoria.icon
   const summary = getAttendanceSummary(event)
   const isList = layout === 'list'
