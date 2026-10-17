@@ -4,11 +4,12 @@ import {
   DONATION_MIN_AMOUNT,
 } from '../../../core/utils/constants'
 
-export const CAMPAIGN_CATEGORIES = ['HEALTH', 'FOOD', 'INFRASTRUCTURE']
+export const CAMPAIGN_CATEGORIES = ['HEALTH', 'FOOD', 'INFRASTRUCTURE', 'NEUTERING', 'RESCUE', 'OTHER']
 
 export const CAMPAIGN_LIMITS = {
   title: { min: 3, max: 120 },
   description: 2000,
+  customCategory: 30,
   goalAmount: { min: 50, max: 1_000_000 },
 }
 
@@ -19,7 +20,7 @@ const COVER_URL_FORMAT = /^(https?:\/\/|data:image\/(jpeg|png|webp);base64,)/
 // 400, igual ao backend; o formulário pode mostrar todas
 export function getCampaignPayloadErrors(payload, today) {
   const errors = {}
-  const { title, description, category, goalAmount, deadline, coverUrl } = payload
+  const { title, description, category, customCategory, goalAmount, deadline, coverUrl } = payload
   const { min, max } = CAMPAIGN_LIMITS.goalAmount
 
   if (!title || title.length < CAMPAIGN_LIMITS.title.min || title.length > CAMPAIGN_LIMITS.title.max) {
@@ -30,6 +31,12 @@ export function getCampaignPayloadErrors(payload, today) {
     errors.description = `A descrição pode ter no máximo ${CAMPAIGN_LIMITS.description} caracteres.`
   }
   if (!CAMPAIGN_CATEGORIES.includes(category)) errors.category = 'Escolha uma categoria.'
+  else if (category === 'OTHER') {
+    if (!customCategory) errors.customCategory = 'Dê um nome para a categoria.'
+    else if (customCategory.length > CAMPAIGN_LIMITS.customCategory) {
+      errors.customCategory = `O nome da categoria pode ter no máximo ${CAMPAIGN_LIMITS.customCategory} caracteres.`
+    }
+  }
 
   if (!Number.isInteger(goalAmount) || goalAmount < min || goalAmount > max) {
     errors.goalAmount = `A meta deve ser um valor inteiro entre R$ ${min} e R$ ${max.toLocaleString('pt-BR')}.`
@@ -42,6 +49,16 @@ export function getCampaignPayloadErrors(payload, today) {
   }
 
   return errors
+}
+
+// Cada ONG tem no máximo uma campanha urgente ativa: senão toda campanha
+// vira urgente e o selo perde o sentido. Devolve a outra urgente, se houver
+export function findOtherUrgentCampaign(campaigns, currentId = null) {
+  return (
+    campaigns.find(
+      (campaign) => campaign.isUrgent && !campaign.isClosed && String(campaign.id) !== String(currentId)
+    ) ?? null
+  )
 }
 
 // Valor da doação: reais inteiros entre o mínimo e o máximo. null = válido

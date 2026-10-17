@@ -18,7 +18,7 @@ function AdminCampaignRow({ campaign, onRemove }) {
   const statusKey = campaignStatus(campaign)
   const status = CAMPAIGN_STATUS_META[statusKey]
   const isOffSite = !hasPublicPage(statusKey)
-  const category = getCategoriaMeta(campaign.category)
+  const category = getCategoriaMeta(campaign.category, campaign.customCategory)
   const deadline = getDeadlineSummary(campaign)
 
   return (
