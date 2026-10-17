@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { loginRequest, registerRequest } from '../services/authService'
+import { exchangeGoogleCode, loginRequest, registerRequest } from '../services/authService'
 import { isAccountBanned, subscribeModeration } from '../../features/admin/services/moderationMock'
 import {
   getMatchProfile,
@@ -138,10 +138,8 @@ export function AuthProvider({ children }) {
     })
   }, [user])
 
-  // Só e-mail e senha — o papel (userType) vem do payload da API
-  async function login({ email, password }) {
-    const { token, tokenType, user: loggedUser } = await loginRequest({ email, password })
-
+  // Abre a sessão com o payload do login (por senha ou pelo Google)
+  async function startSession({ token, tokenType, user: loggedUser }) {
     // O token vai antes: a busca do Perfil AUmatch já precisa dele
     localStorage.setItem(TOKEN_STORAGE_KEY, token)
     localStorage.setItem(TOKEN_TYPE_STORAGE_KEY, tokenType)
@@ -160,6 +158,16 @@ export function AuthProvider({ children }) {
     setMatchProfileLoadedFor(matchProfile ? mergedUser.id : null)
 
     return mergedUser
+  }
+
+  // Só e-mail e senha — o papel (userType) vem do payload da API
+  async function login({ email, password }) {
+    return startSession(await loginRequest({ email, password }))
+  }
+
+  // O código que a API mandou na volta do Google vira a mesma sessão
+  async function loginWithGoogle(code) {
+    return startSession(await exchangeGoogleCode(code))
   }
 
   async function register(formData) {
@@ -206,6 +214,7 @@ export function AuthProvider({ children }) {
         isLoading,
         isMatchProfileReady,
         login,
+        loginWithGoogle,
         register,
         logout,
         updateProfile,
