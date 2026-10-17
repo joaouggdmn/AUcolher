@@ -37,13 +37,3 @@ export function buildCityOptions(cities, selected = '') {
   const sorted = [...unique].sort((a, b) => a.localeCompare(b, 'pt-BR'))
   return [{ value: '', label: 'Todas as cidades' }, ...sorted.map((city) => ({ value: city, label: city }))]
 }
-
-export const CITY_OPTIONS = [
-  { value: '', label: 'Todas as cidades' },
-  { value: 'Araranguá', label: 'Araranguá' },
-  { value: 'Criciúma', label: 'Criciúma' },
-  { value: 'Tubarão', label: 'Tubarão' },
-  { value: 'Florianópolis', label: 'Florianópolis' },
-  { value: 'Içara', label: 'Içara' },
-  { value: 'Sombrio', label: 'Sombrio' },
-]
