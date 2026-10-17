@@ -22,6 +22,8 @@ export function toFrontendCampaign(dto) {
     title: dto.title,
     description: dto.description ?? '',
     category: dto.category,
+    // Nome livre que a ONG deu quando a categoria é OTHER
+    customCategory: dto.customCategory ?? null,
     isUrgent: Boolean(dto.isUrgent),
     goalAmount,
     raisedAmount,
@@ -62,6 +64,7 @@ export function toCampaignPayload(values) {
     title: textOrNull(values.title),
     description: textOrNull(values.description),
     category: values.category || null,
+    customCategory: values.category === 'OTHER' ? textOrNull(values.customCategory) : null,
     isUrgent: Boolean(values.isUrgent),
     goalAmount: goalAmount == null ? null : Number(goalAmount),
     deadline: values.deadline || null,

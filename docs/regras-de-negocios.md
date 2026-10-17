@@ -340,7 +340,8 @@ Perfil mais completo que o de usuário comum:
 ### 10.2 Campanhas e doações
 
 - Só conta **ONG** cria campanha; só a **ONG dona** edita, encerra e exclui (painel `/ong/painel`, seção Campanhas, ou pela página da campanha).
-- Campanha: título, descrição, categoria (saúde, alimentação, estrutura), meta em reais inteiros, selo de **urgente** opcional, **prazo** opcional e capa opcional. A urgente ativa mais recente vira o banner SOS da vitrine.
+- Campanha: título, descrição, categoria (saúde, alimentação, estrutura, castração, resgate ou **outro**, com um nome curto escrito pela ONG), meta em reais inteiros, selo de **urgente** opcional, **prazo** opcional e capa opcional. A urgente ativa mais recente vira o banner SOS da vitrine.
+- **Uma campanha urgente ativa por ONG.** Para marcar outra, a ONG tira a urgência da atual. Assim o selo continua significando algo.
 - Doação só por **PIX via Mercado Pago (Orders API)**, sempre chamado pelo backend. Login obrigatório; pessoa e ONG doam, **menos a ONG na própria campanha**. O admin não doa (403 "Contas de admin não fazem doações."): no lugar do botão, ele vê "Remover campanha". Mínimo **R$ 5**, sem centavos.
 - O PIX vale **30 minutos**; o modal acompanha o pagamento sozinho. Só doações **aprovadas** contam no total da campanha e em "Meu impacto".
 - **Meta atingida** não encerra: a campanha continua recebendo. Ela encerra quando a ONG encerra ou quando o prazo vence; encerrada fica visível, mas não recebe nem edita.

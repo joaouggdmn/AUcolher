@@ -3,7 +3,8 @@ import { getErrorMessage } from '../../../core/utils/apiError'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../core/components/ui/Spinner'
 import CampaignForm from '../../doacoes/components/CampaignForm'
-import { useCampaign } from '../../doacoes/hooks/useCampanhas'
+import { useCampaign, useCampaigns } from '../../doacoes/hooks/useCampanhas'
+import { findOtherUrgentCampaign } from '../../doacoes/utils/campanhaRules'
 import { buildCampaignForm } from '../../doacoes/utils/campaignForm'
 import PanelFormPage from '../../ong/panel/PanelFormPage'
 import PanelNotice from '../../ong/panel/PanelNotice'
@@ -14,6 +15,9 @@ import { ADMIN_PATHS } from '../panel/adminPaths'
 
 function AdminEditCampaignForm({ campaign, backTo, done }) {
   const updateCampaign = useUpdateAdminCampaign()
+  // Vale a mesma regra da ONG: uma campanha urgente ativa por vez
+  const { data: ngoCampaigns = [] } = useCampaigns({ ongId: campaign.ong.id })
+  const urgentConflict = findOtherUrgentCampaign(ngoCampaigns, campaign.id)
 
   const handleSubmit = (values) => {
     updateCampaign.mutate({ id: campaign.id, values }, { onSuccess: () => done('Campanha atualizada!') })
@@ -25,6 +29,7 @@ function AdminEditCampaignForm({ campaign, backTo, done }) {
       <CampaignForm
         initialValues={buildCampaignForm(campaign)}
         raisedAmount={campaign.raisedAmount}
+        urgentConflict={urgentConflict}
         submitLabel="Salvar alterações"
         isSubmitting={updateCampaign.isPending}
         submitError={updateCampaign.error ? getErrorMessage(updateCampaign.error) : null}
