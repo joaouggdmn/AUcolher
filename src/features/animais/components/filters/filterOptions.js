@@ -28,6 +28,16 @@ export const AGE_GROUP_OPTIONS = [
 export const ENERGY_LEVEL_OPTIONS = Object.entries(LEVEL_LABELS).map(([value, label]) => ({ value, label }))
 export const TEMPERAMENT_OPTIONS = Object.entries(TEMPERAMENT_META).map(([value, meta]) => ({ value, label: meta.label }))
 
+// Cidades reais (do deck do AUmatch ou do backend) viram as opções do
+// select, em ordem alfabética. A cidade já escolhida continua na lista mesmo
+// que tenha sumido dos dados, para o select não ficar em branco
+export function buildCityOptions(cities, selected = '') {
+  const unique = new Set(cities.filter(Boolean))
+  if (selected) unique.add(selected)
+  const sorted = [...unique].sort((a, b) => a.localeCompare(b, 'pt-BR'))
+  return [{ value: '', label: 'Todas as cidades' }, ...sorted.map((city) => ({ value: city, label: city }))]
+}
+
 export const CITY_OPTIONS = [
   { value: '', label: 'Todas as cidades' },
   { value: 'Araranguá', label: 'Araranguá' },

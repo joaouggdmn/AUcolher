@@ -1,6 +1,6 @@
-import { FaChevronDown, FaLocationDot, FaXmark, FaArrowRotateRight } from 'react-icons/fa6'
+import { Link } from 'react-router-dom'
+import { FaChevronDown, FaLocationDot, FaXmark, FaArrowRotateRight, FaPaperPlane, FaArrowRight } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
-import { CITY_OPTIONS, SORT_OPTIONS } from './matchFilterOptions'
 
 // Seção em versão escura: o painel é translúcido sobre o emerald-950, então
 // os componentes claros de filtro da listagem (FilterSection/CheckboxOption)
@@ -26,14 +26,16 @@ const OPTION_CLASS = 'bg-emerald-900 text-white'
 
 function MatchPreferencesPanel({
   filters,
+  cityOptions,
   onCityChange,
-  onSortChange,
   onClear,
   hasActiveFilters,
   onOpenQuiz,
   hasCompletedQuiz,
   // ONG e admin veem o deck como prévia: no lugar do quiz, só o aviso
   isQuizAvailable = true,
+  // Só quem adota tem pedidos enviados
+  showInterestsLink = false,
 }) {
   return (
     <div className="flex flex-col">
@@ -70,7 +72,7 @@ function MatchPreferencesPanel({
             aria-label="Filtrar por cidade"
             className={SELECT_CLASS}
           >
-            {CITY_OPTIONS.map((option) => (
+            {cityOptions.map((option) => (
               <option key={option.value} value={option.value} className={OPTION_CLASS}>
                 {option.label}
               </option>
@@ -83,26 +85,17 @@ function MatchPreferencesPanel({
         </div>
       </PanelSection>
 
-      <PanelSection title="Ordenar matches" icon={LuSparkles}>
-        <div className="relative">
-          <select
-            value={filters.sort}
-            onChange={(event) => onSortChange(event.target.value)}
-            aria-label="Ordenar matches"
-            className={SELECT_CLASS}
+      {showInterestsLink && (
+        <PanelSection title="Meus interesses" icon={FaPaperPlane}>
+          <Link
+            to="/meus-interesses"
+            className="group flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10"
           >
-            {SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value} className={OPTION_CLASS}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <FaChevronDown
-            size={11}
-            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-200/70"
-          />
-        </div>
-      </PanelSection>
+            Ver os pets que eu curti
+            <FaArrowRight size={12} className="text-amber-300 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </PanelSection>
+      )}
 
       {hasActiveFilters && (
         <button
