@@ -22,10 +22,6 @@ const INITIAL_ONG_FIELDS = {
   district: '',
   city: '',
   uf: '',
-  instagram: '',
-  twitter: '',
-  facebook: '',
-  bio: '',
 }
 
 const INITIAL_FORM = {
