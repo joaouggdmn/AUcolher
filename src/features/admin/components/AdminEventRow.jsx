@@ -24,7 +24,7 @@ const SUMMARY_TONES = {
 function AdminEventRow({ event, onRemove }) {
   const statusKey = eventStatus(event)
   const status = EVENT_STATUS_META[statusKey]
-  const summary = getAttendanceSummary(event)
+  const summary = getAttendanceSummary(event, { invite: false })
 
   return (
     <li className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center">

@@ -131,7 +131,7 @@ function CampaignCard({ campaign, onDonate }) {
         <DonationProgress raised={campaign.raisedAmount} goal={campaign.goalAmount} />
 
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs font-semibold">
-          <span className="whitespace-nowrap text-slate-500">{formatDonationsCount(campaign.donationsCount)}</span>
+          <span className="whitespace-nowrap text-slate-500">{formatDonationsCount(campaign.donationsCount, { invite: !isOwner && !isAdminAccount(user) })}</span>
           <span className={`flex items-center gap-1 whitespace-nowrap ${DEADLINE_TONES[deadline.tone]}`}>
             <FaClock size={10} />
             {deadline.label}
