@@ -87,13 +87,9 @@ function OngAccountForm({ account = null, onSave = null }) {
 
       <div className="mt-10">
         <AccountFormShell isDirty={isDirty} onSave={handleSave} onDiscard={discard}>
-          <AccountGroupHeading
-            visibility="public"
-            title="Perfil público da instituição"
-            description="Tudo aqui aparece na página da ONG. É o que adotantes e doadores usam para conhecer e confiar em vocês."
-          />
+          <AccountGroupHeading visibility="public" title="Perfil público da instituição" />
 
-          <ProfileSection icon={FaBuildingNgo} title="Identidade" description="Banner, logo, nome e apresentação da instituição">
+          <ProfileSection icon={FaBuildingNgo} title="Identidade">
             <div className="mb-6 flex flex-col gap-1.5">
               <p className="text-sm font-semibold text-slate-700">Banner</p>
               <CoverImageInput
@@ -161,7 +157,7 @@ function OngAccountForm({ account = null, onSave = null }) {
             </div>
           </ProfileSection>
 
-          <ProfileSection icon={FaMapLocationDot} title="Endereço e visitas" description="Onde e quando a instituição recebe visitas">
+          <ProfileSection icon={FaMapLocationDot} title="Endereço e visitas">
             <div className="grid grid-cols-6 gap-4">
               <div className="col-span-6 sm:col-span-3">
                 <CepField
@@ -244,7 +240,7 @@ function OngAccountForm({ account = null, onSave = null }) {
             </div>
           </ProfileSection>
 
-          <ProfileSection icon={FaShareNodes} title="Contato e redes sociais" description="Canais públicos para falar com a instituição">
+          <ProfileSection icon={FaShareNodes} title="Contato e redes sociais">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <p className="flex items-start gap-2 rounded-xl bg-emerald-50/60 px-3.5 py-2.5 text-xs text-emerald-900 sm:col-span-2">
                 <FaEnvelope size={12} className="mt-0.5 shrink-0 text-emerald-600" />
@@ -296,7 +292,7 @@ function OngAccountForm({ account = null, onSave = null }) {
             </div>
           </ProfileSection>
 
-          <ProfileSection icon={FaPeopleGroup} title="Equipe" description="Quem faz a instituição acontecer">
+          <ProfileSection icon={FaPeopleGroup} title="Equipe">
             <RowsEditor
               rows={formData.team}
               onChange={(rows) => setField('team', rows)}
@@ -307,11 +303,7 @@ function OngAccountForm({ account = null, onSave = null }) {
             />
           </ProfileSection>
 
-          <AccountGroupHeading
-            visibility="private"
-            title="Dados da conta"
-            description="Só a instituição vê. Usados para entrar na plataforma. O e-mail também é o contato público."
-          />
+          <AccountGroupHeading visibility="private" title="Dados da conta" />
 
           {isModeration ? (
             <ModerationEmailSection
