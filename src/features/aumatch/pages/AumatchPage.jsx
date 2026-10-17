@@ -10,7 +10,6 @@ import MatchToast from '../components/MatchToast'
 import PetDetailModal from '../components/PetDetailModal'
 import MatchReasonsModal from '../components/MatchReasonsModal'
 import AdoptersOnlyModal from '../components/AdoptersOnlyModal'
-import MatchPreferencesSidebar from '../components/filters/MatchPreferencesSidebar'
 import MatchPreferencesDrawer from '../components/filters/MatchPreferencesDrawer'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
@@ -18,6 +17,7 @@ import { getErrorMessage } from '../../../core/utils/apiError'
 import { isSameId } from '../../../core/utils/ids'
 import { useModeration } from '../../admin/hooks/useModeration'
 import { applyMatchPreferences } from '../utils/matchFilters'
+import { buildCityOptions } from '../../animais/components/filters/filterOptions'
 import { useMatchPreferences } from '../hooks/useMatchPreferences'
 import { matchDeckKeys, useAumatchDeck } from '../hooks/useAumatchDeck'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
@@ -71,7 +71,6 @@ function AumatchPage() {
   const {
     filters,
     setCity,
-    setSort,
     clearFilters,
     activeFiltersCount,
     hasActiveFilters,
@@ -91,7 +90,13 @@ function AumatchPage() {
     [pets, user, isAccountBanned]
   )
 
-  // Preferências do painel esquerdo por último: elas filtram e reordenam
+  // As cidades do filtro são as dos pets do próprio deck, que vem inteiro
+  const cityOptions = useMemo(
+    () => buildCityOptions(eligiblePets.map((pet) => pet.city), filters.city),
+    [eligiblePets, filters.city]
+  )
+
+  // Preferências do painel por último: elas filtram e reordenam
   // o resultado do algoritmo, sem interferir nas regras de elegibilidade
   const preferredPets = useMemo(
     () => applyMatchPreferences({ pets: eligiblePets, filters }),
@@ -175,13 +180,14 @@ function AumatchPage() {
 
   const preferencesPanelProps = {
     filters,
+    cityOptions,
     onCityChange: setCity,
-    onSortChange: setSort,
     onClear: clearFilters,
     hasActiveFilters,
     onOpenQuiz: handleOpenQuiz,
     hasCompletedQuiz,
     isQuizAvailable: !isAuthenticated || isAdopter,
+    showInterestsLink: isAdopter,
   }
 
   const renderDeck = () => {
@@ -262,28 +268,26 @@ function AumatchPage() {
           )}
         </header>
 
-        {/* Split view: ~30% de painel de controle, ~70% de modo foco */}
-        <div className="lg:flex lg:items-start lg:gap-8">
-          <MatchPreferencesSidebar resultsCount={visiblePets.length} {...preferencesPanelProps} />
+        {/* Modo foco: o deck tem a página só para ele. Os filtros ficam
+            numa gaveta, aberta pelo botão no canto do deck */}
+        <div>
+          <main className="flex min-w-0 flex-col items-center">
+            <div className="mb-4 flex w-full max-w-md justify-end lg:max-w-lg">
+              <button
+                type="button"
+                onClick={() => setIsPreferencesDrawerOpen(true)}
+                className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-colors duration-300 hover:bg-white/15"
+              >
+                <FaSliders size={13} className="text-amber-300" />
+                Filtros e preferências
+                {activeFiltersCount > 0 && (
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-black text-emerald-950">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </button>
+            </div>
 
-          <main className="flex min-w-0 flex-1 flex-col items-center">
-            {/* Abaixo de lg o painel de 30% vira esta gaveta */}
-            <button
-              type="button"
-              onClick={() => setIsPreferencesDrawerOpen(true)}
-              className="mb-5 flex w-full max-w-md items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/10 py-3 text-sm font-bold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/15 lg:hidden"
-            >
-              <FaSliders size={14} className="text-amber-300" />
-              Filtros e preferências
-              {activeFiltersCount > 0 && (
-                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-black text-emerald-950">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </button>
-
-            {/* Modo foco: um pet por vez, e com mais largura no desktop —
-                agora o card tem 70% da página só para ele */}
             <div className="h-[70vh] w-full max-w-md sm:h-[75vh] sm:max-h-[640px] lg:max-w-lg">{renderDeck()}</div>
 
             <SwipeActionButtons
