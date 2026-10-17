@@ -44,7 +44,7 @@ function MyAnimalsPanel({ animals, isOng }) {
           {isOng ? 'Gerencie os animais no painel da ONG' : 'Gerencie seus anúncios em Meus animais'}
         </p>
         <p className="text-xs text-slate-500">
-          Editar, tirar do ar, marcar como adotado{isOng ? '' : ' e acompanhar os animais que você adotou'}.
+          Editar ou tirar do ar{isOng ? '' : ', e acompanhar os animais que você adotou'}.
         </p>
       </div>
       <FaArrowRight

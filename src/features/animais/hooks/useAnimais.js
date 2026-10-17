@@ -104,7 +104,7 @@ export function useUpdateAnimal() {
   })
 }
 
-// Marcar como adotado, tirar do ar ou reativar. A resposta já é o animal
+// Tirar do ar ou reativar. A resposta já é o animal
 // atualizado: entra direto no cache do detalhe, e a tela muda sem esperar o refetch
 export function useChangeAnimalStatus() {
   const queryClient = useQueryClient()
