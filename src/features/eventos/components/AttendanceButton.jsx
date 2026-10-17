@@ -9,6 +9,8 @@ import InfoToast from '../../../core/components/ui/InfoToast'
 import { useEventAttendance } from '../hooks/useEventAttendance'
 
 const SIZES = {
+  // Pílula da vitrine da home, no mesmo formato do botão "Doar"
+  sm: 'h-10 rounded-full px-4 text-sm',
   md: 'rounded-xl py-2.5 text-sm',
   lg: 'rounded-2xl py-4 text-base',
 }
@@ -25,7 +27,7 @@ function getLockedState(event, isConfirmed) {
 // Botão de presença do card e do detalhe. Os estados travados (passado,
 // lotado, evento da própria ONG) espelham as recusas do backend, para o
 // usuário nem chegar a tentar
-function AttendanceButton({ event, size = 'md', className = '' }) {
+function AttendanceButton({ event, size = 'md', idleLabel = 'Confirmar presença', className = '' }) {
   const navigate = useNavigate()
   const location = useLocation()
   const { user } = useAuth()
@@ -105,7 +107,7 @@ function AttendanceButton({ event, size = 'md', className = '' }) {
         } ${className}`}
       >
         <Icon size={14} className={isPending ? 'animate-spin' : ''} />
-        {isConfirmed ? 'Presença confirmada' : 'Confirmar presença'}
+        {isConfirmed ? 'Presença confirmada' : idleLabel}
       </button>
 
       {/* Portal: modal e toast são fixed e não podem herdar o transform/empilhamento do card */}
