@@ -30,6 +30,9 @@ export const ACCOUNT_SUSPENDED_FLAG_KEY = 'aucolher_account_suspended'
 // sessionStorage: a API recusou o token (ex.: a senha foi trocada em outro
 // aparelho) e a sessão caiu (o login avisa)
 export const SESSION_EXPIRED_FLAG_KEY = 'aucolher_session_expired'
+// sessionStorage: a página de onde a pessoa foi entrar com o Google (o
+// state do router se perde na ida e volta ao Google)
+export const GOOGLE_LOGIN_RETURN_KEY = 'aucolher_google_login_return'
 
 // Formato antigo do chat (uma chave por conversa e uma de leitura por conta):
 // só o chatMock lê, uma vez, para converter as conversas para o banco falso
