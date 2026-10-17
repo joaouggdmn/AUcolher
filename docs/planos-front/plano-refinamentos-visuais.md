@@ -24,7 +24,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
 
 ## Front, parte 1 (sem depender do back)
 
-### R1. Travessões
+### ✅ R1. Travessões
 
 - Trocar `—`/`–` em **todo texto visível**: JSX, toasts, `aria-label`, `title`, mensagens de status e textos de seed/mock que aparecem na tela.
 - A pontuação substituta muda caso a caso: vírgula, ponto, dois-pontos ou parênteses.
@@ -40,7 +40,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - `FavoritesEmptyState`, `FinalCtaSection.jsx`, `TrustJourneySection.jsx`, `quizQuestions.js`, `seedEventos.js`, `adocaoService.js`.
 - Verificação: grep final por `—|–` sem comentários. Só podem sobrar os placeholders de número.
 
-### R2. Home
+### ✅ R2. Home
 
 - **Números do hero:**
   - remover `<PlatformStatsBar />` de `features/home/components/Hero/HeroSection.jsx:50`;
@@ -52,7 +52,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - adicionar a prop opcional `idleLabel`. Na home o texto é "Participar do evento"; confirmado, continua "Presença confirmada";
   - a linha do evento quebra o botão para baixo no mobile.
 
-### R3. Animais (visual)
+### ✅ R3. Animais (visual)
 
 - `features/animais/components/AnimalCard.jsx:32`: tirar `transition-transform duration-500 ease-in-out group-hover:scale-110` da foto. A sombra do card e a animação do "Conhecer" (linhas 105 e 110) ficam.
 - Final de `AnimaisListPage.jsx`, depois do `ShowMoreButton`: um `CreateEntityCta` (`core/components/ui/CreateEntityCta.jsx`), no mesmo padrão de `EventsListPage.jsx:184-193`. "Tem um animal para doar? Cadastre e encontre um lar para ele."
@@ -61,7 +61,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - Visitante → `onNeedsLogin`.
   - ADMIN → não aparece (admin não participa).
 
-### R4. Eventos e campanhas (cards e subtítulo)
+### ✅ R4. Eventos e campanhas (cards e subtítulo)
 
 - Tirar o zoom da capa:
   - `features/eventos/components/EventCard.jsx:45` (`group-hover:scale-110`);
@@ -69,7 +69,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - A sombra e o anel do card ficam, igual ao card de animal.
 - `EventsListPage.jsx:121-130`: subtítulo curto abaixo do `<h1>`, com a mesma classe das outras páginas (`<p className="max-w-xl text-slate-600">`): "Feiras, mutirões e encontros das ONGs perto de você."
 
-### R5. Campanhas (banner + urgência + categorias)
+### ✅ R5. Campanhas (banner + urgência + categorias)
 
 - **Banner SOS** (`features/doacoes/components/HeroSosBanner.jsx`):
   - foto `opacity-40` → `opacity-70`;
@@ -86,7 +86,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - helper `getCategoryLabel(campaign)` que devolve `customCategory` quando `OTHER`, usado no card, no detalhe, na home e no admin;
   - contrato atualizado.
 
-### R6. Sidebar, badges e barra de rolagem
+### ✅ R6. Sidebar, badges e barra de rolagem
 
 - **Badges** (`core/components/layout/PlatformSidebar.jsx:148-156`):
   - tirar a variante `neutral` (rose-50/rose-600). Todos ficam `bg-red-500 text-white` com `formatBadge` ("9+");
@@ -103,7 +103,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
     - nos 4 drawers de filtro e no `PlatformSidebar`.
   - Modais de fundo escuro usam o `.scrollbar-dark` que já existe.
 
-### R7. AUmatch (sem cidades)
+### ✅ R7. AUmatch (sem cidades)
 
 - **Painel oculto:**
   - tirar `MatchPreferencesSidebar` do layout (`AumatchPage.jsx:266-267`);
@@ -117,7 +117,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - `useMatchPreferences` ignora o `sort` já salvo no localStorage.
 - **"Meus interesses":** link no painel para `/meus-interesses` ("Ver meus interesses").
 
-### R8. Minha conta
+### ✅ R8. Minha conta
 
 - **Menos texto.** Ficam o título de cada seção e os avisos que mudam comportamento ou privacidade. Saem:
   - as descrições dos grupos "Perfil público" e "Dados da conta" (`PersonAccountForm.jsx:36-40, 70-74`). Viram um selo curto "Público" / "Só você vê" ao lado do título;
@@ -134,7 +134,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - O back continua aceitando o PATCH; só o front deixa de oferecer.
   - Atualizar `docs/regras-de-negocios.md`: ADOPTED só vem da conclusão do pedido, o que também evita inflar o número de "adotados" do admin.
 
-### R9. Interesses recebidos
+### ✅ R9. Interesses recebidos
 
 - `adocao/components/ReceivedRequestCard.jsx:143-178`. Hoje os botões ficam desalinhados por quatro motivos:
   - um tem borda e o outro não;
@@ -152,7 +152,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
 
 ## Back (`feature/refinamentos`)
 
-### B1. Categorias de evento
+### ✅ B1. Categorias de evento
 
 - `event/entity/EventCategory.java`: + `COLLECTION`, `MEETUP`, `OTHER`.
 - `Event.java`: + `customCategory` (`custom_category VARCHAR(30)`).
@@ -168,12 +168,12 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
   - `ADD COLUMN custom_category VARCHAR(30)`.
 - Atualizar `sql/schema.sql`.
 
-### B2. Cidades dos animais
+### ✅ B2. Cidades dos animais
 
 - `GET /api/animals/cities` → `List<String>`: cidades distintas (do dono) dos animais que aparecem na listagem pública, com o mesmo filtro base do `GET /api/animals`, ordenadas.
 - Query no `AnimalRepository`. A rota é pública, igual à listagem; conferir o `SecurityConfig`.
 
-### B3. "Ainda não recebi"
+### ✅ B3. "Ainda não recebi"
 
 - `AdoptionRequestService.changeStatus`, caso `ACCEPTED`:
   - dono: continua como está (PENDING → ACCEPTED);
@@ -184,7 +184,7 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
 
 ## Front, parte 2 (depois do back)
 
-### R10. Categorias de evento
+### ✅ R10. Categorias de evento
 
 - `features/eventos/components/filters/filterOptions.js`: + `COLLECTION` "Arrecadação", `MEETUP` "Passeio e encontro", `OTHER` "Outro", com meta de ícone/cor.
 - `EventForm.jsx:103-107`: campo "Nome da categoria" aparece com "Outro".
@@ -195,14 +195,14 @@ O modo de commit (eu commito ou passo os comandos) será perguntado antes do pri
 - Filtro: "Outro" agrupa todos os personalizados.
 - Contrato de eventos em `docs/contratos-prontos/` atualizado.
 
-### R11. Cidades reais
+### ✅ R11. Cidades reais
 
 - Hook `useAnimalCities()` (React Query, chamando `GET /api/animals/cities` em `animaisApi.js`/`animalService.js`).
 - `FiltersPanel.jsx:107-111` usa o hook, com "Todas as cidades" primeiro.
 - AUmatch: as opções saem das cidades distintas do deck (`pet.city`, ordenadas com `localeCompare('pt-BR')`), num `buildCityOptions(pets)`.
 - Apagar `CITY_OPTIONS` (`animais/components/filters/filterOptions.js:31-39`) se ficar órfão.
 
-### R12. Chat: "Ainda não recebi"
+### ✅ R12. Chat: "Ainda não recebi"
 
 - `AdoptionRequestContext.jsx`: `declineDelivery(id)`, que manda PATCH `ACCEPTED`.
 - `useConcludeAdoption.js`: nova ação, com evento de sistema `DELIVERY_DECLINED` em `chatService.js`: "{Adotante} avisou que {pet} ainda não chegou. O chat foi liberado para vocês combinarem a entrega."
@@ -237,3 +237,14 @@ R1 → R9 (front, independentes) → B1–B3 (back) → R10–R12 (front que dep
   - `GET /api/animals/cities` devolve as cidades do seed;
   - PATCH ACCEPTED pelo adotante em AWAITING_DELIVERY volta o pedido;
   - pelo dono, a regra antiga continua.
+
+## Desvios e notas da entrega (2026-10-17)
+
+- **Cidades do AUmatch** saíram já no R7 (do próprio deck, só front); o R11 ficou só com a página de animais.
+- **R12:** o "Ainda não recebi" ficou só no chat, ao lado do "Confirmar chegada" (é onde o adotante age nessa etapa). O card de Meus interesses só ganhou o texto "se não chegou, avise por lá".
+- **R1:** os "—" sozinhos usados como valor vazio de número (painel, avaliações) continuaram.
+- **R8:** "Marcar como adotado" saiu do card de Meus animais, do painel da ONG e da página do animal. O back continua aceitando `PATCH status ADOPTED`.
+- **Back:** `ddl-auto=validate`, então a API só sobe depois da migração **017**. Os testes de unidade passam (as transições de pedido incluem os casos novos). Os 7 `@WebMvcTest` já falhavam antes deste ciclo: o `SecurityConfig` pede o `OAuth2AuthenticationFailureHandler` do login com Google, que esses testes não carregam.
+- **Dados:** as duas ONGs do banco local têm "Criciuma" sem acento, então o filtro mostra "Criciuma" e "Criciúma" separadas. É dado, não código.
+- **Lint:** 5 erros antigos (contexts e `useCepLookup`), os mesmos de antes do ciclo.
+- Sem teste no navegador (só lint, build e revisão).
