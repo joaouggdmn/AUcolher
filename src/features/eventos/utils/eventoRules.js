@@ -19,7 +19,7 @@ function tooLong(value, max) {
   return value != null && value.length > max
 }
 
-// Regras do corpo de POST/PUT /api/events (docs/api-campanhas-eventos.md
+// Regras do corpo de POST/PUT /api/events (docs/contratos-prontos/api-eventos.md
 // §2.2), campo a campo, com as chaves do DTO. O mock devolve a primeira como
 // erro 400, igual ao backend; o formulário pode mostrar todas
 export function getEventPayloadErrors(payload, today) {

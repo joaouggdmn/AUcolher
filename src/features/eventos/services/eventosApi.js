@@ -1,6 +1,6 @@
 import api from '../../../core/services/api'
 
-// Adaptador real: é o contrato de docs/api-campanhas-eventos.md §3 em código.
+// Adaptador real: é o contrato de docs/contratos-prontos/api-eventos.md §3 em código.
 // eventosMock.js tem as mesmas funções e devolve os mesmos DTOs
 
 export async function listEvents({ ngoId } = {}) {

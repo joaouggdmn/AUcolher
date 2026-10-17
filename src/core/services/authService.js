@@ -10,7 +10,7 @@ function buildRegisterEndpoint(userType) {
 }
 
 // Backend usa NGO | PERSON; o frontend trabalha com PESSOA | ONG | ADMIN
-// (docs/regras-de-negocio.md, seção 2)
+// (docs/regras-de-negocios.md, seção 2)
 function normalizeUserType(apiUserType) {
   if (apiUserType === "NGO") return "ONG";
   return apiUserType === "ADMIN" ? "ADMIN" : "PESSOA";

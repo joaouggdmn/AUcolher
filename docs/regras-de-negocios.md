@@ -1,6 +1,6 @@
 # AUcolher — Regras de Negócio
 
-> Documento vivo. Reflete as decisões tomadas até 2026-10-14. Atualizar conforme o projeto evoluir — não é uma especificação congelada.
+> Documento vivo: atualizar conforme o projeto evoluir. Os contratos da API estão em `contratos-prontos/` (já implementados) e `entrega-final/` (o que falta no backend).
 
 ## 1. Visão geral
 
@@ -18,11 +18,11 @@ Frontend em React (Vite), backend em Spring Boot + PostgreSQL (em desenvolviment
 
 - Campo único de papel: `userType`. A API usa `PERSON | NGO | ADMIN` e o frontend converte para `PESSOA | ONG | ADMIN` (`authService.normalizeUserType`). Não existe um campo `role` separado.
 - Um usuário só tem um papel por vez (não é possível ser `PESSOA` e `ADMIN` simultaneamente, por exemplo).
-- **Criação do admin** (decidido em 2026-10-10):
+- **Criação do admin**:
   - Não há cadastro público de admin. O cadastro público continua só para pessoa e ONG.
   - A primeira conta `ADMIN` é criada pela própria API ao subir, a partir das variáveis de ambiente `ADMIN_EMAIL` / `ADMIN_PASSWORD` (`ADMIN_NAME` é opcional). Sem elas, nada é criado.
   - Nenhuma senha fica no repositório.
-- **O que o admin faz no site** (decidido em 2026-10-15; a edição entrou no mesmo dia): ele **modera, mas não participa**.
+- **O que o admin faz no site**: ele **modera, mas não participa**.
   - **Modera:** remove anúncios, eventos e campanhas e bane ou reativa contas, sempre com confirmação. Faz isso pelo painel (`/admin`) **e** direto nas páginas do site:
     - "Remover anúncio" no detalhe do animal, só para anúncio que não foi adotado nem removido;
     - "Banir conta" ou "Reativar conta" no perfil público, no lugar do "Denunciar";
@@ -45,11 +45,11 @@ Frontend em React (Vite), backend em Spring Boot + PostgreSQL (em desenvolviment
     - o dono, em "Meus animais", nas listas do painel da ONG, em "Minha conta" e no detalhe do próprio anúncio, evento ou campanha;
     - o público não vê o selo.
 
-### 2.1 Senha e exclusão de conta (decidido em 2026-10-14)
+### 2.1 Senha e exclusão de conta
 
-Os três recursos saíram do "fora do escopo" (`plano-backend-restante.md` §6) e entram no sistema final.
+Contratos: `entrega-final/api-senha.md` e `entrega-final/api-exclusao-conta.md`.
 
-**Alterar senha** (revisto em 2026-10-15)
+**Alterar senha**
 - Em "Minha conta", card "Acesso": e-mail e senha aparecem só para ver, a senha mascarada (o banco guarda o hash).
 - O botão "Alterar senha" envia o mesmo link do "Esqueci minha senha" para o e-mail da conta. Não há formulário com a senha atual: quem acessa o e-mail prova que é dono da conta. Nova senha com no mínimo 6 caracteres, como no cadastro.
 - Conta criada pelo Google (`provider = GOOGLE`, sem senha): o botão vira "Criar senha", com o mesmo link. Depois disso a conta entra das duas formas.
@@ -86,7 +86,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
 (quando um pedido conclui, os outros ativos do mesmo animal viram CANCELLED)
 ```
 
-**A API valida tudo isso (2026-10-13):** pedidos e avaliações moram no banco (`adoption_requests`, `adoption_reviews`). O contrato está em `docs/api-adocao.md`.
+**A API valida tudo isso:** pedidos e avaliações moram no banco (`adoption_requests`, `adoption_reviews`). O contrato está em `contratos-prontos/api-adocao.md`.
 
 **Quem pede e quando:**
 - Pessoa ou ONG pode pedir; o admin não pede.
@@ -131,7 +131,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
 - Uma avaliação considerada abusiva/injusta pode ser alvo de denúncia (seção 8) — ainda não implementado.
 - O perfil público lê as avaliações e o número de adoções de `GET /api/users/{id}/reviews`.
 
-### 3.3 Devolução e taxa de reabandono (decidido em 2026-10-14)
+### 3.3 Devolução e taxa de reabandono
 
 É a métrica que valida a hipótese principal do TCC: adoções com compatibilidade alta no AUmatch voltam menos.
 
@@ -139,7 +139,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
 - Ao passar para `CONCLUDED`, o pedido guarda o `matchScore` daquele momento (`match_score_at_adoption`). Depois disso ele não muda, mesmo que o quiz ou o animal mudem.
 - Ele só é gravado com o **quiz completo** (as 7 respostas). ONG adotando, ou pessoa sem quiz completo: o campo fica nulo. A adoção conta na taxa geral, mas fica fora das faixas.
 
-> **Reescrito em 2026-10-15.** Agora há dois caminhos, e os dois contam como reabandono. Contrato em `entrega-final/api-devolucao-reabandono.md`.
+> Há dois caminhos, e os dois contam como reabandono. Contrato em `contratos-prontos/api-devolucao-reabandono.md`.
 
 **Os dois caminhos** (os dois só partem de um pedido `CONCLUDED`; vale o primeiro)
 
@@ -150,7 +150,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
 
 - **Depois do retorno**, o adotante não republica, porque o animal não está mais com ele. **Depois do repasse**, o doador não registra retorno, porque o animal está com o adotante.
 - **No republicar, o animal não volta para o doador.** A participação do doador termina ali.
-- **Adotante ONG fica fora de tudo** (decidido em 2026-10-15). A ONG que adota está resgatando o animal e depois o anuncia de novo pelo painel: isso não é reabandono. Pedido com adotante ONG não tem "Animal retornado" nem "Republicar anúncio", e fica fora da taxa (nem entra no total de adoções). A **ONG doadora** continua normal: registra o retorno quando o animal que ela doou volta.
+- **Adotante ONG fica fora de tudo.** A ONG que adota está resgatando o animal e depois o anuncia de novo pelo painel: isso não é reabandono. Pedido com adotante ONG não tem "Animal retornado" nem "Republicar anúncio", e fica fora da taxa (nem entra no total de adoções). A **ONG doadora** continua normal: registra o retorno quando o animal que ela doou volta.
 
 **Motivo** (`returnReason`), nos dois caminhos
 - `BEHAVIOR`: comportamento do animal;
@@ -215,7 +215,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
   | Temperamento | 15 | perfil ideal × temperamento |
   | Porte | 15 | porte preferido × porte (vazio + apartamento conta como pequeno) |
 
-  O detalhe está em `docs/api-aumatch.md`.
+  O detalhe está em `contratos-prontos/api-aumatch.md`.
 - Um animal já adotado nunca aparece na fila. Um animal já com pedido `PENDING`/`ACCEPTED` do próprio usuário também não deveria ser mostrado de novo (evitar duplicidade de interesse pelo mesmo animal).
 
 ## 5. Animais
@@ -225,10 +225,10 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
 - **Sem geolocalização.** O sistema não pede nem guarda localização exata (latitude/longitude, GPS) de usuários ou animais, e não ordena por distância. A localização é só cidade/UF, e quem quer animais de uma cidade usa a busca e o filtro por cidade. No perfil da pessoa e no cadastro do animal, estado e cidade são **escolhidos em listas** (municípios do IBGE), nunca digitados, para a mesma cidade não aparecer escrita de dois jeitos. O animal herda a cidade/UF de quem anuncia; se a conta ainda não tem localização, o formulário do animal pede e já salva no perfil. O **CEP** só existe no endereço da ONG e dos eventos.
 - Um animal só aparece nas listagens/AUmatch enquanto estiver disponível (não adotado).
 - Ao concluir uma adoção, o animal passa a "adotado" e some das listagens públicas.
-- **Página "Meus animais"** (decidido em 2026-10-15, só pessoa física, link na sidebar, rota `/meus-animais`). A ONG continua usando o painel. A página tem duas abas:
+- **Página "Meus animais"** (só pessoa física, link na sidebar, rota `/meus-animais`). A ONG continua usando o painel. A página tem duas abas:
   - **Anunciados por mim:** editar o anúncio (até aqui a pessoa não conseguia), tirar do ar ou reativar, marcar como adotado, excluir e, nos adotados, **"Animal retornado"** (seção 3.3);
   - **Adotados por mim:** as adoções concluídas, com **"Republicar anúncio"** e **"Desisti de doar"** (seção 3.3).
-  - `/meus-anuncios` redireciona para ela, e a lista "Meus animais" de Minha conta vira um link. Plano em `entrega-final/README.md` §4.
+  - `/meus-anuncios` redireciona para ela, e a lista "Meus animais" de Minha conta vira um link.
 
 ## 6. Perfis, bio e favoritos
 
@@ -242,10 +242,10 @@ Perfil mais completo que o de usuário comum:
 - Endereço físico.
 - Número de adoções realizadas.
 - Equipe.
-- Horário de visitas: dias da semana marcados + horário de abrir e fechar, ou "Somente com agendamento" (revisto em 2026-10-15; o banco continua guardando o texto, ex.: "Terça a sexta" / "14h às 18h").
+- Horário de visitas: dias da semana marcados + horário de abrir e fechar, ou "Somente com agendamento" (o banco continua guardando o texto, ex.: "Terça a sexta" / "14h às 18h").
 - CNPJ e links de redes sociais (Instagram/Facebook/X).
-- Contato: o **e-mail de login** da ONG aparece no perfil público (decidido em 2026-10-15). Não existe mais e-mail institucional separado: o cadastro aceita qualquer e-mail, então quem tem um institucional já se cadastra com ele. O e-mail de pessoa física continua privado.
-- **Banner** no topo do perfil público, opcional e **só para ONG** (decidido em 2026-10-13; contrato em `api-perfil-ong.md`).
+- Contato: o **e-mail de login** da ONG aparece no perfil público. Não existe mais e-mail institucional separado: o cadastro aceita qualquer e-mail, então quem tem um institucional já se cadastra com ele. O e-mail de pessoa física continua privado.
+- **Banner** no topo do perfil público, opcional e **só para ONG** (contrato em `contratos-prontos/api-perfil-ong.md`).
 - Selo de "verificada": **toda ONG tem**, desde o cadastro (ver seção 7).
 
 ### 6.3 Favoritos
@@ -255,7 +255,7 @@ Perfil mais completo que o de usuário comum:
 
 ## 7. Cadastro de ONG
 
-> Decisão de 2026-10-10: **não existe mais etapa de aprovação pelo admin.** A fila de aprovação (status `PENDENTE`, aprovar/recusar com motivo) foi descartada.
+> **Não existe mais etapa de aprovação pelo admin.** A fila de aprovação (status `PENDENTE`, aprovar/recusar com motivo) foi descartada.
 
 1. A ONG se cadastra informando: nome, CNPJ, e-mail (o de login, que também é o contato público), links de redes sociais, bio e endereço.
 2. O cadastro válido já entra **ativo**: a ONG loga direto e usa o painel `/ong/painel`.
@@ -270,7 +270,7 @@ Perfil mais completo que o de usuário comum:
 
 ## 8. Denúncias e moderação
 
-> Decisões de 2026-10-11 (branch `feature/denuncias`). Plano em `plano-painel-admin.md`, contrato em `api-admin.md` §6.
+> Plano em `planos-front/plano-painel-admin.md`, contrato em `contratos-prontos/api-denuncias-moderacao.md`.
 
 - **Quem denuncia**: qualquer conta logada de pessoa ou ONG. Quem não entrou é convidado a fazer login. O admin não denuncia: ele modera direto pelo painel.
 - **O que pode ser denunciado**: anúncios de animais e perfis (pessoa ou ONG). Campanhas, eventos e avaliações ficam fora por enquanto.
@@ -295,7 +295,7 @@ Perfil mais completo que o de usuário comum:
 
 ## 9. Dashboard do admin
 
-> Plano completo em `plano-painel-admin.md` (2026-10-10).
+> Plano completo em `planos-front/plano-painel-admin.md`.
 > - O painel é uma tela própria em `/admin`, no mesmo formato do painel da ONG (barra lateral, sem a navbar do site).
 > - Seções: Visão geral, Usuários, Animais, Campanhas, Eventos e Denúncias.
 
@@ -304,29 +304,29 @@ Perfil mais completo que o de usuário comum:
 - Animais disponíveis vs. adotados.
 - Total de adoções concluídas.
 - Denúncias pendentes, com atalho direto para julgar.
-- Saiu em 2026-10-10: "ONGs aguardando aprovação". A ONG não passa mais por aprovação (ver seção 7).
+- Saiu: "ONGs aguardando aprovação". A ONG não passa mais por aprovação (ver seção 7).
 
 ### 9.2 Requisito adicional
 - Exportar as informações do dashboard em **PDF**, pela impressão do navegador ("Salvar como PDF"), com um layout de impressão próprio.
 
 ### 9.3 Métricas extras
-- Já entram no painel (2026-10-10):
+- Já entram no painel:
   - total arrecadado em campanhas;
   - eventos ativos;
   - adoções ao longo do tempo;
   - novos cadastros por mês;
   - funil do pedido à adoção;
   - ranking de ONGs.
-- **Taxa de reabandono** (entra, decidido em 2026-10-14):
+- **Taxa de reabandono**:
   - é a métrica mais valiosa para validar a proposta do TCC, pois mede diretamente se o AUmatch reduz as devoluções;
   - card na Visão geral: taxa geral, taxa por faixa de compatibilidade (alta, média, baixa) e distribuição dos motivos. Também sai no PDF;
   - regras de registro e cálculo na seção 3.3. O histórico vem dos próprios pedidos (`RETURNED` / `REHOMED` + score congelado), sem tabela de histórico do animal.
 
 ## 10. Eventos e campanhas de doação
 
-> Decisões completas em `plano-campanhas-eventos.md`; contrato da API em `api-campanhas-eventos.md`.
+> Decisões completas em `planos-front/plano-campanhas-eventos.md`; contratos da API em `contratos-prontos/api-eventos.md` e `entrega-final/api-campanhas-doacoes.md`.
 
-### 10.1 Eventos (frontend entregue em 2026-09-27, com mock)
+### 10.1 Eventos
 
 - Só conta **ONG** cria evento; só a **ONG dona** edita, exclui e vê a lista de confirmados (painel `/ong/painel`).
 - Evento de um dia: data, início, término opcional, local com endereço (CEP opcional preenche o resto), capa opcional e **vagas opcionais**.
@@ -336,7 +336,7 @@ Perfil mais completo que o de usuário comum:
 - **Excluir**: sem confirmados → exclusão real; com confirmados → vira `CANCELADO`, some da vitrine e do detalhe, e aparece como "Evento cancelado" em Minha conta de quem confirmou.
 - A vitrine, a home e a aba "Eventos" do perfil público da ONG mostram só eventos ativos de hoje em diante.
 
-### 10.2 Campanhas e doações (frontend entregue em 2026-10-10, com mock)
+### 10.2 Campanhas e doações
 
 - Só conta **ONG** cria campanha; só a **ONG dona** edita, encerra e exclui (painel `/ong/painel`, seção Campanhas, ou pela página da campanha).
 - Campanha: título, descrição, categoria (saúde, alimentação, estrutura), meta em reais inteiros, selo de **urgente** opcional, **prazo** opcional e capa opcional. A urgente ativa mais recente vira o banner SOS da vitrine.
@@ -346,9 +346,9 @@ Perfil mais completo que o de usuário comum:
 - **Encerrar/excluir** cancela os PIX ainda não pagos. **Excluir**: sem doações aprovadas → some de vez; com doações → sai de todas as telas, mas fica no histórico de quem doou e nas doações recebidas da ONG.
 - A ONG vê as **doações recebidas** (quem doou, quanto e para qual campanha) no painel.
 
-### 10.3 Conta Mercado Pago de cada ONG (decidido em 2026-10-14)
+### 10.3 Conta Mercado Pago de cada ONG
 
-Substitui a "conta única da plataforma" do `plano-campanhas-eventos.md`: **o dinheiro cai direto na conta da ONG**, e a plataforma nunca guarda doações.
+Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na conta da ONG**, e a plataforma nunca guarda doações.
 
 - **Vincular a conta.** No painel da ONG há o botão "Conectar Mercado Pago". Ele leva ao login do Mercado Pago (OAuth, fluxo de código de autorização com o escopo `offline_access`) e volta para o painel.
 - **Credenciais da ONG.** O backend guarda o `access_token` e o `refresh_token` da ONG:
@@ -360,29 +360,22 @@ Substitui a "conta única da plataforma" do `plano-campanhas-eventos.md`: **o di
 - **Criar o PIX.** O backend cria a order (`POST /v1/orders`, método `pix`) com o **token da ONG dona da campanha**. Assim o pagamento pertence à conta dela.
 - **Comissão.** A plataforma não cobra (`marketplace_fee` = 0, ou ausente). Só a tarifa do Mercado Pago é descontada, na conta da ONG.
 - **Confirmação.** Igual ao plano original: webhook com assinatura validada, mais consulta enquanto o PIX estiver pendente. A aprovação continua atômica (soma uma vez só).
-- **A validar no começo da próxima sprint:** criar um PIX com o token OAuth de uma conta de teste de vendedor no sandbox. A documentação brasileira de split não cita o PIX explicitamente. **Plano B**, se não funcionar: voltar à conta única da plataforma, com repasse às ONGs registrado no painel.
+- **A validar antes de implementar:** criar um PIX com o token OAuth de uma conta de teste de vendedor no sandbox. A documentação brasileira de split não cita o PIX explicitamente. **Plano B**, se não funcionar: voltar à conta única da plataforma, com repasse às ONGs registrado no painel.
 
 ## 11. Notificações (removidas)
 
-- Havia uma central de notificações **pull-based** (sininho/lista consultada ao abrir o app ou navegar) — decisão revertida em 2026-09-23.
+- Havia uma central de notificações **pull-based** (sininho/lista consultada ao abrir o app ou navegar) — decisão revertida.
 - **Decisão atual**: a central de notificações foi removida do sistema. A sidebar de navegação (acessível pelo ícone de menu na navbar) já cobre os alertas mais importantes do dia a dia via badges numéricos: interesses recebidos pendentes e mensagens de chat não lidas.
 - Eventos que antes gerariam notificação e hoje **não têm nenhum canal de aviso**: animal favoritado foi adotado por outra pessoa, nova avaliação recebida, denúncia julgada. Se algum desses precisar de visibilidade no futuro, considerar um badge dedicado na sidebar em vez de reintroduzir uma central separada.
 
-## 12. Nota técnica: estado atual (mock) vs. arquitetura final
+## 12. Nota técnica: API real vs. mock
 
-- **Já integrado com o backend real (Spring Boot + PostgreSQL)**:
-  - login e cadastro (`core/services/authService.js`, `core/services/api.js`), inclusive o login do admin (2026-10-10);
-  - animais;
-  - favoritos;
-  - AUmatch: respostas do quiz e deck com o score (2026-10-12);
-  - pedidos de adoção e avaliações (2026-10-13). O `AnimalContext` legado e os pedidos do localStorage saíram;
-  - eventos e presenças (2026-10-13), com `VITE_USE_MOCK_EVENTOS=false` no `.env`. O servidor falso (`eventosMock.js`) continua no código como alternativa.
-- **Ainda mockado em `localStorage`, só para testes de frontend**:
-  - mensagens de chat (`useChatMessages`), guardadas pelo id real do pedido. Contrato para o backend: `api-chat.md`;
-  - a moderação do admin (banir, remover anúncio), que só "cancela" pedidos na tela. Contrato: `api-denuncias-moderacao.md`.
-- **O que falta no backend, em ordem**: `plano-backend-restante.md` (2026-10-13).
-- **Campanhas e doações**: mesmo esquema (`features/doacoes/services/doacoesMock.js`, que também faz o papel do Mercado Pago, com o botão "Simular pagamento" só em desenvolvimento). Com `VITE_USE_MOCK_CAMPANHAS=false`, chama `doacoesApi.js`. Contrato em inglês: `docs/api-campanhas-eventos.md` §6.
-- Conforme o parceiro de backend for entregando endpoints, cada um desses módulos precisa ser migrado do mock para chamadas reais de API — isso deve ser tratado como um roteiro próprio, módulo por módulo, não uma migração única.
+- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, perfil público e banner da ONG, painel do admin, denúncias e moderação.
+- **Ainda num servidor falso no `localStorage`**, cada um atrás de uma flag `VITE_USE_MOCK_*` (ligada por padrão) e com o adaptador da API já escrito:
+  - campanhas e doações (`VITE_USE_MOCK_CAMPANHAS`; o `doacoesMock.js` também faz o papel do Mercado Pago, com "Simular pagamento" só em desenvolvimento);
+  - recuperar e alterar senha (`VITE_USE_MOCK_SENHA`);
+  - chat.
+- **O que falta no backend, em ordem:** `entrega-final/README.md`. Quando o parceiro entrega um módulo, o front desliga a flag dele (`=false` no `.env`).
 
 ## 13. Backlog técnico conhecido (não implementar agora — só registro)
 
@@ -391,18 +384,14 @@ Gaps encontrados na exploração do código atual, guardados aqui para referênc
 - **Bug de papel**:
   - `OngRoute` já usa `user.userType` (corrigido).
   - `AdminRoute` também já usa `user.userType` (corrigido no painel do admin).
-- ~~Bug de identidade no chat~~ e ~~página do adotante~~: resolvidos com os pedidos na API (2026-10-13).
+- ~~Bug de identidade no chat~~ e ~~página do adotante~~: resolvidos com os pedidos na API.
 - Avaliações não podem ser denunciadas, e as de contas banidas continuam aparecendo.
-- Várias telas ainda são arquivos vazios/placeholders: dashboard admin, aprovação de ONGs, denúncias, estatísticas. Elas serão substituídas pelo painel do admin (`plano-painel-admin.md`), e a de aprovação de ONGs será apagada.
+- Várias telas ainda são arquivos vazios/placeholders: dashboard admin, aprovação de ONGs, denúncias, estatísticas. Elas serão substituídas pelo painel do admin (`planos-front/plano-painel-admin.md`), e a de aprovação de ONGs será apagada.
 
 ## 14. Perguntas em aberto (alinhar com o parceiro de backend)
 
-- ~~Como o primeiro usuário `ADMIN` é criado~~: resolvido em 2026-10-10 com variáveis de ambiente na subida da API (seção 2).
+- ~~Como o primeiro usuário `ADMIN` é criado~~: resolvido com variáveis de ambiente na subida da API (seção 2).
 - ~~Nome do campo de papel~~: resolvido. É `userType`, com `PERSON | NGO | ADMIN` na API.
-- ~~Endpoints `/api/admin/*` e `/api/reports`~~: contrato escrito. Estatísticas e listas em `api-admin.md`; denúncias e moderação, com o SQL, em `api-denuncias-moderacao.md` (2026-10-13). Falta implementar.
-- ~~Se e quando o histórico de status do animal entra no modelo~~: resolvido em 2026-10-14. A taxa de reabandono usa os status `RETURNED` / `REHOMED` do pedido e o score congelado na conclusão (seção 3.3), sem tabela de histórico do animal.
-- ~~Novos itens para o parceiro de backend, sem contrato~~: contratos escritos em 2026-10-15 na pasta **`docs/entrega-final/`**. O `README.md` dela traz o cronograma das 3 sprints (até 29/11), as migrações renumeradas (007 a 014) e os riscos:
-  - `api-mercado-pago-ongs.md`;
-  - `api-senha.md`;
-  - `api-exclusao-conta.md`;
-  - `api-devolucao-reabandono.md`.
+- ~~Endpoints `/api/admin/*` e `/api/reports`~~: implementados (`contratos-prontos/api-admin.md` e `contratos-prontos/api-denuncias-moderacao.md`). Falta só a parte de campanhas, junto com a 007.
+- ~~Se e quando o histórico de status do animal entra no modelo~~: resolvido. A taxa de reabandono usa os status `RETURNED` / `REHOMED` do pedido e o score congelado na conclusão (seção 3.3), sem tabela de histórico do animal.
+- ~~Novos itens para o parceiro de backend, sem contrato~~: os contratos do que falta estão em **`docs/entrega-final/`**, com o mapa no `README.md` dela.

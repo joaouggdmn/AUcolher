@@ -6,7 +6,7 @@ import { changeAnimalStatus, createAnimal, getAnimal } from '../../animais/servi
 import { RETURN_NOTE_MAX_LENGTH, canHaveReturn } from '../utils/requestStatus'
 
 // 🔴 "Servidor falso" do retorno e do repasse (USE_MOCK_REABANDONO), até as
-// rotas da migração 012 existirem (docs/entrega-final/api-devolucao-reabandono.md).
+// rotas da migração 012 existirem (docs/contratos-prontos/api-devolucao-reabandono.md).
 // Os pedidos continuam vindo da API real; aqui ficam só:
 // - `records`: um retorno (RETURNED) ou repasse (REHOMED) por pedido;
 // - `frozenScores`: o score do AUmatch visto quando o pedido estava CONCLUDED,

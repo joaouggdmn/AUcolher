@@ -1,6 +1,6 @@
 import api from '../../../core/services/api'
 
-// Adaptador real: é o contrato de docs/api-campanhas-eventos.md em código.
+// Adaptador real: é o contrato de docs/entrega-final/api-campanhas-doacoes.md em código.
 // doacoesMock.js tem as mesmas funções e devolve os mesmos DTOs. O Mercado
 // Pago nunca é chamado daqui: o backend cria o PIX e consulta o pagamento
 
