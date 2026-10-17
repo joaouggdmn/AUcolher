@@ -126,9 +126,12 @@ function toFrontendUser(backendUser) {
 
 export { ACCOUNT_SUSPENDED_MESSAGE };
 
-// Rota única para qualquer tipo de conta — o papel vem em user.userType
-export async function loginRequest({ email, password }) {
-  const { data } = await api.post("/auth/login", { email, password });
+// Início do login com o Google: uma página do Spring na origem da API (sem o
+// /api), aberta pelo navegador e não pelo axios, porque redireciona ao Google
+export const GOOGLE_LOGIN_URL = `${new URL(api.defaults.baseURL).origin}/oauth2/authorization/google`;
+
+// Mesmo payload no login por senha e na troca do código do Google
+function toSession(data) {
   const user = toFrontendUser(data.user);
 
   // 🔴 Moderação no modo mock: a API ainda não sabe quem o admin baniu. Com
@@ -144,6 +147,19 @@ export async function loginRequest({ email, password }) {
     tokenType: data.type ?? "Bearer",
     user,
   };
+}
+
+// Rota única para qualquer tipo de conta — o papel vem em user.userType
+export async function loginRequest({ email, password }) {
+  const { data } = await api.post("/auth/login", { email, password });
+  return toSession(data);
+}
+
+// Fim do login com o Google: a API voltou ao front com um código de uso único
+// (docs/entrega-final/api-login-google.md §3)
+export async function exchangeGoogleCode(code) {
+  const { data } = await api.post("/auth/google/exchange", { code });
+  return toSession(data);
 }
 
 export async function registerRequest(formData) {
