@@ -130,7 +130,7 @@ export { ACCOUNT_SUSPENDED_MESSAGE };
 // /api), aberta pelo navegador e não pelo axios, porque redireciona ao Google
 export const GOOGLE_LOGIN_URL = `${new URL(api.defaults.baseURL).origin}/oauth2/authorization/google`;
 
-// Mesmo payload no login por senha e na troca do código do Google
+// Mesmo payload no login por senha, no cadastro e na troca do código do Google
 function toSession(data) {
   const user = toFrontendUser(data.user);
 
@@ -168,5 +168,6 @@ export async function registerRequest(formData) {
 
   const { data } = await api.post(endpoint, payload);
 
-  return data?.user ? toFrontendUser(data.user) : null;
+  // O cadastro devolve o mesmo payload do login: a conta já entra
+  return toSession(data);
 }
