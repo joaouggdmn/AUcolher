@@ -1,6 +1,5 @@
 import HeroCopy from './HeroCopy'
 import HeroAUmatchMockup from './HeroAUmatchMockup'
-import PlatformStatsBar from './PlatformStatsBar'
 import HomeSearch from '../Search/HomeSearch'
 import { useRankedPets } from '../../hooks/useRankedPets'
 
@@ -46,8 +45,6 @@ function HeroSection({ persona }) {
           <HeroAUmatchMockup />
         </div>
       </div>
-
-      <PlatformStatsBar />
     </section>
   )
 }
