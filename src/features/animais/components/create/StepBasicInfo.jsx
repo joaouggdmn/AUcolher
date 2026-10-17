@@ -59,7 +59,7 @@ function StepBasicInfo({ formData, onChange, showLocationFields }) {
       {showLocationFields && (
         <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
           <p className="text-xs font-semibold text-amber-700">
-            Não encontramos sua localização — ela será usada neste anúncio e salva no seu perfil.
+            Não encontramos sua localização. Ela será usada neste anúncio e salva no seu perfil.
           </p>
 
           <CityStateFields state={formData.state} city={formData.city} onChange={handleLocationChange} />

@@ -7,13 +7,11 @@ const SECTIONS = [
   {
     key: 'estiloDeVida',
     title: 'Seu Estilo de Vida & Ambiente',
-    description: 'Como é o seu dia a dia — isso define o que o pet vai precisar de você.',
     icon: FaHouseUser,
   },
   {
     key: 'preferenciasPet',
     title: 'Suas Preferências para o Pet Ideal',
-    description: 'O tipo de companheiro que você imagina para a sua rotina.',
     icon: FaPaw,
   },
 ]
@@ -33,13 +31,12 @@ function LifestyleForm({ values, onChange }) {
 
         return (
           <div key={section.key} className="rounded-2xl border border-slate-100 bg-slate-50/60 p-5 sm:p-6">
-            <div className="mb-5 flex items-start gap-3">
+            <div className="mb-5 flex items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-white">
                 <SectionIcon size={15} />
               </span>
               <div>
                 <h3 className="text-base font-extrabold tracking-tight text-emerald-950">{section.title}</h3>
-                <p className="text-xs text-slate-500">{section.description}</p>
               </div>
             </div>
 

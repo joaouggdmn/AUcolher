@@ -25,7 +25,7 @@ export const quizQuestions = [
     key: 'rotinaExercicio',
     section: 'estiloDeVida',
     title: 'Como é a sua rotina de exercícios?',
-    subtitle: 'Pets também têm níveis de energia diferentes — vamos parear com o seu.',
+    subtitle: 'Pets também têm níveis de energia diferentes. Vamos parear com o seu.',
     options: [
       { value: 'SEDENTARIO', label: 'Sedentário', icon: FaCouch },
       { value: 'ATIVO', label: 'Ativo', icon: FaPersonWalking },

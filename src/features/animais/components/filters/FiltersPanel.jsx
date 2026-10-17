@@ -10,8 +10,11 @@ import {
   AGE_GROUP_OPTIONS,
   ENERGY_LEVEL_OPTIONS,
   TEMPERAMENT_OPTIONS,
-  CITY_OPTIONS,
+  buildCityOptions,
 } from "./filterOptions";
+import { useAnimalCities } from "../../hooks/useAnimais";
+
+const NO_CITIES = [];
 
 function FiltersPanel({
   filters,
@@ -21,6 +24,10 @@ function FiltersPanel({
   onClear,
   hasActiveFilters,
 }) {
+  // As cidades vêm do backend: só as que têm animal disponível
+  const { data: cities = NO_CITIES } = useAnimalCities();
+  const cityOptions = buildCityOptions(cities, filters.city);
+
   return (
     <div className="flex flex-col">
       {/* Filtros essenciais — sempre visíveis */}
@@ -108,7 +115,7 @@ function FiltersPanel({
                 onChange={(e) => onCityChange(e.target.value)}
                 className="min-h-11 w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-sm font-medium text-slate-700 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
               >
-                {CITY_OPTIONS.map((opt) => (
+                {cityOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>

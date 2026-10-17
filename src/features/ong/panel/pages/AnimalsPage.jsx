@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { FaCircleCheck, FaPaw, FaPlus } from 'react-icons/fa6'
+import { FaPaw, FaPlus } from 'react-icons/fa6'
 import { getErrorMessage } from '../../../../core/utils/apiError'
 import { matchesSearch } from '../../../../core/utils/search'
-import ConfirmDialog from '../../../../core/components/ui/ConfirmDialog'
 import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../../core/components/ui/Spinner'
 import PillToggleGroup from '../../../../core/components/ui/filters/PillToggleGroup'
@@ -27,7 +26,6 @@ import { useOngPanel } from '../useOngPanel'
 const SUCCESS_MESSAGES = {
   AVAILABLE: ({ name }) => `${name} voltou para a vitrine.`,
   INACTIVE: ({ name }) => `${name} saiu do ar. Dá para colocar de volta quando quiser.`,
-  ADOPTED: ({ name, sex }) => `Que notícia boa! ${name} foi ${sex === 'FEMALE' ? 'marcada como adotada' : 'marcado como adotado'}.`,
 }
 
 function AnimalsPage() {
@@ -35,7 +33,6 @@ function AnimalsPage() {
   const { animals, queries } = dashboard
   const [statusFilter, setStatusFilter] = useState('')
   const [search, setSearch] = useState('')
-  const [adoptionCandidate, setAdoptionCandidate] = useState(null)
   const [statusError, setStatusError] = useState(null)
   // "Animal retornado": a adoção cujo retorno a ONG está registrando
   const [returningRequest, setReturningRequest] = useState(null)
@@ -48,11 +45,9 @@ function AnimalsPage() {
       { id: animal.id, status },
       {
         onSuccess: () => {
-          setAdoptionCandidate(null)
           notify(SUCCESS_MESSAGES[status](animal))
         },
         onError: (error) => {
-          setAdoptionCandidate(null)
           setStatusError(getErrorMessage(error))
         },
       }
@@ -124,7 +119,6 @@ function AnimalsPage() {
                     requestsTo={PANEL_PATHS.requests}
                     pendingStatus={isPending && variables?.id === animal.id ? variables.status : null}
                     onChangeStatus={handleChangeStatus}
-                    onMarkAdopted={setAdoptionCandidate}
                     details={
                       adoption && RETURN_STATUSES.includes(adoption.status) ? (
                         <div className="mt-2">
@@ -144,7 +138,6 @@ function AnimalsPage() {
     )
   }
 
-  const adoptedWord = adoptionCandidate?.sex === 'FEMALE' ? 'adotada' : 'adotado'
 
   return (
     <PanelPage
@@ -163,18 +156,6 @@ function AnimalsPage() {
         />
       )}
 
-      {adoptionCandidate && (
-        <ConfirmDialog
-          icon={FaCircleCheck}
-          title={`${adoptionCandidate.name} foi ${adoptedWord}?`}
-          description="Essa ação é definitiva: o anúncio sai da vitrine e do perfil público e não pode mais ser editado nem voltar ao ar."
-          confirmLabel={`Sim, foi ${adoptedWord}`}
-          processingLabel="Salvando..."
-          isProcessing={isPending}
-          onConfirm={() => handleChangeStatus(adoptionCandidate, 'ADOPTED')}
-          onCancel={() => setAdoptionCandidate(null)}
-        />
-      )}
     </PanelPage>
   )
 }

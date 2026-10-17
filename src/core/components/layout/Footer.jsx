@@ -51,7 +51,7 @@ function Footer() {
             </Link>
 
             <p className="max-w-xs text-sm leading-relaxed text-emerald-200/80">
-              Conectamos corações e patas — cada adoção começa com um match
+              Conectamos corações e patas. Cada adoção começa com um match
               feito para durar a vida toda.
             </p>
 

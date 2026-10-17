@@ -50,7 +50,7 @@ function ReportModal({ targetType, target, onClose, onReported }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="report-modal-title"
-        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg animate-fade-slide-in overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg animate-fade-slide-in scrollbar-soft overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
       >
         <button
           type="button"

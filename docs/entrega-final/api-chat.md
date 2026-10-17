@@ -26,7 +26,8 @@
 
 | `systemEvent` | Quando o backend cria | Texto que o front mostra |
 |---|---|---|
-| `DELIVERY_REQUESTED` | `ACCEPTED → AWAITING_DELIVERY` | "O doador confirmou a entrega de {animal}. O chat foi bloqueado para novas mensagens — quando o pet chegar até você, confirme o recebimento para concluir a adoção." |
+| `DELIVERY_REQUESTED` | `ACCEPTED → AWAITING_DELIVERY` | "O doador confirmou a entrega de {animal}. O chat foi bloqueado para novas mensagens. Quando o pet chegar até você, confirme o recebimento para concluir a adoção." |
+| `DELIVERY_DECLINED` | adotante avisa "Ainda não recebi" (`AWAITING_DELIVERY → ACCEPTED`) | "O adotante avisou que {animal} ainda não chegou. O chat foi liberado para vocês combinarem a entrega." |
 | `ADOPTION_CONCLUDED` | `AWAITING_DELIVERY → CONCLUDED` | "Adoção de {animal} concluída! Parabéns pelo novo membro da família." |
 | `ADOPTER_WITHDREW` | adotante cancela **a partir de** `ACCEPTED` ou `AWAITING_DELIVERY` | "O adotante cancelou o pedido de adoção de {animal}." |
 | `OWNER_WITHDREW` | dono cancela (`ACCEPTED` ou `AWAITING_DELIVERY`) | "O doador desistiu da adoção de {animal}. O pedido foi cancelado." |
@@ -166,6 +167,7 @@ No `PUT /read`, `lastMessageId` ausente ou negativo → 400 "Informe a última m
    `/api/chats/summary` não colide com `/api/chats/{requestId}/messages`, porque as duas têm profundidades diferentes.
 3. **Mensagens de sistema**: no `AdoptionRequestService.changeStatus(...)`, depois de aplicar a transição, chame `chatService.addSystemMessage(request, SystemEvent.X)`. Tudo fica na mesma `@Transactional`: se a mensagem falhar, a troca de status volta junto.
    - `AWAITING_DELIVERY` → `DELIVERY_REQUESTED`;
+   - `ACCEPTED` vindo de `AWAITING_DELIVERY` (o adotante avisou que o pet não chegou) → `DELIVERY_DECLINED`. O `PENDING → ACCEPTED` do dono não gera aviso;
    - `CONCLUDED` → `ADOPTION_CONCLUDED` (dentro do `conclude(...)`);
    - `CANCELLED` pelo adotante → `ADOPTER_WITHDREW`, **só se** o status de partida era `ACCEPTED` ou `AWAITING_DELIVERY`;
    - `CANCELLED` pelo dono → `OWNER_WITHDREW`;
@@ -237,7 +239,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     created_at    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_chat_messages_type         CHECK (type IN ('USER', 'SYSTEM')),
-    CONSTRAINT chk_chat_messages_system_event CHECK (system_event IN ('DELIVERY_REQUESTED', 'ADOPTION_CONCLUDED',
+    CONSTRAINT chk_chat_messages_system_event CHECK (system_event IN ('DELIVERY_REQUESTED', 'DELIVERY_DECLINED', 'ADOPTION_CONCLUDED',
                                                                       'ADOPTER_WITHDREW', 'OWNER_WITHDREW',
                                                                       'ANIMAL_RETURNED', 'ANIMAL_REHOMED')),
     CONSTRAINT chk_chat_messages_text         CHECK (text IS NULL OR char_length(btrim(text)) > 0),
@@ -254,7 +256,7 @@ COMMENT ON TABLE  chat_messages              IS 'Mensagens do chat de cada pedid
 COMMENT ON COLUMN chat_messages.sender_id    IS 'Quem escreveu (adotante ou dono) — nulo nas mensagens de sistema';
 COMMENT ON COLUMN chat_messages.type         IS 'USER (escrita por uma das partes) ou SYSTEM (aviso criado pela API na troca de status)';
 COMMENT ON COLUMN chat_messages.text         IS 'Texto da mensagem USER, de 1 a 1000 caracteres — nulo em SYSTEM';
-COMMENT ON COLUMN chat_messages.system_event IS 'Só em SYSTEM: DELIVERY_REQUESTED, ADOPTION_CONCLUDED, ADOPTER_WITHDREW, OWNER_WITHDREW, ANIMAL_RETURNED ou ANIMAL_REHOMED';
+COMMENT ON COLUMN chat_messages.system_event IS 'Só em SYSTEM: DELIVERY_REQUESTED, DELIVERY_DECLINED, ADOPTION_CONCLUDED, ADOPTER_WITHDREW, OWNER_WITHDREW, ANIMAL_RETURNED ou ANIMAL_REHOMED';
 
 -- ------------------------------------------------------------
 -- chat_reads — até qual mensagem cada parte já leu, por conversa.

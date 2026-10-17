@@ -17,7 +17,7 @@ const SUMMARY_TONES = {
 
 function EventCard({ event, layout = 'grid' }) {
   const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false)
-  const categoria = getCategoriaMeta(event.category)
+  const categoria = getCategoriaMeta(event.category, event.customCategory)
   const CategoriaIcon = categoria.icon
   const summary = getAttendanceSummary(event)
   const isList = layout === 'list'
@@ -40,10 +40,7 @@ function EventCard({ event, layout = 'grid' }) {
         }`}
       >
         <Link to={`/eventos/${event.id}`} className="block h-full">
-          <EventCover
-            event={event}
-            className="transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-110"
-          />
+          <EventCover event={event} />
         </Link>
 
         <div className="absolute left-4 top-4 z-10">

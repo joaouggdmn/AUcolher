@@ -24,7 +24,7 @@ function PetDetailModal({ pet, onClose }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-emerald-950/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
-      <div role="dialog" aria-modal="true" className="relative z-10 max-h-[85vh] w-full max-w-md animate-fade-slide-in overflow-y-auto rounded-3xl bg-white shadow-2xl">
+      <div role="dialog" aria-modal="true" className="relative z-10 max-h-[85vh] w-full max-w-md animate-fade-slide-in scrollbar-soft overflow-y-auto rounded-3xl bg-white shadow-2xl">
         <button type="button" onClick={onClose} aria-label="Fechar" className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-md transition-colors duration-300 hover:bg-white">
           <FaXmark size={16} />
         </button>

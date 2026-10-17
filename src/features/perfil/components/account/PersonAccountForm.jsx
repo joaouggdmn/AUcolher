@@ -33,13 +33,9 @@ function PersonAccountForm({ account = null, onSave = null }) {
 
       <div className="mt-10">
         <AccountFormShell isDirty={isDirty} onSave={() => save()} onDiscard={discard}>
-          <AccountGroupHeading
-            visibility="public"
-            title="Perfil público"
-            description="O que qualquer pessoa vê ao abrir seu perfil, inclusive quem analisa o seu pedido de adoção."
-          />
+          <AccountGroupHeading visibility="public" title="Perfil público" />
 
-          <ProfileSection icon={FaUser} title="Apresentação" description="Foto, nome e algumas linhas sobre você">
+          <ProfileSection icon={FaUser} title="Apresentação">
             <div className="mb-6 flex justify-center sm:justify-start">
               <AvatarUploadInput
                 value={formData.photoUrl}
@@ -62,16 +58,11 @@ function PersonAccountForm({ account = null, onSave = null }) {
                 value={formData.bio}
                 onChange={(value) => setField('bio', value)}
                 placeholder="Conte um pouco sobre você: se já tem pets, se cuida ou resgata animais, o que procura numa adoção..."
-                hint="Cuida de animais por conta própria? Conte aqui — ajuda quem vai adotar de você a confiar."
               />
             </div>
           </ProfileSection>
 
-          <AccountGroupHeading
-            visibility="private"
-            title="Dados da conta"
-            description="Só você vê. Usados para entrar na plataforma e alimentar as recomendações do AUmatch."
-          />
+          <AccountGroupHeading visibility="private" title="Dados da conta" />
 
           {isModeration ? (
             <ModerationEmailSection
@@ -80,19 +71,15 @@ function PersonAccountForm({ account = null, onSave = null }) {
               isGoogleAccount={user.provider === 'GOOGLE'}
             />
           ) : (
-            <AccessSection emailHint="Usado para login — não pode ser alterado por aqui." />
+            <AccessSection emailHint="Usado para login, não pode ser alterado por aqui." />
           )}
 
-          <ProfileSection icon={FaLocationDot} title="Localização" description="Sua cidade e estado aparecem no perfil público">
+          <ProfileSection icon={FaLocationDot} title="Localização" description="Aparece no perfil público">
             <CityStateFields state={formData.state} city={formData.city} onChange={setFields} />
           </ProfileSection>
 
           {!isModeration && (
-            <ProfileSection
-              icon={FaHeartCircleCheck}
-              title="Perfil AUmatch"
-              description="Isso alimenta o algoritmo que encontra seus matches"
-            >
+            <ProfileSection icon={FaHeartCircleCheck} title="Perfil AUmatch">
               <LifestyleForm values={formData} onChange={setField} />
             </ProfileSection>
           )}

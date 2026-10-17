@@ -21,7 +21,7 @@ import { getEventPayloadErrors } from '../utils/eventoRules'
 const store = createMockStore({ key: MOCK_EVENTOS_STORE_KEY, version: 2, seed: buildSeedEventos })
 
 const PAYLOAD_FIELDS = [
-  'title', 'description', 'category', 'date', 'startTime', 'endTime', 'venueName', 'cep',
+  'title', 'description', 'category', 'customCategory', 'date', 'startTime', 'endTime', 'venueName', 'cep',
   'street', 'number', 'complement', 'district', 'city', 'state', 'capacity', 'coverUrl',
 ]
 
@@ -94,6 +94,8 @@ function normalizePayload(payload = {}) {
     })
   )
   if (normalized.cep) normalized.cep = normalized.cep.replace(/\D/g, '')
+  // O nome livre só vale para "Outro", como no backend
+  if (normalized.category !== 'OTHER') normalized.customCategory = null
   return normalized
 }
 

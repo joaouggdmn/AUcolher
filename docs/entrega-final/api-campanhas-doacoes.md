@@ -15,6 +15,8 @@
 - Valores em **reais inteiros**. Doação mínima **R$ 5**, máxima **R$ 100.000**. Meta entre **R$ 50** e **R$ 1.000.000**.
 - Status da campanha: `ACTIVE | CLOSED`. Ela fica `CLOSED` quando a ONG encerra **ou** quando o `deadline` (opcional) passa. O segundo caso é **calculado na leitura** (`deadline < hoje`), sem job agendado. `closedAt` é o momento do encerramento ou `"{deadline}T23:59:59"`.
 - **Meta atingida** não encerra nada: a campanha continua recebendo doações.
+- **Uma campanha urgente ativa por ONG.** Ligar `isUrgent` (criar urgente, ou editar uma que não era) responde **409** se a ONG já tiver outra campanha `ACTIVE` com `isUrgent = true`. Uma campanha que já é urgente pode continuar urgente ou desligar. O admin, ao editar, segue a mesma regra. Sem isso, toda ONG marcaria todas as campanhas como urgentes e o selo perderia o sentido.
+- **Categoria "Outro":** com `category = OTHER`, a ONG escreve o nome da categoria em `customCategory` (obrigatório, até 30 caracteres), que aparece no selo. Com qualquer outra categoria, o backend grava `customCategory = null`.
 - Campanha encerrada é somente leitura: não edita e não recebe doação, mas o detalhe abre.
 - **Conta Mercado Pago que caiu** (desconectada ou `NEEDS_RECONNECT`): a campanha continua visível com `acceptingDonations: false`, e doar responde 400. Os PIX já gerados valem até vencer.
 - **Encerrar** e **excluir** cancelam (`CANCELLED`) os PIX ainda pendentes da campanha.
@@ -34,6 +36,7 @@
   "title": "Cirurgia urgente do Rex",
   "description": "Rex foi atropelado e precisa de uma cirurgia ortopédica...",
   "category": "HEALTH",
+  "customCategory": null,
   "isUrgent": true,
   "goalAmount": 8000,
   "raisedAmount": 3250,
@@ -55,7 +58,8 @@
 }
 ```
 
-- `category`: `HEALTH | FOOD | INFRASTRUCTURE` (saúde/cirurgias, alimentação, estrutura do abrigo).
+- `category`: `HEALTH | FOOD | INFRASTRUCTURE | NEUTERING | RESCUE | OTHER` (saúde/cirurgias, alimentação, estrutura do abrigo, castração, resgate, outro).
+- `customCategory`: nome livre da categoria quando `category = OTHER`; `null` nas outras.
 - `goalAmount` e `raisedAmount` em reais inteiros (no banco, `NUMERIC(12,2)`; o JSON pode mandar `3250` ou `3250.00`).
 - `acceptingDonations` = campanha `ACTIVE` **e** ONG com conta Mercado Pago `CONNECTED`. Calculado na leitura.
 - `deadline`, `closedAt`, `coverUrl`, `ngo.photoUrl`, `ngo.city` e `ngo.state` podem vir `null`.
@@ -69,6 +73,7 @@
   "title": "Cirurgia urgente do Rex",
   "description": "Rex foi atropelado e precisa de uma cirurgia ortopédica...",
   "category": "HEALTH",
+  "customCategory": null,
   "isUrgent": true,
   "goalAmount": 8000,
   "deadline": "2026-10-29",
@@ -80,8 +85,9 @@
 |---|---|---|
 | `title` | sim | 3 a 120 caracteres |
 | `description` | sim | até 2000 caracteres |
-| `category` | sim | um dos 3 valores |
-| `isUrgent` | não | padrão `false` |
+| `category` | sim | um dos 6 valores |
+| `customCategory` | só com `OTHER` | 1 a 30 caracteres; ignorado (vira `null`) nas outras categorias |
+| `isUrgent` | não | padrão `false`; no máximo uma urgente ativa por ONG (§1) |
 | `goalAmount` | sim | inteiro de 50 a 1.000.000 |
 | `deadline` | não | `>= hoje` |
 | `coverUrl` | não | mesma regra da capa do evento (http(s) ou data URL jpeg/png/webp, até 600.000 caracteres; `PhotoUrl.COVER_MAX_LENGTH`) |
@@ -120,8 +126,8 @@ O `PUT` substitui todos os campos e é recusado (400) se a campanha estiver ence
 |---|---|---|---|---|
 | GET | `/api/campaigns?ngoId=&status=` | público | 200 `Campaign[]` | `status` = `ACTIVE` (padrão) ou `CLOSED`. Nunca devolve excluídas nem de ONG banida. Ordem: `createdAt` decrescente |
 | GET | `/api/campaigns/{id}` | público | 200 `Campaign` | 404 se não existe, foi excluída ou a ONG está banida. Encerrada **abre** normalmente |
-| POST | `/api/campaigns` | ONG | 201 `Campaign` | 403 se não for ONG; 400 sem conta Mercado Pago conectada |
-| PUT | `/api/campaigns/{id}` | ONG dona | 200 `Campaign` | 400 se encerrada |
+| POST | `/api/campaigns` | ONG | 201 `Campaign` | 403 se não for ONG; 400 sem conta Mercado Pago conectada; 409 se ligar a urgência já tendo outra urgente ativa |
+| PUT | `/api/campaigns/{id}` | ONG dona | 200 `Campaign` | 400 se encerrada; 409 se ligar a urgência já tendo outra urgente ativa |
 | POST | `/api/campaigns/{id}/close` | ONG dona | 200 `Campaign` | cancela os PIX pendentes. 400 se já encerrada |
 | DELETE | `/api/campaigns/{id}` | ONG dona | 204 | real ou lógica (§1); cancela os PIX pendentes |
 | GET | `/api/campaigns/mine` | ONG | 200 `Campaign[]` | ativas e encerradas da ONG logada, sem as excluídas |
@@ -142,6 +148,8 @@ O `PUT` substitui todos os campos e é recusado (400) se a campanha estiver ence
 | 400 | editar / encerrar campanha encerrada | "Campanhas encerradas não podem ser editadas." / "Esta campanha já está encerrada." |
 | 400 | criar sem conta conectada | "Conecte sua conta do Mercado Pago no painel antes de criar uma campanha." |
 | 403 | admin doando | "Contas de admin não fazem doações." |
+| 400 | `OTHER` sem nome | "Dê um nome para a categoria." |
+| 409 | ligar urgência com outra urgente ativa | "A ONG já tem uma campanha urgente ativa (\"{título}\"). Tire a urgência dela antes de marcar outra." |
 
 ## 6. Fluxo do PIX e notas de implementação
 
@@ -219,7 +227,8 @@ CREATE TABLE IF NOT EXISTS campaigns (
     ngo_id                 BIGINT         NOT NULL REFERENCES users(id),
     title                  VARCHAR(120)   NOT NULL,
     description            TEXT           NOT NULL,
-    category               VARCHAR(20)    NOT NULL CHECK (category IN ('HEALTH', 'FOOD', 'INFRASTRUCTURE')),
+    category               VARCHAR(20)    NOT NULL CHECK (category IN ('HEALTH', 'FOOD', 'INFRASTRUCTURE', 'NEUTERING', 'RESCUE', 'OTHER')),
+    custom_category        VARCHAR(30),
     is_urgent              BOOLEAN        NOT NULL DEFAULT FALSE,
     goal_amount            NUMERIC(12,2)  NOT NULL CHECK (goal_amount >= 50),
     deadline               DATE,

@@ -40,7 +40,7 @@ function AccessSection({ emailHint }) {
   }
 
   return (
-    <ProfileSection icon={FaEnvelope} title="Acesso" description="E-mail e senha usados para entrar na plataforma">
+    <ProfileSection icon={FaEnvelope} title="Acesso">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField label="E-mail" value={user?.email ?? ''} disabled hint={emailHint} />
         <FormField
@@ -48,11 +48,7 @@ function AccessSection({ emailHint }) {
           type={hasPassword ? 'password' : 'text'}
           value={hasPassword ? MASKED_PASSWORD : 'Nenhuma senha criada'}
           disabled
-          hint={
-            hasPassword
-              ? 'Por segurança, a senha não é exibida.'
-              : 'Você entra pelo Google. Com uma senha, também entra com e-mail e senha.'
-          }
+          hint={hasPassword ? undefined : 'Você entra pelo Google. Com uma senha, também entra com e-mail e senha.'}
         />
       </div>
 

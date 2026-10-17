@@ -66,7 +66,7 @@ function SlotRow({ slot, index, onChange, onRemove }) {
           />
           {slot.legacy && (
             <p className="mt-2 text-xs text-amber-700">
-              Antes: “{slot.legacy.days} — {slot.legacy.hours}”. Escolha os dias e o horário para atualizar.
+              Antes: “{slot.legacy.days}, {slot.legacy.hours}”. Escolha os dias e o horário para atualizar.
             </p>
           )}
         </fieldset>

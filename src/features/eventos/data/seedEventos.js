@@ -133,7 +133,7 @@ const EVENTS = [
   {
     id: 14, ngoId: 1, dayOffset: -12, category: 'ADOPTION_FAIR', place: 'araPraca', coverUrl: COVERS.feira,
     title: 'Feira de Adoção de Inverno', startTime: '09:00', endTime: '15:00', capacity: null, confirmed: 7,
-    description: 'Feira que já aconteceu — 23 animais foram adotados neste dia.',
+    description: 'Feira que já aconteceu: 23 animais foram adotados neste dia.',
   },
   {
     id: 15, ngoId: 5, dayOffset: -30, category: 'HEALTH', place: 'tubUbs', coverUrl: COVERS.castracao,
@@ -143,7 +143,7 @@ const EVENTS = [
   {
     id: 16, ngoId: 4, dayOffset: 8, category: 'BAZAAR', place: 'cricPraca', coverUrl: COVERS.bazar, status: 'CANCELLED',
     title: 'Bazar do Dia dos Animais', startTime: '10:00', endTime: '17:00', capacity: null, confirmed: 3,
-    description: 'Evento cancelado pela ONG — só aparece em Minha conta, para quem tinha confirmado presença.',
+    description: 'Evento cancelado pela ONG. Só aparece em Minha conta, para quem tinha confirmado presença.',
   },
 ]
 

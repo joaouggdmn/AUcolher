@@ -75,11 +75,6 @@ function UserProfilePage() {
             <AccountDateTag user={user} isOng={isOng} />
           </div>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">Minha conta</h1>
-          <p className="mt-1 text-slate-600">
-            {isOng
-              ? 'Cuide da vitrine pública da instituição e dos dados de acesso.'
-              : 'Mantenha seus dados atualizados para melhorar suas recomendações.'}
-          </p>
         </div>
 
         {/* Abre a mesma página que qualquer visitante vê. Com alterações

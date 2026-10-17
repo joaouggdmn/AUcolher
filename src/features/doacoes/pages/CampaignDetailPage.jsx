@@ -194,7 +194,7 @@ function CampaignDetailPage() {
     )
   }
 
-  const categoria = getCategoriaMeta(campaign.category)
+  const categoria = getCategoriaMeta(campaign.category, campaign.customCategory)
   const CategoriaIcon = categoria.icon
   const deadline = getDeadlineSummary(campaign)
   const isOwner = isCampaignOwner(campaign, user)

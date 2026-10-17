@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { FaFilter } from 'react-icons/fa6'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { FaFilter, FaPaw } from 'react-icons/fa6'
 import SearchBar from '../components/SearchBar'
 import FiltersSidebar from '../components/filters/FiltersSidebar'
 import FiltersDrawer from '../components/filters/FiltersDrawer'
 import AnimalsGrid from '../components/AnimalsGrid'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
+import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
+import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
+import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 import { useAnimalsList } from '../hooks/useAnimais'
 
 // Mesmos nomes dos filtros da API (species, sizes, sexes...): a filtragem e
@@ -49,6 +53,10 @@ function AnimaisListPage() {
   const [lastUrlSearch, setLastUrlSearch] = useState(urlSearch)
   const [filters, setFilters] = useState(INITIAL_FILTERS)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { user } = useAuth()
 
   // A URL mudou de fora (ex: nova busca pela Home com esta página já aberta):
   // ajusta o campo durante a renderização, sem um efeito que renderizaria duas vezes
@@ -166,12 +174,35 @@ function AnimaisListPage() {
         </div>
       </div>
 
+      {/* O admin modera, mas não anuncia; a ONG cadastra pelo painel dela */}
+      {user?.userType !== 'ADMIN' && (
+        <CreateEntityCta
+          icon={FaPaw}
+          title="Tem um animal para doar?"
+          description="Cadastre o pet e encontre um lar para ele. O AUmatch mostra o anúncio para quem combina com ele."
+          buttonLabel="Cadastrar animal"
+          targetPath={user?.userType === 'ONG' ? PANEL_PATHS.animalNew : '/animais/criar'}
+          onNeedsLogin={() => setIsAuthModalOpen(true)}
+        />
+      )}
+
       <FiltersDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         resultsCount={totalElements}
         {...filterPanelProps}
       />
+
+      {isAuthModalOpen && (
+        <AuthRequiredModal
+          message="Para cadastrar um animal, você precisa estar conectado à sua conta."
+          onCancel={() => setIsAuthModalOpen(false)}
+          onLogin={() => {
+            setIsAuthModalOpen(false)
+            navigate('/login', { state: { from: location } })
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -83,7 +83,7 @@ function EventParticipantsModal({ event, onClose }) {
           </button>
         </div>
 
-        <div className="overflow-y-auto px-6 pb-4">{content}</div>
+        <div className="scrollbar-soft overflow-y-auto px-6 pb-4">{content}</div>
       </div>
     </div>,
     document.body

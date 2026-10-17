@@ -40,7 +40,7 @@ function AdminEventRow({ event, onRemove }) {
             {formatTimeRange(event.startTime, event.endTime)} · {event.location.venue}, {event.location.city}
           </p>
           <p className="truncate text-xs text-slate-500">
-            {getCategoriaMeta(event.category).label} ·{' '}
+            {getCategoriaMeta(event.category, event.customCategory).label} ·{' '}
             <Link to={`/ong/${event.organizer.id}`} className="font-bold text-emerald-800 hover:underline">
               {event.organizer.name}
             </Link>

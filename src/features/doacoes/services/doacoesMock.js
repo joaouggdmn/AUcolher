@@ -12,7 +12,7 @@ import { isAccountBanned } from '../../admin/services/moderationMock'
 import { PIX_EXPIRATION_MINUTES } from '../../../core/utils/constants'
 import { addMinutesLocalIso, nowLocalIso, todayLocalIso } from '../../../core/utils/localDate'
 import { buildSeedCampanhas } from '../data/seedCampanhas'
-import { getCampaignPayloadErrors, getDonationAmountError } from '../utils/campanhaRules'
+import { findOtherUrgentCampaign, getCampaignPayloadErrors, getDonationAmountError } from '../utils/campanhaRules'
 
 // 🔴 Servidor falso de campanhas e doações: mesmas funções de doacoesApi.js
 // e mesmas regras, DTOs e erros do contrato (docs/entrega-final/api-campanhas-doacoes.md).
@@ -20,7 +20,7 @@ import { getCampaignPayloadErrors, getDonationAmountError } from '../utils/campa
 // aprova pelo botão "Simular pagamento" (simulateDonationApproval)
 const store = createMockStore({ key: MOCK_CAMPANHAS_STORE_KEY, version: 1, seed: buildSeedCampanhas })
 
-const PAYLOAD_FIELDS = ['title', 'description', 'category', 'isUrgent', 'goalAmount', 'deadline', 'coverUrl']
+const PAYLOAD_FIELDS = ['title', 'description', 'category', 'customCategory', 'isUrgent', 'goalAmount', 'deadline', 'coverUrl']
 
 // ---------- helpers do "backend" ----------
 
@@ -45,6 +45,7 @@ function toCampaignDto(db, row) {
     title: row.title,
     description: row.description,
     category: row.category,
+    customCategory: row.customCategory ?? null,
     isUrgent: row.isUrgent,
     goalAmount: row.goalAmount,
     coverUrl: row.coverUrl,
@@ -147,12 +148,27 @@ function normalizePayload(payload = {}) {
     })
   )
   normalized.isUrgent = Boolean(normalized.isUrgent)
+  // O nome livre só vale para "Outro"
+  if (normalized.category !== 'OTHER') normalized.customCategory = null
   return normalized
 }
 
 function validate(payload) {
   const [firstError] = Object.values(getCampaignPayloadErrors(payload, todayLocalIso()))
   if (firstError) throw mockHttpError(400, firstError)
+}
+
+// Uma campanha urgente ativa por ONG. Só barra quem está LIGANDO a urgência:
+// campanhas que já eram urgentes continuam editáveis
+function requireUrgentSlot(db, ngoId, fields, row = null) {
+  if (!fields.isUrgent || row?.isUrgent) return
+  const ngoCampaigns = db.campaigns
+    .filter((campaign) => !campaign.deleted && isSameId(campaign.ngo.id, ngoId))
+    .map((campaign) => ({ ...campaign, isClosed: isClosed(campaign) }))
+  const other = findOtherUrgentCampaign(ngoCampaigns, row?.id)
+  if (other) {
+    throw mockHttpError(409, `A ONG já tem uma campanha urgente ativa ("${other.title}"). Tire a urgência dela antes de marcar outra.`)
+  }
 }
 
 function ngoSnapshot(user) {
@@ -237,6 +253,7 @@ export async function createCampaign(payload) {
   validate(fields)
 
   const db = store.read()
+  requireUrgentSlot(db, user.id, fields)
   const row = {
     id: nextId(db.campaigns),
     ...fields,
@@ -277,6 +294,7 @@ function saveCampaignEdit(db, row, payload, extra) {
 
   const fields = normalizePayload(payload)
   validate(fields)
+  requireUrgentSlot(db, row.ngo.id, fields, row)
 
   const updated = { ...row, ...fields, ...extra }
   store.write({ ...db, campaigns: db.campaigns.map((campaign) => (campaign.id === row.id ? updated : campaign)) })

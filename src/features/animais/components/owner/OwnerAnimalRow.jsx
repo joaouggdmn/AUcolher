@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaCircleCheck, FaEye, FaEyeSlash, FaHeart, FaPaw, FaPen, FaShieldHalved } from 'react-icons/fa6'
+import { FaEye, FaEyeSlash, FaHeart, FaPaw, FaPen, FaShieldHalved } from 'react-icons/fa6'
 import { SPECIES_OPTIONS } from '../filters/filterOptions'
 import { LISTING_STATUS_META } from '../../utils/listingStatus'
 import ModeratedNote from '../../../../core/components/ui/ModeratedNote'
@@ -16,8 +16,8 @@ function Spinner() {
 }
 
 // Uma linha da lista de animais do dono: painel da ONG e "Meus animais" da
-// pessoa. As ações seguem o status na API: adotado é definitivo (só dá para
-// ver); fora do ar pode voltar; removido pela moderação não tem ação nenhuma.
+// pessoa. As ações seguem o status na API: adotado (só pela conclusão do
+// pedido) é definitivo e só dá para ver; fora do ar pode voltar; removido pela moderação não tem ação nenhuma.
 // `editTo` e `requestsTo` apontam para as telas de cada lado; `details`
 // entra embaixo do nome e `children` são ações extras, antes de "Ver no site"
 function OwnerAnimalRow({
@@ -26,13 +26,11 @@ function OwnerAnimalRow({
   requestsTo,
   pendingStatus,
   onChangeStatus,
-  onMarkAdopted,
   details,
   children,
 }) {
   const status = LISTING_STATUS_META[animal.listingStatus]
   const isBusy = pendingStatus != null
-  const adoptedWord = animal.sex === 'FEMALE' ? 'adotada' : 'adotado'
 
   return (
     <li className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:flex-row lg:items-center">
@@ -104,18 +102,6 @@ function OwnerAnimalRow({
             >
               {pendingStatus === 'AVAILABLE' ? <Spinner /> : <FaEye size={11} />}
               Colocar no ar
-            </button>
-          )}
-
-          {animal.status !== 'ADOPTED' && (
-            <button
-              type="button"
-              onClick={() => onMarkAdopted(animal)}
-              disabled={isBusy}
-              className={`${ACTION_CLASSES} border-amber-200 text-amber-700 hover:bg-amber-50`}
-            >
-              <FaCircleCheck size={11} />
-              Marcar como {adoptedWord}
             </button>
           )}
 

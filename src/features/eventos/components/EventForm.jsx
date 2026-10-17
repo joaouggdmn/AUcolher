@@ -106,6 +106,18 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
             <FieldError message={errors.category} />
           </div>
 
+          {values.category === 'OTHER' && (
+            <FormField
+              label="Nome da categoria"
+              value={values.customCategory}
+              onChange={(e) => setField('customCategory', e.target.value)}
+              placeholder="Ex: Cãominhada"
+              maxLength={EVENT_LIMITS.customCategory}
+              hint="Aparece no selo do evento."
+              {...fieldProps('customCategory')}
+            />
+          )}
+
           <TextAreaField
             label="Descrição"
             value={values.description}
@@ -146,7 +158,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
         </div>
       </ProfileSection>
 
-      <ProfileSection icon={FaMapLocationDot} title="Local" description="Onde o público deve ir — aparece com link para o mapa">
+      <ProfileSection icon={FaMapLocationDot} title="Local" description="Onde o público deve ir. Aparece com link para o mapa">
         <div className="grid grid-cols-6 gap-4">
           <div className="col-span-6">
             <FormField

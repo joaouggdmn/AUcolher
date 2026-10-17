@@ -63,7 +63,7 @@ function Navbar() {
                 aria-expanded={isSidebarOpen}
                 aria-label={
                   sidebarUpdates > 0
-                    ? `Abrir menu — ${sidebarUpdates} ${sidebarUpdates === 1 ? 'novidade' : 'novidades'}`
+                    ? `Abrir menu: ${sidebarUpdates} ${sidebarUpdates === 1 ? 'novidade' : 'novidades'}`
                     : 'Abrir menu'
                 }
                 className={`relative -ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 ${
@@ -179,7 +179,7 @@ function Navbar() {
                     to="/favoritos"
                     aria-label={
                       totalFavoritos > 0
-                        ? `Meus favoritos — ${totalFavoritos} ${totalFavoritos === 1 ? 'pet salvo' : 'pets salvos'}`
+                        ? `Meus favoritos: ${totalFavoritos} ${totalFavoritos === 1 ? 'pet salvo' : 'pets salvos'}`
                         : 'Meus favoritos'
                     }
                     className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 ${
@@ -193,7 +193,7 @@ function Navbar() {
                     {totalFavoritos > 0 && (
                       <span
                         aria-hidden="true"
-                        className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
+                        className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
                           isScrolled ? 'ring-emerald-800' : 'ring-white'
                         }`}
                       >

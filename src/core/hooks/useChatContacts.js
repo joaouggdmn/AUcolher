@@ -50,6 +50,8 @@ export function useChatContacts() {
             status: request.status, // 🆕 controla o estado travado do header
             cancelReason: request.cancelReason ?? null,
             isOwnerView: isOwner, // 🆕 só o doador vê o botão "Confirmar Entrega"
+            // A outra parte da conversa (o "Denunciar" do chat aponta para ela)
+            otherUserId: isOwner ? request.adopter?.userId : request.ownerId,
             reviews: request.reviews ?? {},
             returnInfo: request.returnInfo ?? null,
           };

@@ -115,6 +115,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
    - **ACCEPTED** — libera o chat entre as partes.
    - **REJECTED** — encerra o pedido, sem chat.
 3. **ACCEPTED → AWAITING_DELIVERY** — dono confirma que vai entregar/já combinou a entrega do animal. Isso **trava o chat para novas mensagens**, mas o histórico continua visível.
+   - **"Ainda não recebi"** (AWAITING_DELIVERY → ACCEPTED): se o pet não chegou (o dono confirmou sem querer, ou é golpe), o adotante avisa pelo chat. O pedido volta a aceito, o chat reabre com um aviso para os dois e, ao lado do botão, fica o "Denunciar" do perfil do doador. Só o adotante faz essa volta.
 4. **AWAITING_DELIVERY → CONCLUDED** — adotante confirma que recebeu o animal. Nesse momento:
    - O animal é marcado como adotado e sai da listagem de disponíveis.
    - Pedidos concorrentes do mesmo animal são cancelados automaticamente (`CANCELLED`, motivo `ANIMAL_ADOPTED`).
@@ -226,8 +227,9 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
 - **Sem geolocalização.** O sistema não pede nem guarda localização exata (latitude/longitude, GPS) de usuários ou animais, e não ordena por distância. A localização é só cidade/UF, e quem quer animais de uma cidade usa a busca e o filtro por cidade. No perfil da pessoa e no cadastro do animal, estado e cidade são **escolhidos em listas** (municípios do IBGE), nunca digitados, para a mesma cidade não aparecer escrita de dois jeitos. O animal herda a cidade/UF de quem anuncia; se a conta ainda não tem localização, o formulário do animal pede e já salva no perfil. O **CEP** só existe no endereço da ONG e dos eventos.
 - Um animal só aparece nas listagens/AUmatch enquanto estiver disponível (não adotado).
 - Ao concluir uma adoção, o animal passa a "adotado" e some das listagens públicas.
+- **"Adotado" só vem da conclusão do pedido** (o adotante confirma a chegada no chat). O dono não marca o animal como adotado à mão: isso inflava o número de adoções do admin sem nenhuma adoção de verdade por trás. Se o animal foi adotado fora da plataforma, o dono **tira o anúncio do ar**. O `PATCH /api/animals/{id}/status` continua aceitando `ADOPTED`, mas o front não oferece mais essa ação.
 - **Página "Meus animais"** (só pessoa física, link na sidebar, rota `/meus-animais`). A ONG continua usando o painel. A página tem duas abas:
-  - **Anunciados por mim:** editar o anúncio (até aqui a pessoa não conseguia), tirar do ar ou reativar, marcar como adotado, excluir e, nos adotados, **"Animal retornado"** (seção 3.3);
+  - **Anunciados por mim:** editar o anúncio (até aqui a pessoa não conseguia), tirar do ar ou reativar, excluir e, nos adotados, **"Animal retornado"** (seção 3.3);
   - **Adotados por mim:** as adoções concluídas, com **"Republicar anúncio"** e **"Desisti de doar"** (seção 3.3).
   - `/meus-anuncios` redireciona para ela, e a lista "Meus animais" de Minha conta vira um link.
 
@@ -331,6 +333,7 @@ Perfil mais completo que o de usuário comum:
 
 - Só conta **ONG** cria evento; só a **ONG dona** edita, exclui e vê a lista de confirmados (painel `/ong/painel`).
 - Evento de um dia: data, início, término opcional, local com endereço (CEP opcional preenche o resto), capa opcional e **vagas opcionais**.
+- Categoria: feira de adoção, mutirão de saúde, bazar beneficente, workshop, arrecadação, passeio e encontro ou **outro**. Em "Outro", a ONG escreve um nome curto (até 30 caracteres) para eventos que não cabem nas outras; no filtro, "Outro" agrupa todos esses.
 - Pessoa e ONG logadas confirmam ou cancelam presença, **menos a ONG dona**. O admin não participa: no lugar do botão, ele vê "Remover evento".
 - Evento lotado mostra "Vagas esgotadas"; na edição, as vagas não podem ficar abaixo de quem já confirmou.
 - **Evento passado** (`data < hoje`) é somente leitura: não edita, não exclui, sem presença. Um evento de hoje fica aberto o dia inteiro.
@@ -340,7 +343,8 @@ Perfil mais completo que o de usuário comum:
 ### 10.2 Campanhas e doações
 
 - Só conta **ONG** cria campanha; só a **ONG dona** edita, encerra e exclui (painel `/ong/painel`, seção Campanhas, ou pela página da campanha).
-- Campanha: título, descrição, categoria (saúde, alimentação, estrutura), meta em reais inteiros, selo de **urgente** opcional, **prazo** opcional e capa opcional. A urgente ativa mais recente vira o banner SOS da vitrine.
+- Campanha: título, descrição, categoria (saúde, alimentação, estrutura, castração, resgate ou **outro**, com um nome curto escrito pela ONG), meta em reais inteiros, selo de **urgente** opcional, **prazo** opcional e capa opcional. A urgente ativa mais recente vira o banner SOS da vitrine.
+- **Uma campanha urgente ativa por ONG.** Para marcar outra, a ONG tira a urgência da atual. Assim o selo continua significando algo.
 - Doação só por **PIX via Mercado Pago (Orders API)**, sempre chamado pelo backend. Login obrigatório; pessoa e ONG doam, **menos a ONG na própria campanha**. O admin não doa (403 "Contas de admin não fazem doações."): no lugar do botão, ele vê "Remover campanha". Mínimo **R$ 5**, sem centavos.
 - O PIX vale **30 minutos**; o modal acompanha o pagamento sozinho. Só doações **aprovadas** contam no total da campanha e em "Meu impacto".
 - **Meta atingida** não encerra: a campanha continua recebendo. Ela encerra quando a ONG encerra ou quando o prazo vence; encerrada fica visível, mas não recebe nem edita.
