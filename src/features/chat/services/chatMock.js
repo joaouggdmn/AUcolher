@@ -1,7 +1,8 @@
 import { createMockStore, getMockSession, isSameId, mockDelay, mockHttpError, nextId } from '../../../core/services/mock/mockStore'
 import { CHAT_MESSAGE_MAX_LENGTH } from '../../../core/utils/constants'
-import { nowLocalIso, toLocalIsoDateTime } from '../../../core/utils/localDate'
-import { MOCK_CHAT_STORE_KEY, chatLastSeenStorageKey, chatMessagesStorageKey } from '../../../core/utils/storageKeys'
+import { nowLocalIso } from '../../../core/utils/localDate'
+import { MOCK_CHAT_STORE_KEY } from '../../../core/utils/storageKeys'
+import { buildSeedChat } from '../data/seedChat'
 
 // 🔴 "Servidor falso" do chat (USE_MOCK_CHAT), até as rotas da migração 011
 // existirem (docs/entrega-final/api-chat.md). Mesmas funções e mesmos DTOs do
@@ -11,74 +12,10 @@ import { MOCK_CHAT_STORE_KEY, chatLastSeenStorageKey, chatMessagesStorageKey } f
 // Limitações: as conversas só existem neste navegador, e o envio não confere
 // o status do pedido (o mock não conhece os pedidos; a tela já esconde o campo
 // de texto fora de ACCEPTED)
-const store = createMockStore({ key: MOCK_CHAT_STORE_KEY, version: 1, seed: importLegacyChat })
 
-// ---------- formato antigo ----------
-
-const LEGACY_MESSAGES_KEY = /^chat_messages_(.+)$/
-const LEGACY_LAST_SEEN_KEY = /^aucolher_chat_last_seen_(.+)$/
-
-function readJson(key, fallback) {
-  try {
-    return JSON.parse(localStorage.getItem(key)) ?? fallback
-  } catch {
-    return fallback
-  }
-}
-
-function localStorageKeys() {
-  return Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index))
-}
-
-// Antes do banco falso, cada conversa era uma chave (`chat_messages_{id}`) e
-// a leitura era a data da última visita por conta. Na primeira vez, tudo isso
-// vira as duas tabelas. As chaves antigas ficam onde estão
-function importLegacyChat() {
-  const legacy = []
-  for (const key of localStorageKeys()) {
-    const requestId = key?.match(LEGACY_MESSAGES_KEY)?.[1]
-    const stored = requestId ? readJson(chatMessagesStorageKey(requestId), []) : null
-    if (!Array.isArray(stored)) continue
-    for (const message of stored) {
-      const time = new Date(message?.timestamp).getTime()
-      if (!message?.text || Number.isNaN(time)) continue
-      legacy.push({ requestId, message, time })
-    }
-  }
-
-  const messages = legacy
-    .sort((a, b) => a.time - b.time)
-    .map(({ requestId, message, time }, index) => {
-      const isSystem = message.senderId === 'system'
-      return {
-        id: index + 1,
-        requestId,
-        type: isSystem ? 'SYSTEM' : 'USER',
-        senderId: isSystem ? null : message.senderId,
-        // Aviso antigo: o texto pronto, sem código de evento
-        text: message.text,
-        systemEvent: null,
-        createdAt: toLocalIsoDateTime(new Date(time)),
-      }
-    })
-
-  // "Li até tal hora" vira "li até tal mensagem"
-  const reads = []
-  for (const key of localStorageKeys()) {
-    const userId = key?.match(LEGACY_LAST_SEEN_KEY)?.[1]
-    const lastSeen = userId ? readJson(chatLastSeenStorageKey(userId), {}) : null
-    if (!lastSeen || typeof lastSeen !== 'object') continue
-    for (const [requestId, seenAt] of Object.entries(lastSeen)) {
-      const seenTime = new Date(seenAt).getTime()
-      const lastReadMessageId = messages
-        .filter((row) => isSameId(row.requestId, requestId) && new Date(row.createdAt).getTime() <= seenTime)
-        .reduce((max, row) => Math.max(max, row.id), 0)
-      reads.push({ requestId, userId, lastReadMessageId })
-    }
-  }
-
-  return { messages, reads }
-}
+// Versão 2: as conversas do banco de teste (seedChat.js) no lugar das do
+// formato antigo, que eram de pedidos que não existem mais
+const store = createMockStore({ key: MOCK_CHAT_STORE_KEY, version: 2, seed: buildSeedChat })
 
 // ---------- apoio ----------
 

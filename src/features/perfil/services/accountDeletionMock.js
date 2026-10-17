@@ -12,7 +12,7 @@ import { MOCK_EXCLUSAO_STORE_KEY } from '../../../core/utils/storageKeys'
 // continuam como estão na API até o backend fazer a exclusão de verdade
 const store = createMockStore({
   key: MOCK_EXCLUSAO_STORE_KEY,
-  version: 1,
+  version: 2,
   seed: () => ({ deletedAccounts: [] }),
 })
 

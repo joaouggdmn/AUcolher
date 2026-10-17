@@ -35,13 +35,3 @@ export const SESSION_EXPIRED_FLAG_KEY = 'aucolher_session_expired'
 // sessionStorage: a página de onde a pessoa foi entrar com o Google (o
 // state do router se perde na ida e volta ao Google)
 export const GOOGLE_LOGIN_RETURN_KEY = 'aucolher_google_login_return'
-
-// Formato antigo do chat (uma chave por conversa e uma de leitura por conta):
-// só o chatMock lê, uma vez, para converter as conversas para o banco falso
-export function chatMessagesStorageKey(requestId) {
-  return `chat_messages_${requestId}`
-}
-
-export function chatLastSeenStorageKey(userId) {
-  return `aucolher_chat_last_seen_${userId}`
-}
