@@ -107,7 +107,7 @@ function PetSwipeCard({
             <button
               type="button"
               onClick={onExplainMatch}
-              aria-label={`Match de ${pet.matchScore}% — ver por que deu match`}
+              aria-label={`Match de ${pet.matchScore}%: ver por que deu match`}
               className="flex items-center gap-1.5 rounded-full bg-emerald-800/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg shadow-emerald-950/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
             >
               <LuSparkles size={12} className="text-amber-300" />

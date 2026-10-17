@@ -133,7 +133,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
                   to={to}
                   end
                   onClick={onClose}
-                  aria-label={count > 0 && countLabel ? `${label} — ${countLabel(count)}` : undefined}
+                  aria-label={count > 0 && countLabel ? `${label}: ${countLabel(count)}` : undefined}
                   className={({ isActive }) =>
                     `flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-200 ${
                       isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'

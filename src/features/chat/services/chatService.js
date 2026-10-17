@@ -34,7 +34,7 @@ export function systemMessageText(message, contact) {
   const animal = contact?.animalName ?? 'o animal'
   switch (message.systemEvent) {
     case 'DELIVERY_REQUESTED':
-      return `O doador confirmou a entrega de ${animal}. O chat foi bloqueado para novas mensagens — quando o pet chegar até você, confirme o recebimento para concluir a adoção.`
+      return `O doador confirmou a entrega de ${animal}. O chat foi bloqueado para novas mensagens. Quando o pet chegar até você, confirme o recebimento para concluir a adoção.`
     case 'ADOPTION_CONCLUDED':
       return `Adoção de ${animal} concluída! Parabéns pelo novo membro da família.`
     case 'ADOPTER_WITHDREW':

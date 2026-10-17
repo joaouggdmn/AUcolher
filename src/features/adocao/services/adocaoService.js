@@ -43,7 +43,7 @@ function toFrontendAdopter(dto) {
 
   const snapshot = buildAdopterSnapshot(profile, completion)
   if (dto.userType !== 'NGO') return { ...snapshot, isOng: false }
-  return { ...snapshot, isOng: true, lifestyleSummary: 'Pedido de uma ONG — o quiz do AUmatch é só para pessoas' }
+  return { ...snapshot, isOng: true, lifestyleSummary: 'Pedido de uma ONG. O quiz do AUmatch é só para pessoas' }
 }
 
 export function toFrontendRequest(dto) {

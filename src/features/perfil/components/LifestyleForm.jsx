@@ -7,7 +7,7 @@ const SECTIONS = [
   {
     key: 'estiloDeVida',
     title: 'Seu Estilo de Vida & Ambiente',
-    description: 'Como é o seu dia a dia — isso define o que o pet vai precisar de você.',
+    description: 'Como é o seu dia a dia. Isso define o que o pet vai precisar de você.',
     icon: FaHouseUser,
   },
   {

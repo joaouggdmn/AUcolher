@@ -94,7 +94,7 @@ function getCopy({ kind, quizProgress }, eligibleCount) {
       eyebrow: 'Atalhos da sua ONG',
       title: 'Mais um resgatado pronto para um lar?',
       subtitle:
-        'Quanto mais completo o perfil de comportamento — energia, independência e convivência —, mais preciso o match com quem quer adotar.',
+        'Quanto mais completo o perfil de comportamento (energia, independência e convivência), mais preciso o match com quem quer adotar.',
     }
   }
 
