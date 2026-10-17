@@ -31,7 +31,15 @@ function StepBasicInfo({ formData, onChange, showLocationFields }) {
         <PillToggleGroup options={SPECIES_OPTIONS} value={formData.species} onChange={(v) => onChange('species', v)} />
       </div>
 
-      <FormField label="Raça" value={formData.breed} onChange={(e) => onChange('breed', e.target.value)} placeholder="Ex: Vira-lata" maxLength={BREED_MAX_LENGTH} />
+      {/* Na espécie "Outro", é aqui que se diz qual é o animal, e é por
+          este campo que a busca acha "coelho" ou "calopsita" */}
+      <FormField
+        label={formData.species === 'OTHER' ? 'Qual animal?' : 'Raça'}
+        value={formData.breed}
+        onChange={(e) => onChange('breed', e.target.value)}
+        placeholder={formData.species === 'OTHER' ? 'Ex: Coelho, calopsita, hamster' : 'Ex: Vira-lata'}
+        maxLength={BREED_MAX_LENGTH}
+      />
 
       <div className="flex flex-col gap-1.5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

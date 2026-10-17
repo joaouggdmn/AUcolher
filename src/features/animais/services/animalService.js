@@ -1,5 +1,6 @@
 import * as animaisApi from './animaisApi'
 import { buildAgeLabel } from '../utils/ageHelpers'
+import { speciesFromSearch } from '../utils/speciesSearch'
 import { mockHttpError } from '../../../core/services/mock/mockStore'
 import { isAccountBanned, isAnimalRemoved } from '../../admin/services/moderationMock'
 
@@ -68,6 +69,15 @@ export function toApiFilters({ search = '', filters = {}, page = 0, size = PAGE_
 
   for (const key of ['species', 'sizes', 'sexes', 'ageGroups', 'energyLevels', 'temperaments']) {
     if (filters[key]?.length) params[key] = filters[key]
+  }
+
+  // Buscar "cachorro" ou "gatos" vira o filtro de espécie (a API procura o
+  // termo só em nome, raça e cidade). Se a pessoa já marcou outras espécies
+  // no filtro, o termo segue como texto e a lista sai vazia, como deve
+  const searchedSpecies = speciesFromSearch(search)
+  if (searchedSpecies && (!params.species || params.species.includes(searchedSpecies))) {
+    delete params.search
+    params.species = [searchedSpecies]
   }
 
   if (filters.specialNeeds) params.specialNeeds = true
