@@ -115,6 +115,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
    - **ACCEPTED** — libera o chat entre as partes.
    - **REJECTED** — encerra o pedido, sem chat.
 3. **ACCEPTED → AWAITING_DELIVERY** — dono confirma que vai entregar/já combinou a entrega do animal. Isso **trava o chat para novas mensagens**, mas o histórico continua visível.
+   - **"Ainda não recebi"** (AWAITING_DELIVERY → ACCEPTED): se o pet não chegou (o dono confirmou sem querer, ou é golpe), o adotante avisa pelo chat. O pedido volta a aceito, o chat reabre com um aviso para os dois e, ao lado do botão, fica o "Denunciar" do perfil do doador. Só o adotante faz essa volta.
 4. **AWAITING_DELIVERY → CONCLUDED** — adotante confirma que recebeu o animal. Nesse momento:
    - O animal é marcado como adotado e sai da listagem de disponíveis.
    - Pedidos concorrentes do mesmo animal são cancelados automaticamente (`CANCELLED`, motivo `ANIMAL_ADOPTED`).

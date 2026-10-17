@@ -26,6 +26,7 @@ import {
   systemMessageText,
 } from "../services/chatService";
 import ConfirmAdoptionModal from "../../adocao/components/ConfirmAdoptionModal";
+import ReportButton from "../../denuncias/components/ReportButton";
 import AdoptionConcludedPanel from "./AdoptionConcludedPanel";
 
 // Linha de sistema do retorno ou do repasse (regras §3.3). No mock ela sai
@@ -74,7 +75,7 @@ function ChatConversationPanel({ contact, onBack }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { messages, loadFailed, sendMessage, isSending } = useChatMessages(contact.requestId);
-  const { requestDelivery, concludeAdoption, cancelAdoption } = useConcludeAdoption();
+  const { requestDelivery, concludeAdoption, declineDelivery, cancelAdoption } = useConcludeAdoption();
   const [draft, setDraft] = useState("");
   const [sendError, setSendError] = useState(null);
   // null | 'request-delivery' (passo 1, doador) | 'conclude' (passo 2, adotante)
@@ -131,6 +132,8 @@ function ChatConversationPanel({ contact, onBack }) {
         await requestDelivery(target);
       } else if (confirmModalMode === "conclude") {
         await concludeAdoption(target);
+      } else if (confirmModalMode === "decline-delivery") {
+        await declineDelivery(target);
       } else {
         await cancelAdoption({ ...target, byOwner: contact.isOwnerView, fromStatus: contact.status });
       }
@@ -354,8 +357,25 @@ function ChatConversationPanel({ contact, onBack }) {
                 <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-amber-500" />
               </span>
               <FaCircleCheck size={15} />
-              Confirmar Chegada do Pet
+              Confirmar chegada do pet
             </button>
+          )}
+
+          {/* O doador pode ter confirmado sem querer (ou ser golpe): o adotante
+              avisa que o pet não chegou, e o pedido volta a aceito */}
+          {!contact.isOwnerView && (
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+              <button
+                type="button"
+                onClick={() => openConfirm("decline-delivery")}
+                className="rounded-full px-3 py-1.5 text-xs font-bold text-slate-500 transition-colors duration-300 hover:bg-white hover:text-emerald-700"
+              >
+                Ainda não recebi
+              </button>
+              {contact.otherUserId != null && (
+                <ReportButton targetType="USER" target={{ id: contact.otherUserId, name: contact.name, photoUrl: contact.photoUrl }} />
+              )}
+            </div>
           )}
         </div>
       ) : (

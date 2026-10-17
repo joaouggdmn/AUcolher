@@ -35,6 +35,8 @@ export function systemMessageText(message, contact) {
   switch (message.systemEvent) {
     case 'DELIVERY_REQUESTED':
       return `O doador confirmou a entrega de ${animal}. O chat foi bloqueado para novas mensagens. Quando o pet chegar até você, confirme o recebimento para concluir a adoção.`
+    case 'DELIVERY_DECLINED':
+      return `O adotante avisou que ${animal} ainda não chegou. O chat foi liberado para vocês combinarem a entrega.`
     case 'ADOPTION_CONCLUDED':
       return `Adoção de ${animal} concluída! Parabéns pelo novo membro da família.`
     case 'ADOPTER_WITHDREW':
