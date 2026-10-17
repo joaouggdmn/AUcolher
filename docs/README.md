@@ -7,6 +7,7 @@
 | `contratos-prontos/` | Contratos da API já implementados (eventos, adoção, AUmatch, admin, denúncias, perfil da ONG, devolução) | Referência |
 | `planos-front/` | Planos do front já executados (campanhas e eventos, home, painel do admin) | Histórico |
 | `planos-front/plano-refinamentos-visuais.md` | **Entregue (17/10):** refinamentos visuais e de fluxo (travessões, home, animais, eventos, campanhas, AUmatch, minha conta, chat) | Você |
+| `planos-front/plano-refinamentos-2.md` | **Em andamento:** "Seja o primeiro" só para quem participa, atalhos da ONG na sidebar, foto no banner de evento, painel do AUmatch que abre e fecha | Você |
 | `regras-de-negocios.md` | As regras de negócio do sistema inteiro | Todos |
 | `script_banco_aucolher.sql` | Cópia do `sql/schema.sql` do backend | Banco local |
 | `seed-*.sql` / `remover-*.sql` | Dados de teste (animais e pedidos) e a limpeza deles | Banco local |
