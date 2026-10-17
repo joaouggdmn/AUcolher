@@ -22,6 +22,8 @@ const ONG_CHECKLIST = [
   { key: 'bio', label: 'Sobre a instituição', check: (p) => !!p?.bio?.trim() },
   { key: 'endereco', label: 'Endereço', check: (p) => !!p?.address?.street && !!p?.address?.city },
   { key: 'visitas', label: 'Horário de visitas', check: (p) => (p?.visitingHours?.length ?? 0) > 0 },
+  // Basta 1 integrante: a ONG de uma pessoa só cadastra a si mesma
+  { key: 'equipe', label: 'Equipe', check: (p) => (p?.team ?? []).some((member) => member?.name?.trim()) },
   // O contato por e-mail sempre existe (é o de login): o que falta são as redes
   { key: 'redes', label: 'Redes sociais', check: (p) => Object.values(p?.socialLinks ?? {}).some(Boolean) },
 ]
