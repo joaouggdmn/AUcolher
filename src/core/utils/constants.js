@@ -23,6 +23,10 @@ export const USE_MOCK_CHAT = import.meta.env.VITE_USE_MOCK_CHAT !== 'false'
 // Excluir a própria conta (docs/entrega-final/api-exclusao-conta.md): sem a
 // rota da migração 013, a exclusão fica num servidor falso no localStorage
 export const USE_MOCK_EXCLUSAO = import.meta.env.VITE_USE_MOCK_EXCLUSAO !== 'false'
+// Entrar com o Google (docs/entrega-final/api-login-google.md). Ao contrário
+// dos mocks, o padrão é desligado: sem as credenciais do Google na API, o
+// botão levaria a uma página de erro do próprio Google
+export const GOOGLE_LOGIN_ENABLED = import.meta.env.VITE_GOOGLE_LOGIN === 'true'
 
 // Listas públicas mudam pouco: 30 s evita refazer a busca a cada navegação
 export const EVENTOS_STALE_TIME = 30_000
