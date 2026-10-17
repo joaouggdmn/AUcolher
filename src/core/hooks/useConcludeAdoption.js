@@ -1,5 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useAdoptionRequests } from '../context/AdoptionRequestContext'
-import { injectSystemMessage } from '../utils/chatSystemMessage'
+import { queryKeys } from '../services/queryKeys'
+import { recordStatusEvent } from '../../features/chat/services/chatService'
+
+const CONVERSATION_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
 
 // Orquestra as mudanças de status que também deixam um registro no chat,
 // num único ponto — evita duplicar essa sequência nos vários lugares que
@@ -10,32 +14,36 @@ import { injectSystemMessage } from '../utils/chatSystemMessage'
 //   Passo 2 (adotante): conclui o pedido (a API cancela os pedidos
 //   concorrentes e marca o animal como ADOPTED) e celebra no chat
 //   Desistência (qualquer uma das partes): cancela e registra quem desistiu
-// Todas rejeitam com o erro da API — quem chama mostra a mensagem; a
-// mensagem de sistema só entra quando a API aceitou
+// Todas rejeitam com o erro da API — quem chama mostra a mensagem. O aviso
+// no chat é criado pelo backend na mesma transação (api-chat.md §1); no mock,
+// o recordStatusEvent faz esse papel. Depois, a conversa e o badge recarregam
 export function useConcludeAdoption() {
   const { requestDeliveryConfirmation, concludeRequest, cancelRequest } = useAdoptionRequests()
+  const queryClient = useQueryClient()
 
-  async function requestDelivery({ requestId, animalName }) {
+  function afterStatusChange(requestId, systemEvent) {
+    recordStatusEvent(requestId, systemEvent)
+    queryClient.invalidateQueries({ queryKey: queryKeys.chat.messages(requestId) })
+    queryClient.invalidateQueries({ queryKey: [...queryKeys.chat.all, 'summary'] })
+  }
+
+  async function requestDelivery({ requestId }) {
     await requestDeliveryConfirmation(requestId)
-    injectSystemMessage(
-      requestId,
-      `O doador confirmou a entrega de ${animalName}. O chat foi bloqueado para novas mensagens — quando o pet chegar até você, confirme o recebimento para concluir a adoção.`,
-    )
+    afterStatusChange(requestId, 'DELIVERY_REQUESTED')
   }
 
-  async function concludeAdoption({ requestId, animalName }) {
+  async function concludeAdoption({ requestId }) {
     await concludeRequest(requestId)
-    injectSystemMessage(requestId, `Adoção de ${animalName} concluída! Parabéns pelo novo membro da família.`)
+    afterStatusChange(requestId, 'ADOPTION_CONCLUDED')
   }
 
-  async function cancelAdoption({ requestId, animalName, byOwner }) {
+  // Só um pedido que já tinha conversa (aceito ou aguardando entrega) ganha
+  // o aviso: cancelar um pedido pendente não fala nada no chat
+  async function cancelAdoption({ requestId, byOwner, fromStatus }) {
     await cancelRequest(requestId)
-    injectSystemMessage(
-      requestId,
-      byOwner
-        ? `O doador desistiu da adoção de ${animalName}. O pedido foi cancelado.`
-        : `O adotante cancelou o pedido de adoção de ${animalName}.`,
-    )
+    if (CONVERSATION_STATUSES.includes(fromStatus)) {
+      afterStatusChange(requestId, byOwner ? 'OWNER_WITHDREW' : 'ADOPTER_WITHDREW')
+    }
   }
 
   return { requestDelivery, concludeAdoption, cancelAdoption }
