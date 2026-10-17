@@ -7,7 +7,7 @@ function AccountGroupHeading({ visibility, title, description, children }) {
       <div>
         <VisibilityChip visibility={visibility} />
         <h2 className="mt-2 text-xl font-black tracking-tight text-emerald-950">{title}</h2>
-        <p className="mt-0.5 max-w-xl text-sm text-slate-500">{description}</p>
+        {description && <p className="mt-0.5 max-w-xl text-sm text-slate-500">{description}</p>}
       </div>
       {children}
     </div>

@@ -40,7 +40,6 @@ function AccountActivity({ user }) {
       visibility: 'public',
       value: animals.length,
       caption: `${availableCount} ${plural(availableCount, 'disponível', 'disponíveis')}`,
-      description: 'Os disponíveis aparecem no seu perfil público. Os adotados ficam só no seu histórico.',
       actions: [{ to: '/animais/criar', label: 'Cadastrar animal', icon: FaPlus }],
       content: <MyAnimalsPanel animals={animals} isOng={isOng} />,
     },
@@ -51,8 +50,6 @@ function AccountActivity({ user }) {
       visibility: 'public',
       value: reviews.count > 0 ? reviews.average.toFixed(1).replace('.', ',') : '—',
       caption: `${reviews.count} ${plural(reviews.count, 'avaliação', 'avaliações')}`,
-      description:
-        'Deixadas por quem adotou ou doou com você depois de uma adoção concluída. Aparecem no seu perfil público.',
       content: <ProfileReviewsList {...reviews} />,
     },
     {
@@ -62,9 +59,6 @@ function AccountActivity({ user }) {
       visibility: 'private',
       value: impact.adoptionsCount,
       caption: `${plural(impact.adoptionsCount, isOng ? 'adoção realizada' : 'adoção', isOng ? 'adoções realizadas' : 'adoções')} · ${formatCurrency(impact.totalDonated)} doados`,
-      description: isOng
-        ? 'Adoções concluídas pela instituição e doações para outras campanhas. O total de adoções aparece no perfil público; o histórico fica só aqui.'
-        : 'Adoções concluídas e doações para campanhas. O número de adoções aparece no seu perfil; o histórico fica só aqui.',
       actions: isOng
         ? [{ to: '/interesses-recebidos', label: 'Interesses recebidos' }]
         : [{ to: '/campanhas', label: 'Ver campanhas' }],
@@ -80,7 +74,6 @@ function AccountActivity({ user }) {
         events.upcoming.length > 0
           ? `${events.upcoming.length} com presença confirmada`
           : plural(events.past.length, 'evento', 'eventos'),
-      description: 'Eventos em que você confirmou presença: os próximos e os que já aconteceram. Só você vê esta lista.',
       actions: [
         ...(isOng ? [{ to: PANEL_PATHS.eventNew, label: 'Criar evento', icon: FaPlus }] : []),
         { to: '/eventos', label: 'Explorar eventos' },
@@ -97,7 +90,6 @@ function AccountActivity({ user }) {
         <h2 id="account-activity-title" className="text-xl font-black tracking-tight text-emerald-950">
           Atividade na AUcolher
         </h2>
-        <p className="mt-0.5 text-sm text-slate-500">Seus números e históricos na plataforma. Escolha um card para ver os detalhes.</p>
       </div>
 
       <div role="tablist" aria-label="Atividade da conta" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -165,7 +157,6 @@ function AccountActivity({ user }) {
               <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">{activeSection.label}</h3>
               <VisibilityChip visibility={activeSection.visibility} />
             </div>
-            <p className="mt-1 max-w-xl text-sm text-slate-500">{activeSection.description}</p>
           </div>
 
           {activeSection.actions && (
