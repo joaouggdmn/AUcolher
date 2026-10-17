@@ -18,6 +18,7 @@ import { NGO_COVER_MAX_LENGTH } from '../../../../core/utils/constants'
 import AvatarUploadInput from '../../../../core/components/ui/AvatarUploadInput'
 import CoverImageInput from '../../../../core/components/ui/CoverImageInput'
 import CepField from '../../../../core/components/ui/CepField'
+import CitySelect from '../../../../core/components/ui/CitySelect'
 import FormField from '../../../../core/components/ui/FormField'
 import AuthInput from '../../../auth/components/AuthInput'
 import { useAccountForm } from '../../hooks/useAccountForm'
@@ -203,10 +204,12 @@ function OngAccountForm({ account = null, onSave = null }) {
                 />
               </div>
               <div className="col-span-4">
-                <FormField
-                  label="Cidade"
-                  value={formData.address.city}
-                  onChange={(e) => setAddressField('city', e.target.value)}
+                {/* Lista do IBGE: a cidade sai sempre com a grafia oficial */}
+                <CitySelect
+                  id="ong-address-city"
+                  state={formData.address.state}
+                  city={formData.address.city}
+                  onChange={(city) => setAddressField('city', city)}
                   required
                 />
               </div>
@@ -214,7 +217,7 @@ function OngAccountForm({ account = null, onSave = null }) {
                 <label className="text-sm font-semibold text-slate-700">UF</label>
                 <select
                   value={formData.address.state}
-                  onChange={(e) => setAddressField('state', e.target.value)}
+                  onChange={(e) => setFields((prev) => ({ address: { ...prev.address, state: e.target.value, city: '' } }))}
                   required
                   className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
                 >

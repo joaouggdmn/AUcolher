@@ -10,6 +10,8 @@ import {
 } from 'react-icons/fa6'
 import AuthInput from './AuthInput'
 import { useCnpjLookup } from '../hooks/useCnpjLookup'
+import { useCepLookup } from '../../../core/hooks/useCepLookup'
+import CitySelect from '../../../core/components/ui/CitySelect'
 import { maskCEP, maskCNPJ } from '../../../core/utils/masks'
 import { BRAZILIAN_STATES } from '../../../core/utils/brazilianStates'
 import { FOUNDED_YEAR_MIN, getCurrentYear } from '../../../core/utils/foundedYear'
@@ -63,6 +65,24 @@ function OngRegisterFields({ values, onFieldsChange }) {
   })
 
   const handleChange = (e) => onFieldsChange({ [e.target.name]: e.target.value })
+
+  // CEP digitado à mão: rua, bairro, cidade e UF com a grafia dos Correios,
+  // como em Minha conta. Não apaga o que a ViaCEP não souber (CEP geral de
+  // cidade pequena vem sem rua). O CEP que o CNPJ preenche já chega corrigido
+  // (useCnpjLookup), por isso não passa por aqui
+  const cepLookup = useCepLookup((found) => {
+    onFieldsChange({
+      ...(found.street && { street: found.street }),
+      ...(found.neighborhood && { district: found.neighborhood }),
+      ...(found.city && { city: found.city }),
+      ...(found.state && { uf: found.state }),
+    })
+  })
+
+  const handleCepChange = (e) => {
+    onFieldsChange({ cep: maskCEP(e.target.value) })
+    cepLookup.handleCepChange(e.target.value)
+  }
 
   const handleCnpjChange = (e) => {
     onFieldsChange({ cnpj: maskCNPJ(e.target.value) })
@@ -139,10 +159,12 @@ function OngRegisterFields({ values, onFieldsChange }) {
               label="CEP"
               placeholder="00000-000"
               value={values.cep}
-              onChange={(e) => onFieldsChange({ cep: maskCEP(e.target.value) })}
+              onChange={handleCepChange}
               inputMode="numeric"
               maxLength={9}
               autoComplete="postal-code"
+              trailing={cepLookup.status === 'loading' ? CNPJ_STATUS_ICONS.loading : null}
+              error={cepLookup.status === 'error' ? cepLookup.errorMessage : null}
               required
             />
           </div>
@@ -191,13 +213,12 @@ function OngRegisterFields({ values, onFieldsChange }) {
             />
           </div>
           <div className="col-span-4">
-            <AuthInput
+            {/* Lista do IBGE: a cidade sai sempre com a grafia oficial */}
+            <CitySelect
               id="city"
-              name="city"
-              label="Cidade"
-              value={values.city}
-              onChange={handleChange}
-              autoComplete="address-level2"
+              state={values.uf}
+              city={values.city}
+              onChange={(city) => onFieldsChange({ city })}
               required
             />
           </div>
@@ -209,7 +230,7 @@ function OngRegisterFields({ values, onFieldsChange }) {
               id="uf"
               name="uf"
               value={values.uf}
-              onChange={handleChange}
+              onChange={(e) => onFieldsChange({ uf: e.target.value, city: '' })}
               required
               className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
             >
