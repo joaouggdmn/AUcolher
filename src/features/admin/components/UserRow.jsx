@@ -30,10 +30,12 @@ function profilePath(user) {
 
 // Uma conta na lista do admin: quem é, de onde, desde quando e quanto anuncia,
 // com banir (ativa) ou reativar (banida). O perfil de conta banida fica
-// indisponível no site, mas o admin ainda o abre
+// indisponível no site, mas o admin ainda o abre. A conta excluída pela
+// própria pessoa não volta: sem editar, banir nem reativar
 function UserRow({ user, onBan, onReactivate }) {
   const type = TYPE_META[user.userType] ?? TYPE_META.PESSOA
   const location = [user.city, user.state].filter(Boolean).join(' - ')
+  const isDeleted = Boolean(user.deletedAt)
 
   return (
     <li className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center">
@@ -46,8 +48,12 @@ function UserRow({ user, onBan, onReactivate }) {
             {user.isVerified && (
               <FaShieldHalved size={12} className="shrink-0 text-amber-500" title="Instituição verificada" />
             )}
-            {!user.isActive && (
-              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-600">Banida</span>
+            {isDeleted ? (
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500">Excluída</span>
+            ) : (
+              !user.isActive && (
+                <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-600">Banida</span>
+              )
             )}
           </div>
           <p className="truncate text-xs text-slate-500">{[user.email, location].filter(Boolean).join(' · ')}</p>
@@ -62,11 +68,13 @@ function UserRow({ user, onBan, onReactivate }) {
           <FaEye size={11} />
           Ver perfil
         </Link>
-        <Link to={ADMIN_PATHS.userEdit(user.id)} className={ACTION_CLASSES}>
-          <FaPen size={10} />
-          Editar
-        </Link>
-        {user.isActive ? (
+        {!isDeleted && (
+          <Link to={ADMIN_PATHS.userEdit(user.id)} className={ACTION_CLASSES}>
+            <FaPen size={10} />
+            Editar
+          </Link>
+        )}
+        {isDeleted ? null : user.isActive ? (
           <button type="button" onClick={() => onBan(user)} className={BAN_CLASSES}>
             <FaBan size={11} />
             Banir

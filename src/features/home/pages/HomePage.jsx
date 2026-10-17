@@ -1,3 +1,6 @@
+import { useCallback, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import SuccessToast from '../../../core/components/ui/SuccessToast'
 import HeroSection from '../components/Hero/HeroSection'
 import FinalCtaSection from '../components/FinalCta/FinalCtaSection'
 import OngShowcaseSection from '../components/OngShowcase/OngShowcaseSection'
@@ -13,9 +16,16 @@ import { useScrollToHash } from '../hooks/useScrollToHash'
 function HomePage() {
   const persona = useHomePersona()
   useScrollToHash()
+  const location = useLocation()
+
+  // Aviso vindo de outra tela (ex.: "Sua conta foi excluída.")
+  const [dismissedFlashKey, setDismissedFlashKey] = useState(null)
+  const flash = location.state?.flash && dismissedFlashKey !== location.key ? location.state.flash : null
+  const closeToast = useCallback(() => setDismissedFlashKey(location.key), [location.key])
 
   return (
     <main>
+      <SuccessToast message={flash} onClose={closeToast} />
       <HeroSection persona={persona} />
       <FinalCtaSection persona={persona} />
       <OngShowcaseSection persona={persona} />

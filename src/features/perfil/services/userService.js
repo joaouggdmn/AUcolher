@@ -1,5 +1,7 @@
 import api from '../../../core/services/api'
 import { toFrontendProfile } from '../../../core/services/authService'
+import { USE_MOCK_EXCLUSAO } from '../../../core/utils/constants'
+import * as accountDeletionMock from './accountDeletionMock'
 
 // "Minha conta": a conta editada é a do token, por isso a rota não leva id.
 // Devolve o perfil como ficou no banco, no formato do usuário logado
@@ -19,4 +21,12 @@ export async function getPublicProfile(id) {
     if (error.response?.status === 404) return null
     throw error
   }
+}
+
+// Exclui a conta logada (docs/entrega-final/api-exclusao-conta.md): `{ password }`
+// para conta com senha, `{ confirmation: 'EXCLUIR' }` para conta sem senha.
+// POST, e não DELETE, porque leva corpo. Não dá para desfazer
+export async function deleteMyAccount(body) {
+  if (USE_MOCK_EXCLUSAO) return accountDeletionMock.deleteMyAccount(body)
+  await api.post('/users/me/deletion', body)
 }

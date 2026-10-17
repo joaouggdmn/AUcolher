@@ -53,6 +53,9 @@ function closedConversationMessage(contact) {
         : `Conversa encerrada: ${contact.name} desistiu da adoção de ${animal}.`;
     case "ANIMAL_ADOPTED":
       return `Conversa encerrada: ${animal} foi adotado por outra pessoa.`;
+    // O nome da outra parte já virou "Conta excluída"
+    case "ACCOUNT_DELETED":
+      return "Conversa encerrada: a outra conta foi excluída e o pedido de adoção foi cancelado.";
     case "ANIMAL_UNAVAILABLE":
       return `Conversa encerrada: o anúncio de ${animal} saiu do ar e o pedido de adoção foi cancelado.`;
     default:

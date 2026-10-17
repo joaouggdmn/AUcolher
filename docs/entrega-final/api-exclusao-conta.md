@@ -132,14 +132,18 @@ COMMIT;
 
 ## 7. O que muda no front
 
-- **Serviço:** `deleteMyAccount({ password } | { confirmation })` em `core/services/authService.js` ou `features/perfil/services/userService.js`.
-- **Minha conta** (pessoa e ONG, também em `/ong/painel/perfil`): no fim da página, depois de "Dados da conta", uma **zona de perigo** "Excluir conta", em vermelho. Não existe aba ou seção "Segurança" (`api-senha.md`).
+> ✅ **Front pronto**, atrás de `VITE_USE_MOCK_EXCLUSAO` (ligada por padrão). Quando a rota existir: `VITE_USE_MOCK_EXCLUSAO=false` no `.env`.
+
+- **Serviço:** `deleteMyAccount(body)` em `features/perfil/services/userService.js`, com `{ password }` ou `{ confirmation: "EXCLUIR" }`.
+  - **No mock** (`accountDeletionMock.js`): a senha é conferida de verdade por um login na API, a conta vai para uma lista de excluídas no `localStorage`, e o login dela passa a ser recusado. A cascata (anúncios, pedidos, campanhas, eventos) **não** é simulada.
+- **Minha conta** (pessoa e ONG, também em `/ong/painel/perfil`): a seção "Excluir conta", em vermelho, no fim da página (`DeleteAccountSection.jsx`). Não aparece quando o admin edita a conta de outra pessoa.
   - O `ConfirmDialog`, na variante perigo, explica o que acontece:
     - os anúncios saem do ar;
     - os pedidos em andamento são cancelados;
-    - as campanhas são encerradas;
+    - na ONG, as campanhas ativas são encerradas e os eventos futuros, cancelados;
     - o histórico das outras pessoas fica, como "Conta excluída".
-  - Ele pede a senha ou que se digite `EXCLUIR` (conforme `hasPassword`).
-- **Sucesso:** logout, ida para a home e o *toast* "Sua conta foi excluída.".
-- **Textos:** `ACCOUNT_DELETED` entra nos textos de cancelamento (cards de pedido e faixa de "Conversa encerrada"): "Cancelado — conta excluída".
-- **Admin:** o `UserRow` mostra o selo "Excluída" quando houver `deletedAt` e esconde "Reativar".
+  - Ele pede a senha ou que se digite `EXCLUIR` (conforme `hasPassword`), e mostra o `message` da API se ela recusar.
+  - Enquanto a API não manda `hasPassword` (migração 010), o front considera sem senha a conta criada pelo Google (`provider: "GOOGLE"`).
+- **Sucesso:** logout, ida para a home e o aviso "Sua conta foi excluída.".
+- **Textos:** `ACCOUNT_DELETED` nos cards de pedido ("Cancelado — conta excluída") e na faixa de "Conversa encerrada".
+- **Admin:** o `UserRow` mostra o selo "Excluída" quando houver `deletedAt`, sem "Editar", "Banir" ou "Reativar", e a lista ganha o filtro "Excluídas".

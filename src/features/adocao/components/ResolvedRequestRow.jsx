@@ -12,7 +12,8 @@ const REJECTED_META = {
 const CANCELLED_CLASS = "bg-slate-100 text-slate-400";
 
 // Por que o pedido foi cancelado, do ponto de vista do dono do animal.
-// ACCOUNT_BANNED e LISTING_REMOVED vêm da moderação (regras §8)
+// ACCOUNT_BANNED e LISTING_REMOVED vêm da moderação (regras §8);
+// ACCOUNT_DELETED, de quem excluiu a própria conta (regras §2.1)
 const CANCEL_LABELS = {
   ANIMAL_ADOPTED: "Cancelado — pet adotado por outra pessoa",
   ADOPTER_WITHDREW: "Cancelado — o adotante desistiu",
@@ -20,6 +21,7 @@ const CANCEL_LABELS = {
   ANIMAL_UNAVAILABLE: "Cancelado — anúncio fora do ar",
   ACCOUNT_BANNED: "Cancelado — conta suspensa",
   LISTING_REMOVED: "Cancelado — anúncio removido",
+  ACCOUNT_DELETED: "Cancelado — conta excluída",
 };
 
 function metaOf(request) {
