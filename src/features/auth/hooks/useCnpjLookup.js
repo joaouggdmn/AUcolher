@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fetchCompanyByCnpj } from '../../../core/services/brasilApiService'
+import { withOfficialSpelling } from '../../../core/services/officialAddress'
 import { isValidCNPJ, sanitizeCNPJ } from '../../../core/utils/cnpj'
 
 const LOOKUP_ERROR_MESSAGES = {
@@ -58,7 +59,9 @@ export function useCnpjLookup(onResolved) {
     setErrorMessage(null)
 
     try {
-      const result = await fetchCompanyByCnpj(cnpj)
+      const found = await fetchCompanyByCnpj(cnpj)
+      // A Receita manda "CRICIUMA": o endereço sai com a grafia dos Correios/IBGE
+      const result = { ...found, address: await withOfficialSpelling(found.address) }
       if (requestId !== requestIdRef.current) return
 
       lastResolvedRef.current = cnpj

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { fetchAddressByCep } from '../services/viaCepService'
 
 function sanitizeCep(value) {
   return value.replace(/\D/g, '').slice(0, 8)
@@ -36,13 +37,10 @@ export function useCepLookup(onResolved) {
       setErrorMessage(null)
 
       try {
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
-        if (!response.ok) throw new Error('network-error')
-
-        const data = await response.json()
+        const address = await fetchAddressByCep(cep)
         if (isCancelled) return
 
-        if (data.erro) {
+        if (!address) {
           setStatus('error')
           setErrorMessage('CEP não encontrado. Verifique e tente novamente.')
           return
@@ -50,12 +48,7 @@ export function useCepLookup(onResolved) {
 
         lastLookedUpRef.current = cep
         setStatus('success')
-        onResolvedRef.current?.({
-          city: data.localidade,
-          state: data.uf,
-          street: data.logradouro,
-          neighborhood: data.bairro,
-        })
+        onResolvedRef.current?.(address)
       } catch {
         if (!isCancelled) {
           setStatus('error')
