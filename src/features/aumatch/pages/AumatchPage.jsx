@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { LuSparkles } from 'react-icons/lu'
-import { FaArrowRotateRight, FaSliders, FaTriangleExclamation } from 'react-icons/fa6'
+import { FaAnglesLeft, FaArrowRotateRight, FaSliders, FaTriangleExclamation } from 'react-icons/fa6'
 import PetCardStack from '../components/PetCardStack'
 import SwipeActionButtons from '../components/SwipeActionButtons'
 import EmptyStackState from '../components/EmptyStackState'
@@ -11,10 +11,12 @@ import PetDetailModal from '../components/PetDetailModal'
 import MatchReasonsModal from '../components/MatchReasonsModal'
 import AdoptersOnlyModal from '../components/AdoptersOnlyModal'
 import MatchPreferencesDrawer from '../components/filters/MatchPreferencesDrawer'
+import MatchPreferencesSidebar from '../components/filters/MatchPreferencesSidebar'
 import { useAuth } from '../../../core/context/AuthContext'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { isSameId } from '../../../core/utils/ids'
+import { AUMATCH_PANEL_OPEN_KEY } from '../../../core/utils/storageKeys'
 import { useModeration } from '../../admin/hooks/useModeration'
 import { applyMatchPreferences } from '../utils/matchFilters'
 import { buildCityOptions } from '../../animais/components/filters/filterOptions'
@@ -23,6 +25,24 @@ import { matchDeckKeys, useAumatchDeck } from '../hooks/useAumatchDeck'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
 import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+
+// A coluna de filtros do desktop lembra se ficou aberta. Sem storage
+// (aba anônima, bloqueio), só começa guardada
+function readPanelOpen() {
+  try {
+    return localStorage.getItem(AUMATCH_PANEL_OPEN_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function savePanelOpen(isOpen) {
+  try {
+    localStorage.setItem(AUMATCH_PANEL_OPEN_KEY, isOpen ? '1' : '0')
+  } catch {
+    // sem storage: a escolha vale só até recarregar
+  }
+}
 
 // Cartão que ocupa o lugar do deck enquanto ele carrega ou recalcula
 function DeckStatusCard({ children }) {
@@ -55,6 +75,7 @@ function AumatchPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isAdoptersOnlyOpen, setIsAdoptersOnlyOpen] = useState(false)
   const [isPreferencesDrawerOpen, setIsPreferencesDrawerOpen] = useState(false)
+  const [isPanelOpen, setIsPanelOpen] = useState(readPanelOpen)
   const [isPreparingMatches, setIsPreparingMatches] = useState(false)
   const [likeError, setLikeError] = useState(null)
   const stackRef = useRef(null)
@@ -173,6 +194,18 @@ function AumatchPage() {
 
   const handleReset = () => setSwipedIds(new Set())
 
+  // Desktop: mostra ou guarda a coluna ao lado do deck. Abaixo de lg não há
+  // espaço para ela, então o mesmo botão abre a gaveta
+  const handleTogglePreferences = () => {
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      const next = !isPanelOpen
+      setIsPanelOpen(next)
+      savePanelOpen(next)
+    } else {
+      setIsPreferencesDrawerOpen(true)
+    }
+  }
+
   const handleGoToLogin = () => {
     setIsAuthModalOpen(false)
     navigate('/login', { state: { from: location } })
@@ -253,7 +286,13 @@ function AumatchPage() {
       <div className="pointer-events-none absolute -left-32 bottom-0 h-96 w-96 rounded-full bg-emerald-500/20 blur-[120px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <header className="mb-6 flex flex-col items-center gap-1.5 text-center lg:mb-8 lg:items-start lg:text-left">
+        {/* Centralizado, como o deck. Com a coluna aberta (desktop), o bloco
+            desliza para a esquerda junto com ela: left e translate animam juntos */}
+        <header
+          className={`relative left-1/2 mb-6 flex w-fit max-w-full -translate-x-1/2 flex-col items-center gap-1.5 text-center transition-all duration-500 ease-out motion-reduce:transition-none lg:mb-8 ${
+            isPanelOpen ? 'lg:left-0 lg:translate-x-0 lg:items-start lg:text-left' : ''
+          }`}
+        >
           <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
             <LuSparkles size={15} />
             AUmatch
@@ -268,26 +307,45 @@ function AumatchPage() {
           )}
         </header>
 
-        {/* Modo foco: o deck tem a página só para ele. Os filtros ficam
-            numa gaveta, aberta pelo botão no canto do deck */}
-        <div>
-          <main className="flex min-w-0 flex-col items-center">
-            <div className="mb-4 flex w-full max-w-md justify-end lg:max-w-lg">
-              <button
-                type="button"
-                onClick={() => setIsPreferencesDrawerOpen(true)}
-                className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-colors duration-300 hover:bg-white/15"
-              >
-                <FaSliders size={13} className="text-amber-300" />
-                Filtros e preferências
-                {activeFiltersCount > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-black text-emerald-950">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </button>
-            </div>
+        {/* Canto superior esquerdo: mostra e guarda a coluna de filtros (no
+            mobile, abre a gaveta) */}
+        <div className="mb-4 flex">
+          <button
+            type="button"
+            onClick={handleTogglePreferences}
+            aria-expanded={isPanelOpen}
+            className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-colors duration-300 hover:bg-white/15"
+          >
+            {isPanelOpen ? (
+              <>
+                <FaSliders size={13} className="text-amber-300 lg:hidden" />
+                <FaAnglesLeft size={13} className="hidden text-amber-300 lg:block" />
+              </>
+            ) : (
+              <FaSliders size={13} className="text-amber-300" />
+            )}
+            {isPanelOpen ? (
+              <>
+                <span className="lg:hidden">Filtros e preferências</span>
+                <span className="hidden lg:inline">Guardar filtros</span>
+              </>
+            ) : (
+              'Filtros e preferências'
+            )}
+            {activeFiltersCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-black text-emerald-950">
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
+        </div>
 
+        {/* Modo foco: com a coluna guardada, o deck tem a página só para ele.
+            Aberta, ela cresce à esquerda e empurra o deck para a direita */}
+        <div className="lg:flex lg:items-start">
+          <MatchPreferencesSidebar isOpen={isPanelOpen} resultsCount={visiblePets.length} {...preferencesPanelProps} />
+
+          <main className="flex min-w-0 flex-1 flex-col items-center">
             <div className="h-[70vh] w-full max-w-md sm:h-[75vh] sm:max-h-[640px] lg:max-w-lg">{renderDeck()}</div>
 
             <SwipeActionButtons

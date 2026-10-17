@@ -25,6 +25,8 @@ export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'
 export const MOCK_CHAT_STORE_KEY = 'aucolher_mock_chat'
 // Contas excluídas no modo mock: o login delas passa a ser recusado (mesmo mockStore)
 export const MOCK_EXCLUSAO_STORE_KEY = 'aucolher_mock_exclusao'
+// AUmatch: a coluna de filtros do desktop ficou aberta ("1") ou guardada
+export const AUMATCH_PANEL_OPEN_KEY = 'aucolher_aumatch_panel_open'
 // sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)
 export const ACCOUNT_SUSPENDED_FLAG_KEY = 'aucolher_account_suspended'
 // sessionStorage: a API recusou o token (ex.: a senha foi trocada em outro
