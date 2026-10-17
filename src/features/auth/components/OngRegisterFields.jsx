@@ -5,21 +5,14 @@ import {
   FaCalendarDays,
   FaEnvelope,
   FaLock,
-  FaInstagram,
-  FaXTwitter,
-  FaFacebookF,
   FaCircleCheck,
-  FaCircleInfo,
   FaTriangleExclamation,
 } from 'react-icons/fa6'
 import AuthInput from './AuthInput'
 import { useCnpjLookup } from '../hooks/useCnpjLookup'
 import { maskCEP, maskCNPJ } from '../../../core/utils/masks'
 import { BRAZILIAN_STATES } from '../../../core/utils/brazilianStates'
-import { FACEBOOK_URL_PATTERN, sanitizeInstagramHandle, sanitizeXHandle } from '../../../core/utils/socialLinks'
 import { FOUNDED_YEAR_MIN, getCurrentYear } from '../../../core/utils/foundedYear'
-
-const BIO_MAX_LENGTH = 500
 
 const CNPJ_STATUS_ICONS = {
   loading: <span className="block h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-emerald-600" />,
@@ -258,78 +251,6 @@ function OngRegisterFields({ values, onFieldsChange }) {
           minLength={6}
           required
         />
-      </FormSection>
-
-      <FormSection title="Redes sociais e bio" badge="Opcional">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <AuthInput
-            id="instagram"
-            name="instagram"
-            label="Instagram"
-            icon={FaInstagram}
-            prefix="@"
-            placeholder="suaong"
-            value={values.instagram}
-            onChange={(e) => onFieldsChange({ instagram: sanitizeInstagramHandle(e.target.value) })}
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-          />
-          <AuthInput
-            id="twitter"
-            name="twitter"
-            label="X (Twitter)"
-            icon={FaXTwitter}
-            prefix="@"
-            placeholder="suaong"
-            value={values.twitter}
-            onChange={(e) => onFieldsChange({ twitter: sanitizeXHandle(e.target.value) })}
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-          />
-          <div className="sm:col-span-2">
-            <AuthInput
-              id="facebook"
-              name="facebook"
-              label="Facebook"
-              icon={FaFacebookF}
-              placeholder="facebook.com/suaong"
-              value={values.facebook}
-              onChange={handleChange}
-              inputMode="url"
-              autoComplete="off"
-              autoCapitalize="none"
-              spellCheck={false}
-              pattern={FACEBOOK_URL_PATTERN}
-              title="Cole o link da página no Facebook, ex: facebook.com/suaong"
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="bio" className="text-sm font-semibold text-slate-700">
-            Bio
-          </label>
-          <textarea
-            id="bio"
-            name="bio"
-            rows={4}
-            maxLength={BIO_MAX_LENGTH}
-            value={values.bio}
-            onChange={handleChange}
-            placeholder="Conte em poucas linhas a missão da sua ONG, quais animais vocês acolhem e como as pessoas podem ajudar."
-            className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
-          />
-          <p className="self-end text-xs text-slate-400">
-            {values.bio.length}/{BIO_MAX_LENGTH}
-          </p>
-        </div>
-
-        <p className="flex items-start gap-2 text-xs text-slate-400">
-          <FaCircleInfo size={12} className="mt-0.5 shrink-0" />
-          Você pode pular estes campos agora e preenchê-los mais tarde no seu perfil.
-        </p>
       </FormSection>
     </div>
   )

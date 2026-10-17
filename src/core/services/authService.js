@@ -2,7 +2,7 @@ import api, { ACCOUNT_SUSPENDED_MESSAGE } from "./api";
 import { mockHttpError } from "./mock/mockStore";
 import { isAccountBanned } from "../../features/admin/services/moderationMock";
 import { isAccountDeleted } from "../../features/perfil/services/accountDeletionMock";
-import { instagramUrl, normalizeFacebookUrl, xUrl } from "../utils/socialLinks";
+import { instagramUrl, xUrl } from "../utils/socialLinks";
 import { maskCEP } from "../utils/masks";
 import { parseFoundedYear } from "../utils/foundedYear";
 
@@ -34,14 +34,11 @@ function toRegisterPayload(formData) {
     return basePayload;
   }
 
-  // Espelha o NgoRegistrationDTO — o backend limpa máscaras (CNPJ/CEP) e o @
+  // Espelha o NgoRegistrationDTO — o backend limpa máscaras (CNPJ/CEP).
+  // Bio e redes sociais não entram no cadastro: a ONG preenche em Minha conta
   return {
     ...basePayload,
     cnpj: formData.cnpj,
-    bio: emptyToNull(formData.bio),
-    instagram: emptyToNull(formData.instagram),
-    twitter: emptyToNull(formData.twitter),
-    facebook: emptyToNull(normalizeFacebookUrl(formData.facebook)),
     foundedYear: parseFoundedYear(formData.foundedYear),
     cep: emptyToNull(formData.cep),
     street: emptyToNull(formData.street),
