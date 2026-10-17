@@ -7,10 +7,12 @@ const ACTION_CLASSES =
 // Moldura de cada seção do painel: título, descrição e botões no topo. Cada
 // ação é um link (`to`) ou um botão (`onClick`), e nenhuma sai na impressão.
 // `printHeader` troca o topo na impressão (ex.: cabeçalho de relatório).
-// `framed` põe o conteúdo num cartão branco; a visão geral monta os próprios
-function PanelPage({ title, description, actions, printHeader, framed = true, children }) {
+// `framed` põe o conteúdo num cartão branco; a visão geral monta os próprios.
+// `widthClass` estreita a coluna inteira (título + conteúdo), sempre
+// centralizada na área ao lado da nav: os formulários usam uma mais estreita
+function PanelPage({ title, description, actions, printHeader, framed = true, widthClass = 'max-w-6xl', children }) {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 sm:py-10 print:max-w-none print:p-0">
+    <div className={`mx-auto w-full ${widthClass} px-4 py-6 sm:px-8 sm:py-10 print:max-w-none print:p-0`}>
       {printHeader && <div className="hidden print:block">{printHeader}</div>}
       <header
         className={`mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between ${printHeader ? 'print:hidden' : ''}`}

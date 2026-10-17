@@ -15,9 +15,10 @@ function ProfilePage() {
       description="A vitrine pública da instituição e os dados de acesso. O que for público aparece no perfil da ONG depois de salvar."
       actions={[{ to: `/ong/${user?.id}`, label: 'Ver perfil público', icon: FaEye }]}
       framed={false}
+      widthClass="max-w-[60rem]"
     >
       {/* pb-24: espaço para a barra fixa de "alterações não salvas" */}
-      <div className="max-w-4xl pb-24">
+      <div className="pb-24">
         {/* A moderação editou o perfil: a ONG fica sabendo aqui */}
         <ModeratedNote moderatedAt={user?.moderatedAt} size="md" className="mb-6" />
         {/* key: outra conta logando no mesmo navegador remonta o form com os dados dela */}
