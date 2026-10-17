@@ -18,7 +18,7 @@ import { findOtherUrgentCampaign, getCampaignPayloadErrors, getDonationAmountErr
 // e mesmas regras, DTOs e erros do contrato (docs/entrega-final/api-campanhas-doacoes.md).
 // Faz o papel do backend E do Mercado Pago: gera um PIX fictício e só
 // aprova pelo botão "Simular pagamento" (simulateDonationApproval)
-const store = createMockStore({ key: MOCK_CAMPANHAS_STORE_KEY, version: 1, seed: buildSeedCampanhas })
+const store = createMockStore({ key: MOCK_CAMPANHAS_STORE_KEY, version: 2, seed: buildSeedCampanhas })
 
 const PAYLOAD_FIELDS = ['title', 'description', 'category', 'customCategory', 'isUrgent', 'goalAmount', 'deadline', 'coverUrl']
 
