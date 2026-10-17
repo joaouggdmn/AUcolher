@@ -10,9 +10,13 @@
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
-/* Customizações globais */
-* {
-  @apply transition-colors duration-200;
+/* Customizações globais. Dentro de @layer base: fora de camada, esta regra
+   venceria as classes transition-* e duration-* de todos os elementos e
+   desligaria as animações de deslizar, crescer e aparecer */
+@layer base {
+  * {
+    @apply transition-colors duration-200;
+  }
 }
 
 html {
