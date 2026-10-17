@@ -19,13 +19,15 @@ Os contratos seguem sempre o mesmo padrão:
 | `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões |
 | `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema |
 | `api-exclusao-conta.md` | Excluir a própria conta (anonimização e efeitos) |
+| `api-login-google.md` | Entrar com o Google: **já implementado** (back e front); só o fluxo, as variáveis e como criar as credenciais |
 | `plano-front-api-pronta.md` | O plano do front para deixar cada módulo pronto para ligar na API |
 
 ## 2. Onde estamos
 
 | Módulo | Tabelas | Backend | Front | Contrato |
 |---|---|---|---|---|
-| Contas e login (pessoa, ONG, admin, Google) | `users`, `ngo_team`, `ngo_visiting_hours` | ✅ pronto | API | README do backend |
+| Contas e login (pessoa, ONG, admin) | `users`, `ngo_team`, `ngo_visiting_hours` | ✅ pronto | API | README do backend |
+| Entrar com o Google | (`users`) | ✅ pronto | API (botão com `VITE_GOOGLE_LOGIN=true`) | `api-login-google.md` |
 | Animais e favoritos | `animals`, `animal_photos`, `favorites` | ✅ pronto | API | README do backend |
 | AUmatch | `match_profiles` | ✅ pronto | API | `contratos-prontos/api-aumatch.md` |
 | Pedidos de adoção e avaliações | `adoption_requests`, `adoption_reviews` | ✅ pronto | API | `contratos-prontos/api-adocao.md` |
@@ -85,7 +87,8 @@ Os contratos seguem sempre o mesmo padrão:
 
 | Variável | Para quê | Exemplo |
 |---|---|---|
-| `FRONTEND_URL` | Montar o link de redefinição de senha e a volta do OAuth do Mercado Pago | `http://localhost:5173` |
+| `FRONTEND_URL` | Montar o link de redefinição de senha, a volta do OAuth do Mercado Pago e a volta do login com o Google (este já em uso: `app.frontend-url`) | `http://localhost:5173` |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Entrar com o Google, já em uso (`api-login-google.md` §6) | — |
 | `MAIL_USERNAME` | Conta Gmail do projeto | `aucolher.app@gmail.com` |
 | `MAIL_PASSWORD` | **Senha de app** do Gmail (não é a senha da conta) | `abcd efgh ijkl mnop` |
 | `MP_CLIENT_ID` | ID da aplicação do AUcolher no Mercado Pago | `1234567890123456` |
