@@ -1,90 +1,55 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../../../core/context/AuthContext";
-import { chatMessagesStorageKey } from "../../../core/utils/storageKeys";
-import { CHAT_SYSTEM_MESSAGE_EVENT } from "../../../core/utils/chatSystemMessage";
+import { queryKeys } from "../../../core/services/queryKeys";
+import { CHAT_POLL_MS } from "../../../core/utils/constants";
+import * as chatService from "../services/chatService";
 
-function loadMessages(requestId) {
-  if (!requestId) return [];
-  try {
-    const stored = localStorage.getItem(chatMessagesStorageKey(requestId));
-    if (stored) return JSON.parse(stored);
-  } catch {
-    // payload corrompido — cai para conversa vazia
-  }
-  return [];
+const NO_MESSAGES = [];
+
+// Junta as mensagens novas ao fim da lista sem repetir: o envio põe a
+// mensagem no cache na hora, e um polling que já estava a caminho pode
+// trazer a mesma de novo
+function appendNew(current, incoming) {
+  const known = new Set(current.map((message) => message.id));
+  const fresh = incoming.filter((message) => !known.has(message.id));
+  return fresh.length ? [...current, ...fresh] : current;
 }
 
+// Conversa aberta (api-chat.md §3.1): o histórico uma vez e, depois, só as
+// mensagens com id maior que a última, a cada 3 s, enquanto a aba está
+// visível. O mesmo código serve para o mock e para a API
 export function useChatMessages(requestId) {
   const { user } = useAuth();
-  const [messages, setMessages] = useState(() => loadMessages(requestId));
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.chat.messages(requestId);
 
-  // Sincroniza quando uma mensagem de sistema é injetada NA MESMA aba (ex:
-  // o doador confirma a adoção estando já dentro desta conversa) — o
-  // evento nativo 'storage' só dispara em OUTRAS abas, então esse evento
-  // customizado cobre o caso "mesma aba, hook já montado"
-  useEffect(() => {
-    if (!requestId) return;
-
-    function handleSystemMessage(event) {
-      if (event.detail?.requestId !== requestId) return;
-      setMessages(loadMessages(requestId));
-    }
-
-    window.addEventListener(CHAT_SYSTEM_MESSAGE_EVENT, handleSystemMessage);
-    return () =>
-      window.removeEventListener(
-        CHAT_SYSTEM_MESSAGE_EVENT,
-        handleSystemMessage,
-      );
-  }, [requestId]);  
-  // Recarrega do zero sempre que o usuário troca de conversa selecionada
-  useEffect(() => {
-    setMessages(loadMessages(requestId));
-  }, [requestId]);
-
-  // Persiste toda alteração — cada match vira uma "tabela" isolada no localStorage
-  useEffect(() => {
-    if (!requestId) return;
-    localStorage.setItem(
-      chatMessagesStorageKey(requestId),
-      JSON.stringify(messages),
-    );
-  }, [requestId, messages]);
-
-  // Sincroniza em tempo real quando a OUTRA aba envia uma mensagem nesta MESMA conversa
-  useEffect(() => {
-    if (!requestId) return;
-
-    function handleStorageChange(event) {
-      if (event.key !== chatMessagesStorageKey(requestId) || !event.newValue)
-        return;
-      try {
-        setMessages(JSON.parse(event.newValue));
-      } catch {
-        // ignora payload inválido
-      }
-    }
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [requestId]);
-
-  const sendMessage = useCallback(
-    (text) => {
-      const trimmed = text.trim();
-      if (!trimmed || !requestId || !user) return;
-
-      const newMessage = {
-        id: Date.now(),
-        senderId: user.id,
-        text: trimmed,
-        timestamp: new Date().toISOString(),
-      };
-
-      setMessages((prev) => [...prev, newMessage]);
+  const query = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const cached = queryClient.getQueryData(queryKey);
+      const lastId = cached?.at(-1)?.id;
+      if (lastId == null) return chatService.listMessages(requestId);
+      return appendNew(cached, await chatService.listMessages(requestId, lastId));
     },
-    [requestId, user],
-  );
+    enabled: requestId != null && user != null,
+    refetchInterval: CHAT_POLL_MS,
+  });
 
-  return { messages, sendMessage };
+  const { mutateAsync, isPending: isSending } = useMutation({
+    mutationFn: (text) => chatService.sendMessage(requestId, text),
+    onSuccess: (message) => {
+      queryClient.setQueryData(queryKey, (current = NO_MESSAGES) => appendNew(current, [message]));
+      queryClient.invalidateQueries({ queryKey: queryKeys.chat.summary(user?.id) });
+    },
+  });
+
+  return {
+    messages: query.data ?? NO_MESSAGES,
+    isLoading: query.isLoading,
+    // Falhou antes de ter qualquer mensagem (ex.: a rota ainda não existe)
+    loadFailed: query.isError && query.data === undefined,
+    // Rejeita com o erro da API: quem chama mostra a `message`
+    sendMessage: mutateAsync,
+    isSending,
+  };
 }

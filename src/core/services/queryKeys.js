@@ -39,6 +39,12 @@ export const queryKeys = {
     all: ['denuncias'],
     mine: (userId) => ['denuncias', 'mine', String(userId)],
   },
+  // Chat: o resumo é da conta logada (leva o userId); as mensagens, da conversa
+  chat: {
+    all: ['chat'],
+    summary: (userId) => ['chat', 'summary', String(userId)],
+    messages: (requestId) => ['chat', 'messages', String(requestId)],
+  },
   // Painel do admin: tudo da plataforma, igual para qualquer conta admin
   admin: {
     all: ['admin'],
