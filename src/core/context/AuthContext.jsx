@@ -138,7 +138,7 @@ export function AuthProvider({ children }) {
     })
   }, [user])
 
-  // Abre a sessão com o payload do login (por senha ou pelo Google)
+  // Abre a sessão com o payload do login (por senha ou pelo Google) ou do cadastro
   async function startSession({ token, tokenType, user: loggedUser }) {
     // O token vai antes: a busca do Perfil AUmatch já precisa dele
     localStorage.setItem(TOKEN_STORAGE_KEY, token)
@@ -170,8 +170,9 @@ export function AuthProvider({ children }) {
     return startSession(await exchangeGoogleCode(code))
   }
 
+  // Cadastrou, entrou: a API devolve o mesmo payload do login
   async function register(formData) {
-    return registerRequest(formData)
+    return startSession(await registerRequest(formData))
   }
 
   function logout() {
