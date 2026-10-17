@@ -193,7 +193,7 @@ function Navbar() {
                     {totalFavoritos > 0 && (
                       <span
                         aria-hidden="true"
-                        className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
+                        className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
                           isScrolled ? 'ring-emerald-800' : 'ring-white'
                         }`}
                       >

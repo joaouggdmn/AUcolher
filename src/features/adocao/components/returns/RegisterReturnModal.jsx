@@ -56,7 +56,7 @@ function RegisterReturnModal({ request, onClose, onRegistered }) {
         aria-modal="true"
         aria-labelledby="register-return-title"
         onSubmit={handleSubmit}
-        className="relative z-10 flex max-h-[90vh] w-full max-w-md animate-fade-slide-in flex-col overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+        className="relative z-10 flex max-h-[90vh] w-full max-w-md animate-fade-slide-in flex-col scrollbar-soft overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
       >
         <div className="flex flex-col items-center gap-3 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-600">

@@ -35,7 +35,7 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="flex-1 scrollbar-soft overflow-y-auto px-5 py-4">
           <MatchPreferencesPanel {...panelProps} />
         </div>
 
