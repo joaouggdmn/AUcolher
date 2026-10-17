@@ -17,13 +17,14 @@ function plural(count, singular, pluralLabel) {
   return `${count} ${count === 1 ? singular : pluralLabel}`
 }
 
-// Linha de lotação do card e do detalhe. `tone` destaca quando está acabando
-export function getAttendanceSummary(event) {
+// Linha de lotação do card e do detalhe. `tone` destaca quando está acabando.
+// invite: false para quem não confirma presença (a ONG dona e o admin)
+export function getAttendanceSummary(event, { invite = true } = {}) {
   const confirmed = plural(event.confirmedCount, 'confirmado', 'confirmados')
 
   if (event.capacity == null) {
     return {
-      label: event.confirmedCount === 0 ? 'Seja o primeiro a confirmar' : confirmed,
+      label: event.confirmedCount === 0 ? (invite ? 'Seja o primeiro a confirmar' : 'Nenhum confirmado ainda') : confirmed,
       tone: 'neutral',
     }
   }

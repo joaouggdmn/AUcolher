@@ -119,10 +119,10 @@ function EventDetailPage() {
 
   const categoria = getCategoriaMeta(event.category, event.customCategory)
   const CategoriaIcon = categoria.icon
-  const summary = getAttendanceSummary(event)
   const address = formatEventAddress(event.location)
   const isOwner = user != null && String(user.id) === String(event.organizer.id)
   const isAdmin = user?.userType === 'ADMIN'
+  const summary = getAttendanceSummary(event, { invite: !isOwner && !isAdmin })
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">

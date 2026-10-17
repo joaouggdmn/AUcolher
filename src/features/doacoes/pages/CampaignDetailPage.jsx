@@ -270,7 +270,7 @@ function CampaignDetailPage() {
             <DonationProgress raised={campaign.raisedAmount} goal={campaign.goalAmount} size="lg" showAmounts={false} />
 
             <InfoRow icon={FaUserGroup}>
-              <span className="font-semibold text-emerald-950">{formatDonationsCount(campaign.donationsCount)}</span>
+              <span className="font-semibold text-emerald-950">{formatDonationsCount(campaign.donationsCount, { invite: !isOwner && !isAdminAccount(user) })}</span>
             </InfoRow>
             <InfoRow icon={FaClock}>
               <span className={`font-semibold ${DEADLINE_TONES[deadline.tone]}`}>{deadline.label}</span>

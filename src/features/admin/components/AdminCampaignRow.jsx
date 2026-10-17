@@ -45,7 +45,7 @@ function AdminCampaignRow({ campaign, onRemove }) {
             <DonationProgress raised={campaign.raisedAmount} goal={campaign.goalAmount} size="sm" />
           </div>
           <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500">
-            <span>{formatDonationsCount(campaign.donationsCount)}</span>
+            <span>{formatDonationsCount(campaign.donationsCount, { invite: false })}</span>
             {!isOffSite && (
               <span className="flex items-center gap-1">
                 <FaClock size={9} />

@@ -25,7 +25,7 @@ const ACTION_CLASSES =
 // Passado fica só como histórico: dá para ver quem confirmou, mas não editar
 // nem excluir (o backend recusaria)
 function OngEventRow({ event, onShowParticipants, onDelete }) {
-  const summary = getAttendanceSummary(event)
+  const summary = getAttendanceSummary(event, { invite: false })
 
   return (
     <li className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center">

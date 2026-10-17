@@ -71,7 +71,7 @@ function EventParticipantsModal({ event, onClose }) {
               Presenças confirmadas
             </h3>
             <p className="truncate text-sm text-slate-500">{event.title}</p>
-            <p className="mt-1 text-xs font-semibold text-emerald-700">{getAttendanceSummary(event).label}</p>
+            <p className="mt-1 text-xs font-semibold text-emerald-700">{getAttendanceSummary(event, { invite: false }).label}</p>
           </div>
           <button
             type="button"
