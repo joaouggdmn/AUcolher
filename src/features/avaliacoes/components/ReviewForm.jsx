@@ -33,7 +33,7 @@ function ReviewForm({ targetName, initialReview, onSubmit, onDelete, onCancel, i
         role="dialog"
         aria-modal="true"
         aria-labelledby="review-form-title"
-        className="relative z-10 max-h-full w-full max-w-sm animate-fade-slide-in overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+        className="relative z-10 max-h-full w-full max-w-sm animate-fade-slide-in scrollbar-soft overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
       >
         <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-amber-500">

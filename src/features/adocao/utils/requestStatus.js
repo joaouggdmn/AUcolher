@@ -32,7 +32,7 @@ export const SENT_STATUS_META = {
   },
   AWAITING_DELIVERY: {
     label: 'Aguardando entrega',
-    description: 'O doador confirmou a entrega. Quando o pet chegar, confirme pelo chat.',
+    description: 'O doador confirmou a entrega. Quando o pet chegar, confirme pelo chat; se não chegou, avise por lá.',
     icon: FaHandHoldingHeart,
     tone: 'amber',
   },

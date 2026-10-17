@@ -15,6 +15,13 @@ const MODE_CONTENT = {
     getDescription: (animalName) =>
       `Confirme que ${animalName} já chegou até você. Essa ação encerra o processo de adoção e não pode ser desfeita.`,
   },
+  // Adotante: o doador confirmou a entrega, mas o pet não chegou
+  'decline-delivery': {
+    title: 'O pet ainda não chegou?',
+    confirmLabel: 'Avisar que não recebi',
+    getDescription: (animalName) =>
+      `O pedido de ${animalName} volta para "aceito" e o chat é liberado para vocês combinarem a entrega. Se desconfiar de golpe, denuncie o perfil do doador.`,
+  },
   // Dono desistindo de um pedido aceito ou aguardando entrega
   'owner-withdraw': {
     title: 'Desistir desta adoção?',

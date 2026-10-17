@@ -15,11 +15,11 @@ function HeroSosBanner({ campaign, onDonate }) {
     <section className="relative isolate overflow-hidden rounded-3xl bg-emerald-950">
       {campaign.coverUrl && (
         <div
-          className="absolute inset-0 -z-20 bg-cover bg-center opacity-40"
+          className="absolute inset-0 -z-20 bg-cover bg-center opacity-70"
           style={{ backgroundImage: `url("${campaign.coverUrl}")` }}
         />
       )}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-950 via-emerald-950/95 to-emerald-950/60" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-950/95 via-emerald-950/70 to-emerald-950/20" />
       <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-amber-500/20 blur-[100px]" />
 
       <div className="relative z-10 flex flex-col gap-6 p-8 sm:p-10 lg:max-w-2xl lg:p-14">

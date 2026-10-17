@@ -27,10 +27,22 @@ function FieldError({ message }) {
 // Criar e editar usam o mesmo formulário. O estado nasce de `initialValues`
 // uma vez só — quem usa passa key={id}, então outra campanha recria o form.
 // `onSubmit` recebe valores já válidos; a página chama a API e devolve o erro
-// dela em `submitError`. `raisedAmount` só existe na edição
-function CampaignForm({ initialValues, raisedAmount = 0, submitLabel, isSubmitting, submitError, onSubmit, cancelTo }) {
+// dela em `submitError`. `raisedAmount` só existe na edição. `urgentConflict`
+// é outra campanha urgente ativa da mesma ONG: com ela, a urgência não liga
+// (uma campanha que já era urgente pode continuar ou desligar)
+function CampaignForm({
+  initialValues,
+  raisedAmount = 0,
+  urgentConflict = null,
+  submitLabel,
+  isSubmitting,
+  submitError,
+  onSubmit,
+  cancelTo,
+}) {
   const [values, setValues] = useState(() => initialValues)
   const [showErrors, setShowErrors] = useState(false)
+  const isUrgentBlocked = urgentConflict != null && !initialValues.isUrgent
 
   // Os erros só aparecem depois da primeira tentativa de envio; a partir daí
   // somem conforme a pessoa corrige
@@ -88,6 +100,18 @@ function CampaignForm({ initialValues, raisedAmount = 0, submitLabel, isSubmitti
             <FieldError message={errors.category} />
           </div>
 
+          {values.category === 'OTHER' && (
+            <FormField
+              label="Nome da categoria"
+              value={values.customCategory}
+              onChange={(e) => setField('customCategory', e.target.value)}
+              placeholder="Ex: Tratamento de sarna"
+              maxLength={CAMPAIGN_LIMITS.customCategory}
+              hint="Aparece no selo da campanha."
+              {...fieldProps('customCategory')}
+            />
+          )}
+
           <TextAreaField
             label="Descrição"
             value={values.description}
@@ -102,12 +126,22 @@ function CampaignForm({ initialValues, raisedAmount = 0, submitLabel, isSubmitti
             <ToggleSwitch
               label="Marcar como urgente"
               checked={values.isUrgent}
+              disabled={isUrgentBlocked}
               onChange={() => setField('isUrgent', !values.isUrgent)}
             />
-            <p className="text-xs text-slate-500">
-              Campanhas urgentes ganham o selo vermelho, aparecem primeiro na página inicial e a mais recente vira o
-              destaque "SOS" da vitrine.
-            </p>
+            {isUrgentBlocked ? (
+              <p className="text-xs font-medium text-rose-700">
+                A ONG já tem uma campanha urgente ativa:{' '}
+                <Link to={`/campanhas/${urgentConflict.id}`} className="font-bold underline underline-offset-2">
+                  {urgentConflict.title}
+                </Link>
+                . Tire a urgência dela para marcar esta.
+              </p>
+            ) : (
+              <p className="text-xs text-slate-500">
+                Ganha o selo vermelho e aparece primeiro na página inicial. Cada ONG pode ter uma campanha urgente por vez.
+              </p>
+            )}
           </div>
         </div>
       </ProfileSection>

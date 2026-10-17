@@ -34,9 +34,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
       to: '/favoritos',
       icon: FaHeart,
       iconClass: 'text-rose-500',
-      // Favoritos não são "novidade" — contador neutro, fora do badge do botão
       count: totalFavoritos,
-      countVariant: 'neutral',
     },
     { label: 'Cadastrar animal', to: '/animais/criar', icon: FaPaw, iconClass: 'text-emerald-600' },
     // A pessoa gerencia anúncios e adoções em "Meus animais"; a ONG, no painel
@@ -48,9 +46,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
       to: '/meus-interesses',
       icon: FaPaperPlane,
       iconClass: 'text-emerald-600',
-      // Pedidos em andamento não são "novidade": contador neutro
       count: activeSentCount,
-      countVariant: 'neutral',
     },
     {
       label: 'Interesses recebidos',
@@ -124,16 +120,16 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <nav className="flex-1 scrollbar-soft overflow-y-auto px-3 py-4">
           <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Meu espaço</p>
           <ul className="flex flex-col gap-0.5">
-            {shortcuts.map(({ label, to, icon: Icon, iconClass, count, countVariant, countLabel }) => (
+            {shortcuts.map(({ label, to, icon: Icon, iconClass, count, countLabel }) => (
               <li key={to}>
                 <NavLink
                   to={to}
                   end
                   onClick={onClose}
-                  aria-label={count > 0 && countLabel ? `${label} — ${countLabel(count)}` : undefined}
+                  aria-label={count > 0 && countLabel ? `${label}: ${countLabel(count)}` : undefined}
                   className={({ isActive }) =>
                     `flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-200 ${
                       isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
@@ -148,11 +144,9 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
                   {count > 0 && (
                     <span
                       aria-hidden="true"
-                      className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold ${
-                        countVariant === 'neutral' ? 'bg-rose-50 text-rose-600' : 'bg-red-500 text-white'
-                      }`}
+                      className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white"
                     >
-                      {countVariant === 'neutral' ? count : formatBadge(count)}
+                      {formatBadge(count)}
                     </span>
                   )}
                 </NavLink>

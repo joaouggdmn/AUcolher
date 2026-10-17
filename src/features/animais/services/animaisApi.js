@@ -12,6 +12,12 @@ export async function listAnimals(params) {
   return data
 }
 
+// Cidades (do dono) que têm animal na vitrine, para o filtro de cidade
+export async function listAnimalCities() {
+  const { data } = await api.get('/animals/cities')
+  return data
+}
+
 export async function getAnimal(id) {
   const { data } = await api.get(`/animals/${id}`)
   return data

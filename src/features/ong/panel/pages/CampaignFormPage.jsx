@@ -6,7 +6,8 @@ import { formatCurrency } from '../../../../core/utils/currency'
 import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../../core/components/ui/Spinner'
 import CampaignForm from '../../../doacoes/components/CampaignForm'
-import { useCampaign, useCreateCampaign, useUpdateCampaign } from '../../../doacoes/hooks/useCampanhas'
+import { useCampaign, useCreateCampaign, useMyCampaigns, useUpdateCampaign } from '../../../doacoes/hooks/useCampanhas'
+import { findOtherUrgentCampaign } from '../../../doacoes/utils/campanhaRules'
 import { isCampaignOwner } from '../../../doacoes/utils/campaignDisplay'
 import { buildCampaignForm, buildNewCampaignForm } from '../../../doacoes/utils/campaignForm'
 import PanelFormPage from '../PanelFormPage'
@@ -14,12 +15,20 @@ import PanelNotice from '../PanelNotice'
 import { PANEL_PATHS } from '../panelPaths'
 
 const BACK = { backTo: PANEL_PATHS.campaigns, backLabel: 'Voltar para campanhas' }
+const NO_CAMPAIGNS = []
+
+// A outra campanha urgente ativa da ONG, que impede marcar esta como urgente
+function useUrgentConflict(currentId = null) {
+  const { data: mine = NO_CAMPAIGNS } = useMyCampaigns()
+  return findOtherUrgentCampaign(mine, currentId)
+}
 
 function NewCampaignForm() {
   const navigate = useNavigate()
   const createCampaign = useCreateCampaign()
   // Formulário novo nasce uma vez só
   const [initialValues] = useState(buildNewCampaignForm)
+  const urgentConflict = useUrgentConflict()
 
   const handleSubmit = (values) => {
     createCampaign.mutate(values, {
@@ -36,6 +45,7 @@ function NewCampaignForm() {
     >
       <CampaignForm
         initialValues={initialValues}
+        urgentConflict={urgentConflict}
         submitLabel="Publicar campanha"
         isSubmitting={createCampaign.isPending}
         submitError={createCampaign.error ? getErrorMessage(createCampaign.error) : null}
@@ -49,6 +59,7 @@ function NewCampaignForm() {
 function EditCampaignForm({ campaign }) {
   const navigate = useNavigate()
   const updateCampaign = useUpdateCampaign()
+  const urgentConflict = useUrgentConflict(campaign.id)
 
   const handleSubmit = (values) => {
     updateCampaign.mutate(
@@ -60,7 +71,7 @@ function EditCampaignForm({ campaign }) {
   const count = campaign.donationsCount
   const description =
     count > 0
-      ? `${count} ${count === 1 ? 'doação' : 'doações'} somando ${formatCurrency(campaign.raisedAmount)} — quem doou verá as mudanças na página da campanha.`
+      ? `${count} ${count === 1 ? 'doação' : 'doações'} somando ${formatCurrency(campaign.raisedAmount)}. Quem doou verá as mudanças na página da campanha.`
       : 'As mudanças aparecem na vitrine assim que você salvar.'
 
   return (
@@ -68,6 +79,7 @@ function EditCampaignForm({ campaign }) {
       <CampaignForm
         initialValues={buildCampaignForm(campaign)}
         raisedAmount={campaign.raisedAmount}
+        urgentConflict={urgentConflict}
         submitLabel="Salvar alterações"
         isSubmitting={updateCampaign.isPending}
         submitError={updateCampaign.error ? getErrorMessage(updateCampaign.error) : null}

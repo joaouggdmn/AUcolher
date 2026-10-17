@@ -59,7 +59,7 @@ function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
 
 function CampaignCard({ campaign, onDonate }) {
   const { user } = useAuth()
-  const categoria = getCategoriaMeta(campaign.category)
+  const categoria = getCategoriaMeta(campaign.category, campaign.customCategory)
   const CategoriaIcon = categoria.icon
   const deadline = getDeadlineSummary(campaign)
   const isOwner = isCampaignOwner(campaign, user)
@@ -74,9 +74,7 @@ function CampaignCard({ campaign, onDonate }) {
         <Link to={`/campanhas/${campaign.id}`} className="block h-full">
           <CampaignCover
             campaign={campaign}
-            className={`transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-110 ${
-              campaign.isClosed ? 'grayscale-[40%]' : ''
-            }`}
+            className={campaign.isClosed ? 'grayscale-[40%]' : ''}
           />
         </Link>
 

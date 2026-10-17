@@ -9,6 +9,7 @@ export function buildNewCampaignForm() {
     title: '',
     description: '',
     category: '',
+    customCategory: '',
     isUrgent: false,
     goalAmount: '',
     hasDeadline: false,
@@ -22,6 +23,7 @@ export function buildCampaignForm(campaign) {
     title: campaign.title,
     description: campaign.description,
     category: campaign.category,
+    customCategory: campaign.customCategory ?? '',
     isUrgent: campaign.isUrgent,
     goalAmount: String(campaign.goalAmount),
     hasDeadline: campaign.deadline != null,
@@ -36,7 +38,7 @@ export function formToCampaignValues({ hasDeadline, ...values }) {
 }
 
 // Ordem visual dos campos: o primeiro com erro recebe o foco
-export const CAMPAIGN_FORM_FIELDS = ['title', 'category', 'description', 'goalAmount', 'deadline', 'coverUrl']
+export const CAMPAIGN_FORM_FIELDS = ['title', 'category', 'customCategory', 'description', 'goalAmount', 'deadline', 'coverUrl']
 
 export function campaignFieldId(field) {
   return `campaign-field-${field}`

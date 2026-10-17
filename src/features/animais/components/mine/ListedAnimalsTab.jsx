@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { FaBullhorn, FaCircleCheck, FaPaw, FaPlus } from 'react-icons/fa6'
+import { FaBullhorn, FaPaw, FaPlus } from 'react-icons/fa6'
 import { useAdoptionRequests } from '../../../../core/context/AdoptionRequestContext'
 import { getErrorMessage } from '../../../../core/utils/apiError'
-import ConfirmDialog from '../../../../core/components/ui/ConfirmDialog'
 import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../../core/components/ui/Spinner'
 import PillToggleGroup from '../../../../core/components/ui/filters/PillToggleGroup'
@@ -24,12 +23,11 @@ const STATUS_ORDER = ['AVAILABLE', 'IN_PROGRESS', 'INACTIVE', 'ADOPTED', 'REMOVE
 const SUCCESS_MESSAGES = {
   AVAILABLE: ({ name }) => `${name} voltou para a vitrine.`,
   INACTIVE: ({ name }) => `${name} saiu do ar. Dá para colocar de volta quando quiser.`,
-  ADOPTED: ({ name, sex }) => `Que notícia boa! ${name} foi ${sex === 'FEMALE' ? 'marcada como adotada' : 'marcado como adotado'}.`,
 }
 
 // "Meus animais" → Anunciados por mim: os anúncios da pessoa em qualquer
 // status, com as mesmas ações do painel da ONG (editar, tirar do ar,
-// reativar, marcar como adotado) e, nos adotados, o "Animal retornado".
+// reativar) e, nos adotados, o "Animal retornado".
 // Tirar do ar um anúncio republicado pergunta se a pessoa ficou com o animal
 // (aí o repasse é desfeito) ou só quer tirar o anúncio do ar.
 // `onNotify` mostra o aviso de sucesso
@@ -38,7 +36,6 @@ function ListedAnimalsTab({ onNotify }) {
   const { requests, undoRehome } = useAdoptionRequests()
   const returnsData = useReturnsMock()
   const [statusFilter, setStatusFilter] = useState('')
-  const [adoptionCandidate, setAdoptionCandidate] = useState(null)
   const [statusError, setStatusError] = useState(null)
   const [returningRequest, setReturningRequest] = useState(null)
   // Anúncio republicado saindo do ar: { animal, requestId }
@@ -53,11 +50,9 @@ function ListedAnimalsTab({ onNotify }) {
       { id: animal.id, status },
       {
         onSuccess: () => {
-          setAdoptionCandidate(null)
           onNotify(SUCCESS_MESSAGES[status](animal))
         },
         onError: (changeError) => {
-          setAdoptionCandidate(null)
           setStatusError(getErrorMessage(changeError))
         },
       }
@@ -130,7 +125,6 @@ function ListedAnimalsTab({ onNotify }) {
       .map(({ key, count }) => ({ value: key, label: `${LISTING_STATUS_META[key].label} (${count})` })),
   ]
   const visible = listed.filter((animal) => !statusFilter || animal.listingStatus === statusFilter)
-  const adoptedWord = adoptionCandidate?.sex === 'FEMALE' ? 'adotada' : 'adotado'
 
   return (
     <div className="flex flex-col gap-4">
@@ -159,7 +153,6 @@ function ListedAnimalsTab({ onNotify }) {
                 requestsTo="/interesses-recebidos"
                 pendingStatus={isPending && variables?.id === animal.id ? variables.status : null}
                 onChangeStatus={requestChangeStatus}
-                onMarkAdopted={setAdoptionCandidate}
                 details={
                   <>
                     {isRehomedListing && (
@@ -203,18 +196,6 @@ function ListedAnimalsTab({ onNotify }) {
         />
       )}
 
-      {adoptionCandidate && (
-        <ConfirmDialog
-          icon={FaCircleCheck}
-          title={`${adoptionCandidate.name} foi ${adoptedWord}?`}
-          description="Essa ação é definitiva: o anúncio sai da vitrine e do seu perfil público e não pode mais ser editado nem voltar ao ar."
-          confirmLabel={`Sim, foi ${adoptedWord}`}
-          processingLabel="Salvando..."
-          isProcessing={isPending}
-          onConfirm={() => handleChangeStatus(adoptionCandidate, 'ADOPTED')}
-          onCancel={() => setAdoptionCandidate(null)}
-        />
-      )}
     </div>
   )
 }

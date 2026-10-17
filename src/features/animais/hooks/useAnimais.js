@@ -5,6 +5,7 @@ import {
   createAnimal,
   deleteAnimal,
   getAnimal,
+  listAnimalCities,
   listAnimals,
   listMyAnimals,
   listUserAnimals,
@@ -24,6 +25,7 @@ export const animalKeys = {
   detail: (id) => ['animals', 'detail', String(id)],
   mine: (userId) => ['animals', 'mine', String(userId)],
   byUser: (userId) => ['animals', 'user', String(userId)],
+  cities: ['animals', 'cities'],
 }
 
 // ---------- leitura ----------
@@ -39,6 +41,15 @@ export function useAnimalsList({ search = '', filters = {} } = {}) {
     // Ao trocar um filtro, os cards atuais ficam na tela até a resposta nova
     // chegar, em vez de piscar o esqueleto de carregamento a cada clique
     placeholderData: keepPreviousData,
+  })
+}
+
+// Cidades reais do filtro: só as que têm animal disponível agora
+export function useAnimalCities() {
+  return useQuery({
+    queryKey: animalKeys.cities,
+    queryFn: listAnimalCities,
+    staleTime: ANIMALS_STALE_TIME,
   })
 }
 
@@ -104,7 +115,7 @@ export function useUpdateAnimal() {
   })
 }
 
-// Marcar como adotado, tirar do ar ou reativar. A resposta já é o animal
+// Tirar do ar ou reativar. A resposta já é o animal
 // atualizado: entra direto no cache do detalhe, e a tela muda sem esperar o refetch
 export function useChangeAnimalStatus() {
   const queryClient = useQueryClient()

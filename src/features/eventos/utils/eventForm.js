@@ -12,6 +12,7 @@ export function buildNewEventForm(user) {
     title: '',
     description: '',
     category: '',
+    customCategory: '',
     date: '',
     startTime: '',
     endTime: '',
@@ -31,6 +32,7 @@ export function buildEventForm(event) {
     title: event.title,
     description: event.description,
     category: event.category,
+    customCategory: event.customCategory ?? '',
     date: event.date,
     startTime: event.startTime ?? '',
     endTime: event.endTime ?? '',
@@ -45,6 +47,7 @@ export function buildEventForm(event) {
 const FIELD_BY_PAYLOAD_KEY = {
   title: 'title',
   category: 'category',
+  customCategory: 'customCategory',
   description: 'description',
   date: 'date',
   startTime: 'startTime',

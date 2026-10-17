@@ -127,6 +127,7 @@ function EventsListPage() {
         <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
           Eventos e feiras de adoção
         </h1>
+        <p className="max-w-xl text-slate-600">Feiras, mutirões e encontros das ONGs perto de você.</p>
       </header>
 
       <div className="lg:flex lg:items-start lg:gap-8">

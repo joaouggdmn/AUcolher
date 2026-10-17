@@ -117,6 +117,10 @@ export async function listAnimals(options) {
 // `moderation`: o anúncio saiu do ar pela moderação ('REMOVED' ou
 // 'OWNER_BANNED'). O detalhe mostra "Anúncio indisponível" (o admin ainda
 // vê, com um aviso)
+export async function listAnimalCities() {
+  return animaisApi.listAnimalCities()
+}
+
 export async function getAnimal(id) {
   const dto = await animaisApi.getAnimal(id)
   const moderation = moderationOf(dto)

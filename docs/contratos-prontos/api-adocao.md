@@ -26,9 +26,10 @@ O chat continua mock: as mensagens ficam no navegador, guardadas pelo **id real*
 | PENDING → REJECTED | dono | Definitivo: a pessoa não pede aquele animal de novo |
 | ACCEPTED → AWAITING_DELIVERY | dono | "Confirmar entrega"; o chat fica só leitura |
 | AWAITING_DELIVERY → CONCLUDED | adotante | "Confirmar chegada"; o animal vira ADOPTED e os outros pedidos ativos são cancelados (`ANIMAL_ADOPTED`) |
+| AWAITING_DELIVERY → ACCEPTED | adotante | "Ainda não recebi": o dono confirmou a entrega, mas o pet não chegou (engano ou golpe). O chat reabre. O dono, nessa etapa, recebe 400 |
 | PENDING / ACCEPTED / AWAITING_DELIVERY → CANCELLED | adotante | `ADOPTER_WITHDREW` (inclusive durante a entrega) |
 | ACCEPTED / AWAITING_DELIVERY → CANCELLED | dono | `OWNER_WITHDREW` (pendente o dono recusa) |
-| ativos → CANCELLED | sistema | `ANIMAL_UNAVAILABLE`: o dono marcou o animal como adotado, tirou do ar ou excluiu |
+| ativos → CANCELLED | sistema | `ANIMAL_UNAVAILABLE`: o animal saiu do ar ou foi excluído (o front não oferece mais "marcar como adotado") |
 
 - **Erros:** papel errado responde 403; status de partida errado, 400 (`message` pronta para mostrar).
 - **Pedir de novo:** só depois de um pedido CANCELLED.

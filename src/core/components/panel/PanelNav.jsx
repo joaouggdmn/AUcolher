@@ -82,7 +82,7 @@ function PanelNav({ homePath, identity, groups, stats = {}, footerLinks = [], on
                           <Icon size={15} className={isActive ? 'text-amber-300' : 'text-emerald-300/70'} />
                           <span className="flex-1">{label}</span>
                           {count > 0 && (
-                            <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-black leading-none text-white">
+                            <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-black leading-none text-white">
                               {formatBadge(count)}
                               <span className="sr-only"> {badgeLabel}</span>
                             </span>

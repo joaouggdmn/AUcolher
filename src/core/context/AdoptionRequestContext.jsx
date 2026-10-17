@@ -133,6 +133,8 @@ export function AdoptionRequestProvider({ children }) {
         requestDeliveryConfirmation: (requestId) => changeStatus(requestId, "AWAITING_DELIVERY"),
         // Adotante
         concludeRequest: (requestId) => changeStatus(requestId, "CONCLUDED"),
+        // "Ainda não recebi": o pedido volta a aceito e o chat reabre
+        declineDelivery: (requestId) => changeStatus(requestId, "ACCEPTED"),
         // As duas partes: quem desistiu vai no motivo (a API decide pelo papel)
         cancelRequest: (requestId) => changeStatus(requestId, "CANCELLED"),
         saveReview,

@@ -14,7 +14,7 @@ function EmptyState() {
           <FaPaw size={16} className="text-rose-400" />
         </h3>
         <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500">
-          Toque no coração dos pets que te conquistarem — eles ficam guardados aqui para você decidir com calma.
+          Toque no coração dos pets que te conquistarem. Eles ficam guardados aqui para você decidir com calma.
         </p>
       </div>
 

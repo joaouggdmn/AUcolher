@@ -1,10 +1,11 @@
 import { EVENT_COVER_MAX_LENGTH } from '../../../core/utils/constants'
 
-export const EVENT_CATEGORIES = ['ADOPTION_FAIR', 'HEALTH', 'BAZAAR', 'WORKSHOP']
+export const EVENT_CATEGORIES = ['ADOPTION_FAIR', 'HEALTH', 'BAZAAR', 'WORKSHOP', 'COLLECTION', 'MEETUP', 'OTHER']
 
 export const EVENT_LIMITS = {
   title: { min: 3, max: 120 },
   description: 2000,
+  customCategory: 30,
   venueName: 120,
   street: 150,
   number: 20,
@@ -34,6 +35,12 @@ export function getEventPayloadErrors(payload, today) {
     errors.description = `A descrição pode ter no máximo ${EVENT_LIMITS.description} caracteres.`
   }
   if (!EVENT_CATEGORIES.includes(payload.category)) errors.category = 'Escolha uma categoria.'
+  else if (payload.category === 'OTHER') {
+    if (!payload.customCategory) errors.customCategory = 'Dê um nome para a categoria.'
+    else if (tooLong(payload.customCategory, EVENT_LIMITS.customCategory)) {
+      errors.customCategory = `O nome da categoria pode ter no máximo ${EVENT_LIMITS.customCategory} caracteres.`
+    }
+  }
 
   if (!date) errors.date = 'Informe a data do evento.'
   else if (date < today) errors.date = 'A data do evento não pode estar no passado.'
