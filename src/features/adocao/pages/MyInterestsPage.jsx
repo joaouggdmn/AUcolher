@@ -81,7 +81,7 @@ function MyInterestsPage() {
           <div>
             <h3 className="text-xl font-extrabold tracking-tight text-emerald-950">Você ainda não pediu nenhum pet</h3>
             <p className="mt-1 max-w-sm text-sm text-slate-500">
-              Curta um pet no AUmatch ou envie um pedido pela página dele — ele aparece aqui.
+              Curta um pet no AUmatch ou envie um pedido pela página dele, e ele aparece aqui.
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-3">

@@ -60,7 +60,7 @@ function EditCampaignForm({ campaign }) {
   const count = campaign.donationsCount
   const description =
     count > 0
-      ? `${count} ${count === 1 ? 'doação' : 'doações'} somando ${formatCurrency(campaign.raisedAmount)} — quem doou verá as mudanças na página da campanha.`
+      ? `${count} ${count === 1 ? 'doação' : 'doações'} somando ${formatCurrency(campaign.raisedAmount)}. Quem doou verá as mudanças na página da campanha.`
       : 'As mudanças aparecem na vitrine assim que você salvar.'
 
   return (

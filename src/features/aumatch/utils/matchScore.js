@@ -165,11 +165,11 @@ function sizeDetail({ preferredSize, desiredSize, petSize }) {
   if (!preferredSize) {
     return petSize === 'SMALL'
       ? 'Porte pequeno, o mais prático para quem mora em apartamento.'
-      : `Porte ${SIZE_WORDS[petSize]} — em apartamento, o pequeno costuma ser mais prático.`
+      : `Porte ${SIZE_WORDS[petSize]}. Em apartamento, o pequeno costuma ser mais prático.`
   }
   return desiredSize === petSize
     ? `Porte ${SIZE_WORDS[petSize]}, exatamente o que você prefere.`
-    : `Porte ${SIZE_WORDS[petSize]} — diferente do ${SIZE_WORDS[desiredSize]} que você prefere.`
+    : `Porte ${SIZE_WORDS[petSize]}, diferente do ${SIZE_WORDS[desiredSize]} que você prefere.`
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -226,7 +226,7 @@ export function buildMatchCriteria(user, pet) {
       points: housingPoints,
       isAnswered: !!housing,
       detail: !housing
-        ? 'Você ainda não informou onde mora — sem restrição de espaço no cálculo.'
+        ? 'Você ainda não informou onde mora, então não há restrição de espaço no cálculo.'
         : housing === 'APARTMENT'
           ? petApartmentFriendly
             ? 'Combina com apartamento, exatamente como a sua moradia.'
@@ -245,7 +245,7 @@ export function buildMatchCriteria(user, pet) {
           ? 'Este anúncio não informou o nível de energia do pet.'
           : desiredEnergy === petEnergy
             ? `Energia ${ENERGY_WORDS[petEnergy]}, no mesmo ritmo que você descreveu.`
-            : `Energia ${ENERGY_WORDS[petEnergy]} — diferente do ritmo da sua rotina.`,
+            : `Energia ${ENERGY_WORDS[petEnergy]}, diferente do ritmo da sua rotina.`,
     },
     {
       key: 'independence',
@@ -259,7 +259,7 @@ export function buildMatchCriteria(user, pet) {
           ? 'Este anúncio não informou o nível de independência do pet.'
           : desiredIndependence === petIndependence
             ? `Independência ${INDEPENDENCE_WORDS[petIndependence]}, ideal para o tempo que você informou.`
-            : `Independência ${INDEPENDENCE_WORDS[petIndependence]} — não é a ideal para o tempo que você passa fora.`,
+            : `Independência ${INDEPENDENCE_WORDS[petIndependence]}, que não é a ideal para o tempo que você passa fora.`,
     },
     {
       key: 'living',

@@ -146,7 +146,7 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
         </div>
       </ProfileSection>
 
-      <ProfileSection icon={FaMapLocationDot} title="Local" description="Onde o público deve ir — aparece com link para o mapa">
+      <ProfileSection icon={FaMapLocationDot} title="Local" description="Onde o público deve ir. Aparece com link para o mapa">
         <div className="grid grid-cols-6 gap-4">
           <div className="col-span-6">
             <FormField

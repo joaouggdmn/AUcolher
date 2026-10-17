@@ -60,7 +60,7 @@ function EditEventForm({ event }) {
   const confirmed = event.confirmedCount
   const description =
     confirmed > 0
-      ? `${confirmed} ${confirmed === 1 ? 'pessoa já confirmou' : 'pessoas já confirmaram'} presença — elas verão as mudanças na página do evento.`
+      ? `${confirmed} ${confirmed === 1 ? 'pessoa já confirmou' : 'pessoas já confirmaram'} presença. Elas verão as mudanças na página do evento.`
       : 'As mudanças aparecem na vitrine assim que você salvar.'
 
   return (

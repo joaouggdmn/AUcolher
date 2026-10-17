@@ -50,7 +50,7 @@ function AuthForm({ heading, subheading, wide = false, children }) {
         </div>
 
         <p className="relative z-10 text-sm text-emerald-200/50">
-          © 2026 AUcolher — Feito com carinho para conectar vidas.
+          © 2026 AUcolher · Feito com carinho para conectar vidas.
         </p>
       </aside>
 

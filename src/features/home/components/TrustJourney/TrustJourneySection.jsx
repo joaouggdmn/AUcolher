@@ -83,7 +83,7 @@ function TrustJourneySection({ persona }) {
             align="center"
             eyebrow="Adoção segura"
             title="Do primeiro like ao “bem-vindo em casa”."
-            subtitle="A decisão é sempre de quem adota e de quem cuida — tudo dentro do AUcolher."
+            subtitle="A decisão é sempre de quem adota e de quem cuida, tudo dentro do AUcolher."
           />
         </HomeReveal>
 

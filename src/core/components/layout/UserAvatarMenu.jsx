@@ -40,7 +40,7 @@ function UserAvatarMenu({
         aria-label={
           isAdmin
             ? "Abrir menu da conta"
-            : `Abrir menu da conta — perfil ${percentage}% completo`
+            : `Abrir menu da conta, perfil ${percentage}% completo`
         }
         className="relative h-11 w-11 shrink-0 rounded-full transition-all duration-300"
         style={{

@@ -310,7 +310,7 @@ function OngAccountForm({ account = null, onSave = null }) {
           <AccountGroupHeading
             visibility="private"
             title="Dados da conta"
-            description="Só a instituição vê. Usados para entrar na plataforma — o e-mail também é o contato público."
+            description="Só a instituição vê. Usados para entrar na plataforma. O e-mail também é o contato público."
           />
 
           {isModeration ? (

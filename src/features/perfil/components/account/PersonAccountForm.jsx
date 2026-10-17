@@ -62,7 +62,7 @@ function PersonAccountForm({ account = null, onSave = null }) {
                 value={formData.bio}
                 onChange={(value) => setField('bio', value)}
                 placeholder="Conte um pouco sobre você: se já tem pets, se cuida ou resgata animais, o que procura numa adoção..."
-                hint="Cuida de animais por conta própria? Conte aqui — ajuda quem vai adotar de você a confiar."
+                hint="Cuida de animais por conta própria? Conte aqui, isso ajuda quem vai adotar de você a confiar."
               />
             </div>
           </ProfileSection>
@@ -80,7 +80,7 @@ function PersonAccountForm({ account = null, onSave = null }) {
               isGoogleAccount={user.provider === 'GOOGLE'}
             />
           ) : (
-            <AccessSection emailHint="Usado para login — não pode ser alterado por aqui." />
+            <AccessSection emailHint="Usado para login, não pode ser alterado por aqui." />
           )}
 
           <ProfileSection icon={FaLocationDot} title="Localização" description="Sua cidade e estado aparecem no perfil público">
