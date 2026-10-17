@@ -1,14 +1,14 @@
 import { FaXmark } from 'react-icons/fa6'
 import MatchPreferencesPanel from './MatchPreferencesPanel'
 
-// O painel de filtros fica escondido nesta gaveta lateral, em qualquer
-// tamanho de tela, para o deck ter a página só para ele. Em vidro escuro,
-// porque os controles do painel são claros e precisam de fundo escuro
+// Abaixo de lg o painel de filtros fica nesta gaveta lateral (no desktop ele
+// é a coluna do MatchPreferencesSidebar). Em vidro escuro, porque os
+// controles do painel são claros e precisam de fundo escuro
 function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }) {
   return (
     <>
       <div
-        className={`fixed inset-0 z-40 bg-emerald-950/60 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-40 bg-emerald-950/60 lg:hidden backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={onClose}
@@ -16,7 +16,7 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
       />
 
       <div
-        className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col border-l border-white/15 bg-emerald-950/90 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-50 flex w-full lg:hidden max-w-sm flex-col border-l border-white/15 bg-emerald-950/90 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"

@@ -5,6 +5,7 @@ import SaveToCalendarMenu from './SaveToCalendarMenu'
 import CalendarDateBadge from './CalendarDateBadge'
 import EventCover from './EventCover'
 import AttendanceButton from './AttendanceButton'
+import { useAuth } from '../../../core/context/AuthContext'
 import { getCategoriaMeta } from './filters/filterOptions'
 import { formatTimeRange } from '../utils/dateHelpers'
 import { getAttendanceSummary } from '../utils/eventDisplay'
@@ -16,10 +17,13 @@ const SUMMARY_TONES = {
 }
 
 function EventCard({ event, layout = 'grid' }) {
+  const { user } = useAuth()
   const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false)
   const categoria = getCategoriaMeta(event.category, event.customCategory)
   const CategoriaIcon = categoria.icon
-  const summary = getAttendanceSummary(event)
+  // A ONG dona e o admin não confirmam presença: para eles, sem o convite
+  const canAttend = user?.userType !== 'ADMIN' && !(user != null && String(user.id) === String(event.organizer.id))
+  const summary = getAttendanceSummary(event, { invite: canAttend })
   const isList = layout === 'list'
 
   return (
