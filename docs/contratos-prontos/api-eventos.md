@@ -26,6 +26,7 @@ Datas: `date` é `LocalDate` (`"2026-10-11"`). Horas são `LocalTime`, e o front
   "title": "Feira de Adoção de Primavera",
   "description": "Mais de 40 animais resgatados procurando um lar.",
   "category": "ADOPTION_FAIR",
+  "customCategory": null,
   "date": "2026-10-11",
   "startTime": "09:00:00",
   "endTime": "16:00:00",
@@ -51,7 +52,8 @@ Datas: `date` é `LocalDate` (`"2026-10-11"`). Horas são `LocalTime`, e o front
 }
 ```
 
-- `category`: `ADOPTION_FAIR | HEALTH | BAZAAR | WORKSHOP` (feira de adoção, mutirão de saúde, bazar beneficente, workshop).
+- `category`: `ADOPTION_FAIR | HEALTH | BAZAAR | WORKSHOP | COLLECTION | MEETUP | OTHER` (feira de adoção, mutirão de saúde, bazar beneficente, workshop, arrecadação, passeio e encontro, outro). Os 3 últimos entraram na migração 017.
+- `customCategory`: nome livre da categoria quando `category = OTHER` (aparece no selo do evento); `null` nas outras.
 - `attendeesCount`: `COUNT` de `event_attendances` do evento.
 - `endTime`, `cep`, `number`, `complement`, `district`, `capacity`, `coverUrl` e `ngo.photoUrl` podem vir `null`.
 - `ngo` é montado a partir de `users` (dono do evento). Use `@JsonProperty("isVerified")`, como já é feito no `UserResponseDTO`.
@@ -66,6 +68,7 @@ O `PUT` recebe o objeto inteiro (substitui todos os campos).
   "title": "Feira de Adoção de Primavera",
   "description": "Mais de 40 animais resgatados procurando um lar.",
   "category": "ADOPTION_FAIR",
+  "customCategory": null,
   "date": "2026-10-11",
   "startTime": "09:00",
   "endTime": "16:00",
@@ -86,7 +89,8 @@ O `PUT` recebe o objeto inteiro (substitui todos os campos).
 |---|---|---|
 | `title` | sim | 3 a 120 caracteres |
 | `description` | sim | até 2000 caracteres |
-| `category` | sim | um dos 4 valores |
+| `category` | sim | um dos 7 valores |
+| `customCategory` | só com `OTHER` | até 30 caracteres; com `OTHER` sem nome, 400 "Dê um nome para a categoria."; nas outras categorias o backend grava `null` |
 | `date` | sim | `>= hoje` |
 | `startTime` | sim | — |
 | `endTime` | não | se vier, `> startTime` |
@@ -171,7 +175,8 @@ CREATE TABLE IF NOT EXISTS events (
     ngo_id       BIGINT        NOT NULL REFERENCES users(id),
     title        VARCHAR(120)  NOT NULL,
     description  TEXT          NOT NULL,
-    category     VARCHAR(20)   NOT NULL CHECK (category IN ('ADOPTION_FAIR', 'HEALTH', 'BAZAAR', 'WORKSHOP')),
+    category     VARCHAR(20)   NOT NULL CHECK (category IN ('ADOPTION_FAIR', 'HEALTH', 'BAZAAR', 'WORKSHOP', 'COLLECTION', 'MEETUP', 'OTHER')),
+    custom_category VARCHAR(30),
     date         DATE          NOT NULL,
     start_time   TIME          NOT NULL,
     end_time     TIME,

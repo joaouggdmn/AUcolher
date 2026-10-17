@@ -5,7 +5,7 @@ import { getCategoriaMeta } from '../../../eventos/components/filters/filterOpti
 import ActivityEmptyState from './ActivityEmptyState'
 
 function EventRowContent({ event, isCancelled }) {
-  const categoria = getCategoriaMeta(event.category)
+  const categoria = getCategoriaMeta(event.category, event.customCategory)
   const CategoriaIcon = categoria.icon
 
   return (

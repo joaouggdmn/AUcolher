@@ -117,7 +117,7 @@ function EventDetailPage() {
     )
   }
 
-  const categoria = getCategoriaMeta(event.category)
+  const categoria = getCategoriaMeta(event.category, event.customCategory)
   const CategoriaIcon = categoria.icon
   const summary = getAttendanceSummary(event)
   const address = formatEventAddress(event.location)

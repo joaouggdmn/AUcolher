@@ -106,6 +106,18 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
             <FieldError message={errors.category} />
           </div>
 
+          {values.category === 'OTHER' && (
+            <FormField
+              label="Nome da categoria"
+              value={values.customCategory}
+              onChange={(e) => setField('customCategory', e.target.value)}
+              placeholder="Ex: Cãominhada"
+              maxLength={EVENT_LIMITS.customCategory}
+              hint="Aparece no selo do evento."
+              {...fieldProps('customCategory')}
+            />
+          )}
+
           <TextAreaField
             label="Descrição"
             value={values.description}

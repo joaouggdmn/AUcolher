@@ -332,6 +332,7 @@ Perfil mais completo que o de usuário comum:
 
 - Só conta **ONG** cria evento; só a **ONG dona** edita, exclui e vê a lista de confirmados (painel `/ong/painel`).
 - Evento de um dia: data, início, término opcional, local com endereço (CEP opcional preenche o resto), capa opcional e **vagas opcionais**.
+- Categoria: feira de adoção, mutirão de saúde, bazar beneficente, workshop, arrecadação, passeio e encontro ou **outro**. Em "Outro", a ONG escreve um nome curto (até 30 caracteres) para eventos que não cabem nas outras; no filtro, "Outro" agrupa todos esses.
 - Pessoa e ONG logadas confirmam ou cancelam presença, **menos a ONG dona**. O admin não participa: no lugar do botão, ele vê "Remover evento".
 - Evento lotado mostra "Vagas esgotadas"; na edição, as vagas não podem ficar abaixo de quem já confirmou.
 - **Evento passado** (`data < hoje`) é somente leitura: não edita, não exclui, sem presença. Um evento de hoje fica aberto o dia inteiro.

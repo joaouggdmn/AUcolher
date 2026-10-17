@@ -26,6 +26,8 @@ export function toFrontendEvent(dto) {
     title: dto.title,
     description: dto.description ?? '',
     category: dto.category,
+    // Nome livre que a ONG deu quando a categoria é OTHER
+    customCategory: dto.customCategory ?? null,
     date: dto.date,
     startTime: toTime(dto.startTime),
     endTime: toTime(dto.endTime),
@@ -73,6 +75,7 @@ export function toEventPayload(values) {
     title: textOrNull(values.title),
     description: textOrNull(values.description),
     category: values.category || null,
+    customCategory: values.category === 'OTHER' ? textOrNull(values.customCategory) : null,
     date: values.date || null,
     startTime: values.startTime || null,
     endTime: values.endTime || null,
