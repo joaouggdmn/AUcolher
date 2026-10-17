@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FaCircleCheck, FaEye, FaEyeSlash, FaPen } from 'react-icons/fa6'
-import ConfirmModal from '../../../core/components/ui/ConfirmModal'
+import { FaEye, FaEyeSlash, FaPen } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { PANEL_PATHS } from '../../ong/panel/panelPaths'
@@ -29,7 +28,6 @@ const STATUS_META = {
 const SUCCESS_MESSAGES = {
   AVAILABLE: 'Anúncio de volta no ar!',
   INACTIVE: 'Anúncio tirado do ar. Você pode colocá-lo de volta quando quiser.',
-  ADOPTED: 'Que notícia boa! O animal foi marcado como adotado.',
 }
 
 const capitalize = (word) => word.charAt(0).toUpperCase() + word.slice(1)
@@ -39,12 +37,11 @@ const PRIMARY_BUTTON =
 const SECONDARY_BUTTON =
   'flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50 disabled:cursor-wait disabled:opacity-70'
 
-// Ações do dono na página de detalhes. Tirar do ar e voltar ao ar são
-// reversíveis; marcar como adotado é definitivo na API, então pede confirmação
+// Ações do dono na página de detalhes: tirar do ar e voltar ao ar. O
+// "adotado" só vem da conclusão do pedido, quando o adotante confirma a chegada
 function OwnerListingPanel({ animal, onStatusChanged }) {
   const { user } = useAuth()
   const { mutate: changeStatus, isPending, variables } = useChangeAnimalStatus()
-  const [isConfirmingAdoption, setIsConfirmingAdoption] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
 
   const meta = STATUS_META[animal.status] ?? STATUS_META.AVAILABLE
@@ -56,29 +53,11 @@ function OwnerListingPanel({ animal, onStatusChanged }) {
     changeStatus(
       { id: animal.id, status },
       {
-        onSuccess: () => {
-          setIsConfirmingAdoption(false)
-          onStatusChanged(SUCCESS_MESSAGES[status])
-        },
-        onError: (error) => {
-          setIsConfirmingAdoption(false)
-          setErrorMessage(getErrorMessage(error))
-        },
+        onSuccess: () => onStatusChanged(SUCCESS_MESSAGES[status]),
+        onError: (error) => setErrorMessage(getErrorMessage(error)),
       },
     )
   }
-
-  const adoptButton = (className) => (
-    <button
-      type="button"
-      onClick={() => setIsConfirmingAdoption(true)}
-      disabled={isPending}
-      className={className}
-    >
-      <FaCircleCheck size={14} />
-      Marcar como {adoptedWord}
-    </button>
-  )
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
@@ -92,7 +71,6 @@ function OwnerListingPanel({ animal, onStatusChanged }) {
 
       {animal.status === 'AVAILABLE' && (
         <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
-          {adoptButton(PRIMARY_BUTTON)}
           <button
             type="button"
             onClick={() => handleChange('INACTIVE')}
@@ -124,7 +102,6 @@ function OwnerListingPanel({ animal, onStatusChanged }) {
             )}
             Colocar no ar de novo
           </button>
-          {adoptButton(SECONDARY_BUTTON)}
         </div>
       )}
 
@@ -145,16 +122,6 @@ function OwnerListingPanel({ animal, onStatusChanged }) {
         </p>
       )}
 
-      {isConfirmingAdoption && (
-        <ConfirmModal
-          title={`${animal.name} foi ${adoptedWord}?`}
-          message="Essa ação é definitiva: o anúncio sai da vitrine e do seu perfil público e não pode mais ser editado nem voltar ao ar."
-          confirmLabel={pendingStatus === 'ADOPTED' ? 'Salvando...' : `Sim, foi ${adoptedWord}`}
-          onConfirm={() => handleChange('ADOPTED')}
-          onCancel={() => setIsConfirmingAdoption(false)}
-          isConfirming={pendingStatus === 'ADOPTED'}
-        />
-      )}
     </div>
   )
 }
