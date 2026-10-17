@@ -15,6 +15,12 @@ import Avatar from "../../../core/components/ui/Avatar";
 import { animalDisplayName } from "../utils/requestAnimal";
 import ReturnInfo from "./ReturnInfo";
 
+// Ações empilhadas do pedido aceito: mesma altura e largura, uma por linha.
+// Lado a lado no grid de 3 colunas, "Confirmar entrega" quebrava a linha e
+// ficava desalinhado do botão do chat
+const STACKED_ACTION =
+  "flex h-10 w-full items-center justify-center gap-1.5 rounded-xl border text-sm font-bold transition-colors duration-300";
+
 function ReceivedRequestCard({
   request,
   onAccept,
@@ -141,40 +147,40 @@ function ReceivedRequestCard({
           )}
 
           {status === "ACCEPTED" && (
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => onGoToChat(request)}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-emerald-200 py-2.5 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-emerald-50"
-              >
-                <FaComments size={13} />
-                Ir para o Chat
-              </button>
+            <div className="flex flex-col gap-2">
               <button
                 type="button"
                 onClick={() => onRequestDelivery(request)}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-2.5 text-sm font-bold text-emerald-950 shadow-md shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400"
+                className={`${STACKED_ACTION} border-transparent bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md shadow-amber-500/30 hover:from-amber-300 hover:to-amber-400`}
               >
-                <FaHandHoldingHeart size={14} />
-                Confirmar Entrega
+                <FaHandHoldingHeart size={13} />
+                Confirmar entrega
+              </button>
+              <button
+                type="button"
+                onClick={() => onGoToChat(request)}
+                className={`${STACKED_ACTION} border-emerald-200 text-emerald-700 hover:bg-emerald-50`}
+              >
+                <FaComments size={13} />
+                Ir para o chat
               </button>
             </div>
           )}
 
           {status === "AWAITING_DELIVERY" && (
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => onGoToChat(request)}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-emerald-200 py-2.5 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-emerald-50"
-              >
-                <FaComments size={13} />
-                Ir para o Chat
-              </button>
-              <div className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-amber-50 py-2.5 text-sm font-extrabold text-amber-700">
+            <div className="flex flex-col gap-2">
+              <div className={`${STACKED_ACTION} border-transparent bg-amber-50 font-extrabold text-amber-700`}>
                 <FaClock size={13} />
                 Aguardando adotante
               </div>
+              <button
+                type="button"
+                onClick={() => onGoToChat(request)}
+                className={`${STACKED_ACTION} border-emerald-200 text-emerald-700 hover:bg-emerald-50`}
+              >
+                <FaComments size={13} />
+                Ir para o chat
+              </button>
             </div>
           )}
 
