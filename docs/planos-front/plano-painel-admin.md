@@ -1,8 +1,8 @@
 # AUcolher — Plano: painel do admin e denúncias
 
-> Plano aprovado em 2026-10-10. Complementa as seções 8 e 9 de `regras-de-negocios.md`. Documento vivo: marcar os blocos (✅) conforme forem entregues e registrar desvios.
+> Complementa as seções 8 e 9 de `regras-de-negocios.md`. Documento vivo: marcar os blocos (✅) conforme forem entregues e registrar desvios.
 >
-> **Status em 2026-10-11:** branch 1 (backend) mergeada, com a migração 003 aplicada no `aucolher_db`. Branch 2 (`feature/painel-admin`) mergeada no PR #6. Branch 3 (`feature/denuncias`) começou: decisões e blocos D1–D4 na seção 4.
+> **Status:** branch 1 (backend) mergeada, com a migração 003 aplicada no `aucolher_db`. Branch 2 (`feature/painel-admin`) mergeada no PR #6. Branch 3 (`feature/denuncias`) começou: decisões e blocos D1–D4 na seção 4.
 
 ## Contexto
 
@@ -15,7 +15,7 @@ As áreas de usuário e de ONG estão prontas (painel da ONG em `/ong/painel`, P
 
 Caminhos abaixo são relativos a `src/` (frontend) ou a `src/main/java/com/aucolher/api/` (backend), salvo indicação.
 
-## 1. Decisões (2026-10-10)
+## 1. Decisões
 
 ### Organização
 - **Três branches, uma depois da outra**, cada uma com PR próprio:
@@ -83,7 +83,7 @@ componente → hook React Query (features/admin/hooks/useAdmin.js)
   - nada de `setState` dentro de effect;
   - arquivos `.jsx` só exportam componentes.
 
-## 3. Contrato `/api/admin/*` (rascunho, detalhado em `docs/api-admin.md` no bloco F3)
+## 3. Contrato `/api/admin/*` (rascunho, detalhado em `contratos-prontos/api-admin.md` no bloco F3)
 
 | Método | Rota | Quem | Observação |
 |---|---|---|---|
@@ -122,7 +122,7 @@ Rascunho do `stats`:
 
 ### Branch 1 — backend `feature/admin-login`
 
-- [x] **B1. Tipo ADMIN, ONG verificada e migração** — feito em 2026-10-10 (testes ok; 003 testada em banco temporário: recusa ADMIN antes, aceita depois, marca ONGs, roda 2x sem erro)
+- [x] **B1. Tipo ADMIN, ONG verificada e migração** (testes ok; 003 testada em banco temporário: recusa ADMIN antes, aceita depois, marca ONGs, roda 2x sem erro)
   - `user/entity/UserType.java`: acrescentar `ADMIN`.
   - `auth/AuthService.java#registerNgo`: `.verified(true)` e trocar o comentário do "fluxo temporário".
   - `sql/migrations/003_admin_and_verified_ngos.sql`, numa transação:
@@ -130,7 +130,7 @@ Rascunho do `stats`:
     - `UPDATE users SET is_verified = TRUE WHERE user_type = 'NGO'`;
     - comentário novo em `is_verified`.
   - `sql/schema.sql` com a mesma CHECK e o mesmo comentário. Copiar igual para `frontend/AUcolher/docs/script_banco_aucolher.sql`.
-- [x] **B2. Primeira conta admin e `/api/admin/**`** — feito em 2026-10-10. Testado de ponta a ponta em banco temporário: o admin loga com `userType: ADMIN`; reiniciar não duplica nem troca a senha; ONG nova sai verificada; `/api/admin` dá 401 sem token, 403 para pessoa e passa para o admin. **Desvio**: o `SecurityConfig` passou a liberar o repasse interno para `/error` (`DispatcherType.ERROR`) — sem isso todo 403 da camada de segurança chegava ao front como 401, e o `api.js` desloga no 401. A 003 já foi aplicada no `aucolher_db` (backup antes).
+- [x] **B2. Primeira conta admin e `/api/admin/**`**. Testado de ponta a ponta em banco temporário: o admin loga com `userType: ADMIN`; reiniciar não duplica nem troca a senha; ONG nova sai verificada; `/api/admin` dá 401 sem token, 403 para pessoa e passa para o admin. **Desvio**: o `SecurityConfig` passou a liberar o repasse interno para `/error` (`DispatcherType.ERROR`) — sem isso todo 403 da camada de segurança chegava ao front como 401, e o `api.js` desloga no 401. A 003 já foi aplicada no `aucolher_db` (backup antes).
   - `auth/AdminAccountInitializer.java` (`ApplicationRunner`) lê `app.admin.email|password|name`:
     - em branco: só avisa no log;
     - e-mail novo: cria a conta `ADMIN`, `LOCAL`, ativa, com a senha via `PasswordEncoder`;
@@ -138,7 +138,7 @@ Rascunho do `stats`:
   - `application.properties`: `app.admin.email=${ADMIN_EMAIL:}`, `app.admin.password=${ADMIN_PASSWORD:}`, `app.admin.name=${ADMIN_NAME:Administrador}`.
   - `config/SecurityConfig.java`: `.requestMatchers("/api/admin/**").hasRole("ADMIN")` antes do `anyRequest()`.
   - Teste `AdminAccountInitializerTest` (Mockito, no padrão do `AnimalServiceTest`) com 3 casos: cria; não duplica; ignora quando falta configuração.
-- [x] **B3. README** — feito em 2026-10-11: valores de `userType`, migração 003, variáveis `ADMIN_*` e como defini-las no IntelliJ (Run Configuration → Environment variables).
+- [x] **B3. README**: valores de `userType`, migração 003, variáveis `ADMIN_*` e como defini-las no IntelliJ (Run Configuration → Environment variables).
 
 **Verificação**
 - Compilar e rodar os testes com o Maven do IntelliJ e o JDK 21.
@@ -155,18 +155,18 @@ psql -U postgres -h localhost -d aucolher_db -f sql/migrations/003_admin_and_ver
 
 ### Branch 2 — frontend `feature/painel-admin`
 
-- [x] **F1. Refatoração: peças comuns dos painéis em `core/`** (sem mudança visual no painel da ONG) — feito em 2026-10-11. Desvio: no lugar de `monthlyColumns(items, ...)` ficaram duas funções, `bucketByMonth(items, { dateOf, valueOf })` (soma itens soltos por mês) e `monthColumns(points, { months, formatValue, countLabel })` (série mensal → colunas), porque o `stats` do admin já chega somado por mês; saída de `monthlyDonationColumns` conferida igual à antiga. `AnimalStatusChart` e `panelCharts.js` continuam em `features/ong`. Lint: 9 erros, os mesmos de antes.
+- [x] **F1. Refatoração: peças comuns dos painéis em `core/`** (sem mudança visual no painel da ONG). Desvio: no lugar de `monthlyColumns(items, ...)` ficaram duas funções, `bucketByMonth(items, { dateOf, valueOf })` (soma itens soltos por mês) e `monthColumns(points, { months, formatValue, countLabel })` (série mensal → colunas), porque o `stats` do admin já chega somado por mês; saída de `monthlyDonationColumns` conferida igual à antiga. `AnimalStatusChart` e `panelCharts.js` continuam em `features/ong`. Lint: 9 erros, os mesmos de antes.
   - `core/components/panel/PanelShell.jsx` (sai de `features/ong/panel/OngPanelLayout.jsx`), `PanelNav.jsx` (sai de `PanelSidebar.jsx`, configurável por props) e `PanelPage.jsx`.
   - `core/components/charts/*`, que saem de `features/ong/components/dashboard/charts/`.
   - `features/ong/utils/panelCharts.js`: nova `monthlyColumns(items, { dateOf, valueOf, months, format })`; `monthlyDonationColumns` vira atalho dela.
-- [x] **F2. Acesso do admin** — feito em 2026-10-11. Desvios: `core/utils/panelLinks.js` (`getPanelLink`, `getHomePath`) concentra o atalho do painel por papel (navbar, menu do avatar, menu lateral); o `GuestRoute` passou a decidir o destino depois do login (página de origem ou início do papel) — antes ele mandava todo mundo para `/` e atropelava o redirecionamento do login, inclusive o "voltar para onde estava". Testado num ambiente isolado (API 8089 + banco temporário + front 5174): admin → `/admin`; pessoa e ONG em `/admin` → `/`; `/admin/dashboard` → `/admin`; login vindo de `/favoritos` volta para lá.
+- [x] **F2. Acesso do admin**. Desvios: `core/utils/panelLinks.js` (`getPanelLink`, `getHomePath`) concentra o atalho do painel por papel (navbar, menu do avatar, menu lateral); o `GuestRoute` passou a decidir o destino depois do login (página de origem ou início do papel) — antes ele mandava todo mundo para `/` e atropelava o redirecionamento do login, inclusive o "voltar para onde estava". Testado num ambiente isolado (API 8089 + banco temporário + front 5174): admin → `/admin`; pessoa e ONG em `/admin` → `/`; `/admin/dashboard` → `/admin`; login vindo de `/favoritos` volta para lá.
   - `AdminRoute` passa a checar `userType`. `LoginPage` manda o ADMIN para `/admin` quando não há `from`.
   - Link "Painel do admin" em `Navbar.jsx`, `UserAvatarMenu.jsx` e `PlatformSidebar.jsx`. `useProfileCompletion` ignora ADMIN.
   - `features/admin/panel/`: `adminPaths.js` (`/admin`, `/admin/usuarios`, `/admin/animais`, `/admin/campanhas`, `/admin/eventos`), `AdminPanelLayout.jsx` e `useAdminPanel.js`.
   - `routers/protectedRoutes.jsx`: rotas novas. `/admin/dashboard`, `/admin/estatisticas` e `/admin/aprovacoes` redirecionam para `/admin`.
   - Apagar os arquivos vazios sem uso: `OngApprovalsPage`, `OngApprovalCard`, `StatisticsPage`, `core/components/layout/AdminLayout.jsx` e os outros 0 B substituídos.
-- [x] **F3. Camada de dados** — feito em 2026-10-11; contrato completo em `docs/api-admin.md`. Desvio: ids repetidos entre o seed e o banco real — a conta vista nos dados reais (dono de animal da API, ONG de campanha/evento) ocupa o lugar da fictícia quando o nome é outro; o ranking usa o nome do próprio dado. Testado contra a API de teste (3 animais reais + seed): números, listas e 403 para quem não é admin.: trio `adminApi`/`adminMock`/`adminService`, hooks, flag, chave, sync, seed de contas, leituras de admin em `doacoesMock`/`eventosMock` e `docs/api-admin.md` com o contrato completo.
-- [x] **F4. Visão geral** — feito em 2026-10-11. 8 blocos (inclui "contas novas neste mês"), gráficos mensais com mensagem quando tudo é zero, situação + espécie no mesmo cartão, funil, ranking de ONGs e atividade recente. Extras: `StatTile` comum aos dois painéis; helpers `*FromCounts` em `panelCharts.js`; `BarList` aceita `valueText`; a dica dos gráficos se alinha pela borda de dentro nas pontas (antes a da última coluna vazava e criava rolagem lateral, também no painel da ONG). Paleta validada (verde/âmbar/azul, inclusive daltonismo).
+- [x] **F3. Camada de dados**; contrato completo em `contratos-prontos/api-admin.md`. Desvio: ids repetidos entre o seed e o banco real — a conta vista nos dados reais (dono de animal da API, ONG de campanha/evento) ocupa o lugar da fictícia quando o nome é outro; o ranking usa o nome do próprio dado. Testado contra a API de teste (3 animais reais + seed): números, listas e 403 para quem não é admin.: trio `adminApi`/`adminMock`/`adminService`, hooks, flag, chave, sync, seed de contas, leituras de admin em `doacoesMock`/`eventosMock` e `contratos-prontos/api-admin.md` com o contrato completo.
+- [x] **F4. Visão geral**. 8 blocos (inclui "contas novas neste mês"), gráficos mensais com mensagem quando tudo é zero, situação + espécie no mesmo cartão, funil, ranking de ONGs e atividade recente. Extras: `StatTile` comum aos dois painéis; helpers `*FromCounts` em `panelCharts.js`; `BarList` aceita `valueText`; a dica dos gráficos se alinha pela borda de dentro nas pontas (antes a da última coluna vazava e criava rolagem lateral, também no painel da ONG). Paleta validada (verde/âmbar/azul, inclusive daltonismo).
   - Números: contas (pessoas · ONGs), animais disponíveis, adoções em andamento, adoções concluídas, total arrecadado, campanhas ativas, eventos próximos.
   - Gráficos:
     - adoções concluídas por mês;
@@ -178,22 +178,22 @@ psql -U postgres -h localhost -d aucolher_db -f sql/migrations/003_admin_and_ver
     - top 5 ONGs (arrecadação e adoções);
     - atividade recente da plataforma.
   - Período de 6 meses, igual ao painel da ONG (o helper aceita `months`).
-- [x] **F5. Exportar PDF** — feito em 2026-10-11. `PanelPage` ganhou ações com `onClick` e `printHeader` (troca o título pelo cabeçalho do relatório na impressão); `usePrintTimestamp` grava a hora no `beforeprint` (botão ou Ctrl+P). Conferido gerando o PDF de verdade num Chrome headless (A4, 3 páginas, sem barra lateral, gráficos coloridos, textos dos blocos sem corte).
+- [x] **F5. Exportar PDF**. `PanelPage` ganhou ações com `onClick` e `printHeader` (troca o título pelo cabeçalho do relatório na impressão); `usePrintTimestamp` grava a hora no `beforeprint` (botão ou Ctrl+P). Conferido gerando o PDF de verdade num Chrome headless (A4, 3 páginas, sem barra lateral, gráficos coloridos, textos dos blocos sem corte).
   - O botão chama `window.print()`.
   - `print:hidden` na barra lateral, no cabeçalho e nos botões.
   - Na impressão, o shell perde `h-screen`/`overflow`, para sair a página inteira.
   - Cabeçalho que só aparece impresso: "Relatório AUcolher · gerado em dd/mm/aaaa hh:mm".
   - `break-inside-avoid` nos cards.
   - Em `styles/global.css`: `@page { size: A4; margin: 12mm }` e `print-color-adjust: exact`.
-- [x] **F6. Usuários** — feito em 2026-10-11. Busca (nome, e-mail, cidade) com `core/utils/search.js` (`matchesSearch`, também usado agora no painel da ONG), filtros por tipo e — só quando houver banidas — por situação, 20 por vez com "Mostrar mais". O selo `VerifiedBadge` deixou de falar em "cadastro aprovado pela equipe".
+- [x] **F6. Usuários**. Busca (nome, e-mail, cidade) com `core/utils/search.js` (`matchesSearch`, também usado agora no painel da ONG), filtros por tipo e — só quando houver banidas — por situação, 20 por vez com "Mostrar mais". O selo `VerifiedBadge` deixou de falar em "cadastro aprovado pela equipe".
   - Busca, filtros (tipo, status), mais recentes primeiro.
   - Cada linha: avatar, nome, tipo, selo, cidade/UF, membro desde, nº de animais e "Ver perfil".
-- [x] **F7. Animais** — feito em 2026-10-11. Situação calculada por `withPlatformAdoptionStatus` (mesmo critério do adminMock, então a página bate com a Visão geral); filtros de situação e espécie, busca por nome, raça, quem anunciou e cidade; link para o anúncio e para o perfil de quem anunciou. Testado com pedido aceito (em processo) e concluído (adotado).: gráficos de situação e espécie, busca, filtros (situação, espécie), linhas no estilo do `AnimalRow` e "Ver anúncio".
-- [x] **F8. Campanhas e Eventos** — feito em 2026-10-11. Cada página tem 4 blocos de números, um gráfico por categoria (arrecadado / quantidade), filtros por situação (com contagem) e busca. Situações e rótulos em `features/admin/utils/listStatus.js`. Excluídas e canceladas aparecem sem link (não têm mais página pública).
+- [x] **F7. Animais**. Situação calculada por `withPlatformAdoptionStatus` (mesmo critério do adminMock, então a página bate com a Visão geral); filtros de situação e espécie, busca por nome, raça, quem anunciou e cidade; link para o anúncio e para o perfil de quem anunciou. Testado com pedido aceito (em processo) e concluído (adotado).: gráficos de situação e espécie, busca, filtros (situação, espécie), linhas no estilo do `AnimalRow` e "Ver anúncio".
+- [x] **F8. Campanhas e Eventos**. Cada página tem 4 blocos de números, um gráfico por categoria (arrecadado / quantidade), filtros por situação (com contagem) e busca. Situações e rótulos em `features/admin/utils/listStatus.js`. Excluídas e canceladas aparecem sem link (não têm mais página pública).
   - Campanhas: total arrecadado e filtros ativas/encerradas/removidas.
   - Eventos: próximos/passados/cancelados, com confirmados.
   - Links para as páginas públicas.
-- [x] **F9. Dados de teste do admin (só dev)** — feito em 2026-10-11. Card na Visão geral (só em `npm run dev`, nunca na impressão): ~18 contas novas, 15 adoções concluídas e o resto do funil, e 5 campanhas encerradas com doações, tudo nos últimos 6 meses e com curva crescente. Marcados com `adminDemo` (o "Apagar" do painel da ONG usa `demo` e não mexe nisto, e vice-versa); donos são as ONGs geradas (ids ≥ 101), que não existem no banco real. Desvio: sem eventos de teste — o seed de eventos já cobre todos os estados. Testado: gerar enche os gráficos; apagar volta exatamente aos números de antes.
+- [x] **F9. Dados de teste do admin (só dev)**. Card na Visão geral (só em `npm run dev`, nunca na impressão): ~18 contas novas, 15 adoções concluídas e o resto do funil, e 5 campanhas encerradas com doações, tudo nos últimos 6 meses e com curva crescente. Marcados com `adminDemo` (o "Apagar" do painel da ONG usa `demo` e não mexe nisto, e vice-versa); donos são as ONGs geradas (ids ≥ 101), que não existem no banco real. Desvio: sem eventos de teste — o seed de eventos já cobre todos os estados. Testado: gerar enche os gráficos; apagar volta exatamente aos números de antes.
   - Card como o `ong/panel/dev/DemoDataCard.jsx`.
   - Gera contas, adoções concluídas espalhadas nos meses e campanhas/doações/eventos de várias ONGs (`insertDemoCampaigns`, `insertDemoEvents`), tudo com `demo: true`.
   - Botão "Apagar" para remover o que gerou.
@@ -211,9 +211,9 @@ psql -U postgres -h localhost -d aucolher_db -f sql/migrations/003_admin_and_ver
 
 ### Branch 3 — frontend `feature/denuncias`
 
-Criada da `main` em 2026-10-11, depois do merge do PR #6 (painel do admin). Os pontos em aberto da seção 5 foram fechados no mesmo dia (todas as recomendações aceitas).
+Criada da `main` depois do merge do PR #6 (painel do admin). Os pontos em aberto da seção 5 foram fechados no mesmo dia (todas as recomendações aceitas).
 
-**Decisões (2026-10-11)**
+**Decisões**
 - Alvos: **anúncios de animais** e **perfis de pessoa/ONG**. Campanhas, eventos e avaliações ficam fora.
 - Categorias conforme o alvo; descrição de até 500 caracteres, obrigatória em "Outro":
   - anúncio: conteúdo impróprio, maus-tratos, golpe/fraude, spam, outro;
@@ -235,24 +235,24 @@ Criada da `main` em 2026-10-11, depois do merge do PR #6 (painel do admin). Os p
   - pedidos (localStorage): banir cancela os pedidos ativos da conta (`cancelReason: 'ACCOUNT_BANNED'`), e a outra parte vê o motivo.
 
 **Blocos** (um commit cada; o usuário commita e dá push ao fim de cada um)
-- [x] **D1. Denunciar (lado do site)** — feito em 2026-10-11. Testado no ambiente isolado: anúncio e perfil denunciados ("Denúncia em análise" depois), validação de motivo e de "Outro", 409 na repetida, 400 no próprio conteúdo e motivo inválido para o alvo, convite para logar (e volta ao anúncio depois do login), botão escondido para o dono e para o admin, rodapé "Como denunciar", layout em 375 px. Extra: seed com 4 denúncias pendentes contra os perfis 5, 6 e 7 e 1 arquivada contra o 1.
+- [x] **D1. Denunciar (lado do site)**. Testado no ambiente isolado: anúncio e perfil denunciados ("Denúncia em análise" depois), validação de motivo e de "Outro", 409 na repetida, 400 no próprio conteúdo e motivo inválido para o alvo, convite para logar (e volta ao anúncio depois do login), botão escondido para o dono e para o admin, rodapé "Como denunciar", layout em 375 px. Extra: seed com 4 denúncias pendentes contra os perfis 5, 6 e 7 e 1 arquivada contra o 1.
   - Camada de dados das denúncias: flag, chave, `queryKeys.denuncias`, sync entre abas, trio + hooks.
   - `ReportButton`, `ReportModal`, `ReportReasonSelect` (portal, `AuthRequiredModal` para quem não logou, "Denúncia em análise" quando já existe uma aberta, escondido no próprio conteúdo e para o admin).
   - Botão no detalhe do animal e no perfil público. Rodapé: "Denunciar anúncio" abre uma explicação de como denunciar (a rota `/denuncia` não existe).
-  - `docs/api-admin.md`: `POST /api/reports` e `GET /api/reports/mine`.
-- [x] **D2. Tela Denúncias no admin (consultar e arquivar)** — feito em 2026-10-11. Rota de arquivar por id (`POST /api/admin/reports/{id}/dismiss`, resolve o alvo inteiro), em vez de mandar o alvo no corpo: assim o mock não precisa do nome para separar perfis com id repetido. Abas Pendentes/Julgadas, filtro Anúncios/Perfis, pendentes ordenados pelos mais denunciados. Grupo "Moderação" na barra lateral com badge de casos; aviso "N casos de denúncia aguardando análise" na Visão geral (sai também no PDF, sem o botão). Apagados os vazios `ReportsPage.jsx` e `ReportTable.jsx`. Testado: badge e aviso batem (4 casos/6 denúncias), arquivar move para Julgadas e atualiza badge e aviso, layout em 375 px.
+  - `contratos-prontos/api-admin.md`: `POST /api/reports` e `GET /api/reports/mine`.
+- [x] **D2. Tela Denúncias no admin (consultar e arquivar)**. Rota de arquivar por id (`POST /api/admin/reports/{id}/dismiss`, resolve o alvo inteiro), em vez de mandar o alvo no corpo: assim o mock não precisa do nome para separar perfis com id repetido. Abas Pendentes/Julgadas, filtro Anúncios/Perfis, pendentes ordenados pelos mais denunciados. Grupo "Moderação" na barra lateral com badge de casos; aviso "N casos de denúncia aguardando análise" na Visão geral (sai também no PDF, sem o botão). Apagados os vazios `ReportsPage.jsx` e `ReportTable.jsx`. Testado: badge e aviso batem (4 casos/6 denúncias), arquivar move para Julgadas e atualiza badge e aviso, layout em 375 px.
   - `GET /api/admin/reports`, `POST /api/admin/reports/dismiss`; `stats.reports`.
   - `/admin/denuncias`: pendentes/resolvidas, agrupadas por alvo ("3 denúncias"), com a cópia do alvo, motivos e descrições; "Arquivar".
   - Badge de casos pendentes na barra lateral e aviso na Visão geral.
-- [x] **D3. Banir e reativar contas** — feito em 2026-10-11. Rotas `PATCH /api/admin/users/{id}/status` e `POST /api/admin/reports/{id}/ban` (pela denúncia, o nome da conta vem da cópia do alvo; pela lista, do próprio admin mock, que tem uma conta por id). Decisões em `moderationMock` + `useModeration` (useSyncExternalStore, reage a outras abas). Extras: adotantes dos pedidos entram na lista de Usuários; situação "ONG banida" em Campanhas/Eventos e "Fora do ar" + "Conta banida" em Animais, batendo com a Visão geral; o admin abre anúncio/perfil de conta banida com uma faixa de aviso; a conversa já aberta fica travada com o motivo. Testado: banir pela lista e pela denúncia (pedidos cancelados com motivo, denúncias resolvidas, vitrine/detalhe/perfil/campanhas/eventos/AUmatch filtrados, login recusado, sessão aberta em outra aba derrubada sem apagar a do admin), reativar (conteúdo volta, pedidos continuam cancelados), Visão geral batendo com as listas.
+- [x] **D3. Banir e reativar contas**. Rotas `PATCH /api/admin/users/{id}/status` e `POST /api/admin/reports/{id}/ban` (pela denúncia, o nome da conta vem da cópia do alvo; pela lista, do próprio admin mock, que tem uma conta por id). Decisões em `moderationMock` + `useModeration` (useSyncExternalStore, reage a outras abas). Extras: adotantes dos pedidos entram na lista de Usuários; situação "ONG banida" em Campanhas/Eventos e "Fora do ar" + "Conta banida" em Animais, batendo com a Visão geral; o admin abre anúncio/perfil de conta banida com uma faixa de aviso; a conversa já aberta fica travada com o motivo. Testado: banir pela lista e pela denúncia (pedidos cancelados com motivo, denúncias resolvidas, vitrine/detalhe/perfil/campanhas/eventos/AUmatch filtrados, login recusado, sessão aberta em outra aba derrubada sem apagar a do admin), reativar (conteúdo volta, pedidos continuam cancelados), Visão geral batendo com as listas.
   - `PATCH /api/admin/users/{id}/status`, que também resolve as denúncias pendentes da conta e dos anúncios dela.
   - Efeitos: login recusado e sessão encerrada; perfil indisponível; animais, campanhas e eventos da conta somem (vitrine, detalhe, perfil, favoritos, AUmatch); pedidos ativos cancelados com o motivo (pedidos recebidos e conversa travada com aviso).
   - Botões: Usuários (banir/reativar) e Denúncias (banir conta / banir quem anunciou).
-- [x] **D4. Remover conteúdo** — feito em 2026-10-11. Rotas `DELETE /api/admin/animals|campaigns|events/{id}`; a tela de Denúncias usa a do animal (id único, sem rota por denúncia). Anúncio removido ganha o status `REMOVED` (dono vê "Removido pela moderação" no painel e em Minha conta, sem ações; editar/status dão 403); pedidos ativos do animal cancelados com `LISTING_REMOVED` (conversa travada com aviso); campanha removida fica marcada (histórico de quem doou diz "removida pela moderação"); evento vira cancelado. Situação "Removido(a) pela moderação" nas listas do admin e no gráfico de situação (rosa claro). **Verificação só com lint, build e revisão do código**: a pedido do usuário, o backend de teste foi desligado no início do bloco para economizar tokens, e sem ele não há como logar no navegador.
+- [x] **D4. Remover conteúdo**. Rotas `DELETE /api/admin/animals|campaigns|events/{id}`; a tela de Denúncias usa a do animal (id único, sem rota por denúncia). Anúncio removido ganha o status `REMOVED` (dono vê "Removido pela moderação" no painel e em Minha conta, sem ações; editar/status dão 403); pedidos ativos do animal cancelados com `LISTING_REMOVED` (conversa travada com aviso); campanha removida fica marcada (histórico de quem doou diz "removida pela moderação"); evento vira cancelado. Situação "Removido(a) pela moderação" nas listas do admin e no gráfico de situação (rosa claro). **Verificação só com lint, build e revisão do código**: a pedido do usuário, o backend de teste foi desligado no início do bloco para economizar tokens, e sem ele não há como logar no navegador.
   - `DELETE /api/admin/animals/{id}`, `/campaigns/{id}`, `/events/{id}`; resolvem as denúncias pendentes do anúncio.
   - Efeitos: anúncio some do site e aparece "Removido pela moderação" para o dono; campanha/evento somem.
   - Botões: Animais, Campanhas, Eventos e Denúncias (remover anúncio).
-  - Fechar a documentação: `regras-de-negocios.md` §8 e `api-admin.md`.
+  - Fechar a documentação: `regras-de-negocios.md` §8 e `../contratos-prontos/api-admin.md`.
 
 **Verificação** (a cada bloco): `npm run lint` sem erro novo, `npm run build` e teste no navegador no ambiente isolado (API 8089 + banco temporário + front 5174), nunca no `aucolher_db`.
 
@@ -281,7 +281,7 @@ Criada da `main` em 2026-10-11, depois do merge do PR #6 (painel do admin). Os p
   - Com o backend pronto, isso vem da API (`users.active = false`, que o login já bloqueia) e os filtros do front deixam de ser necessários.
 - **Rodapé**: o link "Denunciar anúncio" (`core/components/layout/Footer.jsx`) aponta para `/denuncia`, que não existe. Ele passa a explicar como denunciar.
 
-**Confirmado em 2026-10-11** (detalhes na branch 3, seção 4)
+**Confirmado** (detalhes na branch 3, seção 4)
 - [x] Lista de categorias: a proposta, conforme o alvo.
 - [x] "Arquivar (improcedente)": sim.
 - [x] Reativar conta banida: sim.

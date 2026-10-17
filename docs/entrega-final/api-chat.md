@@ -1,6 +1,6 @@
 # AUcolher — Contrato da API: chat dos pedidos de adoção
 
-> Versão 1 (13/10/2026). Hoje o chat é todo do navegador: as mensagens ficam no `localStorage` (`chat_messages_{requestId}`), a última leitura também (`aucolher_chat_last_seen_{userId}`), e as mensagens de sistema são escritas pelo próprio front (`core/hooks/useConcludeAdoption.js`). Cada navegador tem a sua conversa, então as duas partes **não se veem**.
+> Migração **011**. Hoje, sem a API, o chat roda num mock do navegador (`localStorage`): cada navegador tem a sua conversa, então as duas partes **não se veem**.
 > Este contrato leva o chat para o banco. Ele segue o padrão do resto da API: rotas, campos e enums em inglês, erros no `ErrorResponseDTO` com a frase pronta em `message`.
 > **Decisão:** as mensagens novas chegam por **polling** (o front pergunta de tempos em tempos), sem WebSocket. É REST comum no Spring, e o modal do PIX já usa o mesmo padrão.
 
@@ -18,18 +18,20 @@
 - **Quem pode mandar mensagem.** Só em `ACCEPTED`. Em qualquer outro status a conversa é **somente leitura**: o histórico aparece, o campo de texto some.
   - `AWAITING_DELIVERY`: o dono confirmou a entrega e o chat trava (regras §3.1, passo 3).
   - `CONCLUDED` e `CANCELLED`: encerrada.
-  - Banimento e anúncio removido pela moderação já cancelam o pedido (`api-denuncias-moderacao.md`), então a conversa trava sozinha, sem regra extra.
+  - Banimento e anúncio removido pela moderação já cancelam o pedido (`../contratos-prontos/api-denuncias-moderacao.md`), então a conversa trava sozinha, sem regra extra.
 - **Mensagem de pessoa.** Só texto, de **1 a 1000 caracteres** depois de aparar os espaços das pontas. Quebras de linha no meio valem. Sem anexos nem imagens.
 - **Mensagens de sistema.** São os avisos centralizados no meio da conversa ("O doador confirmou a entrega de Rex...").
   - Passam a ser criadas **pelo backend**, na **mesma transação** da troca de status do pedido. Assim as duas partes veem o aviso, e ele nunca existe sem a troca de status (nem o contrário).
   - O banco guarda um **código** (`systemEvent`), não o texto. O front monta a frase em português com o nome do animal, como já faz com o `cancelReason`.
 
-| `systemEvent` | Quando o backend cria | Texto que o front mostra (hoje) |
+| `systemEvent` | Quando o backend cria | Texto que o front mostra |
 |---|---|---|
 | `DELIVERY_REQUESTED` | `ACCEPTED → AWAITING_DELIVERY` | "O doador confirmou a entrega de {animal}. O chat foi bloqueado para novas mensagens — quando o pet chegar até você, confirme o recebimento para concluir a adoção." |
 | `ADOPTION_CONCLUDED` | `AWAITING_DELIVERY → CONCLUDED` | "Adoção de {animal} concluída! Parabéns pelo novo membro da família." |
 | `ADOPTER_WITHDREW` | adotante cancela **a partir de** `ACCEPTED` ou `AWAITING_DELIVERY` | "O adotante cancelou o pedido de adoção de {animal}." |
 | `OWNER_WITHDREW` | dono cancela (`ACCEPTED` ou `AWAITING_DELIVERY`) | "O doador desistiu da adoção de {animal}. O pedido foi cancelado." |
+| `ANIMAL_RETURNED` | dono registra o retorno (`CONCLUDED → RETURNED`, `../contratos-prontos/api-devolucao-reabandono.md` §1.6) | "{animal} voltou para quem doou." |
+| `ANIMAL_REHOMED` | adotante republica (`CONCLUDED → REHOMED`) | "{adotante} anunciou {animal} para uma nova adoção." |
 
   - O adotante que cancela um pedido ainda `PENDING` **não** gera mensagem: não havia conversa.
   - Os cancelamentos feitos pelo sistema (`ANIMAL_ADOPTED`, `ANIMAL_UNAVAILABLE`, `ACCOUNT_BANNED`, `LISTING_REMOVED`) também **não** geram mensagem. O front já mostra o motivo na faixa de "Conversa encerrada", a partir do `cancelReason` do pedido.
@@ -167,7 +169,8 @@ No `PUT /read`, `lastMessageId` ausente ou negativo → 400 "Informe a última m
    - `CONCLUDED` → `ADOPTION_CONCLUDED` (dentro do `conclude(...)`);
    - `CANCELLED` pelo adotante → `ADOPTER_WITHDREW`, **só se** o status de partida era `ACCEPTED` ou `AWAITING_DELIVERY`;
    - `CANCELLED` pelo dono → `OWNER_WITHDREW`;
-   - os cancelamentos em lote (`ANIMAL_ADOPTED` no `conclude`, `ANIMAL_UNAVAILABLE` no `onAnimalLeftListing`, e os da moderação) **não** chamam o chat.
+   - os cancelamentos em lote (`ANIMAL_ADOPTED` no `conclude`, `ANIMAL_UNAVAILABLE` no `onAnimalLeftListing`, e os da moderação) **não** chamam o chat;
+   - no `registerReturn(...)` → `ANIMAL_RETURNED`, e no `rehome(...)` → `ANIMAL_REHOMED` (os dois já existem no `AdoptionRequestService`).
 4. **Quem é parte**: `request.getAdopter().getId()` ou `request.getAnimal().getOwner().getId()`, os mesmos campos que o `AdoptionRequestService.get(...)` já usa para liberar o pedido às duas partes.
 5. **Texto**: aplicar `trim()` e validar o tamanho no service (para devolver a frase exata da tabela acima). Não precisa escapar HTML: o React mostra o texto como texto.
 6. **Marcar como lida**: um upsert que nunca volta para trás.
@@ -199,14 +202,7 @@ No `PUT /read`, `lastMessageId` ausente ou negativo → 400 "Informe a última m
 
 ## 5. SQL (rascunho de migração, PostgreSQL)
 
-Número: **`011_chat.sql`** (renumerada em 15/10; ver `entrega-final/README.md` §3).
-
-**Atualizado em 15/10/2026:** dois eventos de sistema novos, criados no registro de retorno e de repasse (`entrega-final/api-devolucao-reabandono.md` §1.6). Eles entram na CHECK de `system_event` e no enum `SystemEvent`:
-
-| `systemEvent` | Quando o backend cria | Texto que o front mostra |
-|---|---|---|
-| `ANIMAL_RETURNED` | dono registra o retorno (`CONCLUDED → RETURNED`) | "{animal} voltou para quem doou." |
-| `ANIMAL_REHOMED` | adotante republica (`CONCLUDED → REHOMED`) | "{adotante} anunciou {animal} para uma nova adoção." |
+Número: **`011_chat.sql`** (ver `README.md` §3). A CHECK de `system_event` já nasce com os 6 eventos da §1.
 
 ```sql
 -- ============================================================
@@ -258,7 +254,7 @@ COMMENT ON TABLE  chat_messages              IS 'Mensagens do chat de cada pedid
 COMMENT ON COLUMN chat_messages.sender_id    IS 'Quem escreveu (adotante ou dono) — nulo nas mensagens de sistema';
 COMMENT ON COLUMN chat_messages.type         IS 'USER (escrita por uma das partes) ou SYSTEM (aviso criado pela API na troca de status)';
 COMMENT ON COLUMN chat_messages.text         IS 'Texto da mensagem USER, de 1 a 1000 caracteres — nulo em SYSTEM';
-COMMENT ON COLUMN chat_messages.system_event IS 'Só em SYSTEM: DELIVERY_REQUESTED, ADOPTION_CONCLUDED, ADOPTER_WITHDREW ou OWNER_WITHDREW';
+COMMENT ON COLUMN chat_messages.system_event IS 'Só em SYSTEM: DELIVERY_REQUESTED, ADOPTION_CONCLUDED, ADOPTER_WITHDREW, OWNER_WITHDREW, ANIMAL_RETURNED ou ANIMAL_REHOMED';
 
 -- ------------------------------------------------------------
 -- chat_reads — até qual mensagem cada parte já leu, por conversa.

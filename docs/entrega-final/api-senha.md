@@ -1,9 +1,8 @@
 # AUcolher — Contrato da API: recuperar e alterar senha
 
-> Versão 2 (15/10/2026). Implementa a regra de negócio §2.1.
-> - **Mudança da v2:** não existe mais "trocar senha" com a senha atual (`PUT /api/users/me/password` saiu). Toda alteração passa pelo link de redefinição por e-mail. Em "Minha conta", o botão "Alterar senha" só pede esse link para o e-mail da conta.
-> - **Recuperar senha por e-mail** e **derrubar as outras sessões**: sprint **S2**.
-> - Migração **010**.
+> Implementa a regra de negócio §2.1. Migração **010**.
+> - Não existe "trocar senha" com a senha atual (sem `PUT /api/users/me/password`). Toda alteração passa pelo link de redefinição por e-mail. Em "Minha conta", o botão "Alterar senha" só pede esse link para o e-mail da conta.
+> - O front já está pronto: `features/auth/services/passwordService.js` chama as rotas abaixo, e o mock responde enquanto `VITE_USE_MOCK_SENHA` estiver ligada (padrão).
 
 ## 1. Regras de negócio
 
@@ -32,7 +31,7 @@
 - **Conta inativa** (banida ou excluída): não envia nada, e a resposta continua a mesma.
 - **Redefinir:** com o token válido, a pessoa escolhe a nova senha. O token é marcado como usado, todas as sessões caem e a pessoa vai para o login com o aviso "Senha redefinida. Entre com a nova senha.". Ela não entra automaticamente.
 
-**Aviso de "senha alterada"** (opcional, o primeiro a sair se faltar tempo)
+**Aviso de "senha alterada"** (opcional)
 - Depois de uma redefinição, um e-mail curto avisa a conta: "Sua senha do AUcolher foi alterada em {data}. Se não foi você, use 'Esqueci minha senha'.".
 
 ## 2. Formatos (DTOs)
@@ -181,7 +180,7 @@ COMMIT;
 
 ## 8. O que muda no front
 
-> Já feito no front (branch `feature/senha`), com o mock `VITE_USE_MOCK_SENHA` até a migração 010 e as rotas existirem.
+> ✅ Já feito no front, atrás de `VITE_USE_MOCK_SENHA`. Quando as rotas existirem: `VITE_USE_MOCK_SENHA=false`.
 
 **Serviço** (`features/auth/services/passwordService.js`)
 - `requestPasswordReset`, `checkResetToken` e `resetPassword`.

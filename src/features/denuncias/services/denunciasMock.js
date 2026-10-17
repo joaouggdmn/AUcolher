@@ -13,7 +13,7 @@ import { buildSeedDenuncias } from '../data/seedDenuncias'
 import { getReportPayloadErrors, reportTargetKey } from '../utils/reportRules'
 
 // 🔴 Servidor falso das denúncias: mesmas funções de denunciasApi.js e as
-// regras, DTOs e erros do contrato (docs/api-admin.md §6). Cada função espera
+// regras, DTOs e erros do contrato (docs/contratos-prontos/api-denuncias-moderacao.md §1). Cada função espera
 // o "tempo de rede" e depois lê, altera e grava o localStorage num bloco só
 const store = createMockStore({ key: MOCK_DENUNCIAS_STORE_KEY, version: 1, seed: buildSeedDenuncias })
 

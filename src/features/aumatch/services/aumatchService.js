@@ -5,7 +5,7 @@ import { isAccountBanned, isAnimalRemoved } from '../../admin/services/moderatio
 // Fachada do AUmatch: as telas só conhecem estas funções e o modelo do
 // frontend. As respostas do quiz seguem com as chaves e os valores do
 // quizQuestions (moradia: 'APARTAMENTO'...); a API usa inglês
-// (housing: 'APARTMENT'...). Contrato em docs/api-aumatch.md
+// (housing: 'APARTMENT'...). Contrato em docs/contratos-prontos/api-aumatch.md
 
 // ---------- conversão DTO ↔ modelo ----------
 

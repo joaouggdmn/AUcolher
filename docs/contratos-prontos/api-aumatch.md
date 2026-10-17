@@ -1,6 +1,6 @@
 # Contrato — API do AUmatch
 
-Backend: branch `feature/aumatch-api` do `api-aucolher` (pacote `match/`). Documentação completa no README do backend, seção "AUmatch".
+> ✅ **Implementado.** Backend: pacote `match/` do `api-aucolher`. Documentação completa no README do backend, seção "AUmatch".
 
 ## Acesso
 

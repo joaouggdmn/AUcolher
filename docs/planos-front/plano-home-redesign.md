@@ -1,6 +1,6 @@
 # AUcolher — Plano: ajustes finais da home
 
-> Plano aprovado em 2026-10-12, na branch `feature/home-redesign`. Escopo: **só a home** (`src/features/home/`). Footer, AUmatch e o resto do site não mudam. Documento vivo: marcar os blocos (✅) conforme forem entregues e registrar desvios.
+> Escopo: **só a home** (`src/features/home/`). Footer, AUmatch e o resto do site não mudam. Documento vivo: marcar os blocos (✅) conforme forem entregues e registrar desvios.
 
 ## Contexto
 
@@ -53,7 +53,7 @@ O objetivo agora é que **quem acabou de chegar entenda o site em poucos segundo
 - O link "Como funciona o match" do rodapé rola até o mockup.
 - Mobile (390px): as legendas do mockup viram lista e não há scroll horizontal.
 
-## 4. Desvios e ajustes depois da entrega (2026-10-12)
+## 4. Desvios e ajustes depois da entrega
 
 - **Atalhos:** a versão clara e sem botões foi revertida a pedido. A seção original (card verde escuro) voltou, só que logo abaixo do hero, com `id="atalhos"`. Pessoa logada e ONG ganharam um painel "Mais atalhos":
   - pessoa: Fazer uma doação, Conversas, Anunciar um animal, Ver perfil público;

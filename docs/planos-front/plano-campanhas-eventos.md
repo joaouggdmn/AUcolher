@@ -1,6 +1,6 @@
 # AUcolher — Plano: campanhas, doações e eventos das ONGs
 
-> Plano aprovado em 2026-09-26. Complementa a seção 10 de `regras-de-negocios.md`. Documento vivo: atualizar conforme as fases forem entregues.
+> Complementa a seção 10 de `regras-de-negocios.md`. Documento vivo: atualizar conforme as fases forem entregues.
 
 ## Contexto
 
@@ -117,9 +117,9 @@ Sem PATCH (o CORS do backend não permite); listas são arrays simples (filtros 
 
 Trabalhar na branch `feature/ong-campanhas-eventos`. Baseline de lint: 12 erros (critério: nenhum novo).
 
-**Ordem de entrega (decidida em 2026-09-27)**: primeiro **eventos** de ponta a ponta (fatias de eventos das fases 0–5, painel da ONG só com a aba Eventos), depois campanhas/doações. Blocos pequenos, 1 commit testado por bloco; o usuário roda os comandos git. Contrato de eventos já escrito em `docs/api-campanhas-eventos.md` (v1).
+**Ordem de entrega**: primeiro **eventos** de ponta a ponta (fatias de eventos das fases 0–5, painel da ONG só com a aba Eventos), depois campanhas/doações. Blocos pequenos, 1 commit testado por bloco; o usuário roda os comandos git. Contrato de eventos já escrito em `docs/api-campanhas-eventos.md` (v1).
 
-**Eventos — entregue em 2026-09-27** (5 commits na branch):
+**Eventos** (5 commits na branch):
 1. Camada de dados (`mockStore`, `queryKeys`, seed relativo, `eventosApi`/`eventosMock`/`eventoService`, hooks).
 2. Vitrine, card, home, detalhe e presença (`AttendanceButton`); Minha conta com cancelados; `mockEventos.js` apagado.
 3. Formulário criar/editar (`EventForm`, `CoverImageInput`, validação compartilhada com o mock).
@@ -130,20 +130,20 @@ Desvios do plano: a reescrita de `useEventAttendance` foi para o bloco 2 (junto 
 
 Para campanhas, já prontos para reaproveitar: `createMockStore`, `ConfirmDialog`, `CoverImageInput`, `LoadErrorState`, `DashboardSections` (nova aba), `queryKeys`/`useMockStorageSync` (nova chave). Pendência vista: a foto `photo-1517849845537` usada em `mockCampanhas.js` está quebrada.
 
-**Atualização de 2026-10-09**: a branch recebeu o `main` (API de animais em inglês). A API inteira passou para inglês, então o contrato de eventos virou v2 em inglês (`/api/events`, `ADOPTION_FAIR|HEALTH|BAZAAR|WORKSHOP`, `ACTIVE|CANCELLED`; mock na versão 2) e campanhas nascem em inglês (`docs/api-campanhas-eventos.md` §6). Os nomes em português das seções abaixo (`/api/campanhas`, `titulo`, `ATIVA`...) valem só como histórico. A partir de agora o usuário faz os commits e pushes; o Claude entrega os comandos ao fim de cada bloco.
+**Atualização**: a branch recebeu o `main` (API de animais em inglês). A API inteira passou para inglês, então o contrato de eventos virou v2 em inglês (`/api/events`, `ADOPTION_FAIR|HEALTH|BAZAAR|WORKSHOP`, `ACTIVE|CANCELLED`; mock na versão 2) e campanhas nascem em inglês (`docs/api-campanhas-eventos.md` §6). Os nomes em português das seções abaixo (`/api/campanhas`, `titulo`, `ATIVA`...) valem só como histórico. A partir de agora o usuário faz os commits e pushes; o Claude entrega os comandos ao fim de cada bloco.
 
 **Campanhas — ordem dos blocos** (mesmo formato de eventos, 1 commit por bloco):
-1. ✅ Camada de dados (2026-10-09): `campanhaRules.js`, `seedCampanhas.js` (13 campanhas, ~260 doações fictícias, foto quebrada trocada), `doacoesApi`/`doacoesMock`/`doacaoService`, `useCampanhas`/`useDoacoes`, flag `VITE_USE_MOCK_CAMPANHAS`, chaves e sync entre abas. Categorias `HEALTH|FOOD|INFRASTRUCTURE`; o arrecadado é a soma das doações aprovadas; o mock gera um "copia e cola" EMV fictício e só aprova por `simulateDonationApproval`.
+1. ✅ Camada de dados: `campanhaRules.js`, `seedCampanhas.js` (13 campanhas, ~260 doações fictícias, foto quebrada trocada), `doacoesApi`/`doacoesMock`/`doacaoService`, `useCampanhas`/`useDoacoes`, flag `VITE_USE_MOCK_CAMPANHAS`, chaves e sync entre abas. Categorias `HEALTH|FOOD|INFRASTRUCTURE`; o arrecadado é a soma das doações aprovadas; o mock gera um "copia e cola" EMV fictício e só aprova por `simulateDonationApproval`.
 2. ✅ Páginas públicas: lista com hook, filtros (urgente / quase lá / meta atingida), card com link, chips "Meta atingida!"/"Encerrada", prazo e botão "Gerenciar" na própria; banner SOS = urgente ativa mais recente; home com urgentes primeiro; detalhe `/campanhas/:id`; `mockCampanhas.js` apagado (lint 10 → 9).
 3. ✅ Doação: `qrcode.react`; modal em portal com etapas derivadas (login → valor → PIX com QR, copia e cola, contagem e polling de 3 s também em segundo plano → aprovada / expirada com "Gerar novo PIX" / cancelada); "Simular pagamento" só em dev + mock; "Meu impacto" com doações aprovadas reais, também para ONG; `mockUserDonations.js` apagado.
 4. ✅ Formulários: `CampaignForm` (categoria, urgente, meta, prazo opcional, capa) + criar `/campanhas/criar` e editar `/campanhas/editar/:id` (bloqueia outra ONG e encerrada); toast no detalhe.
 5. ✅ Painel da ONG com 3 abas (Eventos, Campanhas, Doações recebidas); encerrar e excluir (real/lógica) com `ConfirmDialog`, também pelo detalhe.
 6. ✅ Aba "Campanhas (n)" no perfil público da ONG (só ativas).
 
-Tudo entregue em 2026-10-10, um commit por bloco, push na branch. PR para o `main` só depois dos testes do usuário.
+Tudo entregue, um commit por bloco, push na branch. PR para o `main` só depois dos testes do usuário.
 
 **Fase 0 — Contrato e regras (só docs)**
-- Novo `docs/api-campanhas-eventos.md` (seções 3 e 4 + fluxo MP + SQL) e cópia em `backend/Api_loginAdocao/adocao-api/docs/` (a pasta `docs/` do frontend é ignorada pelo git).
+- Novo `docs/api-campanhas-eventos.md` (hoje `contratos-prontos/api-eventos.md` e `entrega-final/api-campanhas-doacoes.md`) (seções 3 e 4 + fluxo MP + SQL) e cópia em `backend/Api_loginAdocao/adocao-api/docs/` (a pasta `docs/` do frontend é ignorada pelo git).
 - `docs/regras-de-negocios.md`: reescrever §10 com as decisões acima; §12 com os novos módulos mockados e flags.
 
 **Fase 1 — Fundação de dados (sem mudança visual)**

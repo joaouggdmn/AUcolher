@@ -18,7 +18,7 @@ const store = createMockStore({
 const CHANGE_EVENT = 'aucolher:moderation'
 
 // No mock, uma conta é id + nome: os ids 1 a 7 dos perfis fictícios se
-// repetem com os do banco real (plano-painel-admin.md §6), e mesmo id com
+// repetem com os do banco real (docs/planos-front/plano-painel-admin.md §6), e mesmo id com
 // outro nome é outra conta. Sem nome conhecido (pedido antigo sem cópia), vale o id
 export function matchesAccount(account, candidate) {
   if (!account || !candidate || !isSameId(account.id, candidate.id)) return false
