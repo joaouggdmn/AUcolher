@@ -9,14 +9,30 @@ function HeroEventBanner({ event }) {
   if (!event) return null
 
   return (
-    <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-800 via-emerald-900 to-emerald-950 p-8 sm:p-10 lg:p-14">
-      <div
-        className="absolute inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)',
-          backgroundSize: '26px 26px',
-        }}
-      />
+    <section
+      className={`relative isolate overflow-hidden rounded-3xl p-8 sm:p-10 lg:p-14 ${
+        event.coverUrl ? 'bg-emerald-950' : 'bg-gradient-to-br from-emerald-800 via-emerald-900 to-emerald-950'
+      }`}
+    >
+      {/* Com capa, a foto aparece por trás do texto, como no banner SOS das
+          campanhas; sem capa, fica o degradê com pontinhos */}
+      {event.coverUrl ? (
+        <>
+          <div
+            className="absolute inset-0 -z-20 bg-cover bg-center opacity-70"
+            style={{ backgroundImage: `url("${event.coverUrl}")` }}
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-950/95 via-emerald-950/70 to-emerald-950/20" />
+        </>
+      ) : (
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)',
+            backgroundSize: '26px 26px',
+          }}
+        />
+      )}
       <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-amber-500/20 blur-[100px]" />
 
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
