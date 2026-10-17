@@ -10,6 +10,7 @@ import AvatarUploadInput from '../../../core/components/ui/AvatarUploadInput'
 import { isValidCNPJ } from '../../../core/utils/cnpj'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
+import { getHomePath } from '../../../core/utils/panelLinks'
 
 const INITIAL_ONG_FIELDS = {
   cnpj: '',
@@ -92,10 +93,10 @@ function RegisterPage() {
     setIsSubmitting(true)
 
     try {
-      await register(formData)
-      // Fluxo temporário: sem etapa PENDENTE de aprovação pelo admin — a ONG
-      // já nasce ativa e segue para o login como qualquer outra conta
-      navigate('/login', { state: { registered: true, email: formData.email } })
+      // Sem etapa de aprovação: a conta (pessoa ou ONG) já nasce ativa e
+      // entra direto, no mesmo destino do login
+      const loggedUser = await register(formData)
+      navigate(location.state?.from?.pathname || getHomePath(loggedUser.userType), { replace: true })
     } catch (err) {
       setError(getErrorMessage(err, 'Não foi possível concluir o cadastro. Tente novamente.'))
     } finally {
