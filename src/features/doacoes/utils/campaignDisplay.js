@@ -24,8 +24,9 @@ export function getDeadlineSummary(campaign) {
   return { label: `Termina em ${days} dias`, tone: days <= 7 ? 'soon' : 'neutral' }
 }
 
-export function formatDonationsCount(count) {
-  if (count === 0) return 'Seja o primeiro a doar'
+// invite: false para quem não pode doar (a ONG dona e o admin): sem o convite
+export function formatDonationsCount(count, { invite = true } = {}) {
+  if (count === 0) return invite ? 'Seja o primeiro a doar' : 'Nenhuma doação ainda'
   return `${count} ${count === 1 ? 'doação' : 'doações'}`
 }
 
