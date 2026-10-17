@@ -11,7 +11,7 @@ Mais uma rodada de ajustes, pedida em 2026-10-17 depois do merge dos PRs (front 
 
 ---
 
-## N1. "Seja o primeiro…" para quem não pode participar
+## N1. "Seja o primeiro…" para quem não pode participar ✅
 
 **Problema.** A ONG que acabou de criar uma campanha vê "Seja o primeiro a doar" na própria campanha. Com evento é igual: ela vê "Seja o primeiro a confirmar". Ela não pode doar nem confirmar presença no que é dela. O admin também não participa.
 
@@ -31,7 +31,7 @@ Mais uma rodada de ajustes, pedida em 2026-10-17 depois do merge dos PRs (front 
   - `OngCampaignsPanel`, `OngEventsPanel`, `EventParticipantsModal`;
   - `AdminCampaignRow`, `AdminEventRow`.
 
-## N2. Atalhos da ONG na sidebar
+## N2. Atalhos da ONG na sidebar ✅
 
 `core/components/layout/PlatformSidebar.jsx` (lista `shortcuts`). Para `userType === 'ONG'`:
 
@@ -46,7 +46,7 @@ Mais uma rodada de ajustes, pedida em 2026-10-17 depois do merge dos PRs (front 
 - Ordem para a ONG: Painel, Favoritos, Meus animais, Cadastrar animal, Criar evento, Criar campanha, Meus interesses, Interesses recebidos, Chat.
 - A pessoa continua exatamente como está. O admin também (só o painel).
 
-## N3. Foto no banner "Próximo evento"
+## N3. Foto no banner "Próximo evento" ✅
 
 `features/eventos/components/HeroEventBanner.jsx`, no mesmo esquema do `HeroSosBanner.jsx` de campanhas:
 - `section` com `bg-emerald-950`.
@@ -54,7 +54,7 @@ Mais uma rodada de ajustes, pedida em 2026-10-17 depois do merge dos PRs (front 
 - Sem foto: continua o degradê verde com pontinhos de hoje.
 - O selo de data (`CalendarDateBadge`) continua à direita no desktop. Ele fica sobre a parte mais clara da foto, mas o selo é branco e sólido, então continua legível.
 
-## N4. AUmatch: painel que abre e fecha ao lado do deck
+## N4. AUmatch: painel que abre e fecha ao lado do deck ✅
 
 **O que você pediu:**
 - o painel de filtros volta para o lugar antigo, uma coluna à esquerda do deck;
@@ -70,7 +70,7 @@ Mais uma rodada de ajustes, pedida em 2026-10-17 depois do merge dos PRs (front 
   - começa fechado;
   - fica lembrado no navegador (`localStorage` com try/catch; se falhar, só começa fechado).
 - **Coluna do painel:**
-  - um wrapper com transição de largura: `lg:w-0` fechado, `lg:w-[30%] lg:max-w-sm` + margem aberto;
+  - um wrapper com transição de largura: `lg:w-0` fechado, `lg:w-80` + margem aberto (entregue com largura fixa de 20rem, no lugar dos 30%, para o painel não se espremer durante a animação);
   - dentro, o painel faz `-translate-x-full opacity-0` → `translate-x-0 opacity-100`;
   - fechado, ele fica `inert` (o Tab não entra nele);
   - o conteúdo é o do antigo `MatchPreferencesSidebar`: vidro, título, "N pets na sua fila" e `MatchPreferencesPanel`. Recrio o componente a partir do git (`3708eae^`), com prop de aberto/fechado.
@@ -121,3 +121,7 @@ N1 → N2 → N3 → N4, um commit por bloco, e o plano marcado como entregue no
   - em 375px: abre a gaveta.
 
   Sem o seu ok, fico em lint + build e aviso que não testei.
+
+## Entrega (2026-10-17)
+
+N1 a N4 commitados na `feature/refinamentos-2`. Lint (5 erros antigos) e build ok. A animação do N4 não foi conferida no navegador.
