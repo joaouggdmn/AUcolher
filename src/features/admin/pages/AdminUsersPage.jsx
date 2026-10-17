@@ -21,6 +21,11 @@ function countWhere(items, predicate) {
   return items.filter(predicate).length
 }
 
+function statusOf(user) {
+  if (user.deletedAt) return 'DELETED'
+  return user.isActive ? 'ACTIVE' : 'BANNED'
+}
+
 function AdminUsersPage() {
   const { data: users = [], isLoading, error, refetch } = useAdminUsers()
   const [search, setSearch] = useState('')
@@ -70,16 +75,19 @@ function AdminUsersPage() {
       { value: 'ONG', label: `ONGs (${countWhere(users, (user) => user.userType === 'ONG')})` },
     ]
     // Só faz sentido filtrar por situação quando existe alguma conta banida
-    const bannedCount = countWhere(users, (user) => !user.isActive)
+    // ou excluída (a excluída também fica inativa, mas não é banimento)
+    const bannedCount = countWhere(users, (user) => statusOf(user) === 'BANNED')
+    const deletedCount = countWhere(users, (user) => statusOf(user) === 'DELETED')
     const statusOptions = [
       { value: '', label: 'Qualquer situação' },
-      { value: 'ACTIVE', label: `Ativas (${users.length - bannedCount})` },
+      { value: 'ACTIVE', label: `Ativas (${users.length - bannedCount - deletedCount})` },
       { value: 'BANNED', label: `Banidas (${bannedCount})` },
+      ...(deletedCount > 0 ? [{ value: 'DELETED', label: `Excluídas (${deletedCount})` }] : []),
     ]
 
     const filtered = users
       .filter((user) => !typeFilter || user.userType === typeFilter)
-      .filter((user) => !statusFilter || (statusFilter === 'BANNED' ? !user.isActive : user.isActive))
+      .filter((user) => !statusFilter || statusOf(user) === statusFilter)
       .filter((user) => matchesSearch(search, user.name, user.email, user.city))
     const visible = filtered.slice(0, visibleCount)
 
@@ -88,7 +96,7 @@ function AdminUsersPage() {
         <SearchBar value={search} onChange={withReset(setSearch)} placeholder="Buscar por nome, e-mail ou cidade..." />
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           <PillToggleGroup options={typeOptions} value={typeFilter} onChange={withReset(setTypeFilter)} />
-          {bannedCount > 0 && (
+          {bannedCount + deletedCount > 0 && (
             <PillToggleGroup options={statusOptions} value={statusFilter} onChange={withReset(setStatusFilter)} />
           )}
         </div>

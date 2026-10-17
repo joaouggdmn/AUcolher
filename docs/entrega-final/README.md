@@ -38,7 +38,7 @@ Os contratos seguem sempre o mesmo padrão:
 | **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ❌ falta | a fazer | `api-mercado-pago-ongs.md` |
 | **Senha** | `password_reset_tokens` + `users.password_changed_at` | ❌ falta | mock (`VITE_USE_MOCK_SENHA`) | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ❌ falta | mock (`VITE_USE_MOCK_CHAT`) | `api-chat.md` |
-| **Excluir conta** | `users.deleted_at` | ❌ falta | a fazer | `api-exclusao-conta.md` |
+| **Excluir conta** | `users.deleted_at` | ❌ falta | mock (`VITE_USE_MOCK_EXCLUSAO`) | `api-exclusao-conta.md` |
 
 ## 3. Ordem sugerida
 

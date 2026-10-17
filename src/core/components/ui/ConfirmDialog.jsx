@@ -13,10 +13,11 @@ const VARIANTS = {
 }
 
 // Confirmação genérica (mesmo visual do ConfirmAdoptionModal). Enquanto
-// `isProcessing`, nada fecha o diálogo; `error` mostra a recusa da API sem
-// fechar, para a pessoa tentar de novo ou desistir. Vai por portal para o
-// <body>: dentro de um ancestral animado (transform) o `fixed` ficaria preso
-// a ele em vez de cobrir a tela
+// `isProcessing`, nada fecha o diálogo; `confirmDisabled` segura o botão de
+// confirmar (ex.: um campo de confirmação ainda vazio); `error` mostra a
+// recusa da API sem fechar, para a pessoa tentar de novo ou desistir. Vai
+// por portal para o <body>: dentro de um ancestral animado (transform) o
+// `fixed` ficaria preso a ele em vez de cobrir a tela
 function ConfirmDialog({
   icon: Icon = FaCircleQuestion,
   title,
@@ -26,6 +27,7 @@ function ConfirmDialog({
   cancelLabel = 'Voltar',
   variant = 'default',
   isProcessing = false,
+  confirmDisabled = false,
   error,
   onConfirm,
   onCancel,
@@ -67,8 +69,10 @@ function ConfirmDialog({
             <button
               type="button"
               onClick={onConfirm}
-              disabled={isProcessing}
-              className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all duration-300 disabled:cursor-wait disabled:opacity-70 ${styles.confirm}`}
+              disabled={isProcessing || confirmDisabled}
+              className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all duration-300 disabled:opacity-70 ${
+                isProcessing ? 'disabled:cursor-wait' : 'disabled:cursor-not-allowed'
+              } ${styles.confirm}`}
             >
               {isProcessing && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
               {isProcessing ? processingLabel : confirmLabel}

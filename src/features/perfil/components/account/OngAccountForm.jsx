@@ -25,6 +25,7 @@ import { FOUNDED_YEAR_FIELD_ID, buildOngForm, toOngUpdates } from '../../utils/a
 import ProfileCompletionBar from '../ProfileCompletionBar'
 import ProfileSection from '../ProfileSection'
 import AccessSection from './AccessSection'
+import DeleteAccountSection from './DeleteAccountSection'
 import ModerationEmailSection from './ModerationEmailSection'
 import AccountFormShell from './AccountFormShell'
 import AccountGroupHeading from './AccountGroupHeading'
@@ -322,6 +323,8 @@ function OngAccountForm({ account = null, onSave = null }) {
           ) : (
             <AccessSection emailHint="Aparece no perfil público como contato. Não pode ser alterado por aqui." />
           )}
+
+          {!isModeration && <DeleteAccountSection />}
         </AccountFormShell>
       </div>
     </>
