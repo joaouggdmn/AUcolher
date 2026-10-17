@@ -18,6 +18,7 @@ Frontend em React (Vite), backend em Spring Boot + PostgreSQL (em desenvolviment
 
 - Campo único de papel: `userType`. A API usa `PERSON | NGO | ADMIN` e o frontend converte para `PESSOA | ONG | ADMIN` (`authService.normalizeUserType`). Não existe um campo `role` separado.
 - Um usuário só tem um papel por vez (não é possível ser `PESSOA` e `ADMIN` simultaneamente, por exemplo).
+- **Cadastrou, entrou**: pelo formulário (pessoa ou ONG) ou pelo Google, a conta já sai do cadastro logada, sem passar pela tela de login. O cadastro devolve o mesmo `{ token, type, user }` do login.
 - **Criação do admin**:
   - Não há cadastro público de admin. O cadastro público continua só para pessoa e ONG.
   - A primeira conta `ADMIN` é criada pela própria API ao subir, a partir das variáveis de ambiente `ADMIN_EMAIL` / `ADMIN_PASSWORD` (`ADMIN_NAME` é opcional). Sem elas, nada é criado.
