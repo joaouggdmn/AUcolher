@@ -4,6 +4,7 @@ import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa6'
 import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
 import UserTypeSelector from '../components/UserTypeSelector'
+import GoogleLoginButton from '../components/GoogleLoginButton'
 import OngRegisterFields from '../components/OngRegisterFields'
 import AvatarUploadInput from '../../../core/components/ui/AvatarUploadInput'
 import { isValidCNPJ } from '../../../core/utils/cnpj'
@@ -189,6 +190,9 @@ function RegisterPage() {
           )}
           {isSubmitting ? 'Criando conta...' : isOng ? 'Cadastrar ONG' : 'Criar conta'}
         </button>
+
+        {/* O Google só cria conta de pessoa: ONG precisa de CNPJ e endereço */}
+        {!isOng && <GoogleLoginButton />}
 
         <p className="text-center text-xs text-slate-400">
           Ao continuar, você concorda com nossos Termos de Uso e Política de Privacidade.

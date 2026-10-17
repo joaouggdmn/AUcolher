@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FaEnvelope, FaLock, FaCircleCheck } from 'react-icons/fa6'
 import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
+import GoogleLoginButton from '../components/GoogleLoginButton'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { getHomePath } from '../../../core/utils/panelLinks'
@@ -61,7 +62,14 @@ function LoginPage() {
         </p>
       </div>
 
-      {wasSuspended && !error && (
+      {/* Volta do Google sem sessão (cancelou, conta banida, código vencido) */}
+      {location.state?.googleError && !error && (
+        <div className="mt-4 rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm font-medium text-rose-700">
+          {location.state.googleError}
+        </div>
+      )}
+
+      {wasSuspended && !error && !location.state?.googleError && (
         <div className="mt-4 rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm font-medium text-rose-700">
           Sua conta foi suspensa pela moderação do AUcolher e a sessão foi encerrada.
         </div>
@@ -140,6 +148,8 @@ function LoginPage() {
           )}
           {isSubmitting ? 'Entrando...' : 'Entrar'}
         </button>
+
+        <GoogleLoginButton />
       </form>
     </AuthForm>
   )
