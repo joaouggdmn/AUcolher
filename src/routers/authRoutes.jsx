@@ -4,6 +4,7 @@ import LoginPage from '../features/auth/pages/LoginPage'
 import RegisterPage from '../features/auth/pages/RegisterPage'
 import ForgotPasswordPage from '../features/auth/pages/ForgotPasswordPage'
 import ResetPasswordPage from '../features/auth/pages/ResetPasswordPage'
+import GoogleCallbackPage from '../features/auth/pages/GoogleCallbackPage'
 import GuestRoute from '../core/guards/GuestRoute'
 
 export const authRoutes = [
@@ -42,6 +43,12 @@ export const authRoutes = [
       {
         path: 'redefinir-senha',
         element: <ResetPasswordPage />,
+      },
+      {
+        // Volta do login com o Google (?code= ou ?error=). Também fora do
+        // GuestRoute: a própria página decide o destino depois do login
+        path: 'login/google',
+        element: <GoogleCallbackPage />,
       },
     ],
   },
