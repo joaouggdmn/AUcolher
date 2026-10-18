@@ -5,6 +5,9 @@ import { USE_MOCK_CAMPANHAS, USE_MOCK_EVENTOS } from '../../../core/utils/consta
 import { matchesPeriod } from '../../eventos/utils/dateHelpers'
 import { useHomeAnimals } from './useHomeAnimals'
 
+// Quantas ONGs a seção da home deixa escolher: as mais ativas
+const MAX_SHOWCASE_ONGS = 4
+
 // As mesmas fontes que /campanhas e /eventos usam hoje, juntadas pelo nome
 // da ONG (campanhas e eventos ainda podem vir do mock). De cada fonte sobram
 // a foto, a cidade e o id da conta. O id só vale quando a fonte é a API
@@ -62,11 +65,12 @@ function buildShowcase(animals, campaigns, events) {
         b.campaigns.length + b.upcomingEvents.length + b.petCount -
           (a.campaigns.length + a.upcomingEvents.length + a.petCount) || a.name.localeCompare(b.name, 'pt-BR')
     )
+    .slice(0, MAX_SHOWCASE_ONGS)
 }
 
 // [{ name, id|null, photoUrl, city, state, campaigns, upcomingEvents,
-// petCount }], ONGs mais ativas primeiro — é o que a seção "ONGs parceiras"
-// da home desenha
+// petCount }], só as MAX_SHOWCASE_ONGS mais ativas, nessa ordem. É o que a
+// seção "ONGs parceiras" da home desenha
 export function useOngShowcase() {
   const { animals } = useHomeAnimals()
   const { data: campaigns } = useCampaigns()
