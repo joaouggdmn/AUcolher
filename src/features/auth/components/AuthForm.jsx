@@ -1,5 +1,23 @@
 import { Link } from 'react-router-dom'
-import PetRegister from '../../../assets/hero-pet.png'
+import AumatchCardMockup from '../../home/components/shared/AumatchCardMockup'
+
+// Pet de exemplo do card, diferente da Brisa do hero da home. As fotos não
+// estão no seed, para ninguém achar que é um anúncio real
+const EXAMPLE_PET = {
+  name: 'Pipoca',
+  ageLabel: '3 meses',
+  breed: 'SRD',
+  city: 'Criciúma',
+  state: 'SC',
+  summary: 'Curiosa e carinhosa, adora um colo depois de brincar.',
+  matchScore: 88,
+  photoUrl: 'https://images.unsplash.com/photo-1529778873920-4da4926a72c2?auto=format&fit=crop&w=1200&q=80',
+}
+
+const BACK_PHOTOS = [
+  'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&w=1200&q=80',
+]
 
 // wide: formulários longos (cadastro de ONG) ganham mais largura útil
 function AuthForm({ heading, subheading, wide = false, children }) {
@@ -36,15 +54,16 @@ function AuthForm({ heading, subheading, wide = false, children }) {
           </h1>
           <p className="max-w-sm text-lg text-emerald-100/80">{subheading}</p>
 
-          {/* Showcase visual — mesma linguagem do Hero, versão compacta */}
-          <div className="relative mt-4 flex h-64 items-center justify-center xl:h-72">
+          {/* Card do AUmatch, como o do hero da home, em versão menor (a
+              coluna tem a altura da tela) e sem os selos numerados */}
+          <div className="relative mt-4 flex items-center justify-center">
             <div className="absolute h-56 w-56 rotate-6 bg-gradient-to-br from-emerald-400 via-amber-400/40 to-transparent opacity-80 blur-2xl xl:h-64 xl:w-64" />
 
-            <img
-              // 🔴 Substitua pelo seu PNG local de pet, se preferir
-              src={PetRegister}
-              alt="Pet feliz esperando adoção"
-              className="relative z-10 h-60 w-60 object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)] xl:h-72 xl:w-72"
+            <AumatchCardMockup
+              pet={EXAMPLE_PET}
+              backPhotos={BACK_PHOTOS}
+              showMarkers={false}
+              className="z-10 w-52 xl:w-60"
             />
           </div>
         </div>
