@@ -15,6 +15,7 @@ import { maskCEP, maskCNPJ } from '../../../../core/utils/masks'
 import { FACEBOOK_URL_PATTERN, sanitizeInstagramHandle, sanitizeXHandle } from '../../../../core/utils/socialLinks'
 import { FOUNDED_YEAR_MIN, getCurrentYear } from '../../../../core/utils/foundedYear'
 import { NGO_COVER_MAX_LENGTH } from '../../../../core/utils/constants'
+import AddressNumberField from '../../../../core/components/ui/AddressNumberField'
 import AvatarUploadInput from '../../../../core/components/ui/AvatarUploadInput'
 import CoverImageInput from '../../../../core/components/ui/CoverImageInput'
 import CepField from '../../../../core/components/ui/CepField'
@@ -170,11 +171,11 @@ function OngAccountForm({ account = null, onSave = null }) {
                 />
               </div>
               <div className="col-span-6 sm:col-span-3">
-                <FormField
-                  label="Número"
+                <AddressNumberField
+                  id="ong-address-number"
+                  input={FormField}
                   value={formData.address.number}
-                  onChange={(e) => setAddressField('number', e.target.value)}
-                  placeholder="Ex: 120 ou S/N"
+                  onChange={(number) => setAddressField('number', number)}
                   required
                 />
               </div>

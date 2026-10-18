@@ -5,7 +5,7 @@ import { useCepLookup } from '../../../core/hooks/useCepLookup'
 import { BRAZILIAN_STATES } from '../../../core/utils/brazilianStates'
 import { EVENT_COVER_MAX_LENGTH } from '../../../core/utils/constants'
 import { todayLocalIso } from '../../../core/utils/localDate'
-import { maskCEP } from '../../../core/utils/masks'
+import { maskAddressNumber, maskCEP } from '../../../core/utils/masks'
 import CepField from '../../../core/components/ui/CepField'
 import CitySelect from '../../../core/components/ui/CitySelect'
 import CoverImageInput from '../../../core/components/ui/CoverImageInput'
@@ -185,8 +185,9 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
             <FormField
               label="Número"
               value={values.location.number}
-              onChange={(e) => setLocationField('number', e.target.value)}
+              onChange={(e) => setLocationField('number', maskAddressNumber(e.target.value))}
               placeholder="Opcional"
+              inputMode="numeric"
               maxLength={EVENT_LIMITS.number}
               {...fieldProps('number')}
             />
