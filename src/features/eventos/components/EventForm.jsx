@@ -7,6 +7,7 @@ import { EVENT_COVER_MAX_LENGTH } from '../../../core/utils/constants'
 import { todayLocalIso } from '../../../core/utils/localDate'
 import { maskCEP } from '../../../core/utils/masks'
 import CepField from '../../../core/components/ui/CepField'
+import CitySelect from '../../../core/components/ui/CitySelect'
 import CoverImageInput from '../../../core/components/ui/CoverImageInput'
 import FormField from '../../../core/components/ui/FormField'
 import PillToggleGroup from '../../../core/components/ui/filters/PillToggleGroup'
@@ -220,23 +221,17 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               {...fieldProps('complement')}
             />
           </div>
-          <div className="col-span-4">
-            <FormField
-              label="Cidade"
-              value={values.location.city}
-              onChange={(e) => setLocationField('city', e.target.value)}
-              maxLength={EVENT_LIMITS.city}
-              {...fieldProps('city')}
-            />
-          </div>
           <div className="col-span-2 flex flex-col gap-1.5">
             <label htmlFor={eventFieldId('state')} className="text-sm font-semibold text-slate-700">
               UF
             </label>
+            {/* Trocar a UF limpa a cidade, que era da UF anterior */}
             <select
               id={eventFieldId('state')}
               value={values.location.state}
-              onChange={(e) => setLocationField('state', e.target.value)}
+              onChange={(e) =>
+                setValues((prev) => ({ ...prev, location: { ...prev.location, state: e.target.value, city: '' } }))
+              }
               aria-invalid={errors.state ? true : undefined}
               className={`min-h-12 w-full rounded-xl border bg-white px-3 text-sm text-slate-900 outline-none transition-all duration-300 focus:ring-4 ${
                 errors.state
@@ -252,6 +247,17 @@ function EventForm({ initialValues, minCapacity = 0, submitLabel, isSubmitting, 
               ))}
             </select>
             <FieldError message={errors.state} />
+          </div>
+          {/* Lista do IBGE: a cidade sai sempre com a grafia oficial, igual à
+              do filtro de cidades */}
+          <div className="col-span-4 flex flex-col gap-1.5">
+            <CitySelect
+              id={eventFieldId('city')}
+              state={values.location.state}
+              city={values.location.city}
+              onChange={(city) => setLocationField('city', city)}
+            />
+            <FieldError message={errors.city} />
           </div>
         </div>
       </ProfileSection>
