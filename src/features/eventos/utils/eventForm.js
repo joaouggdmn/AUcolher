@@ -58,8 +58,8 @@ const FIELD_BY_PAYLOAD_KEY = {
   street: 'street',
   district: 'district',
   complement: 'complement',
-  city: 'city',
   state: 'state',
+  city: 'city',
   coverUrl: 'coverUrl',
   capacity: 'capacity',
 }
