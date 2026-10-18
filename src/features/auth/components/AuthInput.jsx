@@ -39,7 +39,7 @@ function AuthInput({ id, label, type = 'text', icon: Icon, prefix, trailing, hin
           id={id}
           type={inputType}
           aria-invalid={error ? true : undefined}
-          className={`min-h-12 w-full rounded-xl border bg-white ${paddingLeft} ${paddingRight} text-sm text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:ring-4 ${borderClasses}`}
+          className={`min-h-12 w-full rounded-xl border bg-white ${paddingLeft} ${paddingRight} text-sm text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:ring-4 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 ${borderClasses}`}
           {...props}
         />
 

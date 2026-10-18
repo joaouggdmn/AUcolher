@@ -11,8 +11,9 @@ import {
 import AuthInput from './AuthInput'
 import { useCnpjLookup } from '../hooks/useCnpjLookup'
 import { useCepLookup } from '../../../core/hooks/useCepLookup'
+import AddressNumberField from '../../../core/components/ui/AddressNumberField'
 import CitySelect from '../../../core/components/ui/CitySelect'
-import { maskCEP, maskCNPJ } from '../../../core/utils/masks'
+import { maskCEP, maskCNPJ, normalizeAddressNumber } from '../../../core/utils/masks'
 import { BRAZILIAN_STATES } from '../../../core/utils/brazilianStates'
 import { FOUNDED_YEAR_MIN, getCurrentYear } from '../../../core/utils/foundedYear'
 
@@ -56,7 +57,7 @@ function OngRegisterFields({ values, onFieldsChange }) {
       ...(legalName && { name: legalName }),
       cep: maskCEP(address.cep),
       street: address.street,
-      number: address.number,
+      number: normalizeAddressNumber(address.number),
       complement: address.complement,
       district: address.district,
       city: address.city,
@@ -169,13 +170,11 @@ function OngRegisterFields({ values, onFieldsChange }) {
             />
           </div>
           <div className="col-span-3">
-            <AuthInput
+            <AddressNumberField
               id="number"
-              name="number"
-              label="Número"
-              placeholder="Ex: 120 ou S/N"
+              input={AuthInput}
               value={values.number}
-              onChange={handleChange}
+              onChange={(number) => onFieldsChange({ number })}
               required
             />
           </div>
