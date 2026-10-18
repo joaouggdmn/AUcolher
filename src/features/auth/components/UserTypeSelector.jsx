@@ -3,7 +3,7 @@ import { FaPaw, FaBuildingShield } from 'react-icons/fa6'
 const USER_TYPES = [
   {
     value: 'PESSOA',
-    title: 'Para mim',
+    title: 'Pessoa física',
     description: 'Quero adotar ou divulgar um animal para adoção',
     icon: FaPaw,
   },
