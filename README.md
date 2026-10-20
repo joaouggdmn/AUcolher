@@ -4,7 +4,7 @@
 
 > Trabalho de Conclusão de Curso do Técnico em Informática — CEDUP Abílio Paulo (Criciúma/SC), 2026.
 
-[PREENCHER: link da demo online, se houver] · [PREENCHER: link do repositório do back-end]
+🖥️ **Front-end:** este repositório · ⚙️ **Back-end:** [joaouggdmn/api-aucolher](https://github.com/joaouggdmn/api-aucolher) 
 
 ---
 
@@ -12,38 +12,60 @@
 
 Muitas adoções dão errado porque o estilo de vida do adotante não combina com o comportamento do animal. O AUcolher conecta **adotantes**, **protetores independentes** e **ONGs** e usa o **AUmatch**, um algoritmo de compatibilidade, para sugerir pets que realmente se encaixam no perfil de cada pessoa.
 
-A hipótese central do TCC é que adotar com base em compatibilidade comportamental reduz a **taxa de reabandono** (adoções devolvidas). A plataforma inclui a métrica necessária para validar essa hipótese.
+A hipótese central do TCC é que adotar com base em compatibilidade comportamental reduz a **taxa de reabandono**. A plataforma registra o que acontece depois da adoção e calcula essa taxa, para verificar se adoções com alta compatibilidade são menos devolvidas.
 
 ## Principais funcionalidades
 
-- **AUmatch** — interface de *swipe* gamificada (arrastar com mouse ou toque) que apresenta os animais com a porcentagem de compatibilidade.
-- **Perfil de estilo de vida** — questionário que descreve a rotina e as preferências do adotante e alimenta o algoritmo.
-- **Cadastro de animais** — publicado por ONGs ou protetores independentes, com atributos de comportamento (nível de energia, temperamento, independência, vocalização), porte e saúde (vacinado, castrado, vermifugado).
-- **Pedidos de adoção** — o adotante solicita e quem anunciou o animal acompanha e responde às solicitações recebidas.
-- **Chat interno** — conversa entre usuários com match, substituindo a troca de telefone/WhatsApp. [CONFIRMAR: nesta versão as mensagens ficam no `localStorage`, sincronizadas entre abas pelo evento `storage`; ajuste se já usa a API]
-- **Geolocalização** — captura por GPS (Geolocation API) ou por CEP, convertido em coordenadas com ViaCEP + Nominatim (OpenStreetMap).
-- **Autenticação e perfis de acesso** — login com JWT e rotas protegidas por perfil: visitante, usuário, ONG e administrador.
-- **Documentação técnica** — requisitos, regras de negócio e diagramas PlantUML do TCC. [CONFIRMAR: caminho, por exemplo `docs/`]
+- **AUmatch** — interface de *swipe* gamificada (arrastar com mouse ou toque) que mostra os animais ordenados por compatibilidade, com a pontuação de cada critério.
+- **Quiz de estilo de vida** — 7 perguntas sobre moradia, rotina, tempo fora de casa, quem mora junto, espécie, perfil ideal de pet e porte.
+- **Anúncios de animais** — qualquer conta (pessoa ou ONG) anuncia, com fotos, saúde, comportamento e história. A vitrine tem filtros por espécie, porte, idade, energia, temperamento e cidade, além de **favoritos**.
+- **Pedidos de adoção** — fluxo completo: pendente → aceito → aguardando entrega → concluído, com regras de quem pode fazer cada transição.
+- **Chat** — liberado quando o dono aceita o pedido e travado na entrega.
+- **Avaliações** — depois da adoção, adotante e dono avaliam um ao outro; o perfil público mostra média e distribuição das notas.
+- **Retorno e repasse** — o dono registra a devolução de um animal, ou o adotante republica o anúncio. Os dois casos alimentam a taxa de reabandono.
+- **Eventos das ONGs** — com confirmação de presença e limite de vagas.
+- **Autenticação** — e-mail e senha ou **login com Google (OAuth2)**, com JWT e rotas protegidas por perfil: pessoa, ONG e administrador.
+- **Denúncias e painel do administrador** — estatísticas, moderação (banir, reativar, editar e remover anúncios, contas e eventos) e a taxa de reabandono.
 
 ## Como o AUmatch funciona
 
-1. O adotante responde ao questionário de estilo de vida.
-2. Cada característica do perfil é comparada com os atributos do animal.
-3. Cada comparação recebe um **peso** e as pontuações são somadas.
-4. O resultado vira uma **porcentagem de compatibilidade**, usada para ordenar e exibir os animais no swipe.
+A compatibilidade vai de 0 a 100 e soma seis critérios:
 
-A lógica fica em `computeMatchScore`, com leitura defensiva dos rótulos (`normalizeToken`) para lidar com acentos e variações do português.
+| Critério | Pontos | O que compara |
+| --- | :---: | --- |
+| Energia | 20 | rotina de exercícios do adotante × nível de energia do animal |
+| Independência | 20 | tempo fora de casa × independência do animal |
+| Moradia | 15 | em apartamento, só pontua se o animal se adapta; casa e sítio pontuam cheio |
+| Convivência | 15 | crianças, cães e gatos em casa × o que o animal tolera |
+| Temperamento | 15 | perfil ideal de pet × temperamento do animal |
+| Porte | 15 | porte preferido × porte do animal |
+
+Nas escalas (energia, independência e porte), nível igual vale o máximo, nível vizinho vale 40% e nível oposto vale 0. O deck mostra primeiro os animais com maior pontuação, e o empate é decidido pelo anúncio mais recente.
+
+O cálculo roda na API (`MatchScoreCalculator`, coberto por testes). O front-end mantém uma cópia em `features/aumatch/utils/matchScore.js` para exibir a pontuação, então qualquer mudança de regra precisa ser feita nos dois lugares.
+
+## Taxa de reabandono
+
+Quando uma adoção é concluída, a API **congela** o score de compatibilidade daquele momento. Se depois a adoção termina em **devolução** ao doador ou em **repasse** para outra pessoa, ela conta como reabandono. O painel do administrador mostra a taxa geral, os motivos mais comuns e a taxa por faixa de compatibilidade (alta, média e baixa). Adoções feitas por ONG ficam fora do cálculo, porque são resgates e não adoções finais.
 
 ## Tecnologias
 
+**Front-end (este repositório)**
+
 | Camada | Tecnologia |
 | --- | --- |
-| Front-end | React 18 · Vite · React Router v6 · Tailwind CSS v4 |
+| Base | React 18 · Vite · React Router v6 · Tailwind CSS v4 |
 | Dados e formulários | Axios · TanStack React Query · React Hook Form · Zod |
-| Estado | Context API (`AuthContext`, `AnimalContext`, `AdoptionRequestContext`) |
-| Back-end | Java · Spring Boot · PostgreSQL (desenvolvido por [PREENCHER: nome do parceiro]) |
-| Geolocalização | Geolocation API · ViaCEP · Nominatim |
-| Documentação | PlantUML |
+| Estado | Context API |
+
+**Back-end** ([api-aucolher](https://github.com/joaouggdmn/api-aucolher))
+
+| Camada | Tecnologia |
+| --- | --- |
+| Base | Java 17 · Spring Boot 3.3 · Spring Data JPA |
+| Segurança | Spring Security · OAuth2 Client (Google) · JWT (JJWT) |
+| Banco de dados | PostgreSQL |
+| Testes | JUnit 5 · Mockito · MockMvc |
 
 ## Arquitetura do front-end
 
@@ -55,43 +77,56 @@ src/
 │   ├── components/
 │   └── hooks/           # ex.: useProfileCompletion, useReceivedRequests
 ├── features/
-│   ├── auth/            # login, cadastro, AuthContext, authService
-│   ├── animais/         # cadastro, listagem e pedidos de adoção
-│   ├── aumatch/         # swipe, questionário e computeMatchScore
-│   └── ...              # chat, perfil, geolocalização etc.
+│   ├── auth/            # login, cadastro, AuthContext
+│   ├── animais/         # anúncios, vitrine e pedidos de adoção
+│   ├── aumatch/         # swipe, quiz e cálculo de compatibilidade
+│   └── ...              # chat, eventos, perfil, admin etc.
 └── routes/              # PrivateRoute, GuestRoute, OngRoute, AdminRoute
 ```
 
-Outras decisões de projeto:
+Decisões de projeto:
 
-- **Modelo em inglês no front-end, entidades em português no back-end.** A tradução entre os dois fica isolada em `authService.js`.
-- **Persistência síncrona antes de navegar.** Os contexts gravam no `localStorage` antes de atualizar o estado ou trocar de rota, para evitar perda de dados.
-- **Banco de dados enxuto.** O perfil do AUmatch fica na tabela `perfis_aumatch`, ligada a `usuarios` por chave estrangeira 1:1, o que mantém a tabela de autenticação leve.
+- **Padrão em inglês nos dois lados.** Código, campos, rotas e valores de enum usam inglês. Os textos exibidos ao usuário ficam em português.
+- **Regras importantes ficam no servidor.** O front-end só esconde botões; quem valida cada transição do pedido de adoção e cada permissão é a API.
+- **Banco de dados controlado por script.** O Hibernate só valida o schema (`ddl-auto=validate`); as tabelas vêm de `sql/schema.sql`, e mudanças em bancos existentes vão em migrações numeradas e transacionais.
+- **Concorrência tratada no banco.** Um índice único parcial impede dois pedidos vivos para o mesmo animal, e a conclusão da adoção trava o animal com `SELECT ... FOR UPDATE`.
+- **Perfil do AUmatch em tabela própria** (`match_profiles`, 1:1 com `users`), para o quiz poder mudar sem mexer no cadastro.
+
+Os detalhes do back-end, como endpoints e regras, estão no README do [api-aucolher](https://github.com/joaouggdmn/api-aucolher).
 
 ## Como rodar
 
-### Front-end
+Requer Node.js 20 ou superior, Java 17 e PostgreSQL.
 
-Requer Node.js 20.19+ ou 22.12+.
+### 1. Back-end
+
+```bash
+git clone https://github.com/joaouggdmn/api-aucolher.git
+cd api-aucolher
+psql -U postgres -h localhost -f sql/schema.sql   # cria o banco aucolher_db e as tabelas
+mvn spring-boot:run                               # sobe em http://localhost:8080
+```
+
+Defina as variáveis de ambiente antes de subir: `JWT_SECRET`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` (a conta de administrador é criada a partir delas), e `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` se for usar o login com Google. A tabela completa está no README do back-end. O login com Google está explicado em `docs/entrega-final/api-login-google.md`.
+
+### 2. Front-end
 
 ```bash
 git clone https://github.com/joaouggdmn/AUcolher.git
 cd AUcolher
 npm install
-npm run dev
+npm run dev                                       # http://localhost:5173
 ```
 
-Crie um arquivo `.env` com o endereço da API: [PREENCHER: nome da variável e valor, por exemplo `VITE_API_URL=http://localhost:8080`].
+Crie um arquivo `.env` com o endereço da API: VITE_API_URL=http://localhost:8080
 
-### Back-end
+## Limitações conhecidas
 
-Requer Java [PREENCHER: versão] e PostgreSQL. Veja as instruções no repositório do back-end: [PREENCHER: link].
-
-## Capturas de tela
-
-[PREENCHER: adicione 3 ou 4 imagens em `docs/screenshots/`, como o swipe do AUmatch, a listagem de animais e o chat, e referencie aqui com `![descrição](docs/screenshots/arquivo.png)`.]
+- **O chat ainda não usa a API:** as mensagens ficam no navegador (`localStorage`), por pedido de adoção, e são sincronizadas entre abas pelo evento `storage`.
+- **Não há geolocalização:** a busca por local é por cidade e UF, por decisão do projeto.
+- **Campanhas e doações** ainda são simuladas no front-end.
 
 ## Equipe
 
 - **João Pedro Uggioni Damin** — front-end, requisitos, regras de negócio e documentação técnica · [GitHub](https://github.com/joaouggdmn) · [LinkedIn](https://linkedin.com/in/joaopedrouggioni)
-- **[PREENCHER: nome do parceiro]** — back-end · [GitHub]([PREENCHER])
+- **Pedro Henrique Manoel Euzébio** — back-end e diagramas
