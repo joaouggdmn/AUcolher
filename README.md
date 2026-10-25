@@ -1,4 +1,4 @@
-# AUcolher 🐾
+# AUcolher 
 
 **Plataforma inteligente de adoção responsável de animais, com algoritmo de matchmaking comportamental (AUmatch).**
 
