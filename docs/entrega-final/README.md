@@ -14,7 +14,7 @@ Os contratos seguem sempre o mesmo padrão:
 | Arquivo | O que tem |
 |---|---|
 | `README.md` | Este mapa: situação, ordem, migrações, variáveis de ambiente, riscos e checklist |
-| `api-campanhas-doacoes.md` | Campanhas e doações por PIX, mais a parte delas no admin e na moderação |
+| `api-campanhas-doacoes.md` | Campanhas e doações por PIX, mais a parte delas no admin e na moderação (**implementado**, menos o PIX real) |
 | `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG e webhook |
 | `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões |
 | `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema |
@@ -34,9 +34,9 @@ Os contratos seguem sempre o mesmo padrão:
 | Devolução, repasse e taxa de reabandono | (`adoption_requests`, `animals`) | ✅ pronto | API | `contratos-prontos/api-devolucao-reabandono.md` |
 | Eventos e presenças | `events`, `event_attendances` | ✅ pronto | API | `contratos-prontos/api-eventos.md` |
 | Perfil público e banner da ONG | (`users`) | ✅ pronto | API | `contratos-prontos/api-perfil-ong.md` |
-| Painel do admin | — | ✅ pronto, **menos campanhas** | API | `contratos-prontos/api-admin.md` |
-| Denúncias e moderação | `reports` | ✅ pronto, **menos campanhas** | API | `contratos-prontos/api-denuncias-moderacao.md` |
-| **Campanhas e doações (PIX)** | `campaigns`, `donations` | ❌ falta | mock (`VITE_USE_MOCK_CAMPANHAS`) | `api-campanhas-doacoes.md` |
+| Painel do admin | — | ✅ pronto (campanhas e números de doação inclusos) | API | `contratos-prontos/api-admin.md` |
+| Denúncias e moderação | `reports` | ✅ pronto (remoção de campanha inclusa) | API | `contratos-prontos/api-denuncias-moderacao.md` |
+| **Campanhas e doações (PIX)** | `campaigns`, `donations` | ✅ pronto, **menos o PIX real** (token único provisório) | mock (`VITE_USE_MOCK_CAMPANHAS`), pode desligar | `api-campanhas-doacoes.md` |
 | **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ❌ falta | a fazer | `api-mercado-pago-ongs.md` |
 | **Senha** | `password_reset_tokens` + `users.password_changed_at` | ❌ falta | mock (`VITE_USE_MOCK_SENHA`) | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ❌ falta | mock (`VITE_USE_MOCK_CHAT`) | `api-chat.md` |
@@ -44,8 +44,8 @@ Os contratos seguem sempre o mesmo padrão:
 
 ## 3. Ordem sugerida
 
-0. **Teste no sandbox do Mercado Pago** (`api-mercado-pago-ongs.md` §6), antes de tudo: OAuth de um vendedor de teste, PIX criado com o token dele e o pagamento confirmado. O resultado decide entre o contrato e o plano B (§6 deste arquivo).
-1. **Campanhas e doações + conta Mercado Pago** (migrações 007 e 009). Saem juntas, porque a conta da ONG muda o jeito de criar o PIX. Inclui a parte de campanhas do admin e da moderação (`api-campanhas-doacoes.md` §7).
+0. **Teste no sandbox do Mercado Pago** (`api-mercado-pago-ongs.md` §6): OAuth de um vendedor de teste, PIX criado com o token dele e o pagamento confirmado. O resultado decide entre o contrato e o plano B (§6 deste arquivo). **Ainda falta:** não há credenciais de teste.
+1. ~~Campanhas e doações~~ (migração 007): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7). Falta a **conta Mercado Pago** (009): até lá, o PIX usa um token único provisório.
 2. **Senha** (010).
 3. **Chat** (011).
 4. **Excluir conta** (013). Por último, porque reaproveita a cascata do banimento e mexe em quase todas as tabelas.
@@ -54,13 +54,12 @@ Os contratos seguem sempre o mesmo padrão:
 
 ## 4. Migrações
 
-**Já aplicadas no `aucolher_db`:** 001 a 006, 008, 012, 014, 015 e 016.
+**Já aplicadas no `aucolher_db`:** 001 a 008, 012, 014, 015 e 016.
 
 **Faltam:**
 
 | Nº | Arquivo | Conteúdo | SQL em |
 |---|---|---|---|
-| 007 | `007_campaigns.sql` | `campaigns` (com `removed_by_moderation`, `moderated_at`, `moderated_by`) e `donations` (com `ngo_id`) | `api-campanhas-doacoes.md` §8 |
 | 009 | `009_mercado_pago_accounts.sql` | `mercado_pago_accounts` | `api-mercado-pago-ongs.md` §8 |
 | 010 | `010_password_security.sql` | `users.password_changed_at`, `password_reset_tokens` | `api-senha.md` §7 |
 | 011 | `011_chat.sql` | `chat_messages`, `chat_reads` | `api-chat.md` §5 |
@@ -70,7 +69,6 @@ Os contratos seguem sempre o mesmo padrão:
 - **A 009 vem depois da 007:** `mercado_pago_accounts` não depende de `campaigns`, mas a regra "sem conta conectada não há campanha" precisa das duas.
 - **A CHECK de `chat_messages.system_event`** já nasce com os 6 eventos, incluindo `ANIMAL_RETURNED` e `ANIMAL_REHOMED` (a devolução, migração 012, já existe).
 - **A CHECK de `adoption_requests.cancel_reason` não deve ser recriada.** A 014 já aceita `ACCOUNT_DELETED`, `ACCOUNT_BANNED` e `LISTING_REMOVED`. Recriá-la com menos valores quebraria a moderação.
-- **As colunas de moderação de `campaigns`** nascem na 007. A 014 só alterou `events`.
 
 **Padrão das migrações:**
 - cabeçalho com o que muda e o comando `psql`;
