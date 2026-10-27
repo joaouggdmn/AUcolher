@@ -1,8 +1,8 @@
 import api from '../../../core/services/api'
 
-// Adaptador real: é o contrato de docs/contratos-prontos/api-admin.md em código. adminMock.js
-// tem as mesmas funções e devolve os mesmos DTOs. Todas as rotas exigem
-// a conta ADMIN (o backend já restringe /api/admin/** a ROLE_ADMIN)
+// Adaptador da API: é o contrato de docs/contratos-prontos/api-admin.md em
+// código. Todas as rotas exigem a conta ADMIN (o backend já restringe
+// /api/admin/** a ROLE_ADMIN)
 
 export async function getStats() {
   const { data } = await api.get('/admin/stats')

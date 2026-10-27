@@ -1,11 +1,14 @@
 import { readAllCampaignsForAdmin, readApprovedDonationsForAdmin } from '../../doacoes/services/doacoesMock'
-import { isAccountBanned } from './moderationMock'
 
 // 🔴 Campanhas e doações ainda moram no servidor falso do frontend: o backend
 // não tem campanhas (migração 007, do parceiro). Os blocos da Visão geral que
-// dependem delas são calculados aqui — pelo adminMock e, com a API real do
-// admin, por cima do stats dela (withMockCampaignStats), enquanto
-// VITE_USE_MOCK_CAMPANHAS estiver ligada
+// dependem delas são calculados aqui, por cima do stats da API
+// (withMockCampaignStats), enquanto VITE_USE_MOCK_CAMPANHAS estiver ligada
+
+// ONG banida pela moderação (`users.active = false` no backend)
+function isNgoBanned(campaign) {
+  return campaign.ngo?.active === false
+}
 
 export const RANKING_LIMIT = 5
 export const RECENT_ACTIVITY_LIMIT = 8
@@ -23,7 +26,7 @@ export function byNewest(field) {
 }
 
 export function isListedCampaign(campaign) {
-  return !campaign.removed && !isAccountBanned(campaign.ngo)
+  return !campaign.removed && !isNgoBanned(campaign)
 }
 
 export function donationsStats(donations, months) {
@@ -43,7 +46,7 @@ export function campaignsStats(campaigns) {
     active: countBy(campaigns, (campaign) => isListedCampaign(campaign) && campaign.status === 'ACTIVE'),
     closed: countBy(campaigns, (campaign) => isListedCampaign(campaign) && campaign.status === 'CLOSED'),
     removed: countBy(campaigns, (campaign) => campaign.removed),
-    suspended: countBy(campaigns, (campaign) => !campaign.removed && isAccountBanned(campaign.ngo)),
+    suspended: countBy(campaigns, (campaign) => !campaign.removed && isNgoBanned(campaign)),
   }
 }
 

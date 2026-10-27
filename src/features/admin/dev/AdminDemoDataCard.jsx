@@ -10,7 +10,7 @@ const ACTIONS = {
     icon: FaWandMagicSparkles,
     title: 'Gerar dados de teste?',
     description:
-      'Cria no navegador contas novas, pedidos e adoções concluídas e campanhas encerradas com doações, espalhados nos últimos 6 meses, para os gráficos terem o que mostrar. Nada vai para o banco. Se já houver dados de teste, eles são refeitos sem duplicar. A página recarrega no fim.',
+      'Cria no navegador campanhas encerradas com doações, espalhadas nos últimos 6 meses, para os gráficos de arrecadação terem o que mostrar. Contas, animais e adoções já vêm do banco. Nada vai para o banco. Se já houver dados de teste, eles são refeitos sem duplicar. A página recarrega no fim.',
     confirmLabel: 'Gerar dados',
   },
   remove: {
@@ -19,7 +19,7 @@ const ACTIONS = {
     variant: 'danger',
     title: 'Apagar dados de teste?',
     description:
-      'Contas, pedidos, adoções, campanhas e doações de teste do painel do admin saem do navegador. Os dados de teste do painel da ONG continuam como estão.',
+      'As campanhas e doações de teste do painel do admin saem do navegador. Os dados de teste do painel da ONG continuam como estão.',
     confirmLabel: 'Apagar dados',
   },
 }
@@ -62,8 +62,8 @@ function AdminDemoDataCard() {
         </p>
         <p className="mt-1 max-w-xl text-xs text-amber-900/70">
           {isActive
-            ? 'O painel está com dados de teste: contas novas, adoções e doações espalhadas nos últimos 6 meses.'
-            : 'Preenche os gráficos com contas novas, adoções e doações de exemplo nos últimos 6 meses.'}
+            ? 'O painel está com dados de teste: campanhas e doações espalhadas nos últimos 6 meses.'
+            : 'Preenche os gráficos de arrecadação com campanhas e doações de exemplo nos últimos 6 meses.'}
         </p>
       </div>
 

@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as adocaoService from "../../features/adocao/services/adocaoService";
 import { animalKeys } from "../../features/animais/hooks/useAnimais";
-import { useModeration } from "../../features/admin/hooks/useModeration";
 import { useReturnsMock } from "../../features/adocao/hooks/useReturnsMock";
 import { freezeConcludedScores } from "../../features/adocao/services/returnsMock";
 import { USE_MOCK_REABANDONO } from "../utils/constants";
@@ -24,7 +23,6 @@ const REFRESH_INTERVAL = 30_000;
 export function AdoptionRequestProvider({ children }) {
   const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
-  const { isAccountBanned } = useModeration();
 
   // Admin não pede nem recebe pedidos
   const takesPart = isAuthenticated && (user?.userType === "PESSOA" || user?.userType === "ONG");
@@ -43,8 +41,6 @@ export function AdoptionRequestProvider({ children }) {
     refetchInterval: REFRESH_INTERVAL,
   });
 
-  // 🔴 A camada de moderação do mock entra aqui, e não na busca: banir ou
-  // remover um anúncio (nesta aba ou em outra) atualiza as telas na hora
   // Os pedidos como a API devolveu: as ações de retorno e repasse usam estes
   const rawById = useMemo(
     () => new Map([...received, ...sent].map((request) => [request.id, request])),
@@ -57,10 +53,8 @@ export function AdoptionRequestProvider({ children }) {
 
   const requests = useMemo(() => {
     if (!takesPart) return NO_REQUESTS;
-    return [...rawById.values()].map((request) =>
-      adocaoService.withModeration(adocaoService.withReturnRecord(request, returnsData), isAccountBanned),
-    );
-  }, [takesPart, rawById, returnsData, isAccountBanned]);
+    return [...rawById.values()].map((request) => adocaoService.withReturnRecord(request, returnsData));
+  }, [takesPart, rawById, returnsData]);
 
   // O score congelado na conclusão: no mock, guardado na primeira vez que o
   // pedido aparece concluído (a API vai gravar no próprio `conclude`)

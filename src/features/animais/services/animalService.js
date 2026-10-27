@@ -1,8 +1,6 @@
 import * as animaisApi from './animaisApi'
 import { buildAgeLabel } from '../utils/ageHelpers'
 import { speciesFromSearch } from '../utils/speciesSearch'
-import { mockHttpError } from '../../../core/services/mock/mockStore'
-import { isAccountBanned, isAnimalRemoved } from '../../admin/services/moderationMock'
 
 // Fachada dos animais: as telas só conhecem estas funções e o modelo do
 // frontend. A API já usa os mesmos nomes e valores (DOG, MALE, YEARS...),
@@ -87,25 +85,12 @@ export function toApiFilters({ search = '', filters = {}, page = 0, size = PAGE_
   return params
 }
 
-// 🔴 Moderação no modo mock (USE_MOCK_ADMIN): a API ainda não sabe quem o
-// admin baniu nem o que ele removeu, então a fachada esconde esses anúncios.
-// Com a moderação no backend, a própria API deixa de devolvê-los
-function isOnSite(dto) {
-  return !isAccountBanned(dto.owner) && !isAnimalRemoved(dto)
-}
-
-// Com a moderação no backend, só o admin recebe esses anúncios: o status
-// REMOVED e o `owner.active` vêm da própria API
+// A moderação é do backend: anúncio removido e de conta banida já não vêm
+// para o site. Só o admin recebe esses, com o status REMOVED e o
+// `owner.active` da própria API
 function moderationOf(dto) {
-  if (isAnimalRemoved(dto) || dto.status === 'REMOVED') return 'REMOVED'
-  return isAccountBanned(dto.owner) || dto.owner?.active === false ? 'OWNER_BANNED' : null
-}
-
-// Removido é definitivo: o dono não edita, não tira do ar nem reativa
-function assertNotRemoved(id) {
-  if (isAnimalRemoved({ id })) {
-    throw mockHttpError(403, 'Este anúncio foi removido pela moderação e não pode mais ser alterado.')
-  }
+  if (dto.status === 'REMOVED') return 'REMOVED'
+  return dto.owner?.active === false ? 'OWNER_BANNED' : null
 }
 
 // ---------- operações ----------
@@ -113,13 +98,10 @@ function assertNotRemoved(id) {
 // Uma página da vitrine. `hasMore` alimenta o botão "Mostrar mais"
 export async function listAnimals(options) {
   const data = await animaisApi.listAnimals(toApiFilters(options))
-  const onSite = data.content.filter(isOnSite)
   return {
-    animals: onSite.map(toFrontendAnimal),
+    animals: data.content.map(toFrontendAnimal),
     page: data.page,
-    // A API ainda conta os escondidos: desconta os desta página (exato quando
-    // a busca cabe numa página só, o caso do TCC)
-    totalElements: Math.max(data.totalElements - (data.content.length - onSite.length), 0),
+    totalElements: data.totalElements,
     hasMore: data.page + 1 < data.totalPages,
   }
 }
@@ -142,37 +124,34 @@ export async function createAnimal(form, photos) {
   return toFrontendAnimal(await animaisApi.createAnimal(toApiAnimal(form, photos)))
 }
 
+// Anúncio removido pela moderação é definitivo: a API recusa (403) editar,
+// tirar do ar ou reativar
 export async function updateAnimal(id, form, photos) {
-  assertNotRemoved(id)
   return toFrontendAnimal(await animaisApi.updateAnimal(id, toApiAnimal(form, photos)))
 }
 
 // AVAILABLE, ADOPTED (definitivo) ou INACTIVE (tirado do ar)
 export async function changeAnimalStatus(id, status) {
-  assertNotRemoved(id)
   return toFrontendAnimal(await animaisApi.changeAnimalStatus(id, status))
 }
 
 // Exclusão lógica: o anúncio vira INACTIVE
 export async function deleteAnimal(id) {
-  assertNotRemoved(id)
   return animaisApi.deleteAnimal(id)
 }
 
-// O dono vê o anúncio removido pela moderação com `status: 'REMOVED'` (no
-// backend, um status próprio que ele não consegue trocar)
+// O dono vê o anúncio removido pela moderação com `status: 'REMOVED'`, um
+// status próprio que ele não consegue trocar
 export async function listMyAnimals() {
-  return (await animaisApi.listMyAnimals())
-    .map((dto) => (isAnimalRemoved(dto) ? { ...dto, status: 'REMOVED' } : dto))
-    .map(toFrontendAnimal)
+  return (await animaisApi.listMyAnimals()).map(toFrontendAnimal)
 }
 
 export async function listUserAnimals(userId) {
-  return (await animaisApi.listUserAnimals(userId)).filter(isOnSite).map(toFrontendAnimal)
+  return (await animaisApi.listUserAnimals(userId)).map(toFrontendAnimal)
 }
 
 export async function listFavorites() {
-  return (await animaisApi.listFavorites()).filter(isOnSite).map(toFrontendAnimal)
+  return (await animaisApi.listFavorites()).map(toFrontendAnimal)
 }
 
 export function listFavoriteIds() {
