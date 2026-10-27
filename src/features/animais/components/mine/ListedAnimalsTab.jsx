@@ -10,7 +10,6 @@ import ReturnInfo from '../../../adocao/components/ReturnInfo'
 import OwnerReturnButton from '../../../adocao/components/returns/OwnerReturnButton'
 import OwnerReturnDialogs from '../../../adocao/components/returns/OwnerReturnDialogs'
 import RehomedListingOffDialog from '../../../adocao/components/returns/RehomedListingOffDialog'
-import { useReturnsMock } from '../../../adocao/hooks/useReturnsMock'
 import { originRequestIdOf } from '../../../adocao/services/adocaoService'
 import { RETURN_STATUSES, ownerReturnRequestFor } from '../../../adocao/utils/requestStatus'
 import { isSameId } from '../../../../core/utils/ids'
@@ -34,7 +33,6 @@ const SUCCESS_MESSAGES = {
 function ListedAnimalsTab({ onNotify }) {
   const { data: animals = [], isLoading, error, refetch } = useMyAnimals()
   const { requests, undoRehome } = useAdoptionRequests()
-  const returnsData = useReturnsMock()
   const [statusFilter, setStatusFilter] = useState('')
   const [statusError, setStatusError] = useState(null)
   const [returningRequest, setReturningRequest] = useState(null)
@@ -61,7 +59,7 @@ function ListedAnimalsTab({ onNotify }) {
 
   // A adoção REHOMED de onde veio o anúncio, enquanto o repasse vale
   const rehomedOriginOf = (animal) => {
-    const originId = originRequestIdOf(animal, returnsData)
+    const originId = originRequestIdOf(animal)
     if (originId == null) return null
     return requests.find((request) => isSameId(request.id, originId) && request.status === 'REHOMED') ?? null
   }
@@ -144,7 +142,7 @@ function ListedAnimalsTab({ onNotify }) {
         <ul className="flex flex-col gap-3">
           {visible.map((animal) => {
             const adoption = ownerReturnRequestFor(animal, requests)
-            const isRehomedListing = originRequestIdOf(animal, returnsData) != null
+            const isRehomedListing = originRequestIdOf(animal) != null
             return (
               <OwnerAnimalRow
                 key={animal.id}
