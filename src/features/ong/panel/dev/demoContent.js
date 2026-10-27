@@ -147,38 +147,29 @@ const EXTRA_NAMES = [
 
 const EXTRA_PEOPLE = EXTRA_NAMES.map((name, index) => ({ id: 9801 + index, name, photoUrl: photoFor(index + 3) }))
 
-// ---------- eventos e campanhas (mocks no localStorage) ----------
+// ---------- eventos (cadastrados de verdade pela API) ----------
 
+// Só próximos: a API recusa data no passado. Presenças não dá para criar
+// (cada uma é de uma conta de verdade)
 const EVENT_TEMPLATES = [
   {
-    daysFromToday: 3, attendees: 14, category: 'ADOPTION_FAIR', title: 'Feira de Adoção no Parque', startTime: '09:00', endTime: '15:00',
+    daysFromToday: 3, category: 'ADOPTION_FAIR', title: 'Feira de Adoção no Parque', startTime: '09:00', endTime: '15:00',
     capacity: null, coverUrl: unsplash('photo-1548199973-03cce0bbc87b'),
     description: 'Cães e gatos resgatados pela ONG, todos vacinados e castrados, esperando uma família. Traga documento com foto e comprovante de residência.',
   },
   {
-    daysFromToday: 12, attendees: 22, category: 'HEALTH', title: 'Mutirão de Vacinação', startTime: '08:00', endTime: '12:00',
+    daysFromToday: 12, category: 'HEALTH', title: 'Mutirão de Vacinação', startTime: '08:00', endTime: '12:00',
     capacity: 30, coverUrl: unsplash('photo-1543466835-00a7907e9de1'),
     description: 'Vacina antirrábica e V10 a preço de custo para cães e gatos da comunidade. Vagas limitadas à equipe veterinária.',
   },
   {
-    daysFromToday: 26, attendees: 6, category: 'WORKSHOP', title: 'Oficina: os primeiros dias com o pet adotado', startTime: '19:00', endTime: '21:00',
+    daysFromToday: 26, category: 'WORKSHOP', title: 'Oficina: os primeiros dias com o pet adotado', startTime: '19:00', endTime: '21:00',
     capacity: 20, coverUrl: null,
     description: 'Adaptação, alimentação, primeiros cuidados veterinários e como lidar com o medo do novo lar. Aberta para quem adotou ou pretende adotar.',
   },
-  {
-    daysFromToday: -18, attendees: 31, category: 'BAZAAR', title: 'Bazar Beneficente de Inverno', startTime: '10:00', endTime: '17:00',
-    capacity: null, coverUrl: unsplash('photo-1607083206968-13611e3d76db'),
-    description: 'Roupas, livros e utensílios doados pela comunidade. Toda a renda vai para a ração do inverno.',
-  },
-  {
-    daysFromToday: -80, attendees: 26, category: 'ADOPTION_FAIR', title: 'Feira de Adoção de Outono', startTime: '09:00', endTime: '16:00',
-    capacity: null, coverUrl: unsplash('photo-1548199973-03cce0bbc87b'),
-    description: 'Edição de outono da feira de adoção da ONG, com orientação de veterinários voluntários.',
-  },
 ]
 
-// Eventos na sede da ONG (cidade do perfil). As presenças são confirmadas
-// nos dias antes do evento — ou antes de hoje, se ele ainda vai acontecer
+// Corpos de POST /events: eventos na sede da ONG (cidade do perfil)
 export function buildDemoEvents(user) {
   const today = todayLocalIso()
   const place = {
@@ -186,21 +177,15 @@ export function buildDemoEvents(user) {
     city: user.address?.city || user.city || 'Criciúma', state: user.address?.state || user.state || 'SC',
   }
 
-  return EVENT_TEMPLATES.map(({ daysFromToday, attendees, ...fields }, index) => {
-    const date = addDaysIso(today, daysFromToday)
-    const lastDay = daysFromToday < 0 ? date : today
-    return {
-      ...fields,
-      ...place,
-      date,
-      createdAt: `${addDaysIso(lastDay, -(15 + index * 4))}T10:00:00`,
-      attendees: EXTRA_PEOPLE.slice(0, attendees).map((person, personIndex) => ({
-        user: person,
-        confirmedAt: `${addDaysIso(lastDay, -1 - (personIndex % 9))}T${String(8 + (personIndex % 12)).padStart(2, '0')}:20:00`,
-      })),
-    }
-  })
+  return EVENT_TEMPLATES.map(({ daysFromToday, ...fields }) => ({
+    ...fields,
+    ...place,
+    customCategory: null,
+    date: addDaysIso(today, daysFromToday),
+  }))
 }
+
+// ---------- campanhas (mock no localStorage) ----------
 
 const CAMPAIGN_TEMPLATES = [
   {
