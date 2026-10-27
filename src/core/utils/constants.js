@@ -1,10 +1,8 @@
 // Módulos sem endpoint no Spring Boot rodam contra um "servidor falso" no
 // localStorage (regras-de-negocios.md §12). O padrão é o mock; com
 // VITE_USE_MOCK_CAMPANHAS=false (ou outra flag abaixo) no .env o mesmo código
-// chama a API real. Eventos e o painel do admin já vêm sempre da API
+// chama a API real. Eventos, denúncias e o painel do admin já vêm sempre da API
 export const USE_MOCK_CAMPANHAS = import.meta.env.VITE_USE_MOCK_CAMPANHAS !== 'false'
-// Denúncias feitas no site (POST /api/reports e GET /api/reports/mine)
-export const USE_MOCK_DENUNCIAS = import.meta.env.VITE_USE_MOCK_DENUNCIAS !== 'false'
 // Retorno e repasse de adoções (docs/contratos-prontos/api-devolucao-reabandono.md):
 // sem as rotas da migração 012, um "servidor falso" guarda os registros por
 // pedido e os sobrepõe aos pedidos reais

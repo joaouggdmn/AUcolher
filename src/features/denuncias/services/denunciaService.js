@@ -1,40 +1,11 @@
-import { httpUrlOrNull } from '../../../core/services/mock/mockStore'
-import { USE_MOCK_DENUNCIAS } from '../../../core/utils/constants'
 import * as denunciasApi from './denunciasApi'
-import * as denunciasMock from './denunciasMock'
 
 // Fachada das denúncias: as telas só conhecem estas funções e o modelo do
-// frontend. Quem fala com o "servidor" é o adaptador — API real ou mock, os
-// dois com as mesmas funções e os mesmos DTOs
-const adapter = USE_MOCK_DENUNCIAS ? denunciasMock : denunciasApi
+// frontend. Quem fala com o servidor é o denunciasApi (DTOs da API)
 
 const FRONTEND_USER_TYPES = { NGO: 'ONG', PERSON: 'PESSOA', ADMIN: 'ADMIN' }
-const API_USER_TYPES = { ONG: 'NGO', PESSOA: 'PERSON' }
 
 // ---------- mappers ----------
-
-// Cópia do alvo que só o mock usa (o backend monta a dele a partir do banco),
-// tirada do animal ou do perfil como as telas já têm
-function animalTarget(animal) {
-  return {
-    name: animal.name,
-    photoUrl: httpUrlOrNull(animal.photoUrl),
-    species: animal.species ?? null,
-    ownerId: animal.ownerId ?? null,
-    ownerName: animal.organizationName ?? animal.ownerName ?? null,
-    ownerUserType: animal.listingType === 'NGO' ? 'NGO' : 'PERSON',
-  }
-}
-
-function profileTarget(profile) {
-  return {
-    name: profile.name,
-    photoUrl: httpUrlOrNull(profile.photoUrl),
-    userType: API_USER_TYPES[profile.userType] ?? 'PERSON',
-    city: profile.city ?? null,
-    state: profile.state ?? null,
-  }
-}
 
 export function toFrontendReport(dto) {
   const target = dto.target ?? {}
@@ -75,14 +46,14 @@ export function toFrontendReport(dto) {
 
 // ---------- operações ----------
 
-// `target` é o animal (targetType ANIMAL) ou o perfil público (USER)
+// `target` é o animal (targetType ANIMAL) ou o perfil público (USER). O
+// backend monta a cópia do alvo a partir do banco: basta o id
 export async function createReport({ targetType, target, reason, description }) {
   const payload = { targetType, targetId: target.id, reason, description: description?.trim() || null }
-  const snapshot = targetType === 'ANIMAL' ? animalTarget(target) : profileTarget(target)
-  return toFrontendReport(await adapter.createReport(payload, { target: snapshot }))
+  return toFrontendReport(await denunciasApi.createReport(payload))
 }
 
 export async function listMyReports() {
-  const dtos = await adapter.listMyReports()
+  const dtos = await denunciasApi.listMyReports()
   return dtos.map(toFrontendReport)
 }
