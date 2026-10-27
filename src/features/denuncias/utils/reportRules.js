@@ -1,5 +1,5 @@
-// Regras das denúncias (regras-de-negocios.md §8), iguais no modal e no
-// servidor falso (denunciasMock), como o backend fará no POST /api/reports
+// Regras das denúncias (regras-de-negocios.md §8), as mesmas que o backend
+// aplica no POST /api/reports
 
 // O que pode ser denunciado: o anúncio de um animal ou o perfil de uma conta
 export const REPORT_TARGET_TYPES = ['ANIMAL', 'USER']
@@ -49,13 +49,9 @@ export const REPORT_REASONS = [
 
 const REASON_BY_VALUE = Object.fromEntries(REPORT_REASONS.map((reason) => [reason.value, reason]))
 
-// Identifica o alvo de uma denúncia (agrupar, achar a que já está em
-// análise). O perfil leva também o nome: no modo mock, os ids 1 a 7 dos perfis
-// fictícios se repetem com os do banco real (docs/planos-front/plano-painel-admin.md §6), e
-// mesmo id com outro nome é outra conta
-export function reportTargetKey({ targetType, targetId, target }) {
-  const name = targetType === 'USER' ? (target?.name ?? '') : ''
-  return `${targetType}:${targetId}:${name}`
+// Identifica o alvo de uma denúncia (agrupar, achar a que já está em análise)
+export function reportTargetKey({ targetType, targetId }) {
+  return `${targetType}:${targetId}`
 }
 
 export function reasonsFor(targetType) {
@@ -66,8 +62,8 @@ export function getReasonLabel(value) {
   return REASON_BY_VALUE[value]?.label ?? 'Outro motivo'
 }
 
-// Corpo do POST /api/reports, campo a campo. O mock devolve a primeira como
-// erro 400, igual ao backend; o modal mostra cada uma no seu campo
+// Corpo do POST /api/reports, campo a campo. O modal mostra cada uma no seu
+// campo antes de enviar; o backend recusa as mesmas com erro 400
 export function getReportPayloadErrors({ targetType, reason, description }) {
   const errors = {}
   const text = description?.trim() ?? ''
