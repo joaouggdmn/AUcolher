@@ -83,7 +83,7 @@ function SentRequestCard({ request, onGoToChat, onCancel }) {
                 {status === 'AWAITING_DELIVERY' ? 'Confirmar chegada no chat' : 'Ir para o chat'}
               </button>
             )}
-            {CANCELLABLE_STATUSES.includes(status) && !request.moderated && (
+            {CANCELLABLE_STATUSES.includes(status) && (
               <button
                 type="button"
                 onClick={() => onCancel(request)}

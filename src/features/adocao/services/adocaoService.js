@@ -5,13 +5,10 @@ import { toApiAnimal, toFrontendAnimal } from '../../animais/services/animalServ
 import { toFrontendMatchProfile } from '../../aumatch/services/aumatchService'
 import { buildAdopterSnapshot } from '../utils/buildAdopterSnapshot'
 import { computeProfileCompletion } from '../../../core/hooks/useProfileCompletion'
-import { isAccountBanned, isAnimalRemoved } from '../../admin/services/moderationMock'
 
 // Fachada dos pedidos de adoção: as telas só conhecem estas funções e o
 // formato de pedido que já usavam quando tudo era localStorage — o resto do
 // app (painel da ONG, Minha conta, chat) muda pouco. Contrato em docs/contratos-prontos/api-adocao.md
-
-const ACTIVE_STATUSES = ['PENDING', 'ACCEPTED', 'AWAITING_DELIVERY']
 
 // ---------- conversão DTO → modelo ----------
 
@@ -70,30 +67,6 @@ export function toFrontendRequest(dto) {
       adopter: toFrontendReview(dto.reviews?.adopter),
       owner: toFrontendReview(dto.reviews?.owner),
     },
-  }
-}
-
-// 🔴 Moderação no modo mock (USE_MOCK_ADMIN): a API ainda não sabe quem o
-// admin baniu nem o que ele removeu. Pedido ativo com uma parte banida ou com
-// o anúncio removido aparece cancelado, com o motivo, e não aceita mais
-// ações — só na tela, o servidor não muda. Com a moderação no backend, o
-// próprio banimento cancela no servidor. `isBanned` vem do useModeration
-// quando a tela precisa reagir na hora a um banimento
-export function withModeration(request, isBanned = isAccountBanned) {
-  if (!ACTIVE_STATUSES.includes(request.status)) return request
-
-  const removed = isAnimalRemoved({ id: request.animalId })
-  const banned =
-    isBanned({ id: request.ownerId, name: request.animal.organizationName ?? request.animal.ownerName }) ||
-    isBanned({ id: request.adopter.userId, name: request.adopter.name })
-  if (!removed && !banned) return request
-
-  return {
-    ...request,
-    status: 'CANCELLED',
-    cancelReason: removed ? 'LISTING_REMOVED' : 'ACCOUNT_BANNED',
-    cancelledFromStatus: request.status,
-    moderated: true,
   }
 }
 

@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { exchangeGoogleCode, loginRequest, registerRequest } from '../services/authService'
-import { isAccountBanned, subscribeModeration } from '../../features/admin/services/moderationMock'
 import {
   getMatchProfile,
   saveMatchProfile as saveMatchProfileRequest,
@@ -13,17 +12,12 @@ import {
   USER_STORAGE_KEY,
   LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY,
   LEGACY_MOCK_EVENTOS_STORAGE_KEY,
+  LEGACY_MOCK_ADMIN_STORAGE_KEY,
+  LEGACY_MOCK_MODERACAO_STORAGE_KEY,
+  LEGACY_ADOPTION_REQUESTS_STORAGE_KEY,
 } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
-
-function isStoredSessionOf(user) {
-  try {
-    return String(JSON.parse(localStorage.getItem(USER_STORAGE_KEY))?.id) === String(user.id)
-  } catch {
-    return false
-  }
-}
 
 // O Perfil AUmatch (respostas do quiz) mora na API e é só de pessoa física.
 // null = não deu para carregar agora (a sessão segue com o que já tinha)
@@ -60,8 +54,12 @@ export function AuthProvider({ children }) {
     // conta (outra pessoa no mesmo navegador herdava as respostas). Agora elas
     // vêm do banco: quem não tiver perfil lá responde o quiz de novo
     localStorage.removeItem(LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY)
-    // O mesmo para o antigo "banco" falso de eventos: agora eles vêm da API
+    // O mesmo para os antigos "bancos" falsos de eventos, do painel do admin
+    // e da moderação (com os pedidos de demonstração): agora vêm da API
     localStorage.removeItem(LEGACY_MOCK_EVENTOS_STORAGE_KEY)
+    localStorage.removeItem(LEGACY_MOCK_ADMIN_STORAGE_KEY)
+    localStorage.removeItem(LEGACY_MOCK_MODERACAO_STORAGE_KEY)
+    localStorage.removeItem(LEGACY_ADOPTION_REQUESTS_STORAGE_KEY)
 
     const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
     const storedUser = localStorage.getItem(USER_STORAGE_KEY)
@@ -72,11 +70,6 @@ export function AuthProvider({ children }) {
         // Sessão salva antes da API em inglês (usuário com `cidade`/`estado`):
         // descarta e pede um novo login, que traz o perfil no formato atual
         if ('cidade' in parsedUser) throw new Error('sessão em formato antigo')
-        // Conta banida enquanto estava fora: a sessão salva não vale mais
-        if (isAccountBanned(parsedUser)) {
-          sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
-          throw new Error('conta suspensa')
-        }
         // Resposta de antes da pergunta "Quem mora com você?" (era sim/não)
         delete parsedUser.temCriancasOuPets
         setUser(parsedUser)
@@ -121,25 +114,6 @@ export function AuthProvider({ children }) {
     window.addEventListener('auth:suspended', handleSuspended)
     return () => window.removeEventListener('auth:suspended', handleSuspended)
   }, [])
-
-  // 🔴 Moderação no modo mock: se o admin banir a conta logada (em outra
-  // aba), a sessão cai na hora e o login explica o motivo. As abas dividem a
-  // mesma sessão salva: se outra conta já entrou por cima (o próprio admin,
-  // por exemplo), só esta aba sai e a sessão salva fica como está
-  useEffect(() => {
-    if (!user) return undefined
-    return subscribeModeration(() => {
-      if (!isAccountBanned(user)) return
-      sessionStorage.setItem(ACCOUNT_SUSPENDED_FLAG_KEY, '1')
-      if (isStoredSessionOf(user)) {
-        logout()
-      } else {
-        setUser(null)
-        setIsAuthenticated(false)
-      }
-      window.location.assign('/login')
-    })
-  }, [user])
 
   // Abre a sessão com o payload do login (por senha ou pelo Google) ou do cadastro
   async function startSession({ token, tokenType, user: loggedUser }) {

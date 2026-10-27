@@ -17,7 +17,6 @@ import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContex
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { isSameId } from '../../../core/utils/ids'
 import { AUMATCH_PANEL_OPEN_KEY } from '../../../core/utils/storageKeys'
-import { useModeration } from '../../admin/hooks/useModeration'
 import { applyMatchPreferences } from '../utils/matchFilters'
 import { buildCityOptions } from '../../animais/components/filters/filterOptions'
 import { useMatchPreferences } from '../hooks/useMatchPreferences'
@@ -54,7 +53,6 @@ function DeckStatusCard({ children }) {
 }
 
 function AumatchPage() {
-  const { isAccountBanned } = useModeration()
   const { user, isAuthenticated, isMatchProfileReady, saveMatchProfile } = useAuth()
   const { pets, isAdopter, isLoading, isError, refetch } = useAumatchDeck()
   const { createRequest } = useAdoptionRequests()
@@ -100,15 +98,10 @@ function AumatchPage() {
   // A API já tira do deck os adotados, os inativos, os próprios anúncios, as
   // outras espécies e os pets que a pessoa já pediu. Aqui ficam as regras
   // que ela ainda não conhece
+  // Na prévia de uma ONG, os anúncios dela mesma não entram
   const eligiblePets = useMemo(
-    () =>
-      pets.filter((pet) => {
-        // Na prévia de uma ONG, os anúncios dela mesma não entram
-        if (user && isSameId(pet.ownerId, user.id)) return false
-        // Dono banido pela moderação: sai na hora, sem esperar o deck recarregar
-        return !isAccountBanned({ id: pet.ownerId, name: pet.organizationName ?? pet.ownerName })
-      }),
-    [pets, user, isAccountBanned]
+    () => pets.filter((pet) => !(user && isSameId(pet.ownerId, user.id))),
+    [pets, user]
   )
 
   // As cidades do filtro são as dos pets do próprio deck, que vem inteiro
