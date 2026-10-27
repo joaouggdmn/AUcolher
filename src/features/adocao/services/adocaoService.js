@@ -1,6 +1,4 @@
 import * as adocaoApi from './adocaoApi'
-import * as returnsMock from './returnsMock'
-import { USE_MOCK_REABANDONO } from '../../../core/utils/constants'
 import { toApiAnimal, toFrontendAnimal } from '../../animais/services/animalService'
 import { toFrontendMatchProfile } from '../../aumatch/services/aumatchService'
 import { buildAdopterSnapshot } from '../utils/buildAdopterSnapshot'
@@ -99,39 +97,30 @@ export function deleteRequestReview(id) {
 }
 
 // ---------- retorno e repasse ----------
-// Recebem o pedido como a API devolveu (o mock precisa dele para validar) e
-// devolvem o pedido atualizado. Com USE_MOCK_REABANDONO, quem responde é o
-// returnsMock; o `withReturnRecord` sobrepõe os registros dele aos pedidos
+// Recebem o pedido como a API devolveu e devolvem o pedido atualizado (o
+// retorno e o repasse vêm no próprio pedido, em `returnInfo`)
 
-export const withReturnRecord = USE_MOCK_REABANDONO ? returnsMock.withReturnRecord : (request) => request
-
-// O pedido de onde veio um anúncio republicado (nulo nos demais). `returnsData`
-// vem do useReturnsMock, para a tela reagir a um repasse novo
-export function originRequestIdOf(animal, returnsData) {
-  if (USE_MOCK_REABANDONO) return returnsMock.originRequestIdOf(animal, returnsData)
+// O pedido de onde veio um anúncio republicado (nulo nos demais)
+export function originRequestIdOf(animal) {
   return animal.originRequestId ?? null
 }
 
 export async function registerReturn(request, { returnDate, reason, note }) {
   const body = { returnDate, reason, note: note?.trim() || null }
-  if (USE_MOCK_REABANDONO) return returnsMock.registerReturn(request, body)
   return toFrontendRequest(await adocaoApi.registerReturn(request.id, body))
 }
 
 // O anúncio original, no formato de animal do front (o formulário usa como base)
 export async function getRehomeDraft(request) {
-  if (USE_MOCK_REABANDONO) return returnsMock.getRehomeDraft(request)
   return toFrontendAnimal(await adocaoApi.getRehomeDraft(request.id))
 }
 
 export async function rehome(request, { reason, note, form, photos }) {
-  if (USE_MOCK_REABANDONO) return returnsMock.rehome(request, { reason, note, form, photos })
   const body = { reason, note: note?.trim() || null, animal: toApiAnimal(form, photos) }
   return toFrontendRequest(await adocaoApi.rehome(request.id, body))
 }
 
 export async function undoRehome(request) {
-  if (USE_MOCK_REABANDONO) return returnsMock.undoRehome(request)
   return toFrontendRequest(await adocaoApi.undoRehome(request.id))
 }
 

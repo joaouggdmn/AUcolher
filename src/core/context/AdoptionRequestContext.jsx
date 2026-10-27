@@ -1,10 +1,7 @@
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as adocaoService from "../../features/adocao/services/adocaoService";
 import { animalKeys } from "../../features/animais/hooks/useAnimais";
-import { useReturnsMock } from "../../features/adocao/hooks/useReturnsMock";
-import { freezeConcludedScores } from "../../features/adocao/services/returnsMock";
-import { USE_MOCK_REABANDONO } from "../utils/constants";
 import { queryKeys } from "../services/queryKeys";
 import { useAuth } from "./AuthContext";
 
@@ -47,20 +44,12 @@ export function AdoptionRequestProvider({ children }) {
     [sent, received],
   );
 
-  // 🔴 Mock do reabandono: o retorno e o repasse registrados neste navegador
-  // entram por cima dos pedidos, como a API vai devolver depois da 012
-  const returnsData = useReturnsMock();
-
-  const requests = useMemo(() => {
-    if (!takesPart) return NO_REQUESTS;
-    return [...rawById.values()].map((request) => adocaoService.withReturnRecord(request, returnsData));
-  }, [takesPart, rawById, returnsData]);
-
-  // O score congelado na conclusão: no mock, guardado na primeira vez que o
-  // pedido aparece concluído (a API vai gravar no próprio `conclude`)
-  useEffect(() => {
-    if (takesPart) freezeConcludedScores([...rawById.values()]);
-  }, [takesPart, rawById]);
+  // O retorno e o repasse já vêm no próprio pedido (`returnInfo`), e o score
+  // congelado na conclusão é gravado pela API no `conclude`
+  const requests = useMemo(
+    () => (takesPart ? [...rawById.values()] : NO_REQUESTS),
+    [takesPart, rawById],
+  );
 
   // Troca o pedido nas duas listas pelo que a API devolveu (a tela muda na
   // hora) e manda buscar de novo — uma conclusão também cancela outros pedidos
@@ -98,12 +87,10 @@ export function AdoptionRequestProvider({ children }) {
     return updated;
   }
 
-  // Retorno e repasse: a API devolve o pedido atualizado; no mock, a camada
-  // do returnsMock já muda as telas, e o cache fica com o pedido da API
+  // Retorno e repasse: a API devolve o pedido atualizado
   async function runReturnAction(requestId, action) {
     const updated = await action(rawById.get(requestId));
-    if (USE_MOCK_REABANDONO) queryClient.invalidateQueries({ queryKey: queryKeys.adocao.all });
-    else applyResult(updated);
+    applyResult(updated);
     // O animal sai do ar (retorno), nasce (repasse) ou sai do ar de novo (desfazer)
     queryClient.invalidateQueries({ queryKey: animalKeys.all });
     return updated;
