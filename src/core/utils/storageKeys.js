@@ -22,7 +22,9 @@ export const LEGACY_MOCK_DENUNCIAS_STORAGE_KEY = 'aucolher_mock_denuncias'
 // Antigo: as decisões de moderação do modo mock. A moderação agora é do
 // backend; o AuthContext só apaga o que versões anteriores deixaram aqui
 export const LEGACY_MOCK_MODERACAO_STORAGE_KEY = 'aucolher_mock_moderacao'
-export const MOCK_REABANDONO_STORE_KEY = 'aucolher_mock_reabandono'
+// Antigo: o "banco" falso do retorno e do repasse. Eles agora vêm da API; o
+// AuthContext só apaga o que versões anteriores deixaram nesta chave
+export const LEGACY_MOCK_REABANDONO_STORAGE_KEY = 'aucolher_mock_reabandono'
 // Links de "Esqueci minha senha" do modo mock (mesmo mockStore)
 export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'
 // "Banco" falso do chat: mensagens e marcas de leitura (mesmo mockStore)
