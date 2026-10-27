@@ -21,8 +21,8 @@ function tooLong(value, max) {
 }
 
 // Regras do corpo de POST/PUT /api/events (docs/contratos-prontos/api-eventos.md
-// §2.2), campo a campo, com as chaves do DTO. O mock devolve a primeira como
-// erro 400, igual ao backend; o formulário pode mostrar todas
+// §2.2), campo a campo, com as chaves do DTO — as mesmas que o backend
+// valida. O formulário mostra todas antes de enviar
 export function getEventPayloadErrors(payload, today) {
   const errors = {}
   const { title, description, date, startTime, endTime, capacity, coverUrl } = payload

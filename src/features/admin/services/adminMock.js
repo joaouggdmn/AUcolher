@@ -24,8 +24,8 @@ import {
   resolvePendingReportsForAdmin,
 } from '../../denuncias/services/denunciasMock'
 import { reportTargetKey } from '../../denuncias/utils/reportRules'
-import { readAllEventsForAdmin, removeEventForAdmin } from '../../eventos/services/eventosMock'
 import { buildSeedAdmin } from '../data/seedAdmin'
+import * as adminApi from './adminApi'
 import {
   byNewest,
   campaignActivity,
@@ -52,7 +52,8 @@ import {
 //              tirados dos pedidos concluídos
 //   pedidos  → API real (GET /api/admin/adoption-requests) + os de
 //              demonstração do admin (só em dev, no localStorage)
-//   campanhas, doações, eventos e denúncias → os outros servidores falsos
+//   eventos  → API real (GET /api/admin/events)
+//   campanhas, doações e denúncias → os outros servidores falsos
 const store = createMockStore({ key: MOCK_ADMIN_STORE_KEY, version: 1, seed: buildSeedAdmin })
 
 // Séries mensais: os últimos 12 meses (a tela mostra os que quiser)
@@ -130,6 +131,11 @@ function readDemoRequests() {
 async function loadRequests() {
   const real = await adocaoApi.listAllForAdmin()
   return [...real.map((dto) => withReturnRecord(toStatsRequest(dto))), ...readDemoRequests()]
+}
+
+// Todos os eventos, inclusive passados e cancelados (só o admin chega aqui)
+function loadEvents() {
+  return adminApi.listEvents()
 }
 
 // A vitrine pública só lista disponíveis, de página em página
@@ -430,8 +436,13 @@ function ngoRanking(accounts, requests, donations) {
   }
 }
 
+// ONG banida pela API (`ngo.active`) ou pelo moderationMock
+function isEventNgoBanned(event) {
+  return event.ngo?.active === false || isAccountBanned(event.ngo)
+}
+
 function isListedEvent(event) {
-  return event.status === 'ACTIVE' && !isAccountBanned(event.ngo)
+  return event.status === 'ACTIVE' && !isEventNgoBanned(event)
 }
 
 // `active` do dono (animal) ou da ONG (campanha, evento): o admin vê o
@@ -506,7 +517,7 @@ export async function getStats() {
   const animals = await loadAnimals(requests)
   const donations = readApprovedDonationsForAdmin()
   const campaigns = readAllCampaignsForAdmin()
-  const events = readAllEventsForAdmin()
+  const events = await loadEvents()
   const accounts = loadAccounts(animals, campaigns, events, requests)
   const today = todayLocalIso()
   const months = lastMonthKeys(SERIES_MONTHS)
@@ -522,7 +533,7 @@ export async function getStats() {
       upcoming: countBy(events, (event) => isListedEvent(event) && event.date >= today),
       past: countBy(events, (event) => isListedEvent(event) && event.date < today),
       cancelled: countBy(events, (event) => event.status === 'CANCELLED'),
-      suspended: countBy(events, (event) => event.status === 'ACTIVE' && isAccountBanned(event.ngo)),
+      suspended: countBy(events, (event) => event.status === 'ACTIVE' && isEventNgoBanned(event)),
     },
     ngoRanking: ngoRanking(accounts, requests, donations),
     recentActivity: recentActivity(accounts, requests, campaigns, events),
@@ -537,7 +548,7 @@ export async function listUsers() {
 
   const requests = await loadRequests()
   const animals = await loadAnimals(requests)
-  return loadAccounts(animals, readAllCampaignsForAdmin(), readAllEventsForAdmin(), requests)
+  return loadAccounts(animals, readAllCampaignsForAdmin(), await loadEvents(), requests)
     .sort(byNewest('createdAt'))
     .map((account) => toUserDto(account, animals))
 }
@@ -560,13 +571,6 @@ export async function listCampaigns() {
   await mockDelay()
   requireAdmin()
   return readAllCampaignsForAdmin().map((dto) => withOwnerStatus(dto, 'ngo'))
-}
-
-// GET /api/admin/events — próximos, passados e cancelados
-export async function listEvents() {
-  await mockDelay()
-  requireAdmin()
-  return readAllEventsForAdmin().map((dto) => withOwnerStatus(dto, 'ngo'))
 }
 
 // GET /api/admin/reports — todas as denúncias, com quem denunciou
@@ -620,7 +624,7 @@ export async function setUserStatus(userId, active) {
 
   const requests = await loadRequests()
   const animals = await loadAnimals(requests)
-  const accounts = loadAccounts(animals, readAllCampaignsForAdmin(), readAllEventsForAdmin(), requests)
+  const accounts = loadAccounts(animals, readAllCampaignsForAdmin(), await loadEvents(), requests)
   const account = accounts.find((item) => isSameId(item.id, userId))
   if (!account) throw mockHttpError(404, 'Conta não encontrada.')
 
@@ -657,13 +661,6 @@ export async function removeCampaign(campaignId) {
   await mockDelay()
   requireAdmin()
   removeCampaignForAdmin(campaignId)
-}
-
-// DELETE /api/admin/events/{id} — vira cancelado para quem tinha confirmado
-export async function removeEvent(eventId) {
-  await mockDelay()
-  requireAdmin()
-  removeEventForAdmin(eventId)
 }
 
 // ---------- só do mock: dados de teste do painel do admin (features/admin/dev) ----------

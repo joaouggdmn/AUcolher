@@ -1,13 +1,9 @@
-import { USE_MOCK_EVENTOS } from '../../../core/utils/constants'
 import { maskCEP } from '../../../core/utils/masks'
 import { todayLocalIso } from '../../../core/utils/localDate'
 import * as eventosApi from './eventosApi'
-import * as eventosMock from './eventosMock'
 
 // Fachada do módulo: os componentes só conhecem estas funções e o modelo do
-// frontend. Quem fala com o "servidor" é o adaptador — API real ou mock, os
-// dois com as mesmas funções e os mesmos DTOs
-const adapter = USE_MOCK_EVENTOS ? eventosMock : eventosApi
+// frontend. Quem fala com o servidor é o eventosApi (DTOs da API)
 
 // ---------- mappers DTO ↔ modelo ----------
 
@@ -103,45 +99,45 @@ function toFrontendParticipant(dto) {
 
 // As telas falam em ONG (`ongId`); a API, em inglês (`ngoId`)
 export async function listEvents({ ongId } = {}) {
-  const dtos = await adapter.listEvents({ ngoId: ongId })
+  const dtos = await eventosApi.listEvents({ ngoId: ongId })
   return dtos.map(toFrontendEvent)
 }
 
 export async function getEvent(id) {
-  return toFrontendEvent(await adapter.getEvent(id))
+  return toFrontendEvent(await eventosApi.getEvent(id))
 }
 
 export async function createEvent(values) {
-  return toFrontendEvent(await adapter.createEvent(toEventPayload(values)))
+  return toFrontendEvent(await eventosApi.createEvent(toEventPayload(values)))
 }
 
 export async function updateEvent(id, values) {
-  return toFrontendEvent(await adapter.updateEvent(id, toEventPayload(values)))
+  return toFrontendEvent(await eventosApi.updateEvent(id, toEventPayload(values)))
 }
 
 export async function deleteEvent(id) {
-  await adapter.deleteEvent(id)
+  await eventosApi.deleteEvent(id)
 }
 
 export async function listMyEvents() {
-  const dtos = await adapter.listMyEvents()
+  const dtos = await eventosApi.listMyEvents()
   return dtos.map(toFrontendEvent)
 }
 
 export async function confirmAttendance(id) {
-  return toFrontendEvent(await adapter.confirmAttendance(id))
+  return toFrontendEvent(await eventosApi.confirmAttendance(id))
 }
 
 export async function cancelAttendance(id) {
-  return toFrontendEvent(await adapter.cancelAttendance(id))
+  return toFrontendEvent(await eventosApi.cancelAttendance(id))
 }
 
 export async function listParticipants(id) {
-  const dtos = await adapter.listParticipants(id)
+  const dtos = await eventosApi.listParticipants(id)
   return dtos.map(toFrontendParticipant)
 }
 
 export async function listMyAttendance() {
-  const dtos = await adapter.listMyAttendance()
+  const dtos = await eventosApi.listMyAttendance()
   return dtos.map(toFrontendEvent)
 }

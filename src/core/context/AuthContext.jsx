@@ -12,6 +12,7 @@ import {
   TOKEN_TYPE_STORAGE_KEY,
   USER_STORAGE_KEY,
   LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY,
+  LEGACY_MOCK_EVENTOS_STORAGE_KEY,
 } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
@@ -59,6 +60,8 @@ export function AuthProvider({ children }) {
     // conta (outra pessoa no mesmo navegador herdava as respostas). Agora elas
     // vêm do banco: quem não tiver perfil lá responde o quiz de novo
     localStorage.removeItem(LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY)
+    // O mesmo para o antigo "banco" falso de eventos: agora eles vêm da API
+    localStorage.removeItem(LEGACY_MOCK_EVENTOS_STORAGE_KEY)
 
     const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
     const storedUser = localStorage.getItem(USER_STORAGE_KEY)
