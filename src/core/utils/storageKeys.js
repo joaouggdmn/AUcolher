@@ -1,9 +1,9 @@
 export const TOKEN_STORAGE_KEY = 'aucolher_token'
 export const TOKEN_TYPE_STORAGE_KEY = 'aucolher_token_type'
 export const USER_STORAGE_KEY = 'aucolher_user'
-// Os pedidos de adoção agora vêm da API; esta chave só guarda os pedidos de
-// demonstração do painel do admin (adminDemoData, só em dev)
-export const ADOPTION_REQUESTS_STORAGE_KEY = 'aucolher_adoption_requests'
+// Antigo: pedidos de demonstração do painel do admin. O AuthContext só apaga
+// o que versões anteriores deixaram nesta chave
+export const LEGACY_ADOPTION_REQUESTS_STORAGE_KEY = 'aucolher_adoption_requests'
 // Antigo: as respostas do quiz agora vêm da API (GET /match/profile). O
 // AuthContext só apaga o que versões anteriores deixaram nesta chave
 export const LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile'
@@ -13,12 +13,14 @@ export const LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile'
 export const LEGACY_MOCK_EVENTOS_STORAGE_KEY = 'aucolher_mock_eventos'
 // "Banco" falso de campanhas + doações (mesmo mockStore)
 export const MOCK_CAMPANHAS_STORE_KEY = 'aucolher_mock_campanhas'
-// "Banco" falso do painel do admin: as contas da plataforma (mesmo mockStore)
-export const MOCK_ADMIN_STORE_KEY = 'aucolher_mock_admin'
+// Antigo: o "banco" falso do painel do admin. O painel agora vem da API; o
+// AuthContext só apaga o que versões anteriores deixaram nesta chave
+export const LEGACY_MOCK_ADMIN_STORAGE_KEY = 'aucolher_mock_admin'
 // "Banco" falso das denúncias feitas no site (mesmo mockStore)
 export const MOCK_DENUNCIAS_STORE_KEY = 'aucolher_mock_denuncias'
-// Decisões de moderação do modo mock: contas banidas (mesmo mockStore)
-export const MOCK_MODERACAO_STORE_KEY = 'aucolher_mock_moderacao'
+// Antigo: as decisões de moderação do modo mock. A moderação agora é do
+// backend; o AuthContext só apaga o que versões anteriores deixaram aqui
+export const LEGACY_MOCK_MODERACAO_STORAGE_KEY = 'aucolher_mock_moderacao'
 export const MOCK_REABANDONO_STORE_KEY = 'aucolher_mock_reabandono'
 // Links de "Esqueci minha senha" do modo mock (mesmo mockStore)
 export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'

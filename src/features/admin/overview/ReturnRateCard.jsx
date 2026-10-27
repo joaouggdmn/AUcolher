@@ -76,12 +76,6 @@ function ReturnRateCard({ returns }) {
       title="Taxa de reabandono"
       subtitle="Adoções que voltaram para quem doou ou foram repassadas pelo adotante (sem os resgates feitos por ONGs)"
     >
-      {returns.isSample && (
-        <p className="w-fit rounded-full border border-dashed border-amber-300 bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-700">
-          Dados de exemplo: ainda há poucas adoções na plataforma para calcular a taxa
-        </p>
-      )}
-
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="text-4xl font-black tracking-tight text-emerald-950">{formatRate(returns.rate)}</span>
         <span className="text-sm font-semibold text-slate-500">

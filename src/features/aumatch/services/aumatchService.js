@@ -1,6 +1,5 @@
 import * as aumatchApi from './aumatchApi'
 import { toFrontendAnimal } from '../../animais/services/animalService'
-import { isAccountBanned, isAnimalRemoved } from '../../admin/services/moderationMock'
 
 // Fachada do AUmatch: as telas só conhecem estas funções e o modelo do
 // frontend. As respostas do quiz seguem com as chaves e os valores do
@@ -83,12 +82,6 @@ export function toFrontendMatchCard(dto) {
   }
 }
 
-// 🔴 Moderação no modo mock (USE_MOCK_ADMIN): como na vitrine
-// (animalService), a fachada esconde anúncios removidos e de contas banidas
-function isOnSite(card) {
-  return !isAccountBanned(card.animal.owner) && !isAnimalRemoved(card.animal)
-}
-
 // ---------- operações ----------
 
 export async function getMatchProfile() {
@@ -101,5 +94,5 @@ export async function saveMatchProfile(answers) {
 }
 
 export async function getMatchDeck() {
-  return (await aumatchApi.getMatchDeck()).filter(isOnSite).map(toFrontendMatchCard)
+  return (await aumatchApi.getMatchDeck()).map(toFrontendMatchCard)
 }

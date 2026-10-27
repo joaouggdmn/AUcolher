@@ -1,4 +1,4 @@
-import { USE_MOCK_ADMIN, USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
+import { USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
 import { toFrontendProfile } from '../../../core/services/authService'
 import { toApiAnimal, toFrontendAnimal } from '../../animais/services/animalService'
 import { toFrontendReport } from '../../denuncias/services/denunciaService'
@@ -8,19 +8,21 @@ import { toEventPayload, toFrontendEvent } from '../../eventos/services/eventoSe
 import { readDeletedAccounts } from '../../perfil/services/accountDeletionMock'
 import { toApiPayload } from '../../perfil/utils/accountForm'
 import * as adminApi from './adminApi'
-import * as adminMock from './adminMock'
 import { withMockCampaignStats } from './campaignAdminStats'
 
 // Fachada do painel do admin: as telas só conhecem estas funções e o modelo
 // do frontend. Animais, campanhas e eventos usam os mesmos mappers das
-// outras telas; contas e números ganham os seus aqui
-const adapter = USE_MOCK_ADMIN ? adminMock : adminApi
+// outras telas; contas e números ganham os seus aqui. Tudo vem do adminApi
 
-// 🔴 Campanhas e doações ainda não estão no backend: com a API real do admin
-// e VITE_USE_MOCK_CAMPANHAS ligada, a lista, a remoção e os blocos de
-// campanha da Visão geral continuam vindo do mock
-const CAMPAIGNS_FROM_MOCK = !USE_MOCK_ADMIN && USE_MOCK_CAMPANHAS
-const campaignAdapter = USE_MOCK_ADMIN || USE_MOCK_CAMPANHAS ? adminMock : adminApi
+// 🔴 Campanhas e doações ainda não estão no backend: com
+// VITE_USE_MOCK_CAMPANHAS ligada, a lista, a remoção e os blocos de campanha
+// da Visão geral vêm do mock das campanhas
+const campaignAdapter = USE_MOCK_CAMPANHAS
+  ? {
+      listCampaigns: async () => doacoesMock.readAllCampaignsForAdmin(),
+      removeCampaign: async (campaignId) => doacoesMock.removeCampaignForAdmin(campaignId),
+    }
+  : adminApi
 
 const FRONTEND_USER_TYPES = { NGO: 'ONG', PERSON: 'PESSOA', ADMIN: 'ADMIN' }
 
@@ -68,8 +70,8 @@ export function toFrontendAdminStats(dto) {
       detail: item.type === 'ACCOUNT_CREATED' ? FRONTEND_USER_TYPES[item.detail] ?? item.detail : item.detail,
     })),
     reports: dto.reports ?? { pending: 0, pendingTargets: 0 },
-    // Taxa de reabandono; `isSample` só vem do mock (números de exemplo)
-    returns: dto.returns ? { ...dto.returns, isSample: Boolean(dto.returns.isSample) } : null,
+    // Taxa de reabandono
+    returns: dto.returns ?? null,
   }
 }
 
@@ -94,8 +96,8 @@ export function toFrontendAdminUser(dto) {
 // ---------- operações ----------
 
 export async function getAdminStats() {
-  const dto = await adapter.getStats()
-  return toFrontendAdminStats(CAMPAIGNS_FROM_MOCK ? withMockCampaignStats(dto) : dto)
+  const dto = await adminApi.getStats()
+  return toFrontendAdminStats(USE_MOCK_CAMPANHAS ? withMockCampaignStats(dto) : dto)
 }
 
 // 🔴 Exclusão no modo mock (USE_MOCK_EXCLUSAO): a API ainda não sabe quem
@@ -110,14 +112,14 @@ function withMockDeletions(users) {
 }
 
 export async function listAdminUsers() {
-  const dtos = await adapter.listUsers()
+  const dtos = await adminApi.listUsers()
   return withMockDeletions(dtos.map(toFrontendAdminUser))
 }
 
 // `ownerIsBanned` / `isOngBanned`: a conta foi banida, então o site já não
 // mostra o conteúdo (o admin continua vendo)
 export async function listAdminAnimals() {
-  const dtos = await adapter.listAnimals()
+  const dtos = await adminApi.listAnimals()
   return dtos.map((dto) => ({ ...toFrontendAnimal(dto), ownerIsBanned: dto.owner?.active === false }))
 }
 
@@ -144,27 +146,27 @@ export async function listAdminEvents() {
 
 // Mesmo modelo das denúncias do site, mais `reporter`
 export async function listAdminReports() {
-  const dtos = await adapter.listReports()
+  const dtos = await adminApi.listReports()
   return dtos.map(toFrontendReport)
 }
 
 export async function dismissAdminReports(reportId) {
-  const dtos = await adapter.dismissReports(reportId)
+  const dtos = await adminApi.dismissReports(reportId)
   return dtos.map(toFrontendReport)
 }
 
 export async function banReportedAccount(reportId) {
-  const dtos = await adapter.banReportedAccount(reportId)
+  const dtos = await adminApi.banReportedAccount(reportId)
   return dtos.map(toFrontendReport)
 }
 
 // false = banir, true = reativar
 export async function setAdminUserStatus(userId, active) {
-  return toFrontendAdminUser(await adapter.setUserStatus(userId, active))
+  return toFrontendAdminUser(await adminApi.setUserStatus(userId, active))
 }
 
 export function removeAdminAnimal(animalId) {
-  return adapter.removeAnimal(animalId)
+  return adminApi.removeAnimal(animalId)
 }
 
 export function removeAdminCampaign(campaignId) {

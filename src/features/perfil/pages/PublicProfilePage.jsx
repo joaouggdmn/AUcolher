@@ -18,7 +18,6 @@ import ModerationNotice from '../../../core/components/ui/ModerationNotice'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
 import ModerationAction from '../../admin/components/ModerationAction'
 import { useSetUserStatus } from '../../admin/hooks/useAdmin'
-import { useModeration } from '../../admin/hooks/useModeration'
 import { banDescription, reactivateDescription } from '../../admin/utils/moderationText'
 import { ADMIN_PATHS } from '../../admin/panel/adminPaths'
 import AnimalCard from '../../animais/components/AnimalCard'
@@ -40,7 +39,6 @@ function PublicProfilePage() {
   const location = useLocation()
   const { user } = useAuth()
   const { profile, isLoading } = usePublicProfile(id)
-  const { isAccountBanned } = useModeration()
   const setUserStatus = useSetUserStatus()
   // "Conta atualizada" vindo da edição pela moderação
   const [successMessage, setSuccessMessage] = useState(location.state?.flash ?? null)
@@ -80,9 +78,9 @@ function PublicProfilePage() {
     )
   }
 
-  // Conta banida: o perfil some do site; só o admin ainda vê, com um aviso.
-  // Com a moderação no backend, só o admin recebe o perfil, com isActive false
-  const isSuspended = profile.isActive === false || isAccountBanned({ id: profile.id, name: profile.name })
+  // Conta banida: o perfil some do site; só o admin ainda recebe o perfil,
+  // com isActive false, e vê um aviso
+  const isSuspended = profile.isActive === false
   const isAdmin = user?.userType === 'ADMIN'
   if (isSuspended && !isAdmin) {
     return (
