@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useCampaigns } from '../../doacoes/hooks/useCampanhas'
 import { useEvents } from '../../eventos/hooks/useEventos'
-import { USE_MOCK_CAMPANHAS, USE_MOCK_EVENTOS } from '../../../core/utils/constants'
+import { USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
 import { matchesPeriod } from '../../eventos/utils/dateHelpers'
 import { useHomeAnimals } from './useHomeAnimals'
 
@@ -9,10 +9,10 @@ import { useHomeAnimals } from './useHomeAnimals'
 const MAX_SHOWCASE_ONGS = 4
 
 // As mesmas fontes que /campanhas e /eventos usam hoje, juntadas pelo nome
-// da ONG (campanhas e eventos ainda podem vir do mock). De cada fonte sobram
-// a foto, a cidade e o id da conta. O id só vale quando a fonte é a API
-// real: o id de um mock abriria o perfil de outra conta. É com ele que o
-// card busca o perfil público (banner, link "Ver perfil")
+// da ONG (as campanhas ainda podem vir do mock). De cada fonte sobram a
+// foto, a cidade e o id da conta. O id só vale quando a fonte é a API real
+// (eventos sempre são): o id de um mock abriria o perfil de outra conta. É
+// com ele que o card busca o perfil público (banner, link "Ver perfil")
 function buildShowcase(animals, campaigns, events) {
   const byName = new Map()
   const entryFor = (name, { id = null, photoUrl = null, city = '', state = '' } = {}) => {
@@ -37,8 +37,7 @@ function buildShowcase(animals, campaigns, events) {
   // listagem de eventos. Evento vencido nunca aparece como "próximo"
   for (const event of events) {
     if (event.organizer?.name && matchesPeriod(event.date, null)) {
-      const organizer = USE_MOCK_EVENTOS ? { ...event.organizer, id: null } : event.organizer
-      entryFor(event.organizer.name, organizer).upcomingEvents.push(event)
+      entryFor(event.organizer.name, event.organizer).upcomingEvents.push(event)
     }
   }
 

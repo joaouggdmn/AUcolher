@@ -1,12 +1,12 @@
-import { USE_MOCK_CAMPANHAS, USE_MOCK_EVENTOS } from '../../../../core/utils/constants'
+import { USE_MOCK_CAMPANHAS } from '../../../../core/utils/constants'
 import { changeAnimalStatus, createAnimal, listMyAnimals } from '../../../animais/services/animalService'
 import { insertDemoCampaigns, removeDemoCampaigns } from '../../../doacoes/services/doacoesMock'
-import { insertDemoEvents, removeDemoEvents } from '../../../eventos/services/eventosMock'
+import { createEvent, deleteEvent } from '../../../eventos/services/eventosApi'
 import { buildDemoCampaigns, buildDemoEvents, DEMO_ANIMALS } from './demoContent'
 
-// 🔴 Dados de teste do painel (só em dev). Animais vão para o banco pela API,
-// logado como a ONG; eventos, campanhas e doações ficam no localStorage,
-// marcados com `demo: true`. Pedidos de adoção são reais e precisam de
+// 🔴 Dados de teste do painel (só em dev). Animais e eventos vão para o banco
+// pela API, logado como a ONG; campanhas e doações ficam no localStorage,
+// marcadas com `demo: true`. Pedidos de adoção são reais e precisam de
 // adotantes de verdade: para testar, use docs/seed-pedidos-teste.sql ou peça
 // os animais com outra conta. O que foi criado fica anotado em
 // `aucolher_demo_seed_<ongId>` para gerar de novo sem duplicar
@@ -63,16 +63,41 @@ async function ensureDemoAnimals(user, onProgress) {
   return animals
 }
 
+// Apaga os eventos de teste anotados. 404 = já foi apagado; 400 = já
+// aconteceu (a API não deixa excluir) — nos dois casos, sai da anotação
+async function removeDemoEvents(user) {
+  for (const id of readSeed(user.id).events ?? []) {
+    try {
+      await deleteEvent(id)
+    } catch (err) {
+      const status = err.response?.status
+      if (status !== 404 && status !== 400) throw err
+    }
+    const seed = readSeed(user.id)
+    saveSeed(user.id, { ...seed, events: (seed.events ?? []).filter((savedId) => savedId !== id) })
+  }
+}
+
+async function createDemoEvents(user, onProgress) {
+  const payloads = buildDemoEvents(user)
+  for (const [index, payload] of payloads.entries()) {
+    onProgress(`Criando eventos (${index + 1} de ${payloads.length})...`)
+    const event = await createEvent(payload)
+    // A cada evento: se algo falhar no meio, a próxima tentativa apaga o que já foi criado
+    const seed = readSeed(user.id)
+    saveSeed(user.id, { ...seed, events: [...(seed.events ?? []), event.id] })
+  }
+}
+
 // `onProgress` recebe o passo atual, para a tela mostrar. Quem chama
 // recarrega a página no fim: os contextos e o cache releem tudo
 export async function generateDemoData(user, onProgress) {
   await ensureDemoAnimals(user, onProgress)
 
-  if (USE_MOCK_EVENTOS) {
-    onProgress('Criando eventos...')
-    await removeDemoEvents()
-    await insertDemoEvents(buildDemoEvents(user))
-  }
+  onProgress('Apagando eventos de teste anteriores...')
+  await removeDemoEvents(user)
+  await createDemoEvents(user, onProgress)
+
   if (USE_MOCK_CAMPANHAS) {
     onProgress('Criando campanhas e doações...')
     await removeDemoCampaigns()
@@ -85,10 +110,9 @@ export async function generateDemoData(user, onProgress) {
 // A API não apaga animal de verdade: os disponíveis saem do ar e os adotados
 // continuam adotados. Os ids continuam anotados para a próxima geração
 export async function removeDemoData(user, onProgress) {
-  if (USE_MOCK_EVENTOS) {
-    onProgress('Apagando eventos...')
-    await removeDemoEvents()
-  }
+  onProgress('Apagando eventos...')
+  await removeDemoEvents(user)
+
   if (USE_MOCK_CAMPANHAS) {
     onProgress('Apagando campanhas e doações...')
     await removeDemoCampaigns()
