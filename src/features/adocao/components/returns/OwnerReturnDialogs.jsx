@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FaEyeSlash, FaPen } from 'react-icons/fa6'
-import { USE_MOCK_REABANDONO } from '../../../../core/utils/constants'
+import { FaPen } from 'react-icons/fa6'
 import ConfirmDialog from '../../../../core/components/ui/ConfirmDialog'
 import { animalDisplayName } from '../../utils/requestAnimal'
 import RegisterReturnModal from './RegisterReturnModal'
@@ -27,21 +26,6 @@ function OwnerReturnDialogs({ request, editTo, onNotify, onClose }) {
 
   if (!registered) {
     return <RegisterReturnModal request={request} onClose={onClose} onRegistered={handleRegistered} />
-  }
-
-  // 🔴 No mock, a API ainda vê o animal como adotado e recusa a edição
-  if (USE_MOCK_REABANDONO) {
-    return (
-      <ConfirmDialog
-        icon={FaEyeSlash}
-        title={`${animalName} está fora do ar`}
-        description="O anúncio voltou para você e não aparece na vitrine. Modo de demonstração: editar e colocar de volta no ar libera quando o backend do retorno estiver pronto."
-        confirmLabel="Entendi"
-        cancelLabel="Fechar"
-        onConfirm={onClose}
-        onCancel={onClose}
-      />
-    )
   }
 
   return (
