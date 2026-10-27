@@ -1,11 +1,10 @@
-import { USE_MOCK_ADMIN, USE_MOCK_CAMPANHAS, USE_MOCK_EVENTOS } from '../../../core/utils/constants'
+import { USE_MOCK_ADMIN, USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
 import { toFrontendProfile } from '../../../core/services/authService'
 import { toApiAnimal, toFrontendAnimal } from '../../animais/services/animalService'
 import { toFrontendReport } from '../../denuncias/services/denunciaService'
 import { toCampaignPayload, toFrontendCampaign } from '../../doacoes/services/doacaoService'
 import * as doacoesMock from '../../doacoes/services/doacoesMock'
 import { toEventPayload, toFrontendEvent } from '../../eventos/services/eventoService'
-import * as eventosMock from '../../eventos/services/eventosMock'
 import { readDeletedAccounts } from '../../perfil/services/accountDeletionMock'
 import { toApiPayload } from '../../perfil/utils/accountForm'
 import * as adminApi from './adminApi'
@@ -133,8 +132,9 @@ export async function listAdminCampaigns() {
   }))
 }
 
+// Eventos sempre pela API real, mesmo com o resto do painel no mock
 export async function listAdminEvents() {
-  const dtos = await adapter.listEvents()
+  const dtos = await adminApi.listEvents()
   return dtos.map((dto) => ({
     ...toFrontendEvent(dto),
     isRemovedByModeration: Boolean(dto.removedByModeration),
@@ -172,13 +172,12 @@ export function removeAdminCampaign(campaignId) {
 }
 
 export function removeAdminEvent(eventId) {
-  return adapter.removeEvent(eventId)
+  return adminApi.removeEvent(eventId)
 }
 
 // ---------- edição pela moderação (o conteúdo segue em nome do dono) ----------
-// Contas e animais sempre pela API real: os animais já moram nela, e o mock
-// do admin não tem as contas completas. Eventos e campanhas seguem a flag
-// de cada módulo
+// Contas, animais e eventos sempre pela API real: eles já moram nela, e o
+// mock do admin não tem as contas completas. Campanhas seguem a flag do módulo
 
 // A conta no formato de "Minha conta" (o mesmo dos formulários), mais isActive
 export async function getAdminUser(userId) {
@@ -197,8 +196,7 @@ export async function updateAdminAnimal(animalId, form, photos) {
 }
 
 export async function updateAdminEvent(eventId, values) {
-  const update = USE_MOCK_EVENTOS ? eventosMock.updateEventForAdmin : adminApi.updateEvent
-  return toFrontendEvent(await update(eventId, toEventPayload(values)))
+  return toFrontendEvent(await adminApi.updateEvent(eventId, toEventPayload(values)))
 }
 
 export async function updateAdminCampaign(campaignId, values) {

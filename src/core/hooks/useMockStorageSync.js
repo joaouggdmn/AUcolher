@@ -7,14 +7,12 @@ import {
   MOCK_CAMPANHAS_STORE_KEY,
   MOCK_CHAT_STORE_KEY,
   MOCK_DENUNCIAS_STORE_KEY,
-  MOCK_EVENTOS_STORE_KEY,
   MOCK_MODERACAO_STORE_KEY,
 } from '../utils/storageKeys'
 
 // Chave do banco falso → queries que dependem dele. O painel do admin lê
 // todos os outros, então qualquer gravação também o atualiza
 const MOCK_STORE_QUERIES = {
-  [MOCK_EVENTOS_STORE_KEY]: [queryKeys.eventos.all, queryKeys.admin.all],
   [MOCK_CAMPANHAS_STORE_KEY]: [queryKeys.campanhas.all, queryKeys.doacoes.all, queryKeys.admin.all],
   [MOCK_ADMIN_STORE_KEY]: [queryKeys.admin.all],
   [MOCK_CHAT_STORE_KEY]: [queryKeys.chat.all],

@@ -1,7 +1,6 @@
 import api from '../../../core/services/api'
 
-// Adaptador real: é o contrato de docs/contratos-prontos/api-eventos.md §3 em código.
-// eventosMock.js tem as mesmas funções e devolve os mesmos DTOs
+// Adaptador da API: é o contrato de docs/contratos-prontos/api-eventos.md §3 em código
 
 export async function listEvents({ ngoId } = {}) {
   const { data } = await api.get('/events', { params: { ngoId: ngoId ?? undefined } })
