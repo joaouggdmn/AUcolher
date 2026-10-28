@@ -1,15 +1,10 @@
 import { addDaysIso, todayLocalIso } from '../../../../core/utils/localDate'
-import { mockPublicProfiles } from '../../../perfil/data/mockPublicProfiles'
 
 // 🔴 Conteúdo dos dados de teste do painel (só em dev, ver demoData.js).
-// Datas relativas a hoje, para os gráficos dos últimos meses terem o que mostrar
+// Datas e prazos relativos a hoje: a API recusa os que já passaram
 
 function unsplash(id, width = 1200) {
   return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=80`
-}
-
-function daysAgoAt(days, time) {
-  return `${addDaysIso(todayLocalIso(), -days)}T${time}:00`
 }
 
 // ---------- animais (cadastrados de verdade pela API) ----------
@@ -123,30 +118,6 @@ export const DEMO_ANIMALS = [
   },
 ]
 
-// ---------- pessoas fictícias (ids altos, para não coincidir com contas reais) ----------
-
-const PERSON_PHOTOS = [
-  unsplash('photo-1544005313-94ddf0286df2', 200),
-  unsplash('photo-1500648767791-00dcc994a43e', 200),
-  unsplash('photo-1534528741775-53994a69daeb', 200),
-  ...mockPublicProfiles.filter((profile) => profile.userType === 'PESSOA' && profile.photoUrl).map((profile) => profile.photoUrl),
-]
-
-function photoFor(index) {
-  return PERSON_PHOTOS[index % PERSON_PHOTOS.length] ?? null
-}
-
-const EXTRA_NAMES = [
-  'Ana Clara Bitencourt', 'Bruno Zanette', 'Carla Mendes', 'Daniel Fabris', 'Eduarda Rosso', 'Fábio Cardoso',
-  'Giovana Pizzetti', 'Hugo Medeiros', 'Isadora Coral', 'Jonas Bez', 'Karina Freitas', 'Leonardo Damiani',
-  'Manuela Ghislandi', 'Nicolas Back', 'Olívia Feltrin', 'Patrick Dagostin', 'Renata Cechinel', 'Samuel Milanez',
-  'Tatiane Bortolotto', 'Vinícius Mazzucco', 'Yasmin Ronchi', 'André Zilli', 'Bianca Costa', 'César Rampinelli',
-  'Débora Just', 'Emanuel Guglielmi', 'Flávia Biff', 'Gabriel Sartor', 'Helena Conti', 'Igor Cardoso',
-  'Joana Pavei', 'Lucas Minatto',
-]
-
-const EXTRA_PEOPLE = EXTRA_NAMES.map((name, index) => ({ id: 9801 + index, name, photoUrl: photoFor(index + 3) }))
-
 // ---------- eventos (cadastrados de verdade pela API) ----------
 
 // Só próximos: a API recusa data no passado. Presenças não dá para criar
@@ -185,66 +156,43 @@ export function buildDemoEvents(user) {
   }))
 }
 
-// ---------- campanhas (mock no localStorage) ----------
+// ---------- campanhas (cadastradas de verdade pela API) ----------
 
+// Sem doações: cada uma é um PIX de verdade. `close`: o gerador encerra a
+// campanha logo depois de criar (POST /campaigns/{id}/close)
 const CAMPAIGN_TEMPLATES = [
   {
-    title: 'Castração de 20 gatos do abrigo', category: 'HEALTH', isUrgent: true, goalAmount: 6000, raised: 4180,
-    createdDaysAgo: 50, deadlineIn: 5, coverUrl: unsplash('photo-1514888286974-6c03e2ca1dba'),
+    title: 'Castração de 20 gatos do abrigo', category: 'HEALTH', isUrgent: true, goalAmount: 6000,
+    deadlineIn: 5, coverUrl: unsplash('photo-1514888286974-6c03e2ca1dba'),
     description: 'O abrigo recebeu uma colônia de gatos de um terreno baldio. Castrar todos evita novas ninhadas nas ruas e é o primeiro passo para a adoção.',
   },
   {
-    title: 'Ração para o inverno', category: 'FOOD', isUrgent: false, goalAmount: 3000, raised: 2735,
-    createdDaysAgo: 160, deadlineIn: null, coverUrl: null,
+    title: 'Ração para o inverno', category: 'FOOD', isUrgent: false, goalAmount: 3000,
+    deadlineIn: null, coverUrl: null,
     description: 'No frio os animais comem mais. A meta garante ração para os 60 cães e gatos do abrigo até o fim do inverno.',
   },
   {
-    title: 'Reforma do canil', category: 'INFRASTRUCTURE', isUrgent: false, goalAmount: 12000, raised: 5120,
-    createdDaysAgo: 95, deadlineIn: 40, coverUrl: unsplash('photo-1587300003388-59208cc962cb'),
+    title: 'Reforma do canil', category: 'INFRASTRUCTURE', isUrgent: false, goalAmount: 12000,
+    deadlineIn: 40, coverUrl: unsplash('photo-1587300003388-59208cc962cb'),
     description: 'Telhado novo, piso aquecido e baias maiores para os cães de grande porte. A obra começa quando a meta for atingida.',
   },
   {
-    title: 'Cirurgia da Pipoca', category: 'HEALTH', isUrgent: false, goalAmount: 2500, raised: 2650,
-    createdDaysAgo: 125, closedDaysAgo: 75, deadlineIn: null, coverUrl: unsplash('photo-1583512603805-3cc6b41f3edb'),
-    description: 'A Pipoca precisou operar a pata traseira. A campanha bateu a meta, a cirurgia deu certo e ela já foi adotada.',
+    title: 'Cirurgia da Pipoca', category: 'HEALTH', isUrgent: false, goalAmount: 2500, close: true,
+    deadlineIn: null, coverUrl: unsplash('photo-1583512603805-3cc6b41f3edb'),
+    description: 'A Pipoca precisou operar a pata traseira. A cirurgia deu certo, a campanha foi encerrada e ela já foi adotada.',
   },
 ]
 
-const AMOUNT_CYCLE = [50, 100, 25, 200, 30, 80, 15, 150, 60, 300, 40, 120]
-
-// O último pedaço completa o total exato, sem ficar abaixo da doação mínima
-function splitIntoDonations(total) {
-  const amounts = []
-  let rest = total
-  for (let index = 0; rest > 0; index += 1) {
-    const amount = AMOUNT_CYCLE[index % AMOUNT_CYCLE.length]
-    const next = rest - amount < 5 ? rest : Math.min(amount, rest)
-    amounts.push(next)
-    rest -= next
-  }
-  return amounts
-}
-
-// Doações espalhadas entre a criação e o fim da campanha (ou ontem)
+// [{ payload, close }]: `payload` é o corpo de POST /campaigns
 export function buildDemoCampaigns() {
   const today = todayLocalIso()
 
-  return CAMPAIGN_TEMPLATES.map(({ raised, createdDaysAgo, closedDaysAgo, deadlineIn, ...fields }, campaignIndex) => {
-    const lastDaysAgo = closedDaysAgo ?? 1
-    const amounts = splitIntoDonations(raised)
-    const step = (createdDaysAgo - lastDaysAgo) / amounts.length
-
-    return {
+  return CAMPAIGN_TEMPLATES.map(({ deadlineIn, close = false, ...fields }) => ({
+    payload: {
       ...fields,
+      customCategory: null,
       deadline: deadlineIn == null ? null : addDaysIso(today, deadlineIn),
-      status: closedDaysAgo == null ? 'ACTIVE' : 'CLOSED',
-      createdAt: daysAgoAt(createdDaysAgo, '09:30'),
-      closedAt: closedDaysAgo == null ? null : daysAgoAt(closedDaysAgo, '18:00'),
-      donations: amounts.map((amount, index) => ({
-        amount,
-        approvedAt: daysAgoAt(Math.round(createdDaysAgo - step * (index + 0.5)), `${String(9 + (index % 11)).padStart(2, '0')}:40`),
-        donor: EXTRA_PEOPLE[(campaignIndex * 7 + index) % EXTRA_PEOPLE.length],
-      })),
-    }
-  })
+    },
+    close,
+  }))
 }

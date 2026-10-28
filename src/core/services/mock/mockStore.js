@@ -69,12 +69,6 @@ export function getMockSession() {
   }
 }
 
-// Snapshots de pessoa/ONG só guardam foto por URL — um data URL por linha
-// estouraria o localStorage rapidinho
-export function httpUrlOrNull(url) {
-  return typeof url === 'string' && /^https?:\/\//.test(url) ? url : null
-}
-
 // Ids chegam como número (banco) ou texto (params de rota)
 export function isSameId(a, b) {
   return a != null && b != null && String(a) === String(b)

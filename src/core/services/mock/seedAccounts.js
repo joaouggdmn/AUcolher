@@ -1,7 +1,6 @@
-// Contas do banco de teste (docs/seed-banco-completo.sql): os mocks dos
-// módulos que ainda não têm tabela (campanhas e chat) usam os mesmos ids,
-// nomes e fotos, para conversarem com os dados reais da API. Mudou o seed do
-// banco? Mude aqui também
+// Contas do banco de teste (docs/seed-banco-completo.sql): o mock do módulo
+// que ainda não tem tabela (o chat) usa os mesmos ids, nomes e fotos, para
+// conversar com os dados reais da API. Mudou o seed do banco? Mude aqui também
 
 const portrait = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=400&q=80`
 

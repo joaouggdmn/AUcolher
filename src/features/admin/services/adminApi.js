@@ -96,7 +96,7 @@ export async function updateEvent(eventId, body) {
   return data
 }
 
-// O corpo de PUT /campaigns/{id} — para quando as campanhas estiverem no backend
+// O mesmo corpo de PUT /campaigns/{id}
 export async function updateCampaign(campaignId, body) {
   const { data } = await api.put(`/admin/campaigns/${campaignId}`, body)
   return data

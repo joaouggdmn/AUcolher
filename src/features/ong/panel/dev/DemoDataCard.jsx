@@ -11,7 +11,7 @@ const ACTIONS = {
     icon: FaWandMagicSparkles,
     title: 'Gerar dados de teste?',
     description:
-      'Cadastra 8 animais e 3 próximos eventos (sem presenças) na sua conta pela API, que ficam no banco, e cria campanhas e doações de exemplo no navegador. Pedidos de adoção são reais: para testar, peça os animais com outra conta ou use o docs/seed-pedidos-teste.sql. Se já houver dados de teste, eles são refeitos sem duplicar. A página recarrega no fim.',
+      'Cadastra 8 animais, 3 próximos eventos (sem presenças) e 4 campanhas (sem doações) na sua conta pela API, que ficam no banco. Doações e pedidos de adoção são reais: cada doação é um PIX de verdade, e para testar pedidos, peça os animais com outra conta ou use o docs/seed-pedidos-teste.sql. Se já houver dados de teste, eles são refeitos sem duplicar. A página recarrega no fim.',
     confirmLabel: 'Gerar dados',
   },
   remove: {
@@ -20,7 +20,7 @@ const ACTIONS = {
     variant: 'danger',
     title: 'Apagar dados de teste?',
     description:
-      'Os eventos de teste são excluídos do banco e as campanhas e doações de teste saem do navegador. Os animais continuam no banco, porque a API não apaga de verdade: os disponíveis saem do ar e os adotados continuam adotados. Gerar de novo reaproveita esses animais.',
+      'Os eventos e as campanhas de teste são excluídos do banco. Os animais continuam no banco, porque a API não apaga de verdade: os disponíveis saem do ar e os adotados continuam adotados. Gerar de novo reaproveita esses animais.',
     confirmLabel: 'Apagar dados',
   },
 }
@@ -64,8 +64,8 @@ function DemoDataCard() {
         </p>
         <p className="mt-1 max-w-xl text-xs text-amber-900/70">
           {isActive
-            ? 'O painel está com dados de teste: animais, pedidos, conversas, eventos, campanhas e doações de exemplo.'
-            : 'Preenche o painel com animais, pedidos de adoção, conversas, eventos, campanhas e doações de exemplo.'}
+            ? 'O painel está com dados de teste: animais, eventos e campanhas de exemplo.'
+            : 'Preenche o painel com animais, eventos e campanhas de exemplo.'}
         </p>
       </div>
 
