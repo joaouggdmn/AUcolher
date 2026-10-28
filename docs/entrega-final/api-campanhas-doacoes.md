@@ -1,6 +1,6 @@
 # AUcolher — Contrato da API: campanhas e doações (PIX)
 
-> Migração **007**. O front já implementa este contrato: `features/doacoes/services/doacoesApi.js` chama as rotas abaixo, e o `doacoesMock.js` responde no lugar enquanto `VITE_USE_MOCK_CAMPANHAS` estiver ligada (padrão). Quando as rotas existirem, basta `VITE_USE_MOCK_CAMPANHAS=false`. Por isso nomes, formatos e códigos de status precisam bater exatamente com o que está aqui.
+> Migração **007**. O front usa este contrato direto na API: `features/doacoes/services/doacoesApi.js` chama as rotas abaixo (o mock e a flag `VITE_USE_MOCK_CAMPANHAS` saíram do código). Por isso nomes, formatos e códigos de status precisam bater exatamente com o que está aqui.
 >
 > **O dinheiro cai direto na conta Mercado Pago da ONG.** A conexão da conta (OAuth), a criação do PIX com o token da ONG e o webhook estão em `api-mercado-pago-ongs.md` (migração 009). Este arquivo já traz o que aquele contrato muda nas campanhas: `acceptingDonations`, `donations.ngo_id` e as recusas por conta não conectada.
 >
@@ -10,6 +10,7 @@
 > - **Pronto:** todas as rotas da §5 e da §7.1, as regras da §1, a migração 007 (§8) e os blocos do `stats` (§7.4). Foi testado de ponta a ponta no Aiven: 50 casos, com as mensagens desta tabela.
 > - **Falta (o PIX real):** a conta Mercado Pago de cada ONG (migração 009, `api-mercado-pago-ongs.md`) ainda não existe. Por enquanto, toda ONG conta como conectada (`acceptingDonations: true`), e o PIX usa um único token de teste (`MP_DEV_ACCESS_TOKEN`). Sem ele, doar responde 400 "Esta ONG não está recebendo doações no momento.". Os campos da Orders API e o webhook ainda precisam ser conferidos no sandbox.
 > - **Fora:** a §7.5 depende da exclusão de conta (`api-exclusao-conta.md`), que ainda não existe.
+> - **Front:** ligado na API desde a branch `feature/campanhas-api` (§9).
 > - **Campos a mais na resposta da campanha:** ela também traz `removed`, `removedByModeration`, `moderatedAt` e `ngo.active`, como os eventos. São os campos do `AdminCampaign` da §7.1.
 
 ## 1. Regras de negócio
@@ -285,8 +286,9 @@ COMMIT;
 - As colunas de moderação seguem a 014 (`removed_by_moderation` em `events`) e a 016 (`moderated_at`/`moderated_by`).
 - Confira o padrão com o `sql/schema.sql` atual antes de criar a migração.
 
-## 9. O que muda no front quando a API existir
+## 9. O que mudou no front (feito)
 
-- `VITE_USE_MOCK_CAMPANHAS=false` no `.env`.
-- Sai a mistura com o mock no admin: `features/admin/services/campaignAdminStats.js` e o `CAMPAIGNS_FROM_MOCK` de `adminService.js`. O admin passa a ler campanhas e os blocos do `stats` direto da API.
-- A home e o perfil público já leem a ONG da campanha pelo id da API quando a flag está desligada (`useOngShowcase`).
+- Campanhas e doações vêm sempre da API. Saíram o `doacoesMock.js`, o `seedCampanhas.js`, a flag `VITE_USE_MOCK_CAMPANHAS` e o botão "Simular pagamento": no sandbox, o PIX do backend é aprovado sozinho (`first_name` "APRO").
+- Saiu a mistura com o mock no admin (`campaignAdminStats.js`): o admin lê as campanhas de `/api/admin/campaigns` e os blocos do `stats` direto da API. O card "Dados de teste" do admin, que só criava campanhas falsas, também saiu.
+- A home e o perfil público leem a ONG da campanha pelo id da API (`useOngShowcase`).
+- Os "Dados de teste" do painel da ONG criam 4 campanhas pela API (uma já encerrada), sem doações.
