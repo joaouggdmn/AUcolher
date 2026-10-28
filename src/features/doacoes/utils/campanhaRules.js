@@ -16,8 +16,8 @@ export const CAMPAIGN_LIMITS = {
 const COVER_URL_FORMAT = /^(https?:\/\/|data:image\/(jpeg|png|webp);base64,)/
 
 // Regras do corpo de POST/PUT /api/campaigns (docs/entrega-final/api-campanhas-doacoes.md),
-// campo a campo, com as chaves do DTO. O mock devolve a primeira como erro
-// 400, igual ao backend; o formulário pode mostrar todas
+// campo a campo, com as chaves do DTO. O backend devolve a primeira como
+// erro 400; o formulário pode mostrar todas
 export function getCampaignPayloadErrors(payload, today) {
   const errors = {}
   const { title, description, category, customCategory, goalAmount, deadline, coverUrl } = payload

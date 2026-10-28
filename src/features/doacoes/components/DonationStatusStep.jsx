@@ -4,7 +4,6 @@ import {
   FaCheck,
   FaCircleCheck,
   FaClockRotateLeft,
-  FaFlask,
   FaHeart,
   FaLock,
   FaRegCopy,
@@ -13,8 +12,7 @@ import {
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { formatCurrency } from '../../../core/utils/currency'
 import Spinner from '../../../core/components/ui/Spinner'
-import { CAN_SIMULATE_PAYMENT } from '../services/doacaoService'
-import { useDonation, useRefreshAfterApproval, useSimulateDonationApproval } from '../hooks/useDoacoes'
+import { useDonation, useRefreshAfterApproval } from '../hooks/useDoacoes'
 import { formatCountdown, useCountdown } from '../hooks/useCountdown'
 
 function CopyPixCode({ code }) {
@@ -52,11 +50,9 @@ function CopyPixCode({ code }) {
   )
 }
 
-// Aguardando o pagamento: QR, copia e cola, tempo restante e, só no modo
-// teste, o botão que faz o papel do Mercado Pago aprovando
+// Aguardando o pagamento: QR, copia e cola e tempo restante
 function PendingPix({ donation }) {
   const secondsLeft = useCountdown(donation.pix?.expiresAt)
-  const simulate = useSimulateDonationApproval()
 
   if (!donation.pix) return null
 
@@ -95,26 +91,6 @@ function PendingPix({ donation }) {
       <p className="text-center text-xs text-slate-400">
         Abra o app do seu banco, escolha pagar com PIX e escaneie o QR ou cole o código. Esta janela atualiza sozinha.
       </p>
-
-      {CAN_SIMULATE_PAYMENT && (
-        <div className="rounded-xl border border-dashed border-sky-200 bg-sky-50/60 p-3">
-          <button
-            type="button"
-            onClick={() => simulate.mutate(donation.id)}
-            disabled={simulate.isPending}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-sky-600 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-sky-700 disabled:opacity-70"
-          >
-            <FaFlask size={13} />
-            {simulate.isPending ? 'Aprovando...' : 'Simular pagamento (modo teste)'}
-          </button>
-          {simulate.isError && (
-            <p className="mt-2 text-center text-xs font-semibold text-rose-600">{getErrorMessage(simulate.error)}</p>
-          )}
-          <p className="mt-2 text-center text-[11px] text-sky-700/80">
-            Só aparece em desenvolvimento, com o mock: faz o papel do Mercado Pago confirmando o PIX.
-          </p>
-        </div>
-      )}
     </div>
   )
 }

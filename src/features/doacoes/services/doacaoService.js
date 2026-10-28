@@ -1,15 +1,9 @@
-import { USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
 import * as doacoesApi from './doacoesApi'
-import * as doacoesMock from './doacoesMock'
 
 // Fachada do módulo: os componentes só conhecem estas funções e o modelo do
-// frontend. Quem fala com o "servidor" é o adaptador — API real ou mock, os
-// dois com as mesmas funções e os mesmos DTOs
-const adapter = USE_MOCK_CAMPANHAS ? doacoesMock : doacoesApi
-
-// "Simular pagamento" só existe no mock e só em desenvolvimento: com a API
-// real quem aprova é o Mercado Pago (no sandbox, payer.first_name = "APRO")
-export const CAN_SIMULATE_PAYMENT = USE_MOCK_CAMPANHAS && import.meta.env.DEV
+// frontend. Quem fala com o servidor é o doacoesApi (DTOs da API). Quem
+// aprova o PIX é o Mercado Pago (no sandbox, o backend manda
+// payer.first_name = "APRO" e ele aprova sozinho)
 
 // ---------- mappers DTO ↔ modelo ----------
 
@@ -106,56 +100,51 @@ export function toFrontendDonation(dto) {
 
 // As telas falam em ONG (`ongId`); a API, em inglês (`ngoId`)
 export async function listCampaigns({ ongId, status } = {}) {
-  const dtos = await adapter.listCampaigns({ ngoId: ongId, status })
+  const dtos = await doacoesApi.listCampaigns({ ngoId: ongId, status })
   return dtos.map(toFrontendCampaign)
 }
 
 export async function getCampaign(id) {
-  return toFrontendCampaign(await adapter.getCampaign(id))
+  return toFrontendCampaign(await doacoesApi.getCampaign(id))
 }
 
 export async function createCampaign(values) {
-  return toFrontendCampaign(await adapter.createCampaign(toCampaignPayload(values)))
+  return toFrontendCampaign(await doacoesApi.createCampaign(toCampaignPayload(values)))
 }
 
 export async function updateCampaign(id, values) {
-  return toFrontendCampaign(await adapter.updateCampaign(id, toCampaignPayload(values)))
+  return toFrontendCampaign(await doacoesApi.updateCampaign(id, toCampaignPayload(values)))
 }
 
 export async function closeCampaign(id) {
-  return toFrontendCampaign(await adapter.closeCampaign(id))
+  return toFrontendCampaign(await doacoesApi.closeCampaign(id))
 }
 
 export async function deleteCampaign(id) {
-  await adapter.deleteCampaign(id)
+  await doacoesApi.deleteCampaign(id)
 }
 
 export async function listMyCampaigns() {
-  const dtos = await adapter.listMyCampaigns()
+  const dtos = await doacoesApi.listMyCampaigns()
   return dtos.map(toFrontendCampaign)
 }
 
 // ---------- operações: doações ----------
 
 export async function createDonation(campaignId, amount) {
-  return toFrontendDonation(await adapter.createDonation(campaignId, { amount }))
+  return toFrontendDonation(await doacoesApi.createDonation(campaignId, { amount }))
 }
 
 export async function getDonation(id) {
-  return toFrontendDonation(await adapter.getDonation(id))
+  return toFrontendDonation(await doacoesApi.getDonation(id))
 }
 
 export async function listMyDonations() {
-  const dtos = await adapter.listMyDonations()
+  const dtos = await doacoesApi.listMyDonations()
   return dtos.map(toFrontendDonation)
 }
 
 export async function listReceivedDonations() {
-  const dtos = await adapter.listReceivedDonations()
+  const dtos = await doacoesApi.listReceivedDonations()
   return dtos.map(toFrontendDonation)
-}
-
-export async function simulateDonationApproval(id) {
-  if (!CAN_SIMULATE_PAYMENT) throw new Error('Simular pagamento só existe no modo mock.')
-  return toFrontendDonation(await doacoesMock.simulateDonationApproval(id))
 }

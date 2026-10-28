@@ -1,12 +1,10 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '../services/queryKeys'
-import { MOCK_CAMPANHAS_STORE_KEY, MOCK_CHAT_STORE_KEY } from '../utils/storageKeys'
+import { MOCK_CHAT_STORE_KEY } from '../utils/storageKeys'
 
-// Chave do banco falso → queries que dependem dele. O painel do admin lê as
-// campanhas do mock, então gravar nelas também o atualiza
+// Chave do banco falso → queries que dependem dele
 const MOCK_STORE_QUERIES = {
-  [MOCK_CAMPANHAS_STORE_KEY]: [queryKeys.campanhas.all, queryKeys.doacoes.all, queryKeys.admin.all],
   [MOCK_CHAT_STORE_KEY]: [queryKeys.chat.all],
 }
 
