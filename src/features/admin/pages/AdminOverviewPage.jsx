@@ -15,7 +15,6 @@ import {
   monthColumns,
   speciesBarsFromCounts,
 } from '../../ong/utils/panelCharts'
-import AdminDemoDataCard from '../dev/AdminDemoDataCard'
 import { useAdminStats } from '../hooks/useAdmin'
 import AdminRecentActivity from '../overview/AdminRecentActivity'
 import AdminStatTiles from '../overview/AdminStatTiles'
@@ -79,9 +78,6 @@ function OverviewContent({ stats }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Ferramenta de desenvolvimento: no build de produção vira código morto */}
-      {import.meta.env.DEV && <AdminDemoDataCard />}
-
       <PendingReportsNotice reports={stats.reports} />
       <AdminStatTiles stats={stats} />
 

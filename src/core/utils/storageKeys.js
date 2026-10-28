@@ -16,6 +16,9 @@ export const MOCK_CAMPANHAS_STORE_KEY = 'aucolher_mock_campanhas'
 // Antigo: o "banco" falso do painel do admin. O painel agora vem da API; o
 // AuthContext só apaga o que versões anteriores deixaram nesta chave
 export const LEGACY_MOCK_ADMIN_STORAGE_KEY = 'aucolher_mock_admin'
+// Antigo: os dados de teste do painel do admin (campanhas do mock). O
+// AuthContext só apaga o que versões anteriores deixaram nesta chave
+export const LEGACY_ADMIN_DEMO_SEED_STORAGE_KEY = 'aucolher_admin_demo_seed'
 // Antigo: o "banco" falso das denúncias. Elas agora vêm da API; o
 // AuthContext só apaga o que versões anteriores deixaram nesta chave
 export const LEGACY_MOCK_DENUNCIAS_STORAGE_KEY = 'aucolher_mock_denuncias'
