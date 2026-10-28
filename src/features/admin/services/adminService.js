@@ -1,28 +1,15 @@
-import { USE_MOCK_CAMPANHAS } from '../../../core/utils/constants'
 import { toFrontendProfile } from '../../../core/services/authService'
 import { toApiAnimal, toFrontendAnimal } from '../../animais/services/animalService'
 import { toFrontendReport } from '../../denuncias/services/denunciaService'
 import { toCampaignPayload, toFrontendCampaign } from '../../doacoes/services/doacaoService'
-import * as doacoesMock from '../../doacoes/services/doacoesMock'
 import { toEventPayload, toFrontendEvent } from '../../eventos/services/eventoService'
 import { readDeletedAccounts } from '../../perfil/services/accountDeletionMock'
 import { toApiPayload } from '../../perfil/utils/accountForm'
 import * as adminApi from './adminApi'
-import { withMockCampaignStats } from './campaignAdminStats'
 
 // Fachada do painel do admin: as telas só conhecem estas funções e o modelo
 // do frontend. Animais, campanhas e eventos usam os mesmos mappers das
 // outras telas; contas e números ganham os seus aqui. Tudo vem do adminApi
-
-// 🔴 Campanhas e doações ainda não estão no backend: com
-// VITE_USE_MOCK_CAMPANHAS ligada, a lista, a remoção e os blocos de campanha
-// da Visão geral vêm do mock das campanhas
-const campaignAdapter = USE_MOCK_CAMPANHAS
-  ? {
-      listCampaigns: async () => doacoesMock.readAllCampaignsForAdmin(),
-      removeCampaign: async (campaignId) => doacoesMock.removeCampaignForAdmin(campaignId),
-    }
-  : adminApi
 
 const FRONTEND_USER_TYPES = { NGO: 'ONG', PERSON: 'PESSOA', ADMIN: 'ADMIN' }
 
@@ -96,8 +83,7 @@ export function toFrontendAdminUser(dto) {
 // ---------- operações ----------
 
 export async function getAdminStats() {
-  const dto = await adminApi.getStats()
-  return toFrontendAdminStats(USE_MOCK_CAMPANHAS ? withMockCampaignStats(dto) : dto)
+  return toFrontendAdminStats(await adminApi.getStats())
 }
 
 // 🔴 Exclusão no modo mock (USE_MOCK_EXCLUSAO): a API ainda não sabe quem
@@ -125,7 +111,7 @@ export async function listAdminAnimals() {
 
 // `isRemoved`: excluída (pela ONG ou, com `isRemovedByModeration`, pelo admin)
 export async function listAdminCampaigns() {
-  const dtos = await campaignAdapter.listCampaigns()
+  const dtos = await adminApi.listCampaigns()
   return dtos.map((dto) => ({
     ...toFrontendCampaign(dto),
     isRemoved: Boolean(dto.removed),
@@ -134,7 +120,6 @@ export async function listAdminCampaigns() {
   }))
 }
 
-// Eventos sempre pela API real, mesmo com o resto do painel no mock
 export async function listAdminEvents() {
   const dtos = await adminApi.listEvents()
   return dtos.map((dto) => ({
@@ -170,7 +155,7 @@ export function removeAdminAnimal(animalId) {
 }
 
 export function removeAdminCampaign(campaignId) {
-  return campaignAdapter.removeCampaign(campaignId)
+  return adminApi.removeCampaign(campaignId)
 }
 
 export function removeAdminEvent(eventId) {
@@ -178,8 +163,6 @@ export function removeAdminEvent(eventId) {
 }
 
 // ---------- edição pela moderação (o conteúdo segue em nome do dono) ----------
-// Contas, animais e eventos sempre pela API real: eles já moram nela, e o
-// mock do admin não tem as contas completas. Campanhas seguem a flag do módulo
 
 // A conta no formato de "Minha conta" (o mesmo dos formulários), mais isActive
 export async function getAdminUser(userId) {
@@ -202,6 +185,5 @@ export async function updateAdminEvent(eventId, values) {
 }
 
 export async function updateAdminCampaign(campaignId, values) {
-  const update = USE_MOCK_CAMPANHAS ? doacoesMock.updateCampaignForAdmin : adminApi.updateCampaign
-  return toFrontendCampaign(await update(campaignId, toCampaignPayload(values)))
+  return toFrontendCampaign(await adminApi.updateCampaign(campaignId, toCampaignPayload(values)))
 }

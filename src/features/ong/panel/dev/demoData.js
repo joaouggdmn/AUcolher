@@ -1,15 +1,14 @@
-import { USE_MOCK_CAMPANHAS } from '../../../../core/utils/constants'
 import { changeAnimalStatus, createAnimal, listMyAnimals } from '../../../animais/services/animalService'
-import { insertDemoCampaigns, removeDemoCampaigns } from '../../../doacoes/services/doacoesMock'
+import { closeCampaign, createCampaign, deleteCampaign } from '../../../doacoes/services/doacoesApi'
 import { createEvent, deleteEvent } from '../../../eventos/services/eventosApi'
 import { buildDemoCampaigns, buildDemoEvents, DEMO_ANIMALS } from './demoContent'
 
-// 🔴 Dados de teste do painel (só em dev). Animais e eventos vão para o banco
-// pela API, logado como a ONG; campanhas e doações ficam no localStorage,
-// marcadas com `demo: true`. Pedidos de adoção são reais e precisam de
-// adotantes de verdade: para testar, use docs/seed-pedidos-teste.sql ou peça
-// os animais com outra conta. O que foi criado fica anotado em
-// `aucolher_demo_seed_<ongId>` para gerar de novo sem duplicar
+// 🔴 Dados de teste do painel (só em dev). Animais, eventos e campanhas vão
+// para o banco pela API, logado como a ONG. Doações, pedidos de adoção e
+// presenças são reais e precisam de contas de verdade (e de um PIX): para
+// testar pedidos, use docs/seed-pedidos-teste.sql ou peça os animais com
+// outra conta. O que foi criado fica anotado em `aucolher_demo_seed_<ongId>`
+// para gerar de novo sem duplicar
 
 function seedKey(userId) {
   return `aucolher_demo_seed_${userId}`
@@ -89,6 +88,43 @@ async function createDemoEvents(user, onProgress) {
   }
 }
 
+// Apaga as campanhas de teste anotadas e as tira da anotação (404 = já foi
+// apagada). Com doação aprovada, a API só esconde a campanha: o histórico de
+// quem doou continua
+async function removeDemoCampaigns(user) {
+  for (const id of readSeed(user.id).campaigns ?? []) {
+    try {
+      await deleteCampaign(id)
+    } catch (err) {
+      if (err.response?.status !== 404) throw err
+    }
+    const seed = readSeed(user.id)
+    saveSeed(user.id, { ...seed, campaigns: (seed.campaigns ?? []).filter((savedId) => savedId !== id) })
+  }
+}
+
+// 409 = a ONG já tem uma campanha urgente de verdade: a de teste entra sem urgência
+async function createCampaignOrNotUrgent(payload) {
+  try {
+    return await createCampaign(payload)
+  } catch (err) {
+    if (err.response?.status !== 409 || !payload.isUrgent) throw err
+    return createCampaign({ ...payload, isUrgent: false })
+  }
+}
+
+async function createDemoCampaigns(user, onProgress) {
+  const templates = buildDemoCampaigns()
+  for (const [index, { payload, close }] of templates.entries()) {
+    onProgress(`Criando campanhas (${index + 1} de ${templates.length})...`)
+    const campaign = await createCampaignOrNotUrgent(payload)
+    // A cada campanha: se algo falhar no meio, a próxima tentativa apaga o que já foi criado
+    const seed = readSeed(user.id)
+    saveSeed(user.id, { ...seed, campaigns: [...(seed.campaigns ?? []), campaign.id] })
+    if (close) await closeCampaign(campaign.id)
+  }
+}
+
 // `onProgress` recebe o passo atual, para a tela mostrar. Quem chama
 // recarrega a página no fim: os contextos e o cache releem tudo
 export async function generateDemoData(user, onProgress) {
@@ -98,11 +134,10 @@ export async function generateDemoData(user, onProgress) {
   await removeDemoEvents(user)
   await createDemoEvents(user, onProgress)
 
-  if (USE_MOCK_CAMPANHAS) {
-    onProgress('Criando campanhas e doações...')
-    await removeDemoCampaigns()
-    await insertDemoCampaigns(buildDemoCampaigns())
-  }
+  // Antes de criar: libera a vaga da campanha urgente da geração anterior
+  onProgress('Apagando campanhas de teste anteriores...')
+  await removeDemoCampaigns(user)
+  await createDemoCampaigns(user, onProgress)
 
   saveSeed(user.id, { ...readSeed(user.id), active: true })
 }
@@ -113,10 +148,8 @@ export async function removeDemoData(user, onProgress) {
   onProgress('Apagando eventos...')
   await removeDemoEvents(user)
 
-  if (USE_MOCK_CAMPANHAS) {
-    onProgress('Apagando campanhas e doações...')
-    await removeDemoCampaigns()
-  }
+  onProgress('Apagando campanhas...')
+  await removeDemoCampaigns(user)
 
   onProgress('Tirando os animais de teste do ar...')
   const seed = readSeed(user.id)
