@@ -116,14 +116,14 @@ O `PUT` substitui todos os campos e é recusado (400) se a campanha estiver ence
     "ticketUrl": "https://www.mercadopago.com.br/...",
     "expiresAt": "2026-10-10T00:09:17"
   },
-  "campaign": { "id": 1, "title": "Cirurgia urgente do Rex", "ngoName": "Patinhas Carentes", "removed": false },
+  "campaign": { "id": 1, "title": "Cirurgia urgente do Rex", "ngoName": "Patinhas Carentes", "removed": false, "removedByModeration": false },
   "donor": null
 }
 ```
 
 - `pix` só vem **para o próprio doador** e **enquanto `PENDING`** (no `POST` e no `GET /donations/{id}`). Nos outros casos, `null`.
   - `qrCode` é o "copia e cola". O frontend desenha o QR a partir dele, então `qrCodeBase64` e `ticketUrl` podem vir `null`.
-- `campaign.title` e `ngoName` são os **atuais** quando a campanha existe; se ela foi apagada de vez, valem os guardados na doação. `removed` é `true` para excluída (real ou lógica, inclusive pela moderação).
+- `campaign.title` e `ngoName` são os **atuais** quando a campanha existe; se ela foi apagada de vez, valem os guardados na doação. `removed` é `true` para excluída (real ou lógica, inclusive pela moderação). `removedByModeration` é `true` só quando quem removeu foi o admin: o histórico do doador mostra "campanha removida pela moderação" no lugar de "encerrada pela ONG".
 - `donor` (`{ id, name, photoUrl }`) só vem em `GET /donations/received`, para a ONG.
 - Corpo do `POST /campaigns/{id}/donations`: `{ "amount": 50 }`.
 
