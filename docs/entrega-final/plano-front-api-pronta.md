@@ -21,7 +21,7 @@ Não.
 
 | # | Entrega | Migração | Front |
 |---|---|---|---|
-| 1 | Campanhas e doações, mais a parte delas no admin | 007 | mock, adaptador da API pronto |
+| 1 | ~~Campanhas e doações, mais a parte delas no admin~~ | 007 | ✅ feito: só API, mock removido |
 | 2 | Conta Mercado Pago por ONG | 009 | a fazer |
 | 3 | Senha (recuperar e alterar pelo link, derrubar sessões, `hasPassword`) | 010 | mock, adaptador da API pronto |
 | 4 | Chat (6 mensagens de sistema) | 011 | parte 2 deste plano |
@@ -30,11 +30,11 @@ Não.
 **Frontend:**
 - o chat (parte 2) e excluir conta (parte 3);
 - conectar o Mercado Pago (`api-mercado-pago-ongs.md` §9);
-- a cada entrega do parceiro: desligar a flag e testar. Em campanhas, sai também a mistura com o mock no admin (`campaignAdminStats.js`, `CAMPAIGNS_FROM_MOCK`);
+- a cada entrega do parceiro: desligar a flag e testar. ~~Campanhas~~: feito, o front usa só a API e o mock saiu do código (`api-campanhas-doacoes.md` §9);
 - pendências pequenas:
   - `/minhas-avaliacoes` ainda é `PlaceholderPage`;
   - "Salvar no calendário" para Outlook e iCal só faz `console.log`. Dá para gerar o `.ics` no próprio navegador;
-- faxina opcional: os mocks cuja flag já está desligada (eventos, admin, moderação, reabandono, denúncias) podem sair do código.
+- ~~faxina dos mocks cuja flag já estava desligada~~: feito. Eventos, admin, moderação, reabandono, denúncias e campanhas já saíram do código.
 
 **Geral:**
 - publicar a API, o banco e o front, e fazer o teste de ponta a ponta;

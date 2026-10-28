@@ -287,7 +287,7 @@ COMMIT;
 
 - **Serviço** (`features/doacoes/services/`):
   - `doacoesApi.js` ganha `getMercadoPagoAccount`, `connectMercadoPago` e `disconnectMercadoPago`;
-  - o `doacoesMock.js` simula: a tabela `mercadoPagoAccounts` guarda as ONGs "conectadas", e o `connect` devolve como `authorizationUrl` o próprio `/ong/painel/campanhas?mp=connected`, já marcando a ONG como conectada;
+  - não há mais mock de campanhas: as três funções chamam a API direto, então esta parte do front só dá para testar com a migração 009 no backend;
   - os mappers levam `acceptingDonations`.
 - **Hook:** `useMercadoPagoAccount()`, com a query da situação e as mutations de conectar e desconectar. A chave fica em `core/services/queryKeys.js`.
 - **Painel da ONG** (`features/ong/panel/pages/CampaignsPage.jsx`):

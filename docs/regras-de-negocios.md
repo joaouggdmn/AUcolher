@@ -375,9 +375,8 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 
 ## 12. Nota técnica: API real vs. mock
 
-- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, perfil público e banner da ONG, painel do admin, denúncias e moderação.
+- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação.
 - **Ainda num servidor falso no `localStorage`**, cada um atrás de uma flag `VITE_USE_MOCK_*` (ligada por padrão) e com o adaptador da API já escrito:
-  - campanhas e doações (`VITE_USE_MOCK_CAMPANHAS`; o `doacoesMock.js` também faz o papel do Mercado Pago, com "Simular pagamento" só em desenvolvimento);
   - recuperar e alterar senha (`VITE_USE_MOCK_SENHA`);
   - chat.
 - **O que falta no backend, em ordem:** `entrega-final/README.md`. Quando o parceiro entrega um módulo, o front desliga a flag dele (`=false` no `.env`).
