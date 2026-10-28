@@ -3,13 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../../core/context/AuthContext'
 import { queryKeys } from '../../../core/services/queryKeys'
 import { DONATION_POLL_INTERVAL } from '../../../core/utils/constants'
-import {
-  createDonation,
-  getDonation,
-  listMyDonations,
-  listReceivedDonations,
-  simulateDonationApproval,
-} from '../services/doacaoService'
+import { createDonation, getDonation, listMyDonations, listReceivedDonations } from '../services/doacaoService'
 
 // ---------- leitura ----------
 
@@ -83,16 +77,4 @@ export function useRefreshAfterApproval() {
       ]),
     [queryClient, userId]
   )
-}
-
-// 🔴 Só do mock: faz o papel do Mercado Pago confirmando o pagamento
-export function useSimulateDonationApproval() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (id) => simulateDonationApproval(id),
-    onSuccess: (donation) => {
-      queryClient.setQueryData(queryKeys.doacoes.detail(donation.id), donation)
-    },
-  })
 }

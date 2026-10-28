@@ -11,8 +11,9 @@ export const LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile'
 // Antigo: o "banco" falso de eventos + presenças. Os eventos agora vêm da
 // API; o AuthContext só apaga o que versões anteriores deixaram nesta chave
 export const LEGACY_MOCK_EVENTOS_STORAGE_KEY = 'aucolher_mock_eventos'
-// "Banco" falso de campanhas + doações (mesmo mockStore)
-export const MOCK_CAMPANHAS_STORE_KEY = 'aucolher_mock_campanhas'
+// Antigo: o "banco" falso de campanhas + doações. Elas agora vêm da API; o
+// AuthContext só apaga o que versões anteriores deixaram nesta chave
+export const LEGACY_MOCK_CAMPANHAS_STORAGE_KEY = 'aucolher_mock_campanhas'
 // Antigo: o "banco" falso do painel do admin. O painel agora vem da API; o
 // AuthContext só apaga o que versões anteriores deixaram nesta chave
 export const LEGACY_MOCK_ADMIN_STORAGE_KEY = 'aucolher_mock_admin'

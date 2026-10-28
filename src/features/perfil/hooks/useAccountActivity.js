@@ -18,8 +18,7 @@ function byDateAsc(a, b) {
 // Tudo o que as quatro seções inferiores de "Minha conta" mostram, a partir
 // das mesmas fontes do perfil público — os números batem entre as páginas.
 // Os animais já vêm da API (GET /animals/mine, em qualquer status), os eventos
-// também (GET /events/attending); doações, do serviço delas (mock ou API, ver
-// USE_MOCK_CAMPANHAS).
+// também (GET /events/attending), e as doações (GET /donations/mine).
 // 🔴 Com a API real, os outros blocos viram uma chamada cada: /avaliacoes e
 // /adocoes
 export function useAccountActivity(user) {

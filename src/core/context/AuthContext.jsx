@@ -12,6 +12,7 @@ import {
   USER_STORAGE_KEY,
   LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY,
   LEGACY_MOCK_EVENTOS_STORAGE_KEY,
+  LEGACY_MOCK_CAMPANHAS_STORAGE_KEY,
   LEGACY_MOCK_ADMIN_STORAGE_KEY,
   LEGACY_ADMIN_DEMO_SEED_STORAGE_KEY,
   LEGACY_MOCK_MODERACAO_STORAGE_KEY,
@@ -57,10 +58,12 @@ export function AuthProvider({ children }) {
     // conta (outra pessoa no mesmo navegador herdava as respostas). Agora elas
     // vêm do banco: quem não tiver perfil lá responde o quiz de novo
     localStorage.removeItem(LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY)
-    // O mesmo para os antigos "bancos" falsos de eventos, do painel do admin
-    // (e os dados de teste dele), da moderação (com os pedidos de
-    // demonstração), das denúncias e do retorno/repasse: agora vêm da API
+    // O mesmo para os antigos "bancos" falsos de eventos, de campanhas e
+    // doações, do painel do admin (e os dados de teste dele), da moderação
+    // (com os pedidos de demonstração), das denúncias e do retorno/repasse:
+    // agora vêm da API
     localStorage.removeItem(LEGACY_MOCK_EVENTOS_STORAGE_KEY)
+    localStorage.removeItem(LEGACY_MOCK_CAMPANHAS_STORAGE_KEY)
     localStorage.removeItem(LEGACY_MOCK_ADMIN_STORAGE_KEY)
     localStorage.removeItem(LEGACY_ADMIN_DEMO_SEED_STORAGE_KEY)
     localStorage.removeItem(LEGACY_MOCK_MODERACAO_STORAGE_KEY)
