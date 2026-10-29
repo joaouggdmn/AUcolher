@@ -3,7 +3,6 @@ import { toApiAnimal, toFrontendAnimal } from '../../animais/services/animalServ
 import { toFrontendReport } from '../../denuncias/services/denunciaService'
 import { toCampaignPayload, toFrontendCampaign } from '../../doacoes/services/doacaoService'
 import { toEventPayload, toFrontendEvent } from '../../eventos/services/eventoService'
-import { readDeletedAccounts } from '../../perfil/services/accountDeletionMock'
 import { toApiPayload } from '../../perfil/utils/accountForm'
 import * as adminApi from './adminApi'
 
@@ -86,20 +85,9 @@ export async function getAdminStats() {
   return toFrontendAdminStats(await adminApi.getStats())
 }
 
-// 🔴 Exclusão no modo mock (USE_MOCK_EXCLUSAO): a API ainda não sabe quem
-// excluiu a conta, então a data vem do servidor falso
-function withMockDeletions(users) {
-  const deleted = readDeletedAccounts()
-  if (deleted.length === 0) return users
-  return users.map((user) => {
-    const match = deleted.find((row) => String(row.id) === String(user.id))
-    return match ? { ...user, deletedAt: match.deletedAt, isActive: false } : user
-  })
-}
-
 export async function listAdminUsers() {
   const dtos = await adminApi.listUsers()
-  return withMockDeletions(dtos.map(toFrontendAdminUser))
+  return dtos.map(toFrontendAdminUser)
 }
 
 // `ownerIsBanned` / `isOngBanned`: a conta foi banida, então o site já não
