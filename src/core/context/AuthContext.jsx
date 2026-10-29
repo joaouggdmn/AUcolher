@@ -19,6 +19,7 @@ import {
   LEGACY_ADOPTION_REQUESTS_STORAGE_KEY,
   LEGACY_MOCK_DENUNCIAS_STORAGE_KEY,
   LEGACY_MOCK_REABANDONO_STORAGE_KEY,
+  LEGACY_MOCK_EXCLUSAO_STORAGE_KEY,
 } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
@@ -60,8 +61,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY)
     // O mesmo para os antigos "bancos" falsos de eventos, de campanhas e
     // doações, do painel do admin (e os dados de teste dele), da moderação
-    // (com os pedidos de demonstração), das denúncias e do retorno/repasse:
-    // agora vêm da API
+    // (com os pedidos de demonstração), das denúncias, do retorno/repasse e
+    // das contas excluídas: agora vêm da API
     localStorage.removeItem(LEGACY_MOCK_EVENTOS_STORAGE_KEY)
     localStorage.removeItem(LEGACY_MOCK_CAMPANHAS_STORAGE_KEY)
     localStorage.removeItem(LEGACY_MOCK_ADMIN_STORAGE_KEY)
@@ -70,6 +71,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(LEGACY_ADOPTION_REQUESTS_STORAGE_KEY)
     localStorage.removeItem(LEGACY_MOCK_DENUNCIAS_STORAGE_KEY)
     localStorage.removeItem(LEGACY_MOCK_REABANDONO_STORAGE_KEY)
+    localStorage.removeItem(LEGACY_MOCK_EXCLUSAO_STORAGE_KEY)
 
     const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
     const storedUser = localStorage.getItem(USER_STORAGE_KEY)
