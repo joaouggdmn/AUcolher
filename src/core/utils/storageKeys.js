@@ -33,8 +33,9 @@ export const LEGACY_MOCK_REABANDONO_STORAGE_KEY = 'aucolher_mock_reabandono'
 export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'
 // "Banco" falso do chat: mensagens e marcas de leitura (mesmo mockStore)
 export const MOCK_CHAT_STORE_KEY = 'aucolher_mock_chat'
-// Contas excluídas no modo mock: o login delas passa a ser recusado (mesmo mockStore)
-export const MOCK_EXCLUSAO_STORE_KEY = 'aucolher_mock_exclusao'
+// Antigo: as contas excluídas do modo mock. A exclusão agora é do backend; o
+// AuthContext só apaga o que versões anteriores deixaram nesta chave
+export const LEGACY_MOCK_EXCLUSAO_STORAGE_KEY = 'aucolher_mock_exclusao'
 // AUmatch: a coluna de filtros do desktop ficou aberta ("1") ou guardada
 export const AUMATCH_PANEL_OPEN_KEY = 'aucolher_aumatch_panel_open'
 // sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)

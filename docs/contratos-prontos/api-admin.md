@@ -4,7 +4,7 @@
 >
 > Diferenças da implementação: `GET /api/admin/animals` devolve `listingStatus` (`AVAILABLE`, `IN_PROGRESS`, `ADOPTED`, `INACTIVE`, `REMOVED`), que a tela exige, e o stats tem `animals.removed`. A moderação também edita: `GET`/`PUT /api/admin/users/{id}` (corpo `{ email, profile }`, com o `profile` igual ao do `PUT /users/me`), `PUT /api/admin/animals/{id}` e `PUT /api/admin/events/{id}` (os mesmos corpos do dono); os DTOs ganham `moderatedAt`.
 >
-> **A parte de campanhas está pronta** (migração 007): `/api/admin/campaigns` (lista, edição e remoção) e os blocos `donations`, `campaigns` e `ngoRanking.byRaised` do stats. O front lê tudo direto da API. O contrato está em `../entrega-final/api-campanhas-doacoes.md` §7. `AdminUserDTO.deletedAt` espera a exclusão de conta (013).
+> **A parte de campanhas está pronta** (migração 007): `/api/admin/campaigns` (lista, edição e remoção) e os blocos `donations`, `campaigns` e `ngoRanking.byRaised` do stats. O front lê tudo direto da API. O contrato está em `../entrega-final/api-campanhas-doacoes.md` §7. `AdminUserDTO.deletedAt` também está pronto (exclusão de conta, migração 013).
 
 ## 1. Regras
 
@@ -112,7 +112,7 @@
 | `EVENT_CREATED` | evento | título | nome da ONG |
 
 - **Bloco `returns`.** O `AdminStatsDTO` traz a **taxa de reabandono**: geral, por faixa de compatibilidade (alta, média, baixa) e por motivo. O formato e o SQL estão em `api-devolucao-reabandono.md` §4.
-- **`AdminUserDTO.deletedAt`** (com a 013). A conta excluída pela própria pessoa aparece como "Conta excluída" e não pode ser reativada (`../entrega-final/api-exclusao-conta.md` §3 e §4).
+- **`AdminUserDTO.deletedAt`** (migração 013). A conta excluída pela própria pessoa aparece como "Conta excluída" e não pode ser reativada nem editada (`api-exclusao-conta.md` §3 e §4).
 
 ### 3.2 `AdminUserDTO`
 

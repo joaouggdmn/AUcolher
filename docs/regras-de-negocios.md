@@ -48,7 +48,7 @@ Frontend em React (Vite), backend em Spring Boot + PostgreSQL (em desenvolviment
 
 ### 2.1 Senha e exclusão de conta
 
-Contratos: `entrega-final/api-senha.md` e `entrega-final/api-exclusao-conta.md`.
+Contratos: `entrega-final/api-senha.md` e `contratos-prontos/api-exclusao-conta.md`.
 
 **Alterar senha**
 - Em "Minha conta", card "Acesso": e-mail e senha aparecem só para ver, a senha mascarada (o banco guarda o hash).
@@ -375,7 +375,7 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 
 ## 12. Nota técnica: API real vs. mock
 
-- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação.
+- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta.
 - **Ainda num servidor falso no `localStorage`**, cada um atrás de uma flag `VITE_USE_MOCK_*` (ligada por padrão) e com o adaptador da API já escrito:
   - recuperar e alterar senha (`VITE_USE_MOCK_SENHA`);
   - chat.

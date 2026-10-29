@@ -1,6 +1,4 @@
 import api, { ACCOUNT_SUSPENDED_MESSAGE } from "./api";
-import { mockHttpError } from "./mock/mockStore";
-import { isAccountDeleted } from "../../features/perfil/services/accountDeletionMock";
 import { instagramUrl, xUrl } from "../utils/socialLinks";
 import { maskCEP } from "../utils/masks";
 import { parseFoundedYear } from "../utils/foundedYear";
@@ -129,10 +127,6 @@ export const GOOGLE_LOGIN_URL = `${new URL(api.defaults.baseURL).origin}/oauth2/
 // Mesmo payload no login por senha, no cadastro e na troca do código do Google
 function toSession(data) {
   const user = toFrontendUser(data.user);
-
-  // 🔴 Exclusão no modo mock: com o backend, o e-mail da conta excluída é
-  // anonimizado e o login responde como a qualquer e-mail desconhecido
-  if (isAccountDeleted(user)) throw mockHttpError(401, "E-mail ou senha inválidos");
 
   // Formato da API: { token, type, user }
   return {
