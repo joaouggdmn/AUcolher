@@ -201,6 +201,7 @@ No `PUT /read`, `lastMessageId` ausente ou negativo → 400 "Informe a última m
    ```
 8. **Custo do polling**: cada `GET ...?after=` é uma busca pelo índice `(request_id, id)`. Com poucos usuários, 3 s não pesa. Se pesar, basta aumentar o intervalo no front, sem mudar o contrato.
 9. **Dados antigos**: as mensagens que estão hoje no `localStorage` são de teste e **não** são migradas.
+10. **Exclusão de conta** (já implementada, `../contratos-prontos/api-exclusao-conta.md`): o `AccountDeletionService` precisa passar a apagar os `chat_reads` da conta. As mensagens ficam, com o autor "Conta excluída".
 
 ## 5. SQL (rascunho de migração, PostgreSQL)
 

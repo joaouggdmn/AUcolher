@@ -4,7 +4,7 @@
 |---|---|---|
 | `entrega-final/` | **O que falta no backend:** o mapa (`README.md`), um contrato por módulo e o plano do front | **Mandar esta pasta inteira ao parceiro de backend** |
 | `entrega-final/api-login-google.md` | Entrar com o Google (já implementado): fluxo, variáveis e como criar as credenciais no Google Cloud | Você e o parceiro |
-| `contratos-prontos/` | Contratos da API já implementados (eventos, adoção, AUmatch, admin, denúncias, perfil da ONG, devolução) | Referência |
+| `contratos-prontos/` | Contratos da API já implementados (eventos, adoção, AUmatch, admin, denúncias, perfil da ONG, devolução, exclusão de conta) | Referência |
 | `planos-front/` | Planos do front já executados (campanhas e eventos, home, painel do admin) | Histórico |
 | `planos-front/plano-refinamentos-visuais.md` | **Entregue (17/10):** refinamentos visuais e de fluxo (travessões, home, animais, eventos, campanhas, AUmatch, minha conta, chat) | Você |
 | `planos-front/plano-refinamentos-2.md` | **Entregue (17/10):** "Seja o primeiro" só para quem participa, atalhos da ONG na sidebar, foto no banner de evento, painel do AUmatch que abre e fecha | Você |

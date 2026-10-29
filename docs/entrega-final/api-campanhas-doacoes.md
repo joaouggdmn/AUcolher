@@ -9,7 +9,7 @@
 > **Situação (27/10/2026): implementado no backend**, na branch `feature/campanhas-doacoes` do `api-aucolher`. A base é o código do Pedro, completado com as regras de segurança, a §7 e os testes.
 > - **Pronto:** todas as rotas da §5 e da §7.1, as regras da §1, a migração 007 (§8) e os blocos do `stats` (§7.4). Foi testado de ponta a ponta no Aiven: 50 casos, com as mensagens desta tabela.
 > - **Falta (o PIX real):** a conta Mercado Pago de cada ONG (migração 009, `api-mercado-pago-ongs.md`) ainda não existe. Por enquanto, toda ONG conta como conectada (`acceptingDonations: true`), e o PIX usa um único token de teste (`MP_DEV_ACCESS_TOKEN`). Sem ele, doar responde 400 "Esta ONG não está recebendo doações no momento.". Os campos da Orders API e o webhook ainda precisam ser conferidos no sandbox.
-> - **Fora:** a §7.5 depende da exclusão de conta (`api-exclusao-conta.md`), que ainda não existe.
+> - **A §7.5** (exclusão da conta da ONG) também está pronta, com a migração 013 (`../contratos-prontos/api-exclusao-conta.md`).
 > - **Front:** ligado na API desde a branch `feature/campanhas-api` (§9).
 > - **Campos a mais na resposta da campanha:** ela também traz `removed`, `removedByModeration`, `moderatedAt` e `ngo.active`, como os eventos. São os campos do `AdminCampaign` da §7.1.
 
@@ -222,7 +222,11 @@ Hoje o `AdminStatsService` devolve estes blocos zerados. Preencher:
 - **`recentActivity`**: entra o tipo `CAMPAIGN_CREATED` (`id` = campanha, `title` = título, `detail` = nome da ONG).
 
 ### 7.5 Exclusão da conta da ONG
-`api-exclusao-conta.md` §2, passo 3: as campanhas `ACTIVE` são encerradas e ficam com `deleted = true`, e os PIX pendentes são cancelados.
+`../contratos-prontos/api-exclusao-conta.md` §2, passo 3 (`CampaignService.closeAndHideAllOf`):
+- **todas** as campanhas da ONG ficam com `deleted = true`, mesmo sem doações;
+- as ativas são encerradas antes;
+- os PIX pendentes são cancelados;
+- as doações aprovadas continuam no histórico do doador, com `campaign.removed = true`.
 
 ## 8. SQL — `007_campaigns.sql` (rascunho, PostgreSQL)
 

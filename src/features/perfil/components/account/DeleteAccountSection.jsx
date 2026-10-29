@@ -8,10 +8,11 @@ import { deleteMyAccount } from '../../services/userService'
 
 const CONFIRMATION_WORD = 'EXCLUIR'
 
-// "Zona de perigo" no fim de Minha conta (api-exclusao-conta.md §7), para
+// "Zona de perigo" no fim de Minha conta (contratos-prontos/api-exclusao-conta.md §7), para
 // pessoa e ONG. Fica dentro do AccountFormShell, mas o estado é próprio: nada
 // aqui conta como alteração não salva do perfil. Conta com senha confirma com
-// a senha; conta do Google sem senha digita EXCLUIR
+// a senha; conta do Google sem senha digita EXCLUIR. O admin não exclui a
+// própria conta (a API responde 403), então a seção nem aparece para ele
 function DeleteAccountSection() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -24,6 +25,8 @@ function DeleteAccountSection() {
   const [error, setError] = useState(null)
 
   const isFilled = hasPassword ? value.length > 0 : value.trim() === CONFIRMATION_WORD
+
+  if (user?.userType === 'ADMIN') return null
 
   const open = () => {
     setValue('')
@@ -78,7 +81,7 @@ function DeleteAccountSection() {
               <ul className="list-disc space-y-1 pl-5">
                 <li>seus anúncios saem do ar;</li>
                 <li>os pedidos de adoção em andamento são cancelados;</li>
-                {isOng && <li>as campanhas ativas são encerradas e os eventos futuros, cancelados;</li>}
+                {isOng && <li>suas campanhas saem do ar (as ativas são encerradas) e os eventos futuros são cancelados;</li>}
                 <li>o histórico das outras pessoas fica, com o nome "Conta excluída".</li>
               </ul>
               <label className="flex flex-col gap-1.5">
