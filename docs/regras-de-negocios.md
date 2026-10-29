@@ -12,7 +12,7 @@ Três papéis de usuário:
 - **ONG** — tudo que o usuário comum faz, mais um perfil institucional mais completo e a possibilidade de criar eventos e campanhas de doação.
 - **Admin** — modera a plataforma, julga denúncias e acompanha métricas gerais (painel próprio em `/admin`).
 
-Frontend em React (Vite), backend em Spring Boot + PostgreSQL (em desenvolvimento paralelo pelo parceiro).
+Frontend em React (Vite), backend em Spring Boot + PostgreSQL (o banco em uso fica no Aiven). Quase tudo já está na API. O que ainda falta está na seção 12 e em `entrega-final/README.md`.
 
 ## 2. Usuários e papéis
 
@@ -21,7 +21,7 @@ Frontend em React (Vite), backend em Spring Boot + PostgreSQL (em desenvolviment
 - **Cadastrou, entrou**: pelo formulário (pessoa ou ONG) ou pelo Google, a conta já sai do cadastro logada, sem passar pela tela de login. O cadastro devolve o mesmo `{ token, type, user }` do login.
 - **Criação do admin**:
   - Não há cadastro público de admin. O cadastro público continua só para pessoa e ONG.
-  - A primeira conta `ADMIN` é criada pela própria API ao subir, a partir das variáveis de ambiente `ADMIN_EMAIL` / `ADMIN_PASSWORD` (`ADMIN_NAME` é opcional). Sem elas, nada é criado.
+  - A API **não** cria admin ao subir (o antigo `AdminAccountInitializer` saiu). A conta `ADMIN` é inserida direto no banco, com `user_type = 'ADMIN'`. O `docs/seed-banco-completo.sql` preserva o admin que já existir como id 1.
   - Nenhuma senha fica no repositório.
 - **O que o admin faz no site**: ele **modera, mas não participa**.
   - **Modera:** remove anúncios, eventos e campanhas e bane ou reativa contas, sempre com confirmação. Faz isso pelo painel (`/admin`) **e** direto nas páginas do site:
@@ -50,6 +50,8 @@ Frontend em React (Vite), backend em Spring Boot + PostgreSQL (em desenvolviment
 
 Contratos: `entrega-final/api-senha.md` e `contratos-prontos/api-exclusao-conta.md`.
 
+**Situação:** a senha ainda roda no mock do front (`VITE_USE_MOCK_SENHA`), e a API dela vem com a migração 010. A exclusão de conta já está na API (migração 013).
+
 **Alterar senha**
 - Em "Minha conta", card "Acesso": e-mail e senha aparecem só para ver, a senha mascarada (o banco guarda o hash).
 - O botão "Alterar senha" envia o mesmo link do "Esqueci minha senha" para o e-mail da conta. Não há formulário com a senha atual: quem acessa o e-mail prova que é dono da conta. Nova senha com no mínimo 6 caracteres, como no cadastro.
@@ -66,11 +68,21 @@ Contratos: `entrega-final/api-senha.md` e `contratos-prontos/api-exclusao-conta.
 - Envio por SMTP (Spring Mail), com as credenciais em variáveis de ambiente.
 
 **Excluir conta**
-- Em "Minha conta", com confirmação por senha (conta do Google: digitar "EXCLUIR").
-- **Não apaga a linha**: anonimiza. Nome vira "Conta excluída"; e-mail, foto, bio, CNPJ, endereço e redes são apagados (o e-mail fica livre para um novo cadastro); a conta não entra mais.
-- Aplica o **mesmo efeito cascata do banimento** (seção 8): os anúncios, campanhas e eventos saem do ar, e os pedidos ativos são cancelados, com motivo visível para a outra parte.
-- Campanhas ativas da ONG são encerradas, e os PIX pendentes, cancelados. Doações aprovadas, pedidos concluídos e avaliações continuam no histórico das outras pessoas, com o autor exibido como "Conta excluída".
-- Não dá para desfazer (diferente do banimento, que o admin reativa).
+- Em "Minha conta" (pessoa e ONG), com confirmação por senha (conta do Google: digitar "EXCLUIR"). O admin não exclui a própria conta, e a seção nem aparece para ele.
+- **Não apaga a linha: anonimiza.**
+  - O nome vira "Conta excluída".
+  - O e-mail vira um endereço inválido, e o original fica livre para um novo cadastro. O CNPJ também fica livre.
+  - Senha, foto, banner, bio, CNPJ, endereço, redes, equipe e horários são apagados.
+  - A conta não entra mais, e o token dela para de valer.
+- **Apagados de vez:** o quiz do AUmatch, os favoritos e as presenças em eventos.
+- **Efeitos** (parecidos com os do banimento, seção 8, mas sem volta):
+  - os pedidos ativos são cancelados (`ACCOUNT_DELETED`), e a outra parte vê "Cancelado: conta excluída";
+  - os anúncios disponíveis saem do ar;
+  - **todas** as campanhas da ONG saem do site. As ativas são encerradas antes, e os PIX pendentes são cancelados;
+  - os eventos futuros da ONG com confirmados viram cancelados (quem confirmou vê "Evento cancelado"), os sem confirmados são apagados e os passados ficam;
+  - as denúncias pendentes contra a conta são arquivadas.
+- Doações aprovadas, pedidos concluídos e avaliações continuam no histórico das outras pessoas, com o autor exibido como "Conta excluída".
+- Não dá para desfazer. Diferente do banimento, o admin não reativa nem edita uma conta excluída: o painel mostra o selo "Excluída".
 
 ## 3. Ciclo de vida da adoção
 
@@ -105,7 +117,8 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
   - `ADOPTER_WITHDREW` ou `OWNER_WITHDREW`: uma das partes desistiu;
   - `ANIMAL_ADOPTED`: outro pedido do mesmo animal concluiu;
   - `ANIMAL_UNAVAILABLE`: o dono tirou o animal do ar, marcou como adotado por fora ou excluiu o anúncio;
-  - `ACCOUNT_BANNED` ou `LISTING_REMOVED`: moderação, ainda mock (só na tela).
+  - `ACCOUNT_BANNED` ou `LISTING_REMOVED`: moderação (uma das contas foi banida, ou o anúncio foi removido);
+  - `ACCOUNT_DELETED`: uma das partes excluiu a própria conta (seção 2.1).
 - A conversa de um pedido cancelado continua visível, travada, com o motivo.
 
 **Acompanhamento:** o adotante acompanha tudo em **"Meus interesses"** (`/meus-interesses`).
@@ -130,7 +143,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
 - **Editável e excluível pelo próprio autor a qualquer momento** (sem janela de prazo definida).
 - Visível no perfil público de quem foi avaliado, como média + contagem (ex: "4.8 ⭐ · 12 avaliações").
 - Serve como sinal de confiança: ao decidir aceitar um pedido de interesse (ou ao escolher de quem adotar), a outra parte pode consultar essas avaliações.
-- Uma avaliação considerada abusiva/injusta pode ser alvo de denúncia (seção 8) — ainda não implementado.
+- Avaliações **não** podem ser denunciadas (decisão: ficam fora das denúncias por enquanto, seção 8), e as de contas banidas continuam aparecendo.
 - O perfil público lê as avaliações e o número de adoções de `GET /api/users/{id}/reviews`.
 
 ### 3.3 Devolução e taxa de reabandono
@@ -218,7 +231,7 @@ PENDING → ACCEPTED → AWAITING_DELIVERY → CONCLUDED → RETURNED (dono regi
   | Porte | 15 | porte preferido × porte (vazio + apartamento conta como pequeno) |
 
   O detalhe está em `contratos-prontos/api-aumatch.md`.
-- Um animal já adotado nunca aparece na fila. Um animal já com pedido `PENDING`/`ACCEPTED` do próprio usuário também não deveria ser mostrado de novo (evitar duplicidade de interesse pelo mesmo animal).
+- Um animal já adotado nunca aparece na fila. O deck também esconde os animais que a pessoa já pediu, para não haver dois interesses no mesmo animal.
 
 ## 5. Animais
 
@@ -337,7 +350,7 @@ Perfil mais completo que o de usuário comum:
 - Pessoa e ONG logadas confirmam ou cancelam presença, **menos a ONG dona**. O admin não participa: no lugar do botão, ele vê "Remover evento".
 - Evento lotado mostra "Vagas esgotadas"; na edição, as vagas não podem ficar abaixo de quem já confirmou.
 - **Evento passado** (`data < hoje`) é somente leitura: não edita, não exclui, sem presença. Um evento de hoje fica aberto o dia inteiro.
-- **Excluir**: sem confirmados → exclusão real; com confirmados → vira `CANCELADO`, some da vitrine e do detalhe, e aparece como "Evento cancelado" em Minha conta de quem confirmou.
+- **Excluir**: sem confirmados → exclusão real; com confirmados → vira `CANCELADO`, some da vitrine e do detalhe, e aparece como "Evento cancelado" em Minha conta de quem confirmou. A mesma regra vale para os eventos futuros da ONG que exclui a conta (seção 2.1).
 - A vitrine, a home e a aba "Eventos" do perfil público da ONG mostram só eventos ativos de hoje em diante.
 
 ### 10.2 Campanhas e doações
@@ -349,9 +362,12 @@ Perfil mais completo que o de usuário comum:
 - O PIX vale **30 minutos**; o modal acompanha o pagamento sozinho. Só doações **aprovadas** contam no total da campanha e em "Meu impacto".
 - **Meta atingida** não encerra: a campanha continua recebendo. Ela encerra quando a ONG encerra ou quando o prazo vence; encerrada fica visível, mas não recebe nem edita.
 - **Encerrar/excluir** cancela os PIX ainda não pagos. **Excluir**: sem doações aprovadas → some de vez; com doações → sai de todas as telas, mas fica no histórico de quem doou e nas doações recebidas da ONG.
+- **ONG que exclui a conta** (seção 2.1): todas as campanhas saem das telas, mesmo sem doações, e quem doou vê a campanha como removida.
 - A ONG vê as **doações recebidas** (quem doou, quanto e para qual campanha) no painel.
 
 ### 10.3 Conta Mercado Pago de cada ONG
+
+> **Ainda não implementado** (migração 009, `entrega-final/api-mercado-pago-ongs.md`). Hoje a API trata toda ONG como conectada e gera o PIX com um token de teste único (`MP_DEV_ACCESS_TOKEN`).
 
 Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na conta da ONG**, e a plataforma nunca guarda doações.
 
@@ -378,8 +394,9 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 - **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta.
 - **Ainda num servidor falso no `localStorage`**, cada um atrás de uma flag `VITE_USE_MOCK_*` (ligada por padrão) e com o adaptador da API já escrito:
   - recuperar e alterar senha (`VITE_USE_MOCK_SENHA`);
-  - chat.
-- **O que falta no backend, em ordem:** `entrega-final/README.md`. Quando o parceiro entrega um módulo, o front desliga a flag dele (`=false` no `.env`).
+  - chat (`VITE_USE_MOCK_CHAT`).
+- **Ainda não existe em lugar nenhum:** a conexão de cada ONG com o próprio Mercado Pago (seção 10.3).
+- **O que falta no backend, em ordem:** `entrega-final/README.md`. Quando um módulo chega na API, o front apaga o mock e a flag dele e passa a usar só a API, como foi feito com campanhas e com a exclusão de conta.
 
 ## 13. Backlog técnico conhecido (não implementar agora — só registro)
 
@@ -390,12 +407,14 @@ Gaps encontrados na exploração do código atual, guardados aqui para referênc
   - `AdminRoute` também já usa `user.userType` (corrigido no painel do admin).
 - ~~Bug de identidade no chat~~ e ~~página do adotante~~: resolvidos com os pedidos na API.
 - Avaliações não podem ser denunciadas, e as de contas banidas continuam aparecendo.
-- Várias telas ainda são arquivos vazios/placeholders: dashboard admin, aprovação de ONGs, denúncias, estatísticas. Elas serão substituídas pelo painel do admin (`planos-front/plano-painel-admin.md`), e a de aprovação de ONGs será apagada.
+- As telas vazias do admin (dashboard, aprovação de ONGs, denúncias, estatísticas) já foram substituídas pelo painel do admin. Ainda sobram:
+  - `/minhas-avaliacoes`, que é só uma `PlaceholderPage`;
+  - cerca de 20 arquivos vazios sem uso, por exemplo `MyReviewsPage.jsx`, `ChatWindow.jsx`, `OngProfilePage.jsx`, `core/components/ui/Button.jsx` e `Input.jsx`.
 
 ## 14. Perguntas em aberto (alinhar com o parceiro de backend)
 
-- ~~Como o primeiro usuário `ADMIN` é criado~~: resolvido com variáveis de ambiente na subida da API (seção 2).
+- ~~Como o primeiro usuário `ADMIN` é criado~~: resolvido. A conta é inserida direto no banco, e a API não cria admin ao subir (seção 2).
 - ~~Nome do campo de papel~~: resolvido. É `userType`, com `PERSON | NGO | ADMIN` na API.
-- ~~Endpoints `/api/admin/*` e `/api/reports`~~: implementados (`contratos-prontos/api-admin.md` e `contratos-prontos/api-denuncias-moderacao.md`). Falta só a parte de campanhas, junto com a 007.
+- ~~Endpoints `/api/admin/*` e `/api/reports`~~: implementados (`contratos-prontos/api-admin.md` e `contratos-prontos/api-denuncias-moderacao.md`), inclusive a parte de campanhas (migração 007).
 - ~~Se e quando o histórico de status do animal entra no modelo~~: resolvido. A taxa de reabandono usa os status `RETURNED` / `REHOMED` do pedido e o score congelado na conclusão (seção 3.3), sem tabela de histórico do animal.
 - ~~Novos itens para o parceiro de backend, sem contrato~~: os contratos do que falta estão em **`docs/entrega-final/`**, com o mapa no `README.md` dela.
