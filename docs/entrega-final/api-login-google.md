@@ -12,7 +12,7 @@
 - **Conta criada pelo Google:**
   - **não troca de e-mail** em "Minha conta": o próximo login pelo Google criaria outra conta;
   - **pode criar uma senha** pelo link de redefinição (`api-senha.md`). Depois disso, entra das duas formas;
-  - exclui a conta digitando `EXCLUIR`, porque não tem senha para confirmar (`api-exclusao-conta.md`).
+  - exclui a conta digitando `EXCLUIR`, porque não tem senha para confirmar (`../contratos-prontos/api-exclusao-conta.md`).
 - **Localização:** a conta nasce sem cidade e UF, como no cadastro de pessoa. O formulário de anunciar animal já pede as duas quando faltam.
 
 ## 2. O fluxo

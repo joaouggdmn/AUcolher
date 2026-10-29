@@ -269,7 +269,7 @@ Erros (todos no `ErrorResponseDTO`, com a mensagem em `message`):
 Número: **`014_reports_moderation.sql`** (aplicada).
 - A CHECK de `cancel_reason` (bloco 3) já aceita `ACCOUNT_DELETED`, da exclusão de conta (013). A 013 não precisa recriá-la.
 - A CHECK de `status` de `adoption_requests` já tem `RETURNED` e `REHOMED`, da migração 012, e não foi recriada aqui.
-- O banimento usa o `AdoptionRequestService.cancelAllForAccount(userId, reason)`, que a exclusão de conta também vai usar.
+- O banimento usa o `AdoptionRequestService.cancelAllForAccount(userId, reason)`, que a exclusão de conta também usa (com `ACCOUNT_DELETED`, `api-exclusao-conta.md`).
 - **O bloco 4 foi aplicado só em `events`.** A coluna `campaigns.removed_by_moderation` nasce direto no `CREATE TABLE campaigns` da 007 (`../entrega-final/api-campanhas-doacoes.md` §8).
 
 ```sql

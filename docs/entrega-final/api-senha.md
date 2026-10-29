@@ -140,6 +140,8 @@ Enviados pelo SMTP do **Gmail**, com uma conta do projeto e **senha de app** (RE
 
 Tokens usados ou vencidos há mais de 7 dias podem ser apagados por um `@Scheduled` diário. É opcional, porque o volume é pequeno.
 
+**Exclusão de conta** (já implementada, `../contratos-prontos/api-exclusao-conta.md`): o `AccountDeletionService` precisa passar a apagar os `password_reset_tokens` da conta. Com a 010, o `hasPassword` do `UserResponseDTO` também passa a decidir, no front, entre pedir a senha ou `EXCLUIR`.
+
 ## 7. SQL (rascunho de migração, PostgreSQL)
 
 ```sql
@@ -189,7 +191,7 @@ COMMIT;
 **Minha conta → card "Acesso"** (`features/perfil/components/account/AccessSection.jsx`, em pessoa e ONG)
 - E-mail e senha só para ver; a senha mascarada, ou "Nenhuma senha criada" quando `hasPassword` é `false`.
 - Botão "Alterar senha" / "Criar senha" → `POST /forgot` com o e-mail da conta → "Enviamos um link para {e-mail}…".
-- A zona de "Excluir conta" (`api-exclusao-conta.md` §7) fica no fim de "Minha conta", depois de "Dados da conta".
+- A zona de "Excluir conta" (`../contratos-prontos/api-exclusao-conta.md` §7) fica no fim de "Minha conta", depois de "Dados da conta".
 
 **`/recuperar-senha`**
 - Campo de e-mail → POST `/forgot` → mensagem neutra, com a dica "Confira também a caixa de spam".
