@@ -25,10 +25,10 @@ Não.
 | 2 | Conta Mercado Pago por ONG | 009 | a fazer |
 | 3 | Senha (recuperar e alterar pelo link, derrubar sessões, `hasPassword`) | 010 | mock, adaptador da API pronto |
 | 4 | Chat (6 mensagens de sistema) | 011 | parte 2 deste plano |
-| 5 | Excluir conta | 013 | parte 3 deste plano |
+| 5 | ~~Excluir conta~~ | 013 | ✅ feito: só API, mock removido |
 
 **Frontend:**
-- o chat (parte 2) e excluir conta (parte 3);
+- o chat (parte 2). ~~Excluir conta~~ (parte 3): feito, o front usa só a API e o mock saiu do código (`../contratos-prontos/api-exclusao-conta.md` §7);
 - conectar o Mercado Pago (`api-mercado-pago-ongs.md` §9);
 - a cada entrega do parceiro: desligar a flag e testar. ~~Campanhas~~: feito, o front usa só a API e o mock saiu do código (`api-campanhas-doacoes.md` §9);
 - pendências pequenas:
@@ -94,7 +94,9 @@ Trio **fachada / api / mock**, como em eventos (`features/eventos/services/event
 
 ## Parte 3: excluir conta pronto para a API
 
-`api-exclusao-conta.md` §1–4 e §7: `POST /api/users/me/deletion`, com `{ password }` ou `{ confirmation: "EXCLUIR" }`.
+> ✅ **Concluída.** A rota existe (migração 013), e o front usa só a API: o mock, a flag e o bloqueio de login do mock saíram do código, e o admin não vê a seção. O que segue é o registro de como a parte foi planejada.
+
+`../contratos-prontos/api-exclusao-conta.md` §1–4 e §7: `POST /api/users/me/deletion`, com `{ password }` ou `{ confirmation: "EXCLUIR" }`.
 
 **E1. Serviço, flag e mock**
 - `USE_MOCK_EXCLUSAO` (`VITE_USE_MOCK_EXCLUSAO`, mock por padrão).
@@ -116,7 +118,7 @@ Trio **fachada / api / mock**, como em eventos (`features/eventos/services/event
 - `ACCOUNT_DELETED` nos textos de cancelamento ("Cancelado — conta excluída") e na faixa de conversa encerrada.
 - **Admin:** selo "Excluída" e sem "Reativar" quando houver `deletedAt`.
 
-**E4. Docs:** `api-exclusao-conta.md` §7 e o `README.md` §2 marcam o front como pronto.
+**E4. Docs:** `../contratos-prontos/api-exclusao-conta.md` §7 e o `README.md` §2 marcam o front como pronto.
 
 ---
 
@@ -130,9 +132,9 @@ Trio **fachada / api / mock**, como em eventos (`features/eventos/services/event
   - as mensagens de sistema aparecem ao confirmar a entrega e ao concluir;
   - o envio é recusado em `AWAITING_DELIVERY`.
 - **Com a flag desligada antes da entrega** (`VITE_USE_MOCK_CHAT=false`): o badge fica em 0, a conversa mostra o erro e o resto do site segue normal.
-- **Excluir conta:**
+- **Excluir conta** (feito, contra a API):
   - senha errada → "Senha incorreta.";
   - conta sem senha → `EXCLUIR`;
   - logout e toast;
-  - o login recusado no mock;
+  - o login antigo recusado pela API (401);
   - o admin não vê a seção.

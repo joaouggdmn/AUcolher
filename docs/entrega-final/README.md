@@ -18,7 +18,6 @@ Os contratos seguem sempre o mesmo padrão:
 | `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG e webhook |
 | `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões |
 | `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema |
-| `api-exclusao-conta.md` | Excluir a própria conta (anonimização e efeitos) |
 | `api-login-google.md` | Entrar com o Google: **já implementado** (back e front); só o fluxo, as variáveis e como criar as credenciais |
 | `plano-front-api-pronta.md` | O plano do front para deixar cada módulo pronto para ligar na API |
 
@@ -36,11 +35,11 @@ Os contratos seguem sempre o mesmo padrão:
 | Perfil público e banner da ONG | (`users`) | ✅ pronto | API | `contratos-prontos/api-perfil-ong.md` |
 | Painel do admin | — | ✅ pronto (campanhas e números de doação inclusos) | API | `contratos-prontos/api-admin.md` |
 | Denúncias e moderação | `reports` | ✅ pronto (remoção de campanha inclusa) | API | `contratos-prontos/api-denuncias-moderacao.md` |
+| Excluir conta | `users.deleted_at` | ✅ pronto | API | `contratos-prontos/api-exclusao-conta.md` |
 | **Campanhas e doações (PIX)** | `campaigns`, `donations` | ✅ pronto, **menos o PIX real** (token único provisório) | API | `api-campanhas-doacoes.md` |
 | **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ❌ falta | a fazer | `api-mercado-pago-ongs.md` |
 | **Senha** | `password_reset_tokens` + `users.password_changed_at` | ❌ falta | mock (`VITE_USE_MOCK_SENHA`) | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ❌ falta | mock (`VITE_USE_MOCK_CHAT`) | `api-chat.md` |
-| **Excluir conta** | `users.deleted_at` | ❌ falta | mock (`VITE_USE_MOCK_EXCLUSAO`) | `api-exclusao-conta.md` |
 
 ## 3. Ordem sugerida
 
@@ -48,13 +47,13 @@ Os contratos seguem sempre o mesmo padrão:
 1. ~~Campanhas e doações~~ (migração 007): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7). Falta a **conta Mercado Pago** (009): até lá, o PIX usa um token único provisório.
 2. **Senha** (010).
 3. **Chat** (011).
-4. **Excluir conta** (013). Por último, porque reaproveita a cascata do banimento e mexe em quase todas as tabelas.
+4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Quando a 009, a 010 e a 011 chegarem, a exclusão precisa apagar também a conta Mercado Pago, os links de senha e as marcas de leitura do chat (§1 do contrato).
 
 **Opcional:** o e-mail de aviso "senha alterada" (`api-senha.md` §1).
 
 ## 4. Migrações
 
-**Já aplicadas no `aucolher_db`:** 001 a 008, 012, 014, 015 e 016.
+**Já aplicadas no `aucolher_db`:** 001 a 008, 012, 014, 015 e 016. A **013** (exclusão de conta, `sql/migrations/013_account_deletion.sql` no backend) está pronta e precisa ser aplicada no banco antes de subir a API nova.
 
 **Faltam:**
 
@@ -63,7 +62,6 @@ Os contratos seguem sempre o mesmo padrão:
 | 009 | `009_mercado_pago_accounts.sql` | `mercado_pago_accounts` | `api-mercado-pago-ongs.md` §8 |
 | 010 | `010_password_security.sql` | `users.password_changed_at`, `password_reset_tokens` | `api-senha.md` §7 |
 | 011 | `011_chat.sql` | `chat_messages`, `chat_reads` | `api-chat.md` §5 |
-| 013 | `013_account_deletion.sql` | `users.deleted_at` | `api-exclusao-conta.md` §6 |
 
 **Dependências que exigem cuidado:**
 - **A 009 vem depois da 007:** `mercado_pago_accounts` não depende de `campaigns`, mas a regra "sem conta conectada não há campanha" precisa das duas.
@@ -115,7 +113,7 @@ Os contratos seguem sempre o mesmo padrão:
 
 | Tabela | Para quê |
 |---|---|
-| `users` | contas (pessoa, ONG, admin); ganha `password_changed_at` (010) e `deleted_at` (013) |
+| `users` | contas (pessoa, ONG, admin); ganha `password_changed_at` (010); `deleted_at` (013) já existe |
 | `ngo_team` | equipe do perfil da ONG |
 | `ngo_visiting_hours` | horário de visitas da ONG |
 | `animals` | anúncios |

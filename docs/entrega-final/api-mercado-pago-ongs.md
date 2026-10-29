@@ -25,7 +25,7 @@
   - nunca saem do backend (nem em DTO, nem em log);
   - ficam **criptografados** no banco (AES-256-GCM).
 - **Comissão.** A plataforma não cobra: a order sai sem `marketplace_fee`. Só a tarifa do Mercado Pago é descontada, na conta da ONG.
-- **Excluir a conta da ONG** apaga a linha de `mercado_pago_accounts` (`api-exclusao-conta.md`).
+- **Excluir a conta da ONG** apaga a linha de `mercado_pago_accounts` (`../contratos-prontos/api-exclusao-conta.md`). A exclusão já existe: com a 009, acrescente essa limpeza no `AccountDeletionService`.
 
 ## 2. Formatos (DTOs)
 
