@@ -26,7 +26,7 @@ Os contratos seguem sempre o mesmo padrão:
 | Módulo | Tabelas | Backend | Front | Contrato |
 |---|---|---|---|---|
 | Contas e login (pessoa, ONG, admin) | `users`, `ngo_team`, `ngo_visiting_hours` | ✅ pronto | API | README do backend |
-| Entrar com o Google | (`users`) | ✅ pronto | API (botão com `VITE_GOOGLE_LOGIN=true`) | `api-login-google.md` |
+| Entrar com o Google | (`users`) | ✅ pronto | API | `api-login-google.md` |
 | Animais e favoritos | `animals`, `animal_photos`, `favorites` | ✅ pronto | API | README do backend |
 | AUmatch | `match_profiles` | ✅ pronto | API | `contratos-prontos/api-aumatch.md` |
 | Pedidos de adoção e avaliações | `adoption_requests`, `adoption_reviews` | ✅ pronto | API | `contratos-prontos/api-adocao.md` |

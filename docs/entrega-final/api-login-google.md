@@ -2,7 +2,7 @@
 
 > Sem migração: `users.password` já aceita nulo e `users.provider` (`LOCAL` | `GOOGLE`) já existe.
 > - **Back e front implementados neste módulo** (branch `feature/login-google` nos dois repositórios). O parceiro não precisa implementar nada: este doc registra como o fluxo funciona, as variáveis de ambiente e como criar as credenciais.
-> - No front, o botão só aparece com `VITE_GOOGLE_LOGIN=true` no `.env`. Sem as credenciais do Google, o botão levaria a uma página de erro do próprio Google.
+> - No front, o botão aparece sempre. Sem as credenciais do Google na API, ele leva a uma página de erro do próprio Google.
 
 ## 1. Regras de negócio
 
@@ -81,7 +81,6 @@ Todos vão para `{FRONTEND_URL}/login/google`:
 
 | Variável | Para quê |
 |---|---|
-| `VITE_GOOGLE_LOGIN=true` | Mostra o botão "Continuar com Google". Sem ela, o botão não aparece |
 | `VITE_API_URL` | A mesma de sempre. A URL de início do fluxo sai da origem dela |
 
 ## 6. Criar as credenciais no Google Cloud
@@ -102,12 +101,11 @@ Todos vão para `{FRONTEND_URL}/login/google`:
    GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com;GOOGLE_CLIENT_SECRET=GOCSPX-xxxx
    ```
    Reinicie a API.
-6. **No front:** adicione `VITE_GOOGLE_LOGIN=true` ao `.env` e reinicie o `npm run dev`.
+6. **No front:** nada a configurar; o botão já aparece.
 
 **Em produção:**
 - cadastre também a origem e a URI com os endereços publicados (`https://...`);
 - defina `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` e `FRONTEND_URL` no servidor da API;
-- defina `VITE_GOOGLE_LOGIN=true` na hospedagem do front;
 - para qualquer conta Google entrar, publique o app na tela de consentimento. Com só os escopos básicos, não precisa de verificação do Google.
 
 ## 7. Implementação (backend)
@@ -129,7 +127,7 @@ Todos vão para `{FRONTEND_URL}/login/google`:
 
 | Arquivo | Papel |
 |---|---|
-| `features/auth/components/GoogleLoginButton.jsx` | O botão (só com `VITE_GOOGLE_LOGIN=true`). Guarda a página de origem e vai para a API |
+| `features/auth/components/GoogleLoginButton.jsx` | O botão. Guarda a página de origem e vai para a API |
 | `features/auth/pages/GoogleCallbackPage.jsx` | A rota `/login/google`: troca o código uma vez só e abre a sessão, ou volta ao login com o aviso |
 | `core/services/authService.js` → `exchangeGoogleCode` | `POST /auth/google/exchange`, com o mesmo mapeamento do login |
 | `core/context/AuthContext.jsx` → `loginWithGoogle` | Abre a sessão como no login por senha |

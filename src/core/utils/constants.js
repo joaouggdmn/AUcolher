@@ -10,10 +10,6 @@ export const USE_MOCK_SENHA = import.meta.env.VITE_USE_MOCK_SENHA !== 'false'
 // Chat dos pedidos (docs/entrega-final/api-chat.md): sem as rotas da migração
 // 011, as conversas ficam num servidor falso no localStorage
 export const USE_MOCK_CHAT = import.meta.env.VITE_USE_MOCK_CHAT !== 'false'
-// Entrar com o Google (docs/entrega-final/api-login-google.md). Ao contrário
-// dos mocks, o padrão é desligado: sem as credenciais do Google na API, o
-// botão levaria a uma página de erro do próprio Google
-export const GOOGLE_LOGIN_ENABLED = import.meta.env.VITE_GOOGLE_LOGIN === 'true'
 
 // Listas públicas mudam pouco: 30 s evita refazer a busca a cada navegação
 export const EVENTOS_STALE_TIME = 30_000
