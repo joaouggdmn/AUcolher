@@ -2,7 +2,7 @@
 
 Esta pasta é o pacote para o parceiro de backend: tudo o que ainda falta implementar na API e no banco, um contrato por módulo. O que já está pronto fica em `../contratos-prontos/`, só como referência.
 
-**Como o front espera cada entrega:** a chamada da API de cada módulo já está escrita no front, atrás de uma flag `VITE_USE_MOCK_*`. Enquanto a rota não existe, a flag fica ligada e um "servidor falso" no `localStorage` responde no lugar, com os mesmos DTOs. Quando o módulo for entregue, o front põe a flag em `false` no `.env` e passa a usar a API. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos.**
+**Como o front espera cada entrega:** a chamada da API de cada módulo já está escrita no front, atrás de uma flag `VITE_USE_MOCK_*`. Enquanto a rota não existe, a flag fica ligada e um "servidor falso" no `localStorage` responde no lugar, com os mesmos DTOs. Quando o módulo é entregue, o front apaga o mock e a flag e passa a usar só a API, como já foi feito com campanhas e com a exclusão de conta. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos.**
 
 Os contratos seguem sempre o mesmo padrão:
 - regras → DTOs → endpoints → notas de Spring → SQL → o que muda no front;
@@ -26,7 +26,7 @@ Os contratos seguem sempre o mesmo padrão:
 | Módulo | Tabelas | Backend | Front | Contrato |
 |---|---|---|---|---|
 | Contas e login (pessoa, ONG, admin) | `users`, `ngo_team`, `ngo_visiting_hours` | ✅ pronto | API | README do backend |
-| Entrar com o Google | (`users`) | ✅ pronto | API (botão com `VITE_GOOGLE_LOGIN=true`) | `api-login-google.md` |
+| Entrar com o Google | (`users`) | ✅ pronto | API | `api-login-google.md` |
 | Animais e favoritos | `animals`, `animal_photos`, `favorites` | ✅ pronto | API | README do backend |
 | AUmatch | `match_profiles` | ✅ pronto | API | `contratos-prontos/api-aumatch.md` |
 | Pedidos de adoção e avaliações | `adoption_requests`, `adoption_reviews` | ✅ pronto | API | `contratos-prontos/api-adocao.md` |
@@ -53,7 +53,11 @@ Os contratos seguem sempre o mesmo padrão:
 
 ## 4. Migrações
 
-**Já aplicadas no `aucolher_db`:** 001 a 008, 012, 014, 015 e 016. A **013** (exclusão de conta, `sql/migrations/013_account_deletion.sql` no backend) está pronta e precisa ser aplicada no banco antes de subir a API nova.
+**Já existem no backend** (`sql/migrations/`): 001 a 008 e 012 a 017. A mais nova é a **013** (exclusão de conta).
+
+**Onde estão aplicadas:**
+- **Aiven:** é o banco em uso (`backend/docs/guia-banco-aiven.md`). A 013 precisa ser aplicada nele antes de subir a API nova.
+- **`aucolher_db` local:** ficou para trás. Não tem a 007 (campanhas) nem a 013, então a API atual não sobe nele.
 
 **Faltam:**
 
@@ -90,13 +94,14 @@ Os contratos seguem sempre o mesmo padrão:
 | `MP_CLIENT_ID` | ID da aplicação do AUcolher no Mercado Pago | `1234567890123456` |
 | `MP_CLIENT_SECRET` | Secret da aplicação | — |
 | `MP_REDIRECT_URI` | URL de retorno do OAuth, **igual** à cadastrada na aplicação do Mercado Pago | `https://api.../api/mercado-pago/oauth/callback` |
-| `MP_WEBHOOK_SECRET` | Assinatura secreta dos webhooks (painel do Mercado Pago → Webhooks) | — |
+| `MP_WEBHOOK_SECRET` | Assinatura secreta dos webhooks (painel do Mercado Pago → Webhooks), já em uso pelas campanhas | — |
+| `MP_DEV_ACCESS_TOKEN` | Já em uso, **provisório**: o token de teste único que todas as ONGs usam até a 009. Sai quando cada ONG conectar a própria conta | — |
 | `MP_TOKEN_ENCRYPTION_KEY` | Chave AES de 32 bytes em Base64 para criptografar os tokens das ONGs | `openssl rand -base64 32` |
 | `MP_TEST_TOKEN` | `true` em desenvolvimento: o OAuth gera credenciais de teste | `true` |
 
 **Regras:**
 - nada disso vai para o Git;
-- sem `MAIL_*`, o link de senha sai **no log** da API, como o `AdminAccountInitializer` faz quando falta configuração;
+- sem `MAIL_*`, o link de senha sai **no log** da API;
 - sem `MP_*`, a conexão do Mercado Pago responde 503 "Pagamentos indisponíveis no momento." e o resto do sistema funciona.
 
 ## 6. Riscos
@@ -104,12 +109,12 @@ Os contratos seguem sempre o mesmo padrão:
 | Risco | O que fazer |
 |---|---|
 | O PIX criado com o token OAuth da ONG não funciona, ou o pagamento não pode ser confirmado | O teste no sandbox decide. Se falhar, **plano B**: conta única da plataforma, com repasse às ONGs registrado no painel (regras §10.3). Avisar o front |
-| O Mercado Pago não aceita `localhost` como URL de retorno do OAuth | Testar com a API publicada ou com um túnel (ngrok). O front segue com o mock enquanto isso |
+| O Mercado Pago não aceita `localhost` como URL de retorno do OAuth | Testar com a API publicada ou com um túnel (ngrok). Enquanto isso, a API segue com o token único provisório (`MP_DEV_ACCESS_TOKEN`) |
 | O e-mail do Gmail cai no spam | Assunto e texto simples, remetente com nome ("AUcolher"). A página de recuperação já avisa para olhar o spam |
 
 ## 7. O banco depois de tudo
 
-19 tabelas. ✱ = nova.
+18 tabelas. ✱ = ainda não existe.
 
 | Tabela | Para quê |
 |---|---|
@@ -125,8 +130,8 @@ Os contratos seguem sempre o mesmo padrão:
 | `events` | eventos das ONGs |
 | `event_attendances` | presenças confirmadas |
 | `reports` | denúncias de anúncios e perfis |
-| ✱ `campaigns` | campanhas de doação |
-| ✱ `donations` | doações via PIX |
+| `campaigns` | campanhas de doação |
+| `donations` | doações via PIX |
 | ✱ `mercado_pago_accounts` | conta Mercado Pago de cada ONG (tokens criptografados) |
 | ✱ `password_reset_tokens` | links de redefinição de senha (só o hash) |
 | ✱ `chat_messages` | mensagens do chat de cada pedido (pessoa ou sistema) |
@@ -174,4 +179,4 @@ erDiagram
 - [ ] Regras no `SecurityConfig`: rotas fixas antes das genéricas, e rotas públicas só onde o contrato manda.
 - [ ] Mensagens de erro **iguais** às dos contratos, porque o front mostra o `message` direto.
 - [ ] Testes de unidade das regras (no padrão do `AdoptionRequestServiceTest`) e um teste HTTP de ponta a ponta num banco descartável.
-- [ ] Avisar o front quando a rota estiver no ar e qual flag pode ser desligada.
+- [ ] Avisar o front quando a rota estiver no ar, para o mock e a flag do módulo saírem do código.

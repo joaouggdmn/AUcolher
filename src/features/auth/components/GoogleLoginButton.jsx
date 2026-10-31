@@ -1,5 +1,4 @@
 import { useLocation } from 'react-router-dom'
-import { GOOGLE_LOGIN_ENABLED } from '../../../core/utils/constants'
 import { GOOGLE_LOGIN_RETURN_KEY } from '../../../core/utils/storageKeys'
 import { GOOGLE_LOGIN_URL } from '../../../core/services/authService'
 
@@ -16,13 +15,11 @@ function GoogleLogo() {
 }
 
 // "Continuar com Google" (docs/entrega-final/api-login-google.md), no login e
-// na aba Pessoa do cadastro: o Google só cria conta de pessoa. Só aparece com
-// VITE_GOOGLE_LOGIN=true. A ida e a volta pelo Google recarregam o site, então
-// a página de origem fica no sessionStorage para a /login/google voltar a ela
+// na aba Pessoa do cadastro: o Google só cria conta de pessoa. A ida e a volta
+// pelo Google recarregam o site, então a página de origem fica no
+// sessionStorage para a /login/google voltar a ela
 function GoogleLoginButton() {
   const location = useLocation()
-
-  if (!GOOGLE_LOGIN_ENABLED) return null
 
   const handleClick = () => {
     const from = location.state?.from?.pathname
