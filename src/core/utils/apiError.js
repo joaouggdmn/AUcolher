@@ -1,3 +1,10 @@
+// Erro de validação da própria tela, no formato que o getErrorMessage lê da API
+export function validationError(message) {
+  const error = new Error(message)
+  error.response = { status: 400, data: { message } }
+  return error
+}
+
 export function getErrorMessage(error, fallback = 'Algo deu errado. Tente novamente.') {
   if (!error.response) {
     // Sem `request` nem chegou a haver chamada: é erro do próprio código (ou
