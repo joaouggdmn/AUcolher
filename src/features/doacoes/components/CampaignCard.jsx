@@ -16,19 +16,19 @@ import { getCategoriaMeta } from './filters/filterOptions'
 import { formatDonationsCount, getDeadlineSummary, isAdminAccount, isCampaignOwner } from '../utils/campaignDisplay'
 
 const DEADLINE_TONES = {
-  neutral: 'text-slate-500',
-  soon: 'text-amber-600',
-  closed: 'text-slate-400',
+  neutral: 'text-ink-500',
+  soon: 'text-accent-600',
+  closed: 'text-ink-500',
 }
 
 // Botão do rodapé: doar (padrão), gerenciar (a própria ONG) ou só ver (encerrada)
 function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
   const linkClass =
-    'mt-auto flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-bold transition-all duration-300'
+    'mt-auto flex items-center justify-center gap-2 rounded-control border py-2.5 text-sm font-bold transition-all duration-300'
 
   if (isOwner) {
     return (
-      <Link to={`/campanhas/${campaign.id}`} className={`${linkClass} border-emerald-200 text-emerald-800 hover:bg-emerald-50`}>
+      <Link to={`/campanhas/${campaign.id}`} className={`${linkClass} border-brand-200 text-brand-700 hover:bg-brand-50`}>
         <FaGear size={13} />
         Gerenciar campanha
       </Link>
@@ -38,7 +38,7 @@ function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
   // Encerrada, ou o admin (que modera, mas não doa): só abre a campanha
   if (campaign.isClosed || isAdmin) {
     return (
-      <Link to={`/campanhas/${campaign.id}`} className={`${linkClass} border-slate-200 text-slate-500 hover:bg-slate-50`}>
+      <Link to={`/campanhas/${campaign.id}`} className={`${linkClass} border-line text-ink-500 hover:bg-paper`}>
         Ver campanha
         <FaArrowRight size={11} />
       </Link>
@@ -49,7 +49,7 @@ function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
     <button
       type="button"
       onClick={() => onDonate(campaign)}
-      className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-emerald-800 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+      className="mt-auto flex items-center justify-center gap-2 rounded-control bg-brand-700 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
     >
       <FaHandHoldingHeart size={14} />
       Fazer doação
@@ -66,8 +66,8 @@ function CampaignCard({ campaign, onDonate }) {
 
   return (
     <div
-      className={`group flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-2xl hover:shadow-emerald-950/20 ${
-        campaign.isClosed ? 'shadow-slate-500/10 ring-1 ring-slate-200' : 'shadow-amber-500/10 ring-2 ring-amber-400'
+      className={`group flex h-full flex-col overflow-hidden rounded-modal bg-white shadow-lg transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-2xl hover: ${
+        campaign.isClosed ? ' ring-1 ring-line' : ' ring-2 ring-accent-400'
       }`}
     >
       <div className="relative h-48 w-full overflow-hidden">
@@ -79,7 +79,7 @@ function CampaignCard({ campaign, onDonate }) {
         </Link>
 
         {campaign.isUrgent && !campaign.isClosed && (
-          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-rose-600 px-3 py-1.5 text-xs font-extrabold text-white shadow-md">
+          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-danger-600 px-3 py-1.5 text-xs font-extrabold text-white shadow-md">
             <FaTriangleExclamation size={11} />
             Urgente
           </span>
@@ -98,13 +98,13 @@ function CampaignCard({ campaign, onDonate }) {
           {(campaign.isGoalReached || campaign.isClosed) && (
             <div className="mb-2 flex flex-wrap gap-1.5">
               {campaign.isGoalReached && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-bold text-brand-600">
                   <FaCircleCheck size={10} />
                   Meta atingida!
                 </span>
               )}
               {campaign.isClosed && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">
+                <span className="inline-flex items-center gap-1 rounded-full bg-sand px-2.5 py-1 text-[11px] font-bold text-ink-500">
                   <FaLock size={9} />
                   Encerrada
                 </span>
@@ -112,17 +112,17 @@ function CampaignCard({ campaign, onDonate }) {
             </div>
           )}
 
-          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">
-            <Link to={`/campanhas/${campaign.id}`} className="transition-colors duration-300 hover:text-emerald-700">
+          <h3 className="text-lg font-extrabold tracking-tight text-brand-950">
+            <Link to={`/campanhas/${campaign.id}`} className="transition-colors duration-300 hover:text-brand-600">
               {campaign.title}
             </Link>
           </h3>
           <Link
             to={`/ong/${campaign.ong.id}`}
-            className="mt-1 inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors duration-300 hover:text-emerald-700"
+            className="mt-1 inline-flex items-center gap-1.5 text-sm text-ink-500 transition-colors duration-300 hover:text-brand-600"
           >
             {campaign.ong.isVerified && (
-              <FaShieldHalved size={12} className="shrink-0 text-amber-500" title="Instituição verificada" />
+              <FaShieldHalved size={12} className="shrink-0 text-accent-500" title="Instituição verificada" />
             )}
             {campaign.ong.name}
           </Link>
@@ -131,7 +131,7 @@ function CampaignCard({ campaign, onDonate }) {
         <DonationProgress raised={campaign.raisedAmount} goal={campaign.goalAmount} />
 
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs font-semibold">
-          <span className="whitespace-nowrap text-slate-500">{formatDonationsCount(campaign.donationsCount, { invite: !isOwner && !isAdminAccount(user) })}</span>
+          <span className="whitespace-nowrap text-ink-500">{formatDonationsCount(campaign.donationsCount, { invite: !isOwner && !isAdminAccount(user) })}</span>
           <span className={`flex items-center gap-1 whitespace-nowrap ${DEADLINE_TONES[deadline.tone]}`}>
             <FaClock size={10} />
             {deadline.label}

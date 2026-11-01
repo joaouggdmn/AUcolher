@@ -8,7 +8,7 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
   return (
     <>
       <div
-        className={`fixed inset-0 z-40 bg-emerald-950/60 lg:hidden backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-40 bg-brand-950/60 lg:hidden backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={onClose}
@@ -16,7 +16,7 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
       />
 
       <div
-        className={`fixed inset-y-0 right-0 z-50 flex w-full lg:hidden max-w-sm flex-col border-l border-white/15 bg-emerald-950/90 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-50 flex w-full lg:hidden max-w-sm flex-col border-l border-white/15 bg-brand-950/90 shadow-float transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"
@@ -29,7 +29,7 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
             type="button"
             onClick={onClose}
             aria-label="Fechar filtros"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-emerald-100/70 transition-colors duration-300 hover:bg-white/10 hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-brand-100/70 transition-colors duration-300 hover:bg-white/10 hover:text-white"
           >
             <FaXmark size={18} />
           </button>
@@ -43,7 +43,7 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 py-3 text-sm font-extrabold text-emerald-950 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:from-amber-300 hover:to-amber-400"
+            className="w-full rounded-full bg-accent-400 py-3 text-sm font-extrabold text-brand-950 shadow-lg transition-all duration-300 hover:bg-accent-500"
           >
             Ver {resultsCount} {resultsCount === 1 ? 'pet' : 'pets'}
           </button>

@@ -63,14 +63,14 @@ function PublicProfilePage() {
   if (!profile) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pb-16 pt-32 text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sand text-ink-500">
           <FaUserSlash size={20} />
         </span>
-        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-emerald-950">Perfil não encontrado</h1>
-        <p className="mt-2 text-slate-500">Essa conta pode ter sido removida ou o link está incorreto.</p>
+        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-brand-950">Perfil não encontrado</h1>
+        <p className="mt-2 text-ink-500">Essa conta pode ter sido removida ou o link está incorreto.</p>
         <Link
           to="/animais"
-          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-6 inline-block rounded-control bg-brand-700 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
         >
           Ver animais para adoção
         </Link>
@@ -85,14 +85,14 @@ function PublicProfilePage() {
   if (isSuspended && !isAdmin) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pb-16 pt-32 text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sand text-ink-500">
           <FaUserSlash size={20} />
         </span>
-        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-emerald-950">Perfil indisponível</h1>
-        <p className="mt-2 text-slate-500">Esta conta foi suspensa pela moderação do AUcolher.</p>
+        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-brand-950">Perfil indisponível</h1>
+        <p className="mt-2 text-ink-500">Esta conta foi suspensa pela moderação do AUcolher.</p>
         <Link
           to="/animais"
-          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-6 inline-block rounded-control bg-brand-700 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
         >
           Ver animais para adoção
         </Link>
@@ -120,10 +120,10 @@ function PublicProfilePage() {
       </div>
     ) : (
       <div className="flex flex-col items-center gap-2 py-10 text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
           <FaPaw size={18} />
         </span>
-        <p className="text-sm font-semibold text-slate-600">
+        <p className="text-sm font-semibold text-ink-600">
           {firstName} não tem animais disponíveis para adoção no momento.
         </p>
       </div>
@@ -139,14 +139,14 @@ function PublicProfilePage() {
       )}
 
       {isOwnProfile && (
-        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="flex items-center gap-2 text-sm font-semibold text-emerald-800">
+        <div className="mb-6 flex flex-col gap-3 rounded-card border border-brand-100 bg-brand-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-center gap-2 text-sm font-semibold text-brand-700">
             <FaEye size={14} className="shrink-0" />
             Esta é a forma como as outras pessoas veem o seu perfil.
           </p>
           <Link
             to="/perfil"
-            className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-800 px-4 py-2 text-xs font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+            className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand-700 px-4 py-2 text-xs font-bold text-white transition-all duration-300 hover:bg-brand-800"
           >
             <FaUserPen size={12} />
             Editar perfil
@@ -165,7 +165,7 @@ function PublicProfilePage() {
                 <Link
                   to={ADMIN_PATHS.userEdit(profile.id)}
                   state={{ from: location.pathname }}
-                  className="flex h-10 items-center gap-2 rounded-full border border-emerald-200 px-4 text-xs font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+                  className="flex h-10 items-center gap-2 rounded-full border border-brand-200 px-4 text-xs font-bold text-brand-700 transition-all duration-300 hover:bg-brand-50"
                 >
                   <FaPen size={10} />
                   Editar conta

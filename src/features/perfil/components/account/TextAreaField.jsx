@@ -19,7 +19,7 @@ function TextAreaField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-semibold text-slate-700">
+      <label htmlFor={id} className="text-sm font-semibold text-ink-700">
         {label}
       </label>
       <textarea
@@ -30,14 +30,14 @@ function TextAreaField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-invalid={error ? true : undefined}
-        className={`w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:ring-4 ${
+        className={`w-full resize-none rounded-control border bg-white px-4 py-3 text-sm leading-relaxed text-ink-900 outline-none transition-all duration-300 placeholder:text-ink-500 focus:ring-4 ${
           error
-            ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/10'
-            : 'border-slate-200 focus:border-emerald-600 focus:ring-emerald-600/10'
+            ? 'border-danger-600/30 focus:border-danger-600 focus:ring-danger-600/10'
+            : 'border-line focus:border-brand-600 focus:ring-brand-600/10'
         }`}
       />
-      <div className="flex items-start justify-between gap-3 text-xs text-slate-400">
-        {error ? <span className="font-medium text-rose-600">{error}</span> : <span>{hint}</span>}
+      <div className="flex items-start justify-between gap-3 text-xs text-ink-500">
+        {error ? <span className="font-medium text-danger-600">{error}</span> : <span>{hint}</span>}
         <span className="shrink-0">
           {value.length}/{maxLength}
         </span>

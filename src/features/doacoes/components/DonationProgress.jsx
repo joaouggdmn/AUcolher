@@ -13,21 +13,21 @@ function DonationProgress({ raised, goal, size = 'md', theme = 'light', showAmou
 
   return (
     <div className="flex flex-col gap-2">
-      <div className={`w-full overflow-hidden rounded-full ${isDark ? 'bg-white/20' : 'bg-slate-200'} ${HEIGHTS[size]}`}>
+      <div className={`w-full overflow-hidden rounded-full ${isDark ? 'bg-white/20' : 'bg-line'} ${HEIGHTS[size]}`}>
         <div
-          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700 ease-out"
+          className="h-full rounded-full bg-accent-400 transition-all duration-700 ease-out"
           style={{ width: `${barWidth}%` }}
         />
       </div>
 
       <div className="flex items-baseline justify-between gap-3 text-xs sm:text-sm">
         {showAmounts && (
-          <span className={isDark ? 'text-emerald-100/60' : 'text-slate-400'}>
-            <span className={`font-bold ${isDark ? 'text-amber-300' : 'text-emerald-800'}`}>{formatCurrency(raised)}</span>
+          <span className={isDark ? 'text-brand-100/60' : 'text-ink-500'}>
+            <span className={`font-bold ${isDark ? 'text-accent-300' : 'text-brand-700'}`}>{formatCurrency(raised)}</span>
             {' '}de {formatCurrency(goal)}
           </span>
         )}
-        <span className={`ml-auto shrink-0 font-bold ${isDark ? 'text-amber-300' : 'text-emerald-800'}`}>
+        <span className={`ml-auto shrink-0 font-bold ${isDark ? 'text-accent-300' : 'text-brand-700'}`}>
           {realPercentage}%{!showAmounts && ' da meta'}
         </span>
       </div>
