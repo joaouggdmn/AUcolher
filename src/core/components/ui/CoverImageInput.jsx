@@ -53,13 +53,13 @@ function CoverImageInput({
   return (
     <div className="flex flex-col gap-1.5">
       {value ? (
-        <div className="group relative h-48 overflow-hidden rounded-2xl sm:h-56">
+        <div className="group relative h-48 overflow-hidden rounded-card sm:h-56">
           <img src={value} alt="Capa escolhida" className="h-full w-full object-cover" />
           <div className="absolute inset-x-0 bottom-0 flex justify-end gap-2 bg-gradient-to-t from-black/60 to-transparent p-3">
             <button
               type="button"
               onClick={openPicker}
-              className="flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-2 text-xs font-bold text-emerald-900 shadow-sm transition-colors duration-300 hover:bg-white"
+              className="flex items-center gap-1.5 rounded-control bg-white/95 px-3.5 py-2 text-xs font-bold text-brand-800 shadow-raised transition-colors duration-200 hover:bg-white"
             >
               <FaRotate size={11} />
               Trocar
@@ -67,7 +67,7 @@ function CoverImageInput({
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-2 text-xs font-bold text-rose-600 shadow-sm transition-colors duration-300 hover:bg-white"
+              className="flex items-center gap-1.5 rounded-control bg-white/95 px-3.5 py-2 text-xs font-bold text-danger-600 shadow-raised transition-colors duration-200 hover:bg-white"
             >
               <FaTrashCan size={11} />
               Remover
@@ -80,29 +80,29 @@ function CoverImageInput({
           type="button"
           onClick={openPicker}
           disabled={isProcessing}
-          className={`flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 text-center transition-all duration-300 disabled:cursor-wait sm:h-56 ${
+          className={`flex h-48 flex-col items-center justify-center gap-2 rounded-card border-2 border-dashed px-6 text-center transition-colors duration-200 disabled:cursor-wait sm:h-56 ${
             message
-              ? 'border-rose-300 bg-rose-50/40'
-              : 'border-slate-200 bg-slate-50/60 hover:border-emerald-300 hover:bg-emerald-50/40'
+              ? 'border-danger-600/30 bg-danger-50/40'
+              : 'border-line bg-paper/60 hover:border-brand-200 hover:bg-brand-50/40'
           }`}
         >
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-emerald-700 shadow-sm">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-brand-600">
             {isProcessing ? (
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-200 border-t-emerald-600" />
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-brand-600" />
             ) : (
               <FaImage size={18} />
             )}
           </span>
-          <span className="text-sm font-bold text-emerald-900">
+          <span className="text-sm font-bold text-brand-800">
             {isProcessing ? 'Preparando imagem...' : label}
           </span>
-          {emptyHint && <span className="max-w-xs text-xs text-slate-400">{emptyHint}</span>}
+          {emptyHint && <span className="max-w-xs text-xs text-ink-500">{emptyHint}</span>}
         </button>
       )}
 
       <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
 
-      {message && <p className="text-xs font-medium text-rose-600">{message}</p>}
+      {message && <p className="text-xs font-medium text-danger-600">{message}</p>}
     </div>
   )
 }

@@ -21,12 +21,12 @@ function AddressNumberField({ id, value, onChange, input: Input, required = fals
         disabled={isWithoutNumber}
         required={required && !isWithoutNumber}
       />
-      <label className="flex w-fit cursor-pointer items-center gap-2 text-xs font-semibold text-slate-600">
+      <label className="flex w-fit cursor-pointer items-center gap-2 text-xs font-semibold text-ink-600">
         <input
           type="checkbox"
           checked={isWithoutNumber}
           onChange={(event) => onChange(event.target.checked ? NO_ADDRESS_NUMBER : '')}
-          className="h-4 w-4 cursor-pointer rounded accent-emerald-700"
+          className="h-4 w-4 cursor-pointer rounded accent-brand-600"
         />
         Sem número
       </label>
