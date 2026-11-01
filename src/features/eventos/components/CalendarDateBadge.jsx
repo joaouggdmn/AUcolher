@@ -11,11 +11,11 @@ function CalendarDateBadge({ date, size = 'md' }) {
   const s = SIZES[size]
 
   return (
-    <div className={`overflow-hidden rounded-control bg-white text-center shadow-lg ring-1 ring-black/5 ${s.wrapper}`}>
-      <div className={`bg-brand-700 font-bold uppercase tracking-wide text-white ${s.top}`}>
+    <div className={`overflow-hidden rounded-xl bg-white text-center shadow-lg shadow-emerald-950/20 ring-1 ring-black/5 ${s.wrapper}`}>
+      <div className={`bg-emerald-800 font-bold uppercase tracking-wide text-white ${s.top}`}>
         {monthLabel}
       </div>
-      <div className={`font-black leading-none text-brand-950 ${s.day}`}>{day}</div>
+      <div className={`font-black leading-none text-emerald-950 ${s.day}`}>{day}</div>
     </div>
   )
 }

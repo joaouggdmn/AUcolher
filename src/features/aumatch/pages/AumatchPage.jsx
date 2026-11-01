@@ -46,7 +46,7 @@ function savePanelOpen(isOpen) {
 // Cartão que ocupa o lugar do deck enquanto ele carrega ou recalcula
 function DeckStatusCard({ children }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-8 text-center">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
       {children}
     </div>
   )
@@ -220,10 +220,10 @@ function AumatchPage() {
     if (isPreparingMatches || isLoading) {
       return (
         <DeckStatusCard>
-          <span className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-accent-400/20 text-accent-300">
+          <span className="flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-amber-400/20 text-amber-300">
             <LuSparkles size={24} />
           </span>
-          <p className="text-sm font-semibold text-brand-100">
+          <p className="text-sm font-semibold text-emerald-100">
             {isAdopter ? 'Calculando seus melhores matches...' : 'Carregando os pets...'}
           </p>
         </DeckStatusCard>
@@ -233,14 +233,14 @@ function AumatchPage() {
     if (isError) {
       return (
         <DeckStatusCard>
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-danger-600/15 text-danger-600">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-400/15 text-rose-300">
             <FaTriangleExclamation size={22} />
           </span>
-          <p className="text-sm font-semibold text-brand-100">Não foi possível carregar o AUmatch agora.</p>
+          <p className="text-sm font-semibold text-emerald-100">Não foi possível carregar o AUmatch agora.</p>
           <button
             type="button"
             onClick={() => refetch()}
-            className="flex items-center gap-2 rounded-control bg-accent-400 px-6 py-2.5 text-sm font-bold text-brand-950 transition-all duration-300 hover:bg-accent-300"
+            className="flex items-center gap-2 rounded-full bg-amber-400 px-6 py-2.5 text-sm font-bold text-emerald-950 transition-all duration-300 hover:bg-amber-300"
           >
             <FaArrowRotateRight size={13} />
             Tentar de novo
@@ -267,7 +267,7 @@ function AumatchPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-brand-950 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+    <div className="relative min-h-screen overflow-hidden bg-emerald-950 px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.08]"
         style={{
@@ -275,8 +275,8 @@ function AumatchPage() {
           backgroundSize: '28px 28px',
         }}
       />
-      <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-accent-500/10 blur-[120px]" />
-      <div className="pointer-events-none absolute -left-32 bottom-0 h-96 w-96 rounded-full bg-brand-400/20 blur-[120px]" />
+      <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -left-32 bottom-0 h-96 w-96 rounded-full bg-emerald-500/20 blur-[120px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl">
         {/* Centralizado, como o deck. Com a coluna aberta (desktop), o bloco
@@ -286,7 +286,7 @@ function AumatchPage() {
             isPanelOpen ? 'lg:left-0 lg:translate-x-0 lg:items-start lg:text-left' : ''
           }`}
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-accent-300/30 bg-accent-400/10 px-4 py-1.5 text-sm font-semibold text-accent-300">
+          <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
             <LuSparkles size={15} />
             AUmatch
           </span>
@@ -294,7 +294,7 @@ function AumatchPage() {
             Arraste para encontrar seu match
           </h1>
           {isAuthenticated && !isAdopter && (
-            <p className="text-sm text-brand-100/70">
+            <p className="text-sm text-emerald-100/70">
               Prévia: curtir e responder o quiz é para contas de pessoa física.
             </p>
           )}
@@ -307,15 +307,15 @@ function AumatchPage() {
             type="button"
             onClick={handleTogglePreferences}
             aria-expanded={isPanelOpen}
-            className="flex items-center gap-2 rounded-control border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/15"
+            className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-colors duration-300 hover:bg-white/15"
           >
             {isPanelOpen ? (
               <>
-                <FaSliders size={13} className="text-accent-300 lg:hidden" />
-                <FaAnglesLeft size={13} className="hidden text-accent-300 lg:block" />
+                <FaSliders size={13} className="text-amber-300 lg:hidden" />
+                <FaAnglesLeft size={13} className="hidden text-amber-300 lg:block" />
               </>
             ) : (
-              <FaSliders size={13} className="text-accent-300" />
+              <FaSliders size={13} className="text-amber-300" />
             )}
             {isPanelOpen ? (
               <>
@@ -326,7 +326,7 @@ function AumatchPage() {
               'Filtros e preferências'
             )}
             {activeFiltersCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-400 px-1.5 text-xs font-black text-brand-950">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-400 px-1.5 text-xs font-black text-emerald-950">
                 {activeFiltersCount}
               </span>
             )}
@@ -362,7 +362,7 @@ function AumatchPage() {
       <MatchToast pet={matchedPet} />
       {likeError && (
         <div role="alert" className="fixed inset-x-0 top-24 z-[110] flex justify-center px-4">
-          <p className="flex items-center gap-3 rounded-full bg-danger-600 px-5 py-3 text-sm font-bold text-white shadow-2xl">
+          <p className="flex items-center gap-3 rounded-full bg-rose-600 px-5 py-3 text-sm font-bold text-white shadow-2xl">
             {likeError}
             <button type="button" onClick={() => setLikeError(null)} className="font-black" aria-label="Fechar aviso">
               ×

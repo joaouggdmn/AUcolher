@@ -50,29 +50,29 @@ function DonationModal({ campaign, onClose }) {
   return createPortal(
     // z-[100] garante prioridade sobre a Navbar (z-50) e qualquer card elevado (z-30)
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-brand-950/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-emerald-950/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="donation-modal-title"
-        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-md animate-fade-slide-in scrollbar-soft overflow-y-auto rounded-modal bg-white p-6 shadow-modal sm:p-8"
+        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-md animate-fade-slide-in scrollbar-soft overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Fechar"
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-ink-500 transition-colors duration-300 hover:bg-sand hover:text-ink-700"
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors duration-300 hover:bg-slate-100 hover:text-slate-700"
         >
           <FaXmark size={16} />
         </button>
 
         <div className="flex flex-col items-center gap-1 px-6 text-center">
-          <span className="text-xs font-semibold uppercase tracking-wide text-accent-600">Você está ajudando</span>
-          <h3 id="donation-modal-title" className="text-lg font-extrabold tracking-tight text-brand-950">
+          <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">Você está ajudando</span>
+          <h3 id="donation-modal-title" className="text-lg font-extrabold tracking-tight text-emerald-950">
             {campaign.title}
           </h3>
-          <p className="text-sm text-ink-500">{campaign.ong.name}</p>
+          <p className="text-sm text-slate-500">{campaign.ong.name}</p>
         </div>
 
         {donationId == null ? (

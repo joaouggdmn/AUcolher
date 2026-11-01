@@ -31,7 +31,7 @@ function DeleteCampaignDialog({ campaign, onClose, onDeleted }) {
       description={
         hasDonations ? (
           <>
-            <strong className="text-brand-950">
+            <strong className="text-emerald-950">
               {donations} {donations === 1 ? 'doação já foi confirmada' : 'doações já foram confirmadas'}
             </strong>
             , então a campanha sai da vitrine e do seu perfil, mas fica registrada no histórico de quem doou e nas suas
@@ -39,7 +39,7 @@ function DeleteCampaignDialog({ campaign, onClose, onDeleted }) {
           </>
         ) : (
           <>
-            <strong className="text-brand-950">{campaign.title}</strong> será apagada definitivamente. Não dá para
+            <strong className="text-emerald-950">{campaign.title}</strong> será apagada definitivamente. Não dá para
             desfazer.
           </>
         )

@@ -26,8 +26,8 @@ function PetSwipeCard({
   if (!isFront) {
     return (
       <div
-        className={`pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem] shadow-float transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          isNgo ? 'ring-2 ring-accent-400' : 'ring-1 ring-white/10'
+        className={`pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem] shadow-lg shadow-emerald-950/10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          isNgo ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
         } ${STACK_TRANSFORM[stackIndex]}`}
         style={{ zIndex: 30 - stackIndex }}
       >
@@ -40,8 +40,8 @@ function PetSwipeCard({
 
   return (
     <div
-      className={`absolute inset-0 z-30 flex cursor-grab touch-none select-none flex-col overflow-hidden rounded-[2rem] shadow-float hover:shadow-2xl hover: active:cursor-grabbing ${
-        isNgo ? 'ring-2 ring-accent-400' : 'ring-1 ring-white/10'
+      className={`absolute inset-0 z-30 flex cursor-grab touch-none select-none flex-col overflow-hidden rounded-[2rem] shadow-xl shadow-emerald-950/20 hover:shadow-2xl hover:shadow-emerald-950/30 active:cursor-grabbing ${
+        isNgo ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
       }`}
       style={{
         transform: `translate(${dragX}px, ${liftY}px) rotate(${rotation}deg)`,
@@ -68,14 +68,14 @@ function PetSwipeCard({
             role="img"
             aria-label="ONG Verificada"
             title="ONG Verificada"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-400 text-brand-950 shadow-lg "
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-400 text-emerald-950 shadow-lg shadow-amber-500/30"
           >
             <FaShieldHalved size={14} />
           </span>
         )}
         {isOwner && (
-          <span className="flex items-center gap-1.5 rounded-full bg-ink-900/85 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg">
-            <FaPaw size={11} className="text-accent-300" />
+          <span className="flex items-center gap-1.5 rounded-full bg-slate-900/85 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg backdrop-blur-sm">
+            <FaPaw size={11} className="text-amber-300" />
             Seu Pet
           </span>
         )}
@@ -83,10 +83,10 @@ function PetSwipeCard({
 
       {dragDirection && (
         <div
-          className={`absolute top-8 z-10 rounded-control border-4 px-4 py-1.5 text-2xl font-black uppercase tracking-wider ${
+          className={`absolute top-8 z-10 rounded-xl border-4 px-4 py-1.5 text-2xl font-black uppercase tracking-wider ${
             dragDirection === 'right'
-              ? 'right-6 rotate-12 border-accent-400 text-accent-400'
-              : 'left-6 -rotate-12 border-line text-paper'
+              ? 'right-6 rotate-12 border-amber-400 text-amber-400'
+              : 'left-6 -rotate-12 border-slate-200 text-slate-100'
           }`}
           style={{ opacity: labelOpacity }}
         >
@@ -108,18 +108,18 @@ function PetSwipeCard({
               type="button"
               onClick={onExplainMatch}
               aria-label={`Match de ${pet.matchScore}%: ver por que deu match`}
-              className="flex items-center gap-1.5 rounded-full bg-brand-700/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg  transition-all duration-300 hover:scale-105 hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300"
+              className="flex items-center gap-1.5 rounded-full bg-emerald-800/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg shadow-emerald-950/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
             >
-              <LuSparkles size={12} className="text-accent-300" />
+              <LuSparkles size={12} className="text-amber-300" />
               {pet.matchScore}% match
-              <LuLightbulb size={13} className="text-accent-300" />
+              <LuLightbulb size={13} className="text-amber-300" />
             </button>
           )}
 
           <FavoriteButton
             animalId={pet.id}
             animalName={pet.name}
-            className="h-9 w-9 shadow-lg "
+            className="h-9 w-9 shadow-lg shadow-emerald-950/25"
           />
         </div>
       )}

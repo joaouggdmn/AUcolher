@@ -8,8 +8,8 @@ import { LuSparkles } from 'react-icons/lu'
 function PanelSection({ title, icon: Icon, children }) {
   return (
     <div className="flex flex-col gap-3 border-b border-white/10 py-5 last:border-b-0 last:pb-0">
-      <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-200/70">
-        {Icon && <Icon size={12} className="text-accent-300" />}
+      <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-200/70">
+        {Icon && <Icon size={12} className="text-amber-300" />}
         {title}
       </h3>
       {children}
@@ -18,11 +18,11 @@ function PanelSection({ title, icon: Icon, children }) {
 }
 
 const SELECT_CLASS =
-  'min-h-11 w-full appearance-none rounded-control border border-white/15 bg-brand-950/60 px-3.5 py-2.5 pr-9 text-sm font-medium text-white outline-none transition-all duration-300 hover:border-white/25 focus:border-accent-300/60 focus:ring-4 focus:ring-accent-300/15'
+  'min-h-11 w-full appearance-none rounded-xl border border-white/15 bg-emerald-950/60 px-3.5 py-2.5 pr-9 text-sm font-medium text-white outline-none transition-all duration-300 hover:border-white/25 focus:border-amber-300/60 focus:ring-4 focus:ring-amber-300/15'
 
 // O popup do <select> nativo herda a cor do fundo do campo em alguns
 // navegadores: sem isso as opções ficariam brancas sobre branco
-const OPTION_CLASS = 'bg-brand-800 text-white'
+const OPTION_CLASS = 'bg-emerald-900 text-white'
 
 function MatchPreferencesPanel({
   filters,
@@ -42,7 +42,7 @@ function MatchPreferencesPanel({
       {/* Atalho para refazer o quiz: é o que realmente move a agulha do
           percentual de match, então abre o painel */}
       {!isQuizAvailable ? (
-        <p className="border-b border-white/10 pb-5 text-xs text-brand-100/70">
+        <p className="border-b border-white/10 pb-5 text-xs text-emerald-100/70">
           O quiz e as curtidas do AUmatch são para quem quer adotar, com conta de pessoa física.
         </p>
       ) : (
@@ -50,13 +50,13 @@ function MatchPreferencesPanel({
           <button
             type="button"
             onClick={onOpenQuiz}
-            className="flex items-center justify-center gap-2 rounded-control bg-accent-400 py-3 text-sm font-extrabold text-brand-950 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-500"
+            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-3 text-sm font-extrabold text-emerald-950 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400"
           >
             {hasCompletedQuiz ? <FaArrowRotateRight size={13} /> : <LuSparkles size={14} />}
             {hasCompletedQuiz ? 'Ajustar meu perfil' : 'Responder o quiz'}
           </button>
 
-          <p className="text-center text-[11px] text-brand-100/60">
+          <p className="text-center text-[11px] text-emerald-100/60">
             {hasCompletedQuiz
               ? 'Refaça o quiz para recalcular seus matches.'
               : 'Responda o quiz para desbloquear o cálculo de compatibilidade.'}
@@ -80,7 +80,7 @@ function MatchPreferencesPanel({
           </select>
           <FaChevronDown
             size={11}
-            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-200/70"
+            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-200/70"
           />
         </div>
       </PanelSection>
@@ -89,10 +89,10 @@ function MatchPreferencesPanel({
         <PanelSection title="Meus interesses" icon={FaPaperPlane}>
           <Link
             to="/meus-interesses"
-            className="group flex items-center justify-between rounded-control border border-white/15 bg-white/5 px-3.5 py-3 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10"
+            className="group flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10"
           >
             Ver os pets que eu curti
-            <FaArrowRight size={12} className="text-accent-300 transition-transform duration-300 group-hover:translate-x-1" />
+            <FaArrowRight size={12} className="text-amber-300 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </PanelSection>
       )}
@@ -101,7 +101,7 @@ function MatchPreferencesPanel({
         <button
           type="button"
           onClick={onClear}
-          className="mt-5 flex items-center justify-center gap-2 rounded-full border border-danger-600/30 bg-danger-600/15 py-2.5 text-sm font-bold text-danger-50 transition-all duration-300 hover:bg-danger-600/25"
+          className="mt-5 flex items-center justify-center gap-2 rounded-full border border-rose-300/30 bg-rose-500/15 py-2.5 text-sm font-bold text-rose-200 transition-all duration-300 hover:bg-rose-500/25"
         >
           <FaXmark size={13} />
           Limpar preferências

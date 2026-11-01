@@ -10,8 +10,8 @@ function HeroEventBanner({ event }) {
 
   return (
     <section
-      className={`relative isolate overflow-hidden rounded-card p-8 sm:p-10 lg:p-14 ${
-        event.coverUrl ? 'bg-brand-950' : 'bg-brand-800'
+      className={`relative isolate overflow-hidden rounded-3xl p-8 sm:p-10 lg:p-14 ${
+        event.coverUrl ? 'bg-emerald-950' : 'bg-gradient-to-br from-emerald-800 via-emerald-900 to-emerald-950'
       }`}
     >
       {/* Com capa, a foto aparece por trás do texto, como no banner SOS das
@@ -22,7 +22,7 @@ function HeroEventBanner({ event }) {
             className="absolute inset-0 -z-20 bg-cover bg-center opacity-70"
             style={{ backgroundImage: `url("${event.coverUrl}")` }}
           />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-950/95 via-brand-950/70 to-brand-950/20" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-950/95 via-emerald-950/70 to-emerald-950/20" />
         </>
       ) : (
         <div
@@ -33,11 +33,11 @@ function HeroEventBanner({ event }) {
           }}
         />
       )}
-      <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-accent-500/20 blur-[100px]" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-amber-500/20 blur-[100px]" />
 
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col gap-4 lg:max-w-xl">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-accent-400 px-3.5 py-1.5 text-xs font-extrabold text-brand-950">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400 px-3.5 py-1.5 text-xs font-extrabold text-emerald-950">
             <LuSparkles size={13} />
             PRÓXIMO EVENTO
           </span>
@@ -46,10 +46,10 @@ function HeroEventBanner({ event }) {
             {event.title}
           </h2>
 
-          <p className="text-brand-100/80">{event.description}</p>
+          <p className="text-emerald-100/80">{event.description}</p>
 
-          <div className="flex items-center gap-2 text-sm font-medium text-brand-100/70">
-            <FaCalendarDays size={14} className="shrink-0 text-accent-300" />
+          <div className="flex items-center gap-2 text-sm font-medium text-emerald-100/70">
+            <FaCalendarDays size={14} className="shrink-0 text-amber-300" />
             <span className="first-letter:uppercase">
               {formatLongDate(event.date)} · {formatTimeRange(event.startTime, event.endTime)} · {event.location.city}
             </span>
@@ -57,7 +57,7 @@ function HeroEventBanner({ event }) {
 
           <Link
             to={`/eventos/${event.id}`}
-            className="group mt-2 flex w-fit items-center gap-2 rounded-control bg-accent-400 px-6 py-3 font-bold text-brand-950 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-300"
+            className="group mt-2 flex w-fit items-center gap-2 rounded-full bg-amber-400 px-6 py-3 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
           >
             Ver detalhes
             <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
