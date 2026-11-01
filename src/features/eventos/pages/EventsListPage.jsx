@@ -119,15 +119,15 @@ function EventsListPage() {
       )}
 
       <header className="mb-6 flex flex-col gap-2">
-        <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
+        <span className="text-sm font-semibold uppercase tracking-wide text-accent-600">
           {isLoading
             ? 'Carregando eventos...'
             : `${filteredEvents.length} ${filteredEvents.length === 1 ? 'evento encontrado' : 'eventos encontrados'}`}
         </span>
-        <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+        <h1 className="text-3xl font-black tracking-tight text-brand-950 sm:text-4xl">
           Eventos e feiras de adoção
         </h1>
-        <p className="max-w-xl text-slate-600">Feiras, mutirões e encontros das ONGs perto de você.</p>
+        <p className="max-w-xl text-ink-600">Feiras, mutirões e encontros das ONGs perto de você.</p>
       </header>
 
       <div className="lg:flex lg:items-start lg:gap-8">
@@ -145,12 +145,12 @@ function EventsListPage() {
             <button
               type="button"
               onClick={() => setIsDrawerOpen(true)}
-              className="relative flex h-12 shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-bold text-emerald-900 shadow-sm transition-all duration-300 hover:border-emerald-300 lg:hidden"
+              className="relative flex h-12 shrink-0 items-center gap-2 rounded-card border border-line bg-white px-4 text-sm font-bold text-brand-800 shadow-sm transition-all duration-300 hover:border-brand-200 lg:hidden"
             >
               <FaFilter size={14} />
               Filtros
               {activeFiltersCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-xs font-black text-emerald-950">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-400 text-xs font-black text-brand-950">
                   {activeFiltersCount}
                 </span>
               )}

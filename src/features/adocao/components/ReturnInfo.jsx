@@ -19,7 +19,7 @@ function ReturnInfo({ request, viewer }) {
   const Icon = info.type === 'RETURNED' ? FaRotateLeft : FaBullhorn
 
   return (
-    <div className="flex items-start gap-2.5 rounded-xl bg-sky-50 px-3.5 py-2.5 text-sky-800">
+    <div className="flex items-start gap-2.5 rounded-control bg-brand-50 px-3.5 py-2.5 text-brand-700">
       <Icon size={13} className="mt-0.5 shrink-0" />
       <div className="min-w-0">
         <p className="text-sm font-extrabold">{titleOf(info, viewer)}</p>
@@ -28,7 +28,7 @@ function ReturnInfo({ request, viewer }) {
         {info.type === 'REHOMED' && info.rehomedAnimalId != null && (
           <Link
             to={`/animais/${info.rehomedAnimalId}`}
-            className="mt-1.5 flex w-fit items-center gap-1 text-xs font-bold text-sky-700 hover:underline"
+            className="mt-1.5 flex w-fit items-center gap-1 text-xs font-bold text-brand-600 hover:underline"
           >
             {viewer === 'adopter' ? 'Ver o seu anúncio' : 'Ver o novo anúncio'}
             <FaArrowRight size={9} />

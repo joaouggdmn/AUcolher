@@ -34,7 +34,7 @@ function EventsFiltersPanel({
         <select
           value={filters.cidade}
           onChange={(e) => onCidadeChange(e.target.value)}
-          className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10"
+          className="min-h-11 w-full rounded-control border border-line bg-white px-3.5 py-2.5 text-sm font-medium text-ink-700 outline-none transition-all duration-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10"
         >
           {cidadeOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -46,7 +46,7 @@ function EventsFiltersPanel({
         <button
           type="button"
           onClick={onClear}
-          className="mt-5 flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 transition-all duration-300 hover:bg-red-100"
+          className="mt-5 flex items-center justify-center gap-2 rounded-full border border-danger-600/30 bg-danger-50 py-2.5 text-sm font-bold text-danger-600 transition-all duration-300 hover:bg-danger-50"
         >
           <FaXmark size={13} />
           Limpar todos os filtros
