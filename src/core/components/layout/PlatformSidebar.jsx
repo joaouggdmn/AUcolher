@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { FiX } from 'react-icons/fi'
 import {
   FaHeart,
@@ -12,6 +12,7 @@ import {
   FaHandHoldingHeart,
 } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
+import Logo from '../ui/Logo'
 import { PANEL_PATHS } from '../../../features/ong/panel/panelPaths'
 
 // Links principais só aparecem aqui no mobile — no desktop eles já estão
@@ -33,7 +34,7 @@ function formatBadge(count) {
 function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos, activeSentCount, pendingCount, unreadChatCount }) {
   const closeButtonRef = useRef(null)
 
-  const panelShortcut = panelLink ? [{ ...panelLink, iconClass: 'text-amber-500' }] : []
+  const panelShortcut = panelLink ? [{ ...panelLink, iconClass: 'text-accent-500' }] : []
   // O admin modera, mas não participa (não favorita, não anuncia, não pede
   // nem conversa): no menu dele fica só o painel
   const shortcuts = userType === 'ADMIN' ? panelShortcut : [
@@ -43,34 +44,34 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
       label: 'Meus favoritos',
       to: '/favoritos',
       icon: FaHeart,
-      iconClass: 'text-rose-500',
+      iconClass: 'text-danger-600',
       count: totalFavoritos,
     },
     // A pessoa gerencia anúncios e adoções em "Meus animais"; a ONG, no
     // painel, e por isso os atalhos dela levam direto para lá
     ...(userType === 'ONG'
       ? [
-          { label: 'Meus animais', to: PANEL_PATHS.animals, icon: FaHouseChimney, iconClass: 'text-emerald-600' },
-          { label: 'Cadastrar animal', to: PANEL_PATHS.animalNew, icon: FaPaw, iconClass: 'text-emerald-600' },
-          { label: 'Criar evento', to: PANEL_PATHS.eventNew, icon: FaCalendarPlus, iconClass: 'text-emerald-600' },
-          { label: 'Criar campanha', to: PANEL_PATHS.campaignNew, icon: FaHandHoldingHeart, iconClass: 'text-emerald-600' },
+          { label: 'Meus animais', to: PANEL_PATHS.animals, icon: FaHouseChimney, iconClass: 'text-brand-600' },
+          { label: 'Cadastrar animal', to: PANEL_PATHS.animalNew, icon: FaPaw, iconClass: 'text-brand-600' },
+          { label: 'Criar evento', to: PANEL_PATHS.eventNew, icon: FaCalendarPlus, iconClass: 'text-brand-600' },
+          { label: 'Criar campanha', to: PANEL_PATHS.campaignNew, icon: FaHandHoldingHeart, iconClass: 'text-brand-600' },
         ]
       : [
-          { label: 'Cadastrar animal', to: '/animais/criar', icon: FaPaw, iconClass: 'text-emerald-600' },
-          { label: 'Meus animais', to: '/meus-animais', icon: FaHouseChimney, iconClass: 'text-emerald-600' },
+          { label: 'Cadastrar animal', to: '/animais/criar', icon: FaPaw, iconClass: 'text-brand-600' },
+          { label: 'Meus animais', to: '/meus-animais', icon: FaHouseChimney, iconClass: 'text-brand-600' },
         ]),
     {
       label: 'Meus interesses',
       to: '/meus-interesses',
       icon: FaPaperPlane,
-      iconClass: 'text-emerald-600',
+      iconClass: 'text-brand-600',
       count: activeSentCount,
     },
     {
       label: 'Interesses recebidos',
       to: '/interesses-recebidos',
       icon: FaInbox,
-      iconClass: 'text-emerald-600',
+      iconClass: 'text-brand-600',
       count: pendingCount,
       countLabel: (n) => `${n} ${n === 1 ? 'pendente' : 'pendentes'}`,
     },
@@ -78,7 +79,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
       label: 'Chat',
       to: '/chat',
       icon: FaComments,
-      iconClass: 'text-emerald-600',
+      iconClass: 'text-brand-600',
       count: unreadChatCount,
       countLabel: (n) => `${n} ${n === 1 ? 'mensagem não lida' : 'mensagens não lidas'}`,
     },
@@ -108,7 +109,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
       <div
         aria-hidden="true"
         onClick={onClose}
-        className={`absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px] transition-opacity duration-300 ${
+        className={`absolute inset-0 bg-brand-950/40 backdrop-blur-[2px] transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -117,29 +118,26 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
         role="dialog"
         aria-modal="true"
         aria-label="Meu espaço"
-        className={`absolute inset-y-0 left-0 flex w-[min(20rem,calc(100vw-3rem))] flex-col bg-white shadow-2xl shadow-emerald-950/20 transition-transform duration-300 ease-out ${
+        className={`absolute inset-y-0 left-0 flex w-[min(20rem,calc(100vw-3rem))] flex-col bg-white shadow-modal transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-          <Link to="/" onClick={onClose} className="text-xl font-black tracking-tight">
-            <span className="text-emerald-900">AU</span>
-            <span className="text-amber-500">colher</span>
-          </Link>
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <Logo onClick={onClose} className="text-xl" />
 
           <button
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Fechar menu"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition-colors duration-200 hover:bg-slate-100 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-ink-500 transition-colors duration-200 hover:bg-sand hover:text-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
           >
             <FiX size={20} />
           </button>
         </div>
 
         <nav className="flex-1 scrollbar-soft overflow-y-auto px-3 py-4">
-          <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Meu espaço</p>
+          <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-ink-500">Meu espaço</p>
           <ul className="flex flex-col gap-0.5">
             {shortcuts.map(({ label, to, icon: Icon, iconClass, count, countLabel }) => (
               <li key={to}>
@@ -149,8 +147,8 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
                   onClick={onClose}
                   aria-label={count > 0 && countLabel ? `${label}: ${countLabel(count)}` : undefined}
                   className={({ isActive }) =>
-                    `flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-200 ${
-                      isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
+                    `flex items-center justify-between gap-3 rounded-control px-3 py-2.5 text-sm font-semibold transition-colors duration-200 ${
+                      isActive ? 'bg-brand-50 text-brand-700' : 'text-ink-700 hover:bg-paper'
                     }`
                   }
                 >
@@ -162,7 +160,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
                   {count > 0 && (
                     <span
                       aria-hidden="true"
-                      className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white"
+                      className="flex h-5 min-w-5 items-center justify-center rounded-full bg-danger-600 px-1.5 text-[11px] font-bold text-white"
                     >
                       {formatBadge(count)}
                     </span>
@@ -173,7 +171,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
           </ul>
 
           <div className="md:hidden">
-            <p className="mt-6 px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">Navegar</p>
+            <p className="mt-6 px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-ink-500">Navegar</p>
             <ul className="flex flex-col gap-0.5">
               {NAV_LINKS.map((link) => (
                 <li key={link.to}>
@@ -183,9 +181,9 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
                     onClick={onClose}
                     className={({ isActive }) =>
                       link.isPremium
-                        ? 'my-1 flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-2.5 text-sm font-extrabold text-emerald-950 shadow-sm'
-                        : `block rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-200 ${
-                            isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
+                        ? 'my-1 flex items-center gap-2 rounded-control bg-accent-400 px-3 py-2.5 text-sm font-extrabold text-brand-950'
+                        : `block rounded-control px-3 py-2.5 text-sm font-semibold transition-colors duration-200 ${
+                            isActive ? 'bg-brand-50 text-brand-700' : 'text-ink-700 hover:bg-paper'
                           }`
                     }
                   >
