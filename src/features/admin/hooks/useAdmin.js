@@ -87,10 +87,8 @@ export function useDismissReports() {
   })
 }
 
-// 🔴 Banir ou remover um anúncio também "cancela" os pedidos ativos
-// envolvidos: no mock, quem mostra isso é a camada de moderação do
-// AdoptionRequestProvider (o servidor não muda). Com a moderação no backend,
-// o próprio banimento cancela os pedidos no servidor
+// Banir ou remover um anúncio também cancela os pedidos ativos envolvidos: quem
+// faz isso é o backend, na mesma operação
 
 // Banir a conta de um caso de denúncia (o perfil ou quem anunciou)
 export function useBanReportedAccount() {
