@@ -6,14 +6,14 @@ import { reasonsFor } from '../utils/reportRules'
 function ReportReasonSelect({ targetType, value, onChange, error }) {
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-2 text-sm font-semibold text-slate-700">Motivo</legend>
+      <legend className="mb-2 text-sm font-semibold text-ink-700">Motivo</legend>
       {reasonsFor(targetType).map((reason) => {
         const isSelected = value === reason.value
         return (
           <label
             key={reason.value}
-            className={`flex cursor-pointer items-start gap-3 rounded-xl border px-3.5 py-2.5 transition-colors duration-200 ${
-              isSelected ? 'border-rose-300 bg-rose-50/70' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+            className={`flex cursor-pointer items-start gap-3 rounded-control border px-3.5 py-2.5 transition-colors duration-200 ${
+              isSelected ? 'border-danger-600/30 bg-danger-50/70' : 'border-line hover:border-line-strong/60 hover:bg-paper'
             }`}
           >
             <input
@@ -22,16 +22,16 @@ function ReportReasonSelect({ targetType, value, onChange, error }) {
               value={reason.value}
               checked={isSelected}
               onChange={() => onChange(reason.value)}
-              className="mt-1 shrink-0 accent-rose-600"
+              className="mt-1 shrink-0 accent-danger-600"
             />
             <span className="min-w-0">
-              <span className="block text-sm font-bold text-emerald-950">{reason.label}</span>
-              <span className="block text-xs leading-snug text-slate-500">{reason.hint}</span>
+              <span className="block text-sm font-bold text-brand-950">{reason.label}</span>
+              <span className="block text-xs leading-snug text-ink-500">{reason.hint}</span>
             </span>
           </label>
         )
       })}
-      {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
+      {error && <p className="text-xs font-medium text-danger-600">{error}</p>}
     </fieldset>
   )
 }

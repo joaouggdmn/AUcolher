@@ -11,8 +11,8 @@ import { useEventAttendance } from '../hooks/useEventAttendance'
 const SIZES = {
   // Pílula da vitrine da home, no mesmo formato do botão "Doar"
   sm: 'h-10 rounded-full px-4 text-sm',
-  md: 'rounded-xl py-2.5 text-sm',
-  lg: 'rounded-2xl py-4 text-base',
+  md: 'rounded-control py-2.5 text-sm',
+  lg: 'rounded-card py-4 text-base',
 }
 
 const TOAST_MS = 3500
@@ -45,7 +45,7 @@ function AttendanceButton({ event, size = 'md', idleLabel = 'Confirmar presença
 
   if (isOwnEvent) {
     return (
-      <p className={`flex items-center justify-center bg-slate-50 font-semibold text-slate-500 ${sizeClasses} ${className}`}>
+      <p className={`flex items-center justify-center bg-paper font-semibold text-ink-500 ${sizeClasses} ${className}`}>
         Evento da sua ONG
       </p>
     )
@@ -55,7 +55,7 @@ function AttendanceButton({ event, size = 'md', idleLabel = 'Confirmar presença
   // de texto quando a presença da conta chega
   if (isLoading) {
     return (
-      <p className={`flex items-center justify-center gap-2 bg-slate-50 font-semibold text-slate-400 ${sizeClasses} ${className}`}>
+      <p className={`flex items-center justify-center gap-2 bg-paper font-semibold text-ink-500 ${sizeClasses} ${className}`}>
         <FaCircleNotch size={14} className="animate-spin" />
         Carregando...
       </p>
@@ -66,7 +66,7 @@ function AttendanceButton({ event, size = 'md', idleLabel = 'Confirmar presença
   if (locked) {
     const LockedIcon = locked.icon
     return (
-      <p className={`flex items-center justify-center gap-2 bg-slate-100 font-bold text-slate-500 ${sizeClasses} ${className}`}>
+      <p className={`flex items-center justify-center gap-2 bg-sand font-bold text-ink-500 ${sizeClasses} ${className}`}>
         <LockedIcon size={14} />
         {locked.label}
       </p>
@@ -102,8 +102,8 @@ function AttendanceButton({ event, size = 'md', idleLabel = 'Confirmar presença
         title={isConfirmed ? 'Clique para cancelar sua presença' : undefined}
         className={`flex items-center justify-center gap-2 font-bold transition-all duration-300 disabled:cursor-wait disabled:opacity-80 ${sizeClasses} ${
           isConfirmed
-            ? 'bg-emerald-700 text-white hover:bg-emerald-800'
-            : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-800 hover:text-white'
+            ? 'bg-brand-600 text-white hover:bg-brand-700'
+            : 'bg-brand-50 text-brand-700 hover:bg-brand-700 hover:text-white'
         } ${className}`}
       >
         <Icon size={14} className={isPending ? 'animate-spin' : ''} />

@@ -11,9 +11,9 @@ import { formatTimeRange } from '../utils/dateHelpers'
 import { getAttendanceSummary } from '../utils/eventDisplay'
 
 const SUMMARY_TONES = {
-  neutral: 'text-slate-500',
-  few: 'text-amber-600',
-  full: 'text-rose-600',
+  neutral: 'text-ink-500',
+  few: 'text-accent-600',
+  full: 'text-danger-600',
 }
 
 function EventCard({ event, layout = 'grid' }) {
@@ -30,17 +30,17 @@ function EventCard({ event, layout = 'grid' }) {
     // z-index dinâmico: z-30 quando o dropdown está aberto eleva o card INTEIRO
     // acima dos cards vizinhos no grid; z-0 em repouso mantém o empilhamento normal
     <div
-      className={`group relative flex rounded-3xl bg-white shadow-lg shadow-amber-500/10 ring-2 ring-amber-400
+      className={`group relative flex rounded-card bg-white shadow-lg ring-2 ring-accent-400
                   transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-                  hover:shadow-2xl hover:shadow-emerald-950/20 hover:ring-amber-300
+                  hover:shadow-2xl hover: hover:ring-accent-300
                   ${isCalendarMenuOpen ? 'z-30' : 'z-0'}
                   ${isList ? 'flex-col sm:flex-row' : 'flex-col'}`}
     >
       <div
         className={`relative shrink-0 overflow-hidden ${
           isList
-            ? 'h-48 rounded-t-3xl sm:h-auto sm:w-64 sm:rounded-l-3xl sm:rounded-tr-none'
-            : 'h-48 w-full rounded-t-3xl'
+            ? 'h-48 rounded-t-card sm:h-auto sm:w-64 sm:rounded-l-card sm:rounded-tr-none'
+            : 'h-48 w-full rounded-t-card'
         }`}
       >
         <Link to={`/eventos/${event.id}`} className="block h-full">
@@ -61,30 +61,30 @@ function EventCard({ event, layout = 'grid' }) {
         </span>
 
         <div>
-          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">
-            <Link to={`/eventos/${event.id}`} className="transition-colors duration-300 hover:text-emerald-700">
+          <h3 className="text-lg font-extrabold tracking-tight text-brand-950">
+            <Link to={`/eventos/${event.id}`} className="transition-colors duration-300 hover:text-brand-600">
               {event.title}
             </Link>
           </h3>
-          <p className="mt-1 text-sm text-slate-500">{formatTimeRange(event.startTime, event.endTime)}</p>
+          <p className="mt-1 text-sm text-ink-500">{formatTimeRange(event.startTime, event.endTime)}</p>
         </div>
 
-        <div className="flex items-center gap-1.5 text-sm text-slate-500">
-          <FaLocationDot size={13} className="shrink-0 text-emerald-600" />
+        <div className="flex items-center gap-1.5 text-sm text-ink-500">
+          <FaLocationDot size={13} className="shrink-0 text-brand-600" />
           <span className="truncate">
             {event.location.venue}, {event.location.city}
           </span>
         </div>
 
-        <p className="flex items-center gap-1.5 text-sm text-slate-600">
+        <p className="flex items-center gap-1.5 text-sm text-ink-600">
           Organizado por
           <Link
             to={`/ong/${event.organizer.id}`}
-            className="flex items-center gap-1 font-semibold text-emerald-800 transition-colors duration-300 hover:text-emerald-600"
+            className="flex items-center gap-1 font-semibold text-brand-700 transition-colors duration-300 hover:text-brand-600"
           >
             {event.organizer.name}
             {event.organizer.isVerified && (
-              <FaShieldHalved size={11} className="shrink-0 text-amber-500" title="Instituição verificada" />
+              <FaShieldHalved size={11} className="shrink-0 text-accent-500" title="Instituição verificada" />
             )}
           </Link>
         </p>

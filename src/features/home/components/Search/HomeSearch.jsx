@@ -39,7 +39,7 @@ function HomeSearch({ labelledBy, className = '' }) {
 
       <button
         type="submit"
-        className="shrink-0 rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+        className="shrink-0 rounded-full bg-brand-700 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
       >
         Buscar
       </button>
