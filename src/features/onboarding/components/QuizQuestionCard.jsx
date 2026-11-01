@@ -12,8 +12,8 @@ function QuizQuestionCard({ question, selectedValue, onSelect }) {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h2 className="text-xl font-extrabold tracking-tight text-brand-950">{question.title}</h2>
-        {question.subtitle && <p className="mt-1 text-sm text-ink-500">{question.subtitle}</p>}
+        <h2 className="text-xl font-extrabold tracking-tight text-emerald-950">{question.title}</h2>
+        {question.subtitle && <p className="mt-1 text-sm text-slate-500">{question.subtitle}</p>}
       </div>
 
       <div className={`grid gap-3 ${gridCols}`}>

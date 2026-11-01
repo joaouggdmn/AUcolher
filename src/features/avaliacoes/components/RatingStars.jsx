@@ -11,7 +11,7 @@ function RatingStars({ value = 0, onChange, size = 14 }) {
     return (
       <div className="flex items-center gap-0.5" role="img" aria-label={`${value} de 5 estrelas`}>
         {STARS.map((star) => (
-          <FaStar key={star} size={size} className={star <= value ? 'text-accent-400' : 'text-line'} />
+          <FaStar key={star} size={size} className={star <= value ? 'text-amber-400' : 'text-slate-200'} />
         ))}
       </div>
     )
@@ -35,9 +35,9 @@ function RatingStars({ value = 0, onChange, size = 14 }) {
           aria-label={`${star} ${star === 1 ? 'estrela' : 'estrelas'}`}
           onClick={() => onChange(star)}
           onMouseEnter={() => setHovered(star)}
-          className="rounded-control p-1 transition-transform duration-200 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400"
+          className="rounded-lg p-1 transition-transform duration-200 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
         >
-          <FaStar size={size} className={star <= displayed ? 'text-accent-400' : 'text-line'} />
+          <FaStar size={size} className={star <= displayed ? 'text-amber-400' : 'text-slate-200'} />
         </button>
       ))}
     </div>

@@ -44,32 +44,32 @@ function ReportModal({ targetType, target, onClose, onReported }) {
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-brand-950/60 backdrop-blur-sm" onClick={handleClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-emerald-950/60 backdrop-blur-sm" onClick={handleClose} aria-hidden="true" />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="report-modal-title"
-        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg animate-fade-slide-in scrollbar-soft overflow-y-auto rounded-modal bg-white p-6 shadow-modal sm:p-8"
+        className="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg animate-fade-slide-in scrollbar-soft overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
       >
         <button
           type="button"
           onClick={handleClose}
           aria-label="Fechar"
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-ink-500 transition-colors duration-300 hover:bg-sand hover:text-ink-700"
+          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors duration-300 hover:bg-slate-100 hover:text-slate-700"
         >
           <FaXmark size={16} />
         </button>
 
         <div className="flex items-center gap-3 pr-10">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-danger-50 text-danger-600">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-500">
             <FaFlag size={16} />
           </span>
           <div className="min-w-0">
-            <h3 id="report-modal-title" className="text-lg font-extrabold tracking-tight text-brand-950">
+            <h3 id="report-modal-title" className="text-lg font-extrabold tracking-tight text-emerald-950">
               {TITLES[targetType]}
             </h3>
-            <p className="truncate text-sm text-ink-500">{target.name}</p>
+            <p className="truncate text-sm text-slate-500">{target.name}</p>
           </div>
         </div>
 
@@ -92,12 +92,12 @@ function ReportModal({ targetType, target, onClose, onReported }) {
             rows={3}
           />
 
-          <p className="text-xs leading-relaxed text-ink-500">
+          <p className="text-xs leading-relaxed text-slate-400">
             Quem foi denunciado não fica sabendo quem denunciou. A equipe do AUcolher analisa cada caso.
           </p>
 
           {createReport.error && (
-            <p role="alert" className="rounded-control bg-danger-50 px-4 py-3 text-sm font-medium text-danger-700">
+            <p role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
               {getErrorMessage(createReport.error)}
             </p>
           )}
@@ -107,14 +107,14 @@ function ReportModal({ targetType, target, onClose, onReported }) {
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="rounded-control px-5 py-3 text-sm font-semibold text-ink-500 transition-colors duration-300 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl px-5 py-3 text-sm font-semibold text-slate-500 transition-colors duration-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-control bg-danger-600 px-5 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-danger-700 disabled:cursor-wait disabled:opacity-70"
+              className="flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-rose-700 disabled:cursor-wait disabled:opacity-70"
             >
               {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
               {isSubmitting ? 'Enviando...' : 'Enviar denúncia'}

@@ -25,17 +25,17 @@ function AvatarUploadInput({ value, onChange, fallbackInitial, size = 'lg' }) {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className={`group relative ${SIZE_CLASSES[size]} shrink-0 overflow-hidden rounded-full bg-brand-50 ring-4 ring-white transition-all duration-300 hover:ring-accent-200`}
+        className={`group relative ${SIZE_CLASSES[size]} shrink-0 overflow-hidden rounded-full bg-emerald-50 shadow-lg shadow-emerald-950/10 ring-4 ring-white transition-all duration-300 hover:ring-amber-200`}
       >
         {value ? (
           <img src={value} alt="Foto de perfil" className="h-full w-full object-cover" />
         ) : (
-          <span className="flex h-full w-full items-center justify-center text-2xl font-black text-brand-600">
+          <span className="flex h-full w-full items-center justify-center text-2xl font-black text-emerald-700">
             {fallbackInitial || <FaUser size={22} />}
           </span>
         )}
 
-        <span className="absolute inset-0 flex items-center justify-center bg-brand-950/0 text-white opacity-0 transition-all duration-300 group-hover:bg-brand-950/50 group-hover:opacity-100">
+        <span className="absolute inset-0 flex items-center justify-center bg-emerald-950/0 text-white opacity-0 transition-all duration-300 group-hover:bg-emerald-950/50 group-hover:opacity-100">
           <FaCamera size={18} />
         </span>
       </button>
@@ -45,7 +45,7 @@ function AvatarUploadInput({ value, onChange, fallbackInitial, size = 'lg' }) {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="text-xs font-semibold text-brand-600 underline decoration-brand-200 decoration-2 underline-offset-4 transition-colors hover:text-brand-800"
+        className="text-xs font-semibold text-emerald-700 underline decoration-emerald-300 decoration-2 underline-offset-4 transition-colors hover:text-emerald-900"
       >
         {value ? 'Trocar foto' : 'Adicionar foto (opcional)'}
       </button>

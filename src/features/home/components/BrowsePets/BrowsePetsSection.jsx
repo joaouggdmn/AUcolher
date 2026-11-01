@@ -63,7 +63,7 @@ function BrowsePetsSection({ persona }) {
 
           <Link
             to="/animais"
-            className="group inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-control lg:self-auto bg-brand-700 px-6 text-sm font-bold text-white transition-colors duration-200 hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+            className="group inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-full lg:self-auto bg-emerald-800 px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/15 transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
           >
             {availableCount > 0 ? `Ver todos os ${availableCount} animais` : 'Ver todos os animais'}
             <FaArrowRight
