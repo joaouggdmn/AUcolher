@@ -40,8 +40,8 @@ function AdminEditCampaignForm({ campaign, backTo, done }) {
   )
 }
 
-// /admin/campanhas/:id/editar — o admin edita a campanha de uma ONG (por
-// enquanto no mock: o backend ainda não tem campanhas). Encerrada não muda
+// /admin/campanhas/:id/editar — o admin edita a campanha de uma ONG. Encerrada
+// não muda
 function AdminCampaignEditPage() {
   const { id } = useParams()
   const { data: campaign, isLoading, error, refetch } = useCampaign(id)

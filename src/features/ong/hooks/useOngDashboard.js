@@ -47,8 +47,8 @@ function previewOf(message, userId) {
   return `Você: ${message.text}`
 }
 
-// Tudo o que o painel da ONG mostra. Animais vêm da API; pedidos e chat,
-// do localStorage; eventos, campanhas e doações, dos seus serviços (mock ou API).
+// Tudo o que o painel da ONG mostra. Animais, pedidos, eventos, campanhas e
+// doações vêm da API; o chat, do chatService (mock até as rotas existirem).
 // O animal de cada pedido já vem resolvido pelo AdoptionRequestProvider
 // (`name: null` quando ele não existe mais)
 export function useOngDashboard() {
