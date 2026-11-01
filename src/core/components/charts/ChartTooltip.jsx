@@ -12,10 +12,10 @@ function ChartTooltip({ value, label, align = 'center' }) {
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none absolute bottom-full z-10 mb-2 whitespace-nowrap rounded-tag bg-brand-950 px-2.5 py-1.5 text-left text-xs opacity-0 shadow-float transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 ${ALIGN_CLASSES[align]}`}
+      className={`pointer-events-none absolute bottom-full z-10 mb-2 whitespace-nowrap rounded-lg bg-emerald-950 px-2.5 py-1.5 text-left text-xs opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 ${ALIGN_CLASSES[align]}`}
     >
       <span className="block font-black text-white">{value}</span>
-      <span className="block text-brand-100/80">{label}</span>
+      <span className="block text-emerald-100/80">{label}</span>
     </span>
   )
 }

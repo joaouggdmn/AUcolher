@@ -29,8 +29,8 @@ function UserAvatarMenu({
 
   const trackColor = isScrolled
     ? "rgba(255,255,255,0.25)"
-    : "rgba(17,77,58,0.15)";
-  const gapBgClass = isScrolled ? "bg-brand-700" : "bg-white";
+    : "rgba(6,78,59,0.15)";
+  const gapBgClass = isScrolled ? "bg-emerald-800" : "bg-white";
 
   return (
     <div className="relative isolate">
@@ -44,12 +44,12 @@ function UserAvatarMenu({
         }
         className="relative h-11 w-11 shrink-0 rounded-full transition-all duration-300"
         style={{
-          background: `conic-gradient(#f2b23a ${percentage}%, ${trackColor} ${percentage}%)`,
+          background: `conic-gradient(#fbbf24 ${percentage}%, ${trackColor} ${percentage}%)`,
         }}
       >
         <span
           className={`absolute inset-[3px] flex items-center justify-center overflow-hidden rounded-full text-sm font-black transition-colors duration-300 ${gapBgClass} ${
-            user?.photoUrl ? "" : isScrolled ? "text-white" : "text-brand-800"
+            user?.photoUrl ? "" : isScrolled ? "text-white" : "text-emerald-900"
           }`}
         >
           {user?.photoUrl ? (
@@ -71,9 +71,9 @@ function UserAvatarMenu({
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="absolute right-0 top-14 z-50 w-64 overflow-hidden rounded-card border border-line bg-white py-2 shadow-float">
-            <div className="flex items-center gap-3 border-b border-line px-4 py-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-700 text-sm font-black text-white">
+          <div className="absolute right-0 top-14 z-50 w-64 overflow-hidden rounded-2xl border border-slate-100 bg-white py-2 shadow-xl shadow-emerald-950/10">
+            <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-800 text-sm font-black text-white">
                 {user?.photoUrl ? (
                   <img
                     src={user.photoUrl}
@@ -85,26 +85,26 @@ function UserAvatarMenu({
                 )}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-brand-950">
+                <p className="truncate text-sm font-bold text-emerald-950">
                   {user?.name}
                 </p>
-                <p className="truncate text-xs text-ink-500">{user?.email}</p>
+                <p className="truncate text-xs text-slate-400">{user?.email}</p>
               </div>
             </div>
 
             {!isAdmin && (
-              <div className="border-b border-line px-4 py-3">
+              <div className="border-b border-slate-100 px-4 py-3">
                 <div className="mb-1.5 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-ink-500">
+                  <span className="font-semibold text-slate-500">
                     Perfil completo
                   </span>
-                  <span className="font-bold text-brand-600">
+                  <span className="font-bold text-emerald-700">
                     {percentage}%
                   </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-sand">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-accent-400 transition-all duration-700 ease-out"
+                    className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700 ease-out"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
@@ -115,9 +115,9 @@ function UserAvatarMenu({
               <Link
                 to={panelLink.to}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-brand-700 transition-colors duration-200 hover:bg-brand-50"
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold text-emerald-800 transition-colors duration-200 hover:bg-emerald-50"
               >
-                <PanelLinkIcon size={14} className="text-accent-500" />
+                <PanelLinkIcon size={14} className="text-amber-500" />
                 {panelLink.label}
               </Link>
             )}
@@ -125,9 +125,9 @@ function UserAvatarMenu({
             <Link
               to="/perfil"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-ink-700 transition-colors duration-200 hover:bg-brand-50"
+              className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-emerald-50"
             >
-              <FaUser size={14} className="text-brand-600" />
+              <FaUser size={14} className="text-emerald-600" />
               Minha conta
             </Link>
 
@@ -135,9 +135,9 @@ function UserAvatarMenu({
               <Link
                 to={`/perfil/publico/${user.id}`}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-ink-700 transition-colors duration-200 hover:bg-brand-50"
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-emerald-50"
               >
-                <FaEye size={14} className="text-brand-600" />
+                <FaEye size={14} className="text-emerald-600" />
                 Meu perfil público
               </Link>
             )}
@@ -147,7 +147,7 @@ function UserAvatarMenu({
             <button
               type="button"
               onClick={handleLogoutClick}
-              className="mt-1 flex border-t border-line w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-danger-600 transition-colors duration-200 hover:bg-danger-50"
+              className="mt-1 flex border-t border-slate-100 w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm font-medium text-rose-600 transition-colors duration-200 hover:bg-rose-50"
             >
               <FaArrowRightFromBracket size={14} />
               Sair

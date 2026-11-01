@@ -51,8 +51,8 @@ function Navbar() {
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-brand-700 shadow-raised'
-            : 'bg-white/80'
+            ? 'bg-emerald-800/95 shadow-lg shadow-emerald-950/10 backdrop-blur-sm'
+            : 'bg-white/80 backdrop-blur-sm'
         }`}
       >
         <nav className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -67,10 +67,10 @@ function Navbar() {
                     ? `Abrir menu: ${sidebarUpdates} ${sidebarUpdates === 1 ? 'novidade' : 'novidades'}`
                     : 'Abrir menu'
                 }
-                className={`relative -ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-300 focus-visible:ring-offset-2 ${
+                className={`relative -ml-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 ${
                   isScrolled
-                    ? 'text-brand-50 hover:bg-white/10 hover:text-accent-300'
-                    : 'text-brand-800 hover:bg-brand-50 hover:text-brand-600'
+                    ? 'text-emerald-50 hover:bg-white/10 hover:text-amber-300'
+                    : 'text-emerald-900 hover:bg-emerald-50 hover:text-emerald-700'
                 }`}
               >
                 <FiMenu size={22} />
@@ -78,8 +78,8 @@ function Navbar() {
                 {sidebarUpdates > 0 && (
                   <span
                     aria-hidden="true"
-                    className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger-600 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
-                      isScrolled ? 'ring-brand-700' : 'ring-white'
+                    className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
+                      isScrolled ? 'ring-emerald-800' : 'ring-white'
                     }`}
                   >
                     {sidebarUpdates > 9 ? '9+' : sidebarUpdates}
@@ -96,7 +96,7 @@ function Navbar() {
               <Link
                 to="/"
                 className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
-                  isScrolled ? 'text-brand-50 hover:text-accent-300' : 'text-ink-700 hover:text-brand-600'
+                  isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
                 }`}
               >
                 Início
@@ -106,9 +106,9 @@ function Navbar() {
             <li>
               <Link
                 to="/aumatch"
-                className="group relative mx-1 flex items-center gap-1.5 rounded-control bg-accent-400 px-4 py-2 text-sm font-extrabold text-brand-950 transition-colors duration-200 hover:bg-accent-500"
+                className="group relative mx-1 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-4 py-2 text-sm font-extrabold text-emerald-950 shadow-[0_0_0_0_rgba(217,119,6,0.5)] transition-all duration-300 animate-glow hover:scale-105 hover:from-amber-300 hover:to-amber-400"
               >
-                <LuSparkles size={15} />
+                <LuSparkles size={15} className="transition-transform duration-300 group-hover:rotate-12" />
                 AUmatch
               </Link>
             </li>
@@ -117,7 +117,7 @@ function Navbar() {
               <Link
                 to="/animais"
                 className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
-                  isScrolled ? 'text-brand-50 hover:text-accent-300' : 'text-ink-700 hover:text-brand-600'
+                  isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
                 }`}
               >
                 Animais
@@ -128,7 +128,7 @@ function Navbar() {
               <Link
                 to="/eventos"
                 className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
-                  isScrolled ? 'text-brand-50 hover:text-accent-300' : 'text-ink-700 hover:text-brand-600'
+                  isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
                 }`}
               >
                 Eventos
@@ -139,7 +139,7 @@ function Navbar() {
               <Link
                 to="/campanhas"
                 className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
-                  isScrolled ? 'text-brand-50 hover:text-accent-300' : 'text-ink-700 hover:text-brand-600'
+                  isScrolled ? 'text-emerald-50 hover:text-amber-300' : 'text-slate-700 hover:text-emerald-700'
                 }`}
               >
                 Campanhas
@@ -149,7 +149,7 @@ function Navbar() {
 
           <div className="flex shrink-0 items-center gap-3">
             {isLoading ? (
-              <div className="h-11 w-11 animate-pulse rounded-full bg-line" />
+              <div className="h-11 w-11 animate-pulse rounded-full bg-slate-200" />
             ) : isAuthenticated ? (
               <>
                 {/* Só em telas largas: abaixo disso encostaria nos links do
@@ -157,13 +157,13 @@ function Navbar() {
                 {panelLink && (
                   <Link
                     to={panelLink.to}
-                    className={`hidden items-center gap-2 rounded-control px-4 py-2 text-sm font-bold transition-colors duration-200 xl:flex ${
+                    className={`hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all duration-300 xl:flex ${
                       isScrolled
                         ? 'bg-white/10 text-white hover:bg-white/20'
-                        : 'bg-brand-700 text-white hover:bg-brand-800'
+                        : 'bg-emerald-800 text-white hover:bg-emerald-900'
                     }`}
                   >
-                    <PanelLinkIcon size={13} className="text-accent-300" />
+                    <PanelLinkIcon size={13} className="text-amber-300" />
                     {panelLink.label}
                   </Link>
                 )}
@@ -178,10 +178,10 @@ function Navbar() {
                         ? `Meus favoritos: ${totalFavoritos} ${totalFavoritos === 1 ? 'pet salvo' : 'pets salvos'}`
                         : 'Meus favoritos'
                     }
-                    className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-600 focus-visible:ring-offset-2 ${
+                    className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 ${
                       isScrolled
-                        ? 'text-brand-50 hover:bg-white/10 hover:text-danger-600'
-                        : 'text-ink-600 hover:bg-danger-50 hover:text-danger-600'
+                        ? 'text-emerald-50 hover:bg-white/10 hover:text-rose-300'
+                        : 'text-slate-600 hover:bg-rose-50 hover:text-rose-500'
                     }`}
                   >
                     <FaHeart size={19} />
@@ -189,8 +189,8 @@ function Navbar() {
                     {totalFavoritos > 0 && (
                       <span
                         aria-hidden="true"
-                        className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-danger-600 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
-                          isScrolled ? 'ring-brand-700' : 'ring-white'
+                        className={`absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white ring-2 transition-colors duration-300 ${
+                          isScrolled ? 'ring-emerald-800' : 'ring-white'
                         }`}
                       >
                         {totalFavoritos > 9 ? '9+' : totalFavoritos}
@@ -211,10 +211,10 @@ function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className={`hidden rounded-control border px-5 py-2 text-sm font-bold transition-colors duration-200 sm:inline-block ${
+                  className={`hidden rounded-full border px-5 py-2 text-sm font-bold transition-all duration-300 sm:inline-block ${
                     isScrolled
                       ? 'border-white/60 text-white hover:bg-white/10'
-                      : 'border-line-strong text-ink-700 hover:border-brand-700 hover:text-brand-700'
+                      : 'border-slate-300 text-slate-700 hover:border-emerald-600 hover:text-emerald-700'
                   }`}
                 >
                   Entrar
@@ -222,10 +222,10 @@ function Navbar() {
 
                 <Link
                   to="/cadastro"
-                  className={`rounded-control px-5 py-2 text-sm font-bold transition-colors duration-200 ${
+                  className={`rounded-full px-5 py-2 text-sm font-bold shadow-md transition-all duration-300 ${
                     isScrolled
-                      ? 'bg-accent-400 text-brand-950 hover:bg-accent-500'
-                      : 'bg-brand-700 text-white hover:bg-brand-800'
+                      ? 'bg-amber-400 text-emerald-950 hover:bg-amber-300'
+                      : 'bg-emerald-800 text-white hover:bg-emerald-900'
                   }`}
                 >
                   Cadastrar-se
@@ -237,7 +237,7 @@ function Navbar() {
             {!isAuthenticated && (
               <button
                 onClick={() => setIsMenuOpen((open) => !open)}
-                className={`ml-1 md:hidden ${isScrolled ? 'text-white' : 'text-brand-800'}`}
+                className={`ml-1 md:hidden ${isScrolled ? 'text-white' : 'text-emerald-900'}`}
                 aria-label="Abrir menu"
               >
                 {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
@@ -247,7 +247,7 @@ function Navbar() {
         </nav>
 
         {isMenuOpen && !isAuthenticated && (
-          <ul className={`flex flex-col gap-1 px-6 pb-4 md:hidden ${isScrolled ? 'bg-brand-700' : 'bg-white'}`}>
+          <ul className={`flex flex-col gap-1 px-6 pb-4 md:hidden ${isScrolled ? 'bg-emerald-800' : 'bg-white'}`}>
             {[{ label: 'Início', to: '/' }, { label: 'AUmatch', to: '/aumatch', isPremium: true }, ...NAV_LINKS.slice(1)].map(
               (link) => (
                 <li key={link.to}>
@@ -256,9 +256,9 @@ function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                     className={
                       link.isPremium
-                        ? 'my-1 flex items-center gap-2 rounded-control bg-accent-400 px-3 py-2.5 text-sm font-extrabold text-brand-950'
-                        : `block rounded-control px-3 py-2 text-sm font-semibold ${
-                            isScrolled ? 'text-brand-50 hover:bg-brand-600' : 'text-ink-700 hover:bg-paper'
+                        ? 'my-1 flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-2.5 text-sm font-extrabold text-emerald-950 shadow-sm'
+                        : `block rounded-lg px-3 py-2 text-sm font-semibold ${
+                            isScrolled ? 'text-emerald-50 hover:bg-emerald-700' : 'text-slate-700 hover:bg-slate-50'
                           }`
                     }
                   >
@@ -272,8 +272,8 @@ function Navbar() {
         )}
       </header>
 
-      {/* Fora do <header>: um backdrop-blur ou transform nele viraria o bloco
-          de contenção do position:fixed e prenderia a sidebar dentro da navbar */}
+      {/* Fora do <header>: o backdrop-blur dele viraria o bloco de contenção
+          do position:fixed e prenderia a sidebar dentro da navbar */}
       {isAuthenticated && (
         <PlatformSidebar
           isOpen={isSidebarOpen}
