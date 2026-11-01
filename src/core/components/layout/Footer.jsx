@@ -28,8 +28,8 @@ const supportLinks = [
 ]
 
 const LINK_CLASSES =
-  'group flex items-center gap-2 text-sm text-emerald-200/80 transition-colors duration-300 hover:text-amber-400'
-const LINK_ICON_CLASSES = 'text-emerald-400 transition-colors duration-300 group-hover:text-amber-400'
+  'group flex items-center gap-2 text-sm text-brand-200/80 transition-colors duration-300 hover:text-accent-400'
+const LINK_ICON_CLASSES = 'text-brand-400 transition-colors duration-300 group-hover:text-accent-400'
 
 const socialLinks = [
   { label: 'Instagram', href: 'https://instagram.com', icon: FaInstagram },
@@ -40,7 +40,7 @@ function Footer() {
   const [isReportHelpOpen, setIsReportHelpOpen] = useState(false)
 
   return (
-    <footer className="bg-emerald-950 px-4 py-14 text-emerald-100 sm:px-6 sm:py-16">
+    <footer className="bg-brand-950 px-4 py-14 text-brand-100 sm:px-6 sm:py-16">
       <div className="mx-auto max-w-7xl">
         {/* sm: 2 colunas (marca ocupa a linha toda) | lg: 4 faixas, marca ocupa 2 */}
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
@@ -48,7 +48,7 @@ function Footer() {
           <div className="flex flex-col gap-4 sm:col-span-2 lg:col-span-2">
             <Logo tone="light" />
 
-            <p className="max-w-xs text-sm leading-relaxed text-emerald-200/80">
+            <p className="max-w-xs text-sm leading-relaxed text-brand-200/80">
               Conectamos corações e patas. Cada adoção começa com um match
               feito para durar a vida toda.
             </p>
@@ -61,7 +61,7 @@ function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-emerald-100 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-400 hover:text-emerald-950"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-brand-100 transition-colors duration-200 hover:bg-accent-400 hover:text-brand-950"
                 >
                   <Icon size={16} />
                 </a>
@@ -72,7 +72,7 @@ function Footer() {
           {/* Coluna 2: Links rápidos */}
           <div className="flex flex-col gap-4">
             <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-white">
-              <LuCompass size={16} className="text-amber-400" />
+              <LuCompass size={16} className="text-accent-400" />
               Links rápidos
             </h4>
             <ul className="flex flex-col gap-3">
@@ -80,9 +80,9 @@ function Footer() {
                 <li key={label}>
                   <Link
                     to={to}
-                    className="group flex items-center gap-2 text-sm text-emerald-200/80 transition-colors duration-300 hover:text-amber-400"
+                    className="group flex items-center gap-2 text-sm text-brand-200/80 transition-colors duration-300 hover:text-accent-400"
                   >
-                    <Icon size={13} className="text-emerald-400 transition-colors duration-300 group-hover:text-amber-400" />
+                    <Icon size={13} className="text-brand-400 transition-colors duration-300 group-hover:text-accent-400" />
                     {label}
                   </Link>
                 </li>
@@ -93,7 +93,7 @@ function Footer() {
           {/* Coluna 3: Suporte & ONGs */}
           <div className="flex flex-col gap-4">
             <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-white">
-              <LuLifeBuoy size={16} className="text-amber-400" />
+              <LuLifeBuoy size={16} className="text-accent-400" />
               Suporte &amp; ONGs
             </h4>
             <ul className="flex flex-col gap-3">
@@ -117,7 +117,7 @@ function Footer() {
         </div>
 
         {/* Linha inferior — separador fino + copyright */}
-        <div className="mt-12 flex flex-col items-center gap-3 border-t border-emerald-800/60 pt-6 text-center text-xs text-emerald-300/70 sm:flex-row sm:justify-between sm:text-left">
+        <div className="mt-12 flex flex-col items-center gap-3 border-t border-brand-700/60 pt-6 text-center text-xs text-brand-200/70 sm:flex-row sm:justify-between sm:text-left">
           <p>© 2026 AUcolher. Todos os direitos reservados.</p>
           
         </div>

@@ -8,7 +8,7 @@ function Avatar({ name, photoUrl, className = '' }) {
 
   return (
     <span
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-700 font-black text-white ${className}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 font-black text-white ${className}`}
     >
       {showPhoto ? (
         <img src={photoUrl} alt={name} onError={() => setFailedUrl(photoUrl)} className="h-full w-full object-cover" />
