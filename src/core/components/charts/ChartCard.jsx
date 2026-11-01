@@ -1,9 +1,9 @@
 function ChartCard({ title, subtitle, children }) {
   return (
-    <figure className="flex break-inside-avoid flex-col gap-4 rounded-card border border-line bg-white p-5">
+    <figure className="flex break-inside-avoid flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
       <figcaption>
-        <p className="text-sm font-extrabold tracking-tight text-brand-950">{title}</p>
-        {subtitle && <p className="mt-0.5 text-xs text-ink-500">{subtitle}</p>}
+        <p className="text-sm font-extrabold tracking-tight text-emerald-950">{title}</p>
+        {subtitle && <p className="mt-0.5 text-xs text-slate-500">{subtitle}</p>}
       </figcaption>
       {children}
     </figure>
