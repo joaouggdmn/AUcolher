@@ -1,8 +1,8 @@
 import { useInView } from '../../../../core/hooks/useInView'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 
-// Mesmo efeito do RevealOnScroll do core, mas respeitando o
-// prefers-reduced-motion: nesse caso o bloco já nasce visível
+// O bloco aparece ao entrar na tela, respeitando o prefers-reduced-motion:
+// nesse caso ele já nasce visível
 function HomeReveal({ children, className = '', delay = 0 }) {
   const [ref, isInView] = useInView()
   const prefersReducedMotion = usePrefersReducedMotion()
