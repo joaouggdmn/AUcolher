@@ -10,16 +10,6 @@ import {
   TOKEN_STORAGE_KEY,
   TOKEN_TYPE_STORAGE_KEY,
   USER_STORAGE_KEY,
-  LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY,
-  LEGACY_MOCK_EVENTOS_STORAGE_KEY,
-  LEGACY_MOCK_CAMPANHAS_STORAGE_KEY,
-  LEGACY_MOCK_ADMIN_STORAGE_KEY,
-  LEGACY_ADMIN_DEMO_SEED_STORAGE_KEY,
-  LEGACY_MOCK_MODERACAO_STORAGE_KEY,
-  LEGACY_ADOPTION_REQUESTS_STORAGE_KEY,
-  LEGACY_MOCK_DENUNCIAS_STORAGE_KEY,
-  LEGACY_MOCK_REABANDONO_STORAGE_KEY,
-  LEGACY_MOCK_EXCLUSAO_STORAGE_KEY,
 } from '../utils/storageKeys'
 
 const AuthContext = createContext(null)
@@ -55,24 +45,6 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    // Versões anteriores guardavam as respostas do quiz nesta chave, solta da
-    // conta (outra pessoa no mesmo navegador herdava as respostas). Agora elas
-    // vêm do banco: quem não tiver perfil lá responde o quiz de novo
-    localStorage.removeItem(LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY)
-    // O mesmo para os antigos "bancos" falsos de eventos, de campanhas e
-    // doações, do painel do admin (e os dados de teste dele), da moderação
-    // (com os pedidos de demonstração), das denúncias, do retorno/repasse e
-    // das contas excluídas: agora vêm da API
-    localStorage.removeItem(LEGACY_MOCK_EVENTOS_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_MOCK_CAMPANHAS_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_MOCK_ADMIN_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_ADMIN_DEMO_SEED_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_MOCK_MODERACAO_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_ADOPTION_REQUESTS_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_MOCK_DENUNCIAS_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_MOCK_REABANDONO_STORAGE_KEY)
-    localStorage.removeItem(LEGACY_MOCK_EXCLUSAO_STORAGE_KEY)
-
     const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
     const storedUser = localStorage.getItem(USER_STORAGE_KEY)
 
