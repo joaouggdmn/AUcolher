@@ -1,41 +1,11 @@
 export const TOKEN_STORAGE_KEY = 'aucolher_token'
 export const TOKEN_TYPE_STORAGE_KEY = 'aucolher_token_type'
 export const USER_STORAGE_KEY = 'aucolher_user'
-// Antigo: pedidos de demonstração do painel do admin. O AuthContext só apaga
-// o que versões anteriores deixaram nesta chave
-export const LEGACY_ADOPTION_REQUESTS_STORAGE_KEY = 'aucolher_adoption_requests'
-// Antigo: as respostas do quiz agora vêm da API (GET /match/profile). O
-// AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_LIFESTYLE_PROFILE_STORAGE_KEY = 'aucolher_lifestyle_profile'
 
-// Antigo: o "banco" falso de eventos + presenças. Os eventos agora vêm da
-// API; o AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_MOCK_EVENTOS_STORAGE_KEY = 'aucolher_mock_eventos'
-// Antigo: o "banco" falso de campanhas + doações. Elas agora vêm da API; o
-// AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_MOCK_CAMPANHAS_STORAGE_KEY = 'aucolher_mock_campanhas'
-// Antigo: o "banco" falso do painel do admin. O painel agora vem da API; o
-// AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_MOCK_ADMIN_STORAGE_KEY = 'aucolher_mock_admin'
-// Antigo: os dados de teste do painel do admin (campanhas do mock). O
-// AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_ADMIN_DEMO_SEED_STORAGE_KEY = 'aucolher_admin_demo_seed'
-// Antigo: o "banco" falso das denúncias. Elas agora vêm da API; o
-// AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_MOCK_DENUNCIAS_STORAGE_KEY = 'aucolher_mock_denuncias'
-// Antigo: as decisões de moderação do modo mock. A moderação agora é do
-// backend; o AuthContext só apaga o que versões anteriores deixaram aqui
-export const LEGACY_MOCK_MODERACAO_STORAGE_KEY = 'aucolher_mock_moderacao'
-// Antigo: o "banco" falso do retorno e do repasse. Eles agora vêm da API; o
-// AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_MOCK_REABANDONO_STORAGE_KEY = 'aucolher_mock_reabandono'
 // Links de "Esqueci minha senha" do modo mock (mesmo mockStore)
 export const MOCK_SENHA_STORE_KEY = 'aucolher_mock_senha'
 // "Banco" falso do chat: mensagens e marcas de leitura (mesmo mockStore)
 export const MOCK_CHAT_STORE_KEY = 'aucolher_mock_chat'
-// Antigo: as contas excluídas do modo mock. A exclusão agora é do backend; o
-// AuthContext só apaga o que versões anteriores deixaram nesta chave
-export const LEGACY_MOCK_EXCLUSAO_STORAGE_KEY = 'aucolher_mock_exclusao'
 // AUmatch: a coluna de filtros do desktop ficou aberta ("1") ou guardada
 export const AUMATCH_PANEL_OPEN_KEY = 'aucolher_aumatch_panel_open'
 // sessionStorage: a sessão caiu porque a conta foi banida (o login avisa)
