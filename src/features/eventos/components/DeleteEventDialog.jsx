@@ -31,7 +31,7 @@ function DeleteEventDialog({ event, onClose, onDeleted }) {
       description={
         hasAttendees ? (
           <>
-            <strong className="text-brand-950">
+            <strong className="text-emerald-950">
               {confirmed} {confirmed === 1 ? 'pessoa já confirmou' : 'pessoas já confirmaram'} presença
             </strong>
             , então o evento não é apagado: ele sai da vitrine e aparece como cancelado em Minha conta de quem ia
@@ -39,7 +39,7 @@ function DeleteEventDialog({ event, onClose, onDeleted }) {
           </>
         ) : (
           <>
-            <strong className="text-brand-950">{event.title}</strong> será apagado definitivamente. Não dá para
+            <strong className="text-emerald-950">{event.title}</strong> será apagado definitivamente. Não dá para
             desfazer.
           </>
         )

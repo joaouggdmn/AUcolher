@@ -71,10 +71,10 @@ function AnimalDetailsPage() {
   if (error && error.response?.status !== 404) {
     return (
       <div className="mx-auto max-w-3xl px-4 pb-16 pt-32 text-center">
-        <h1 className="text-2xl font-extrabold tracking-tight text-brand-950">
+        <h1 className="text-2xl font-extrabold tracking-tight text-emerald-950">
           Não foi possível carregar este animal
         </h1>
-        <p className="mt-2 text-ink-500">{getErrorMessage(error)}</p>
+        <p className="mt-2 text-slate-500">{getErrorMessage(error)}</p>
       </div>
     );
   }
@@ -82,15 +82,15 @@ function AnimalDetailsPage() {
   if (!animal) {
     return (
       <div className="mx-auto max-w-3xl px-4 pb-16 pt-32 text-center">
-        <h1 className="text-2xl font-extrabold tracking-tight text-brand-950">
+        <h1 className="text-2xl font-extrabold tracking-tight text-emerald-950">
           Animal não encontrado
         </h1>
-        <p className="mt-2 text-ink-500">
+        <p className="mt-2 text-slate-500">
           Esse anúncio pode ter sido removido ou o link está incorreto.
         </p>
         <Link
           to="/animais"
-          className="mt-6 inline-block rounded-control bg-brand-700 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
+          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           Ver outros animais
         </Link>
@@ -167,34 +167,34 @@ function AnimalDetailsPage() {
         <div className="flex flex-col gap-6">
           <header>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-3xl font-black tracking-tight text-brand-950 sm:text-4xl">
+              <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
                 {animal.name}
               </h1>
               {isAdopted && (
-                <span className="flex items-center gap-1.5 rounded-full bg-accent-50 px-3 py-1 text-xs font-bold text-accent-800">
+                <span className="flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
                   <FaHouseChimney size={11} />
                   {isFemale ? "Adotada" : "Adotado"}
                 </span>
               )}
             </div>
-            <p className="mt-1 flex items-center gap-1.5 text-ink-500">
+            <p className="mt-1 flex items-center gap-1.5 text-slate-500">
               {animal.breed}
-              <span className="text-line-strong">·</span>
-              <FaLocationDot size={12} className="text-brand-600" />
+              <span className="text-slate-300">·</span>
+              <FaLocationDot size={12} className="text-emerald-600" />
               {animal.city}, {animal.state}
             </p>
           </header>
 
           <div className="flex flex-wrap gap-2.5">
-            <span className="flex items-center gap-2 rounded-full bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700">
+            <span className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
               <FaCakeCandles size={13} />
               {animal.ageLabel}
             </span>
-            <span className="flex items-center gap-2 rounded-full bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700">
+            <span className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
               {isFemale ? <FaVenus size={13} /> : <FaMars size={13} />}
               {isFemale ? "Fêmea" : "Macho"}
             </span>
-            <span className="flex items-center gap-2 rounded-full bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700">
+            <span className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
               <FaRulerVertical size={13} />
               Porte {SIZE_LABELS[animal.size]}
             </span>
@@ -203,11 +203,11 @@ function AnimalDetailsPage() {
           {animal.ownerId != null && (
             <Link
               to={`/perfil/publico/${animal.ownerId}`}
-              className="group flex items-center gap-3 rounded-card border border-line bg-white p-3.5 shadow-sm transition-all duration-300 hover:shadow-md hover:"
+              className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-emerald-950/5"
             >
               <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden bg-brand-600 text-sm font-black text-white ${
-                  isNgo ? "rounded-control" : "rounded-full"
+                className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden bg-emerald-700 text-sm font-black text-white ${
+                  isNgo ? "rounded-xl" : "rounded-full"
                 }`}
               >
                 {animal.ownerPhotoUrl ? (
@@ -221,17 +221,17 @@ function AnimalDetailsPage() {
                 )}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                   Anunciado por
                 </p>
-                <p className="flex items-center gap-1.5 truncate text-sm font-bold text-brand-950">
+                <p className="flex items-center gap-1.5 truncate text-sm font-bold text-emerald-950">
                   {ownerDisplayName}
                   {isNgo && (
-                    <FaShieldHalved size={12} className="shrink-0 text-accent-500" />
+                    <FaShieldHalved size={12} className="shrink-0 text-amber-500" />
                   )}
                 </p>
               </div>
-              <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-brand-600">
+              <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-emerald-700">
                 Ver perfil
                 <FaArrowRight
                   size={10}
@@ -245,10 +245,10 @@ function AnimalDetailsPage() {
           <BehaviorProfile animal={animal} />
 
           <div>
-            <h2 className="text-lg font-extrabold tracking-tight text-brand-950">
+            <h2 className="text-lg font-extrabold tracking-tight text-emerald-950">
               História
             </h2>
-            <p className="mt-2 leading-relaxed text-ink-600 break-words">
+            <p className="mt-2 leading-relaxed text-slate-600 break-words">
               {animal.story}
             </p>
           </div>
@@ -260,11 +260,11 @@ function AnimalDetailsPage() {
                 onStatusChanged={setSuccessMessage}
               />
             ) : myRequestStatus === "CONCLUDED" ? (
-              <div className="rounded-card bg-brand-50 px-5 py-4 text-center">
-                <p className="text-sm font-bold text-brand-800">
+              <div className="rounded-2xl bg-emerald-50 px-5 py-4 text-center">
+                <p className="text-sm font-bold text-emerald-900">
                   Você adotou {animal.name}! 🎉
                 </p>
-                <p className="mt-1 text-sm text-brand-700/80">
+                <p className="mt-1 text-sm text-emerald-800/80">
                   Que tal contar como foi a adoção avaliando o doador no chat?
                 </p>
               </div>
@@ -274,12 +274,12 @@ function AnimalDetailsPage() {
               // O admin modera, mas não adota: no lugar do pedido, a moderação.
               // Removido não muda mais; adotado fica como histórico (edita, não remove)
               animal.status === "REMOVED" ? null : (
-                <div className="flex flex-col gap-2 rounded-card border border-line bg-paper p-4">
-                  <p className="mb-1 text-xs font-bold uppercase tracking-wide text-ink-500">Moderação</p>
+                <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-wide text-slate-500">Moderação</p>
                   <Link
                     to={ADMIN_PATHS.animalEdit(animal.id)}
                     state={{ from: location.pathname }}
-                    className="flex w-full items-center justify-center gap-2 rounded-card border border-brand-200 bg-white py-3.5 text-sm font-bold text-brand-700 transition-all duration-300 hover:bg-brand-50"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white py-3.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
                   >
                     <FaPen size={12} />
                     Editar anúncio
@@ -302,47 +302,47 @@ function AnimalDetailsPage() {
                 </div>
               )
             ) : isAdopted ? (
-              <div className="rounded-card bg-accent-50 px-5 py-4 text-center">
-                <p className="text-sm font-bold text-accent-800">
+              <div className="rounded-2xl bg-amber-50 px-5 py-4 text-center">
+                <p className="text-sm font-bold text-amber-900">
                   {animal.name} já encontrou um lar!
                 </p>
-                <p className="mt-1 text-sm text-accent-800/80">
+                <p className="mt-1 text-sm text-amber-800/80">
                   Este anúncio não recebe mais pedidos de interesse.
                 </p>
                 <Link
                   to="/animais"
-                  className="mt-3 inline-block rounded-control bg-brand-700 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
+                  className="mt-3 inline-block rounded-full bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
                 >
                   Ver outros animais
                 </Link>
               </div>
             ) : !canRequest ? null : myRequestStatus ? (
               <div
-                className={`rounded-card px-5 py-4 text-center ${
-                  myRequestStatus === "REJECTED" ? "bg-sand" : "bg-brand-50"
+                className={`rounded-2xl px-5 py-4 text-center ${
+                  myRequestStatus === "REJECTED" ? "bg-slate-100" : "bg-emerald-50"
                 }`}
               >
-                <p className="flex items-center justify-center gap-2 text-sm font-bold text-brand-950">
-                  <FaCircleCheck size={14} className="text-brand-600" />
+                <p className="flex items-center justify-center gap-2 text-sm font-bold text-emerald-950">
+                  <FaCircleCheck size={14} className="text-emerald-600" />
                   {myRequestStatus === "REJECTED"
                     ? "O doador recusou o seu pedido"
                     : `Seu pedido: ${SENT_STATUS_META[myRequestStatus].label.toLowerCase()}`}
                 </p>
-                <p className="mt-1 text-sm text-ink-600">{SENT_STATUS_META[myRequestStatus].description}</p>
+                <p className="mt-1 text-sm text-slate-600">{SENT_STATUS_META[myRequestStatus].description}</p>
                 {myRequestStatus !== "REJECTED" && (
                   <div className="mt-3 flex flex-wrap justify-center gap-2">
                     {myRequestStatus !== "PENDING" && (
                       <button
                         type="button"
                         onClick={() => navigate("/chat", { state: { requestId: myRequest.id } })}
-                        className="rounded-control bg-brand-700 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
+                        className="rounded-full bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
                       >
                         Ir para o chat
                       </button>
                     )}
                     <Link
                       to="/meus-interesses"
-                      className="rounded-control border border-brand-200 px-5 py-2 text-sm font-bold text-brand-600 transition-all duration-300 hover:bg-white"
+                      className="rounded-full border border-emerald-200 px-5 py-2 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-white"
                     >
                       Acompanhar em Meus interesses
                     </Link>
@@ -357,14 +357,14 @@ function AnimalDetailsPage() {
                   type="button"
                   onClick={handleInterestClick}
                   disabled={isSending}
-                  className="flex w-full items-center justify-center gap-2 rounded-control bg-accent-400 py-4 text-base font-extrabold text-brand-950 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-accent-500 hover: disabled:pointer-events-none disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-4 text-base font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400 hover:shadow-amber-500/40 disabled:pointer-events-none disabled:opacity-60"
                 >
                   <FaHeart size={16} />
                   {isSending ? "Enviando..." : "Enviar Pedido de Interesse"}
                 </button>
 
                 {requestError && (
-                  <p role="alert" className="rounded-control bg-danger-50 px-4 py-2.5 text-center text-sm font-semibold text-danger-600">
+                  <p role="alert" className="rounded-xl bg-rose-50 px-4 py-2.5 text-center text-sm font-semibold text-rose-600">
                     {requestError}
                   </p>
                 )}

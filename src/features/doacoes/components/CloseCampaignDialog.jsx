@@ -22,7 +22,7 @@ function CloseCampaignDialog({ campaign, onClose, onClosed }) {
       title="Encerrar esta campanha?"
       description={
         <>
-          <strong className="text-brand-950">{campaign.title}</strong> para de receber doações agora, com{' '}
+          <strong className="text-emerald-950">{campaign.title}</strong> para de receber doações agora, com{' '}
           {formatCurrency(campaign.raisedAmount)} arrecadados. Ela continua visível como encerrada, e quem estiver com um
           PIX aberto terá o pagamento cancelado. Não dá para reabrir.
         </>

@@ -6,11 +6,11 @@ function ProfileReviewsList({ reviews, average, count, distribution }) {
   if (count === 0) {
     return (
       <div className="flex flex-col items-center gap-2 py-10 text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-50 text-accent-500">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-500">
           <FaStar size={18} />
         </span>
-        <p className="text-sm font-semibold text-ink-600">Ainda não há avaliações para este perfil.</p>
-        <p className="max-w-sm text-xs text-ink-500">
+        <p className="text-sm font-semibold text-slate-600">Ainda não há avaliações para este perfil.</p>
+        <p className="max-w-sm text-xs text-slate-400">
           As avaliações aparecem aqui depois que uma adoção é concluída na plataforma.
         </p>
       </div>
@@ -19,12 +19,12 @@ function ProfileReviewsList({ reviews, average, count, distribution }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-5 rounded-card bg-brand-50/70 p-5 sm:flex-row sm:items-center sm:gap-8">
+      <div className="flex flex-col gap-5 rounded-2xl bg-emerald-50/70 p-5 sm:flex-row sm:items-center sm:gap-8">
         <div className="flex items-center gap-4 sm:flex-col sm:gap-1 sm:text-center">
-          <span className="text-5xl font-black text-brand-800">{average.toFixed(1).replace('.', ',')}</span>
+          <span className="text-5xl font-black text-emerald-900">{average.toFixed(1).replace('.', ',')}</span>
           <div className="flex flex-col gap-1 sm:items-center">
             <RatingStars value={Math.round(average)} size={16} />
-            <p className="text-xs font-semibold text-brand-600">
+            <p className="text-xs font-semibold text-emerald-700">
               {count} {count === 1 ? 'avaliação' : 'avaliações'}
             </p>
           </div>
@@ -32,18 +32,18 @@ function ProfileReviewsList({ reviews, average, count, distribution }) {
 
         <ul className="flex flex-1 flex-col gap-1.5" aria-label="Distribuição das notas">
           {distribution.map(({ stars, count: starCount }) => (
-            <li key={stars} className="flex items-center gap-3 text-xs font-semibold text-brand-700">
+            <li key={stars} className="flex items-center gap-3 text-xs font-semibold text-emerald-800">
               <span className="flex w-7 shrink-0 items-center gap-1">
                 {stars}
-                <FaStar size={10} className="text-accent-400" />
+                <FaStar size={10} className="text-amber-400" />
               </span>
               <span className="h-2 flex-1 overflow-hidden rounded-full bg-white">
                 <span
-                  className="block h-full rounded-full bg-accent-400 transition-all duration-500"
+                  className="block h-full rounded-full bg-amber-400 transition-all duration-500"
                   style={{ width: `${(starCount / count) * 100}%` }}
                 />
               </span>
-              <span className="w-5 shrink-0 text-right text-brand-600">{starCount}</span>
+              <span className="w-5 shrink-0 text-right text-emerald-700">{starCount}</span>
             </li>
           ))}
         </ul>
