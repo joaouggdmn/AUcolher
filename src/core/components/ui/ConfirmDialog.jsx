@@ -3,12 +3,12 @@ import { FaCircleQuestion } from 'react-icons/fa6'
 
 const VARIANTS = {
   default: {
-    icon: 'bg-accent-50 text-accent-500',
-    confirm: 'bg-brand-700 hover:bg-brand-800',
+    icon: 'bg-amber-50 text-amber-500',
+    confirm: 'bg-emerald-800 hover:bg-emerald-900',
   },
   danger: {
-    icon: 'bg-danger-50 text-danger-600',
-    confirm: 'bg-danger-600 hover:bg-danger-700',
+    icon: 'bg-rose-50 text-rose-500',
+    confirm: 'bg-rose-600 hover:bg-rose-700',
   },
 }
 
@@ -39,13 +39,13 @@ function ConfirmDialog({
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-brand-950/60 backdrop-blur-sm" onClick={handleCancel} aria-hidden="true" />
+      <div className="absolute inset-0 bg-emerald-950/60 backdrop-blur-sm" onClick={handleCancel} aria-hidden="true" />
 
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
-        className="relative z-10 w-full max-w-sm animate-fade-slide-in rounded-modal bg-white p-6 shadow-modal sm:p-8"
+        className="relative z-10 w-full max-w-sm animate-fade-slide-in rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
       >
         <div className="flex flex-col items-center gap-4 text-center">
           <span className={`flex h-14 w-14 items-center justify-center rounded-full ${styles.icon}`}>
@@ -53,14 +53,14 @@ function ConfirmDialog({
           </span>
 
           <div>
-            <h3 id="confirm-dialog-title" className="text-lg font-extrabold tracking-tight text-brand-950">
+            <h3 id="confirm-dialog-title" className="text-lg font-extrabold tracking-tight text-emerald-950">
               {title}
             </h3>
-            <div className="mt-1.5 text-sm text-ink-500">{description}</div>
+            <div className="mt-1.5 text-sm text-slate-500">{description}</div>
           </div>
 
           {error && (
-            <p role="alert" className="w-full rounded-control bg-danger-50 px-4 py-3 text-sm font-medium text-danger-700">
+            <p role="alert" className="w-full rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
               {error}
             </p>
           )}
@@ -70,7 +70,7 @@ function ConfirmDialog({
               type="button"
               onClick={onConfirm}
               disabled={isProcessing || confirmDisabled}
-              className={`flex items-center justify-center gap-2 rounded-control py-3 text-sm font-bold text-white transition-colors duration-200 disabled:opacity-70 ${
+              className={`flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition-all duration-300 disabled:opacity-70 ${
                 isProcessing ? 'disabled:cursor-wait' : 'disabled:cursor-not-allowed'
               } ${styles.confirm}`}
             >
@@ -81,7 +81,7 @@ function ConfirmDialog({
               type="button"
               onClick={handleCancel}
               disabled={isProcessing}
-              className="rounded-control py-3 text-sm font-semibold text-ink-600 transition-colors duration-200 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl py-3 text-sm font-semibold text-slate-500 transition-colors duration-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {cancelLabel}
             </button>

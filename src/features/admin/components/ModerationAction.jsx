@@ -6,16 +6,16 @@ const APPEARANCES = {
   // Bloco de ação das páginas de detalhe (anúncio, evento, campanha)
   block: {
     danger:
-      'flex w-full items-center justify-center gap-2 rounded-card border border-danger-600/30 bg-white py-3.5 text-sm font-bold text-danger-600 transition-all duration-300 hover:bg-danger-50',
+      'flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-white py-3.5 text-sm font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50',
     default:
-      'flex w-full items-center justify-center gap-2 rounded-card border border-brand-200 bg-white py-3.5 text-sm font-bold text-brand-700 transition-all duration-300 hover:bg-brand-50',
+      'flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white py-3.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50',
   },
   // Ao lado das redes sociais, no cabeçalho do perfil (como o "Denunciar")
   pill: {
     danger:
-      'flex h-10 items-center gap-2 rounded-full border border-danger-600/30 px-4 text-xs font-bold text-danger-600 transition-all duration-300 hover:bg-danger-50',
+      'flex h-10 items-center gap-2 rounded-full border border-rose-200 px-4 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50',
     default:
-      'flex h-10 items-center gap-2 rounded-full border border-brand-200 px-4 text-xs font-bold text-brand-700 transition-all duration-300 hover:bg-brand-50',
+      'flex h-10 items-center gap-2 rounded-full border border-emerald-200 px-4 text-xs font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50',
   },
 }
 

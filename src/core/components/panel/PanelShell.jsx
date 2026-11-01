@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { FiMenu } from 'react-icons/fi'
 import SuccessToast from '../ui/SuccessToast'
 import PanelNav from './PanelNav'
-import Logo from '../ui/Logo'
 
 // Tela própria dos painéis (ONG e admin), como o chat: sem a navbar do site.
 // A barra lateral (`nav`, as props do PanelNav) fica fixa no desktop; no
@@ -47,7 +46,7 @@ function PanelShell({ title, nav, context }) {
     // --fixed-left-offset: largura da barra lateral, para barras fixas das páginas não passarem por cima.
     // Na impressão (PDF) sai só o conteúdo, em altura livre: sem barra lateral,
     // cabeçalho do celular nem a rolagem própria da área principal
-    <div className="flex h-screen overflow-hidden bg-paper lg:[--fixed-left-offset:16rem] print:block print:h-auto print:overflow-visible print:bg-white">
+    <div className="flex h-screen overflow-hidden bg-slate-50 lg:[--fixed-left-offset:16rem] print:block print:h-auto print:overflow-visible print:bg-white">
       <aside className="hidden w-64 shrink-0 lg:flex print:hidden">
         <PanelNav {...nav} />
       </aside>
@@ -56,7 +55,7 @@ function PanelShell({ title, nav, context }) {
         <div
           aria-hidden="true"
           onClick={closeDrawer}
-          className={`absolute inset-0 bg-brand-950/40 backdrop-blur-[2px] transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px] transition-opacity duration-300 ${
             isDrawerOpen ? 'opacity-100' : 'opacity-0'
           }`}
         />
@@ -64,7 +63,7 @@ function PanelShell({ title, nav, context }) {
           role="dialog"
           aria-modal="true"
           aria-label="Menu do painel"
-          className={`absolute inset-y-0 left-0 flex w-[min(18rem,calc(100vw-3rem))] shadow-modal transition-transform duration-300 ease-out ${
+          className={`absolute inset-y-0 left-0 flex w-[min(18rem,calc(100vw-3rem))] shadow-2xl shadow-emerald-950/30 transition-transform duration-300 ease-out ${
             isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
@@ -73,18 +72,21 @@ function PanelShell({ title, nav, context }) {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line bg-white px-3 lg:hidden print:hidden">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-100 bg-white px-3 lg:hidden print:hidden">
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
             aria-expanded={isDrawerOpen}
             aria-label="Abrir menu do painel"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-brand-800 transition-colors duration-200 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-emerald-900 transition-colors duration-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             <FiMenu size={21} />
           </button>
-          <Logo to={nav.homePath} className="text-lg" />
-          <span className="text-sm font-semibold text-ink-500">{title}</span>
+          <Link to={nav.homePath} className="text-lg font-black tracking-tight">
+            <span className="text-emerald-950">AU</span>
+            <span className="text-amber-500">colher</span>
+          </Link>
+          <span className="text-sm font-semibold text-slate-400">{title}</span>
         </header>
 
         <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto print:overflow-visible">

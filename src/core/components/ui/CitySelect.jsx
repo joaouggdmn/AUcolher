@@ -2,7 +2,7 @@ import { useCities } from '../../hooks/useCities'
 import { normalizeSearch } from '../../utils/search'
 
 const SELECT_CLASS =
-  'min-h-12 w-full rounded-control border border-line-strong bg-white px-4 text-sm text-ink-900 outline-none transition-colors duration-200 focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 disabled:cursor-not-allowed disabled:bg-paper disabled:text-ink-500'
+  'min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all duration-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400'
 
 // Cidade escolhida na lista do IBGE da UF, com a grafia oficial: o mesmo
 // município nunca aparece escrito de dois jeitos ("Criciuma" e "Criciúma")
@@ -18,7 +18,7 @@ function CitySelect({ id, state, city, onChange, required = false, label = 'Cida
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-semibold text-ink-700">
+      <label htmlFor={id} className="text-sm font-semibold text-slate-700">
         {label}
       </label>
 
@@ -32,7 +32,7 @@ function CitySelect({ id, state, city, onChange, required = false, label = 'Cida
             required={required}
             className={SELECT_CLASS}
           />
-          <p className="text-xs text-ink-500">Não conseguimos carregar a lista de cidades agora.</p>
+          <p className="text-xs text-slate-500">Não conseguimos carregar a lista de cidades agora.</p>
         </>
       ) : (
         <select

@@ -5,61 +5,18 @@
 
 /* Fonte única na plataforma inteira: o contraste entre logo, títulos e corpo
    vem só do peso (font-normal → font-black) e do tracking, nunca de uma
-   segunda família tipográfica.
-   Tokens da marca: as cores viram classes como bg-brand-700, text-ink-600,
-   border-line. Contraste conferido (WCAG AA) sobre paper e branco: ink-500
-   é o mais claro permitido para texto; accent-600 só passa em texto grande */
+   segunda família tipográfica */
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+}
 
-  /* Verde: ações principais, links e títulos */
-  --color-brand-50: #eaf4ee;
-  --color-brand-100: #d3e8dc;
-  --color-brand-200: #a6d0b9;
-  --color-brand-400: #4f9c77;
-  --color-brand-600: #1d7a55;
-  --color-brand-700: #166048;
-  --color-brand-800: #114d3a;
-  --color-brand-950: #0a2a20;
-
-  /* Âmbar: reservado ao AUmatch e ao selo de ONG verificada */
-  --color-accent-50: #fef6e4;
-  --color-accent-200: #f9d98f;
-  --color-accent-300: #f7c866;
-  --color-accent-400: #f2b23a;
-  --color-accent-500: #e39f22;
-  --color-accent-600: #b86e0c;
-  --color-accent-700: #94570a;
-  --color-accent-800: #7a4708;
-
-  /* Neutro quente no lugar de slate/gray */
-  --color-paper: #faf6ef;
-  --color-sand: #f1ebe1;
-  --color-surface: #ffffff;
-  --color-line: #e6ddd0;
-  --color-line-strong: #9c9184;
-  --color-ink-500: #746a5e;
-  --color-ink-600: #5e554a;
-  --color-ink-700: #4a4238;
-  --color-ink-900: #231e18;
-
-  /* Erro e ações destrutivas; sucesso usa o próprio brand */
-  --color-danger-50: #fcedea;
-  --color-danger-600: #b3261e;
-  --color-danger-700: #8f1f18;
-
-  /* Raio por papel (nomes próprios para não mudar os rounded-* atuais):
-     rounded-tag, rounded-control (botão/campo), rounded-card, rounded-modal.
-     rounded-full fica para avatar, chip e selo */
-  --radius-tag: 6px;
-  --radius-control: 10px;
-  --radius-card: 16px;
-  --radius-modal: 22px;
-
-  /* Sombra só no que flutua, sempre no tom do ink. Card em repouso: só borda */
-  --shadow-raised: 0 1px 2px rgb(35 30 24 / 0.06);
-  --shadow-float: 0 10px 28px -14px rgb(35 30 24 / 0.22);
-  --shadow-modal: 0 28px 56px -20px rgb(35 30 24 / 0.32);
+/* Customizações globais. Dentro de @layer base: fora de camada, esta regra
+   venceria as classes transition-* e duration-* de todos os elementos e
+   desligaria as animações de deslizar, crescer e aparecer */
+@layer base {
+  * {
+    @apply transition-colors duration-200;
+  }
 }
 
 html {
@@ -67,7 +24,7 @@ html {
 }
 
 body {
-  @apply bg-white text-ink-900 font-sans;
+  @apply bg-white text-gray-900 font-sans;
 }
 
 @keyframes float {
@@ -101,12 +58,8 @@ body {
   }
 }
 
-/* Chama atenção três vezes ao abrir a página e para; sem movimento para
-   quem pediu redução de animação */
-@media (prefers-reduced-motion: no-preference) {
-  .animate-glow {
-    animation: glow 2.5s ease-in-out 3;
-  }
+.animate-glow {
+  animation: glow 2.5s ease-in-out infinite;
 }
 
 @keyframes fade-slide-in {

@@ -21,7 +21,7 @@ function StackedBar({ segments }) {
                 tabIndex={0}
                 aria-label={`${segment.label}: ${segment.value} (${share})`}
                 style={{ flexGrow: segment.value }}
-                className={`group relative min-w-1 basis-0 outline-none transition-[filter] duration-150 first:rounded-l last:rounded-r hover:brightness-110 focus-visible:ring-2 focus-visible:ring-brand-950/30 ${segment.colorClass}`}
+                className={`group relative min-w-1 basis-0 outline-none transition-[filter] duration-150 first:rounded-l last:rounded-r hover:brightness-110 focus-visible:ring-2 focus-visible:ring-emerald-950/30 ${segment.colorClass}`}
               >
                 <ChartTooltip value={`${segment.value} · ${share}`} label={segment.label} align={align} />
               </div>
@@ -31,10 +31,10 @@ function StackedBar({ segments }) {
 
       <ul className="flex flex-wrap gap-x-4 gap-y-1.5">
         {segments.map((segment) => (
-          <li key={segment.key} className="flex items-center gap-1.5 text-xs text-ink-600">
+          <li key={segment.key} className="flex items-center gap-1.5 text-xs text-slate-600">
             <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-sm ${segment.colorClass}`} />
             {segment.label}
-            <span className={`font-bold ${segment.value > 0 ? 'text-brand-950' : 'text-ink-500'}`}>{segment.value}</span>
+            <span className={`font-bold ${segment.value > 0 ? 'text-emerald-950' : 'text-slate-400'}`}>{segment.value}</span>
           </li>
         ))}
       </ul>

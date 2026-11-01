@@ -69,10 +69,14 @@ function PetCard({ pet }) {
 
         <Link
           to={`/animais/${pet.id}`}
-          className="mt-auto flex items-center justify-center gap-2 rounded-control bg-brand-50 py-2.5 text-sm font-bold text-brand-700 transition-colors duration-200 after:absolute after:inset-0 after:content-[''] group-hover:bg-brand-700 group-hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+          className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-emerald-50 py-2.5 text-sm font-bold text-emerald-800 transition-colors duration-300 after:absolute after:inset-0 after:content-[''] group-hover:bg-emerald-800 group-hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
         >
           Conhecer<span className="sr-only"> {pet.name}</span>
-          <FaArrowRight aria-hidden="true" size={12} />
+          <FaArrowRight
+            aria-hidden="true"
+            size={12}
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          />
         </Link>
       </div>
     </article>

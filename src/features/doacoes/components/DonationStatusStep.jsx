@@ -30,16 +30,16 @@ function CopyPixCode({ code }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wide text-ink-500">PIX copia e cola</span>
-      <div className="flex items-center gap-2 rounded-control border border-line bg-paper p-2 pl-4">
-        <span className="flex-1 truncate font-mono text-xs text-ink-600" title={code}>
+      <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">PIX copia e cola</span>
+      <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2 pl-4">
+        <span className="flex-1 truncate font-mono text-xs text-slate-600" title={code}>
           {code}
         </span>
         <button
           type="button"
           onClick={handleCopy}
-          className={`flex shrink-0 items-center gap-1.5 rounded-control px-3 py-2 text-xs font-bold transition-all duration-300 ${
-            isCopied ? 'bg-brand-600 text-white' : 'bg-brand-50 text-brand-700 hover:bg-brand-700 hover:text-white'
+          className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all duration-300 ${
+            isCopied ? 'bg-emerald-700 text-white' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-800 hover:text-white'
           }`}
         >
           {isCopied ? <FaCheck size={12} /> : <FaRegCopy size={12} />}
@@ -59,11 +59,11 @@ function PendingPix({ donation }) {
   return (
     <div className="mt-6 flex flex-col gap-5">
       <div className="text-center">
-        <p className="text-sm text-ink-500">Valor da doação</p>
-        <p className="text-2xl font-black text-brand-950">{formatCurrency(donation.amount)}</p>
+        <p className="text-sm text-slate-500">Valor da doação</p>
+        <p className="text-2xl font-black text-emerald-950">{formatCurrency(donation.amount)}</p>
       </div>
 
-      <div className="mx-auto rounded-card border border-line bg-white p-3 shadow-sm">
+      <div className="mx-auto rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
         {donation.pix.qrCodeBase64 ? (
           <img
             src={`data:image/png;base64,${donation.pix.qrCodeBase64}`}
@@ -77,7 +77,7 @@ function PendingPix({ donation }) {
 
       <CopyPixCode code={donation.pix.qrCode} />
 
-      <div className="flex items-center justify-center gap-2 rounded-control bg-accent-50 px-4 py-3 text-sm font-semibold text-accent-800">
+      <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
         <FaSpinner size={13} className="animate-spin" />
         {secondsLeft > 0 ? (
           <span>
@@ -88,7 +88,7 @@ function PendingPix({ donation }) {
         )}
       </div>
 
-      <p className="text-center text-xs text-ink-500">
+      <p className="text-center text-xs text-slate-400">
         Abra o app do seu banco, escolha pagar com PIX e escaneie o QR ou cole o código. Esta janela atualiza sozinha.
       </p>
     </div>
@@ -97,9 +97,9 @@ function PendingPix({ donation }) {
 
 function ResultState({ icon: Icon, tone, title, message, children }) {
   const tones = {
-    success: 'bg-brand-50 text-brand-600',
-    warning: 'bg-accent-50 text-accent-600',
-    neutral: 'bg-sand text-ink-500',
+    success: 'bg-emerald-50 text-emerald-600',
+    warning: 'bg-amber-50 text-amber-600',
+    neutral: 'bg-slate-100 text-slate-500',
   }
 
   return (
@@ -108,8 +108,8 @@ function ResultState({ icon: Icon, tone, title, message, children }) {
         <Icon size={26} />
       </span>
       <div>
-        <h4 className="text-lg font-extrabold tracking-tight text-brand-950">{title}</h4>
-        <p className="mt-1 text-sm text-ink-500">{message}</p>
+        <h4 className="text-lg font-extrabold tracking-tight text-emerald-950">{title}</h4>
+        <p className="mt-1 text-sm text-slate-500">{message}</p>
       </div>
       <div className="mt-1 flex w-full flex-col gap-2">{children}</div>
     </div>
@@ -117,9 +117,9 @@ function ResultState({ icon: Icon, tone, title, message, children }) {
 }
 
 const primaryButton =
-  'rounded-control bg-brand-700 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800'
+  'rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900'
 const secondaryButton =
-  'rounded-control py-3 text-sm font-semibold text-ink-500 transition-colors duration-300 hover:bg-paper'
+  'rounded-xl py-3 text-sm font-semibold text-slate-500 transition-colors duration-300 hover:bg-slate-50'
 
 // Passo 2 do modal: acompanha a doação até um status final. O polling de
 // useDonation para sozinho quando sai de PENDING
@@ -162,8 +162,8 @@ function DonationStatusStep({ donationId, onRetry, onClose }) {
         title="Doação confirmada!"
         message={`Recebemos seus ${formatCurrency(donation.amount)}. Obrigado por ajudar a ${donation.campaign.ngoName || 'ONG'}!`}
       >
-        <p className="flex items-center justify-center gap-2 text-sm text-ink-500">
-          <FaHeart size={13} className="text-danger-600" />
+        <p className="flex items-center justify-center gap-2 text-sm text-slate-500">
+          <FaHeart size={13} className="text-rose-500" />
           A doação já aparece em "Meu impacto", na sua conta.
         </p>
         <button type="button" onClick={onClose} className={primaryButton}>

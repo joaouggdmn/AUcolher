@@ -6,10 +6,10 @@ import { LuSparkles } from 'react-icons/lu'
 // esmeralda e branco — é isso que mantém a hierarquia legível
 const VARIANTS = {
   amber:
-    'bg-accent-400 font-extrabold text-brand-950 hover:bg-accent-500',
-  outline: 'border border-line-strong bg-white font-bold text-brand-700 hover:border-brand-700 hover:bg-brand-50',
+    'bg-gradient-to-r from-amber-400 to-amber-500 font-extrabold text-emerald-950 shadow-lg shadow-amber-500/25 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400',
+  outline: 'border border-slate-300 bg-white font-bold text-emerald-900 hover:border-emerald-700 hover:bg-emerald-50',
   outlineDark: 'border border-white/30 font-bold text-white hover:border-white/60 hover:bg-white/10',
-  emerald: 'bg-brand-700 font-bold text-white hover:bg-brand-800',
+  emerald: 'bg-emerald-800 font-bold text-white shadow-lg shadow-emerald-900/15 hover:bg-emerald-900',
 }
 
 // Padding menor no mobile: com o respiro do card escuro, "Começar meu
@@ -28,27 +28,27 @@ function ActionLink({ action, variant = 'amber', size = 'lg', icon, showArrow = 
     <Link
       to={action.to}
       state={action.state}
-      className={`group inline-flex w-full items-center justify-center gap-2.5 rounded-control text-center leading-tight transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 sm:w-auto ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`group inline-flex w-full items-center justify-center gap-2.5 rounded-full text-center leading-tight transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 sm:w-auto ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
     >
       {Icon && (
-        <Icon aria-hidden="true" size={17} className="shrink-0" />
+        <Icon aria-hidden="true" size={17} className="shrink-0 transition-transform duration-300 group-hover:rotate-12" />
       )}
       {action.label}
       {action.badge > 0 && (
-        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-danger-600 px-1.5 text-[11px] font-bold text-white">
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[11px] font-bold text-white">
           {action.badge > 9 ? '9+' : action.badge}
           <span className="sr-only"> {action.badge === 1 ? 'novo' : 'novos'}</span>
         </span>
       )}
       {showArrow && (
-        <FaArrowRight aria-hidden="true" size={14} className="shrink-0" />
+        <FaArrowRight aria-hidden="true" size={14} className="shrink-0 transition-transform duration-300 group-hover:translate-x-0.5" />
       )}
     </Link>
   )
 }
 
 export function ActionSkeleton({ className = '' }) {
-  return <div aria-hidden="true" className={`h-12 w-56 rounded-control bg-line/70 motion-safe:animate-pulse sm:h-14 ${className}`} />
+  return <div aria-hidden="true" className={`h-12 w-56 rounded-full bg-slate-200/70 motion-safe:animate-pulse sm:h-14 ${className}`} />
 }
 
 export default ActionLink
