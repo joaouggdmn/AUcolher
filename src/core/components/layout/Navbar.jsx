@@ -12,6 +12,7 @@ import { useChatUnread } from '../../hooks/useChatUnread'
 import { getPanelLink } from '../../utils/panelLinks'
 import UserAvatarMenu from './UserAvatarMenu'
 import PlatformSidebar from './PlatformSidebar'
+import Logo from '../ui/Logo'
 
 const NAV_LINKS = [
   { label: 'Início', to: '/' },
@@ -87,12 +88,7 @@ function Navbar() {
               </button>
             )}
 
-            <Link to="/" className="flex items-center text-2xl font-black tracking-tight">
-              <span className={`transition-colors duration-300 ${isScrolled ? 'text-white' : 'text-emerald-900'}`}>
-                AU
-              </span>
-              <span className="text-amber-500">colher</span>
-            </Link>
+            <Logo tone={isScrolled ? 'light' : 'dark'} />
           </div>
 
           <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 whitespace-nowrap md:flex">
