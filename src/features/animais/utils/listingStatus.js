@@ -10,13 +10,9 @@ export const LISTING_STATUS_META = {
   REMOVED: { label: 'Removido pela moderação', className: 'bg-rose-50 text-rose-600' },
 }
 
-// Pedido sobre este animal da API — ids do AnimalContext antigo se repetem
+// Pedido sobre este animal
 function isRequestFor(request, animal) {
-  return (
-    request.animalSource === 'api' &&
-    isSameId(request.animalId, animal.id) &&
-    isSameId(request.ownerId, animal.ownerId)
-  )
+  return isSameId(request.animalId, animal.id) && isSameId(request.ownerId, animal.ownerId)
 }
 
 // Status do anúncio do ponto de vista do dono: "em processo" quando já
@@ -25,11 +21,6 @@ function isRequestFor(request, animal) {
 function deriveListingStatus(animal, statuses) {
   // Removido pelo admin é definitivo e vale mais que qualquer pedido
   if (animal.status === 'REMOVED') return 'REMOVED'
-  // Voltou para o doador (RETURNED) sem adoção nova: o anúncio fica fora do
-  // ar. A API já devolve o animal INACTIVE; no mock do reabandono ele ainda
-  // vem ADOPTED, e só a tela mostra a volta
-  const returned = statuses.includes('RETURNED') && !statuses.includes('CONCLUDED') && !statuses.includes('REHOMED')
-  if (animal.status === 'ADOPTED' && returned) return 'INACTIVE'
   if (animal.status === 'ADOPTED' || statuses.includes('CONCLUDED')) return 'ADOPTED'
   if (animal.status === 'INACTIVE') return 'INACTIVE'
   return statuses.some((status) => IN_PROGRESS_STATUSES.includes(status)) ? 'IN_PROGRESS' : 'AVAILABLE'

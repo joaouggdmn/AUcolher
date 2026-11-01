@@ -53,7 +53,6 @@ export function toFrontendRequest(dto) {
     closedAt: dto.closedAt,
     cancelReason: dto.cancelReason,
     cancelledFromStatus: dto.cancelledFromStatus,
-    animalSource: 'api',
     animal: toFrontendAnimal(dto.animal),
     adopter: toFrontendAdopter(dto.adopter),
     matchScore: dto.matchScore,
@@ -69,8 +68,7 @@ export function toFrontendRequest(dto) {
 }
 
 // ---------- operações ----------
-// Devolvem os pedidos como o servidor guarda; a camada de moderação fica
-// para quem mostra (AdoptionRequestProvider)
+// Devolvem os pedidos como o servidor guarda
 
 export async function listSentRequests() {
   return (await adocaoApi.listSent()).map(toFrontendRequest)

@@ -30,7 +30,7 @@ function startOfDay(date) {
   return d
 }
 
-// Calcula o período em relação a "hoje" real (new Date()) — funciona com qualquer data mockada
+// Calcula o período em relação a "hoje" real (new Date())
 export function matchesPeriod(dateStr, period) {
   const eventDate = startOfDay(new Date(`${dateStr}T00:00:00`))
   const today = startOfDay(new Date())

@@ -1,6 +1,6 @@
 // Redimensiona e recomprime uma imagem no navegador, devolvendo um data URL
-// JPEG leve. Fotos de celular em base64 passam fácil de 5 MB — o limite
-// inteiro do localStorage que usamos como banco mockado
+// JPEG leve. Fotos de celular em base64 passam fácil de 5 MB — pesado demais
+// para ir no JSON da API
 export function compressImage(file, { maxSize = 800, quality = 0.7 } = {}) {
   return new Promise((resolve, reject) => {
     const objectUrl = URL.createObjectURL(file)

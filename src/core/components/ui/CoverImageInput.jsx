@@ -4,7 +4,7 @@ import { compressImage } from '../../utils/compressImage'
 
 // Imagem de capa (evento, campanha, banner da ONG). 🔴 Vai como data URL no
 // JSON, como a foto de perfil: reduzida a `maxSize` px (~1000 por padrão)
-// para caber no limite da API (`maxLength`) e no localStorage do mock. Com
+// para caber no limite da API (`maxLength`). Com
 // upload próprio, o backend passaria a guardar só a URL pública
 function CoverImageInput({
   id,

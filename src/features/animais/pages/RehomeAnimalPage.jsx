@@ -5,8 +5,7 @@ import { FaArrowLeft } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useAuth } from '../../../core/context/AuthContext'
-import { mockHttpError } from '../../../core/services/mock/mockStore'
-import { getErrorMessage } from '../../../core/utils/apiError'
+import { getErrorMessage, validationError } from '../../../core/utils/apiError'
 import { isSameId } from '../../../core/utils/ids'
 import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../core/components/ui/Spinner'
@@ -54,7 +53,7 @@ function RehomeForm({ request, draft, reasonFields }) {
     onSubmit: (formData, photos) => {
       // O motivo fica no topo da página, fora das etapas do formulário
       if (!isReturnReasonValid(reasonFields)) {
-        throw mockHttpError(400, 'Escolha o motivo do repasse, no começo da página.')
+        throw validationError('Escolha o motivo do repasse, no começo da página.')
       }
       return rehome(request.id, { ...reasonFields, form: formData, photos })
     },
