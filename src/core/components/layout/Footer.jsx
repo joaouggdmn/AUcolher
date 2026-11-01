@@ -13,7 +13,6 @@ import {
 } from 'react-icons/fa6'
 import { LuCompass, LuLifeBuoy } from 'react-icons/lu'
 import HowToReportDialog from '../../../features/denuncias/components/HowToReportDialog'
-import Logo from '../ui/Logo'
 
 const quickLinks = [
   { label: 'Buscar pets', to: '/animais', icon: FaMagnifyingGlass },
@@ -46,7 +45,10 @@ function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           {/* Coluna 1: Marca */}
           <div className="flex flex-col gap-4 sm:col-span-2 lg:col-span-2">
-            <Logo tone="light" />
+            <Link to="/" className="flex items-center text-2xl font-black tracking-tight">
+              <span className="text-white">AU</span>
+              <span className="text-amber-400">colher</span>
+            </Link>
 
             <p className="max-w-xs text-sm leading-relaxed text-emerald-200/80">
               Conectamos corações e patas. Cada adoção começa com um match
