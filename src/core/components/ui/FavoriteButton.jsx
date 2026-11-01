@@ -49,10 +49,10 @@ function FavoriteButton({ animalId, animalName, className = '', iconSize = 15 })
         aria-pressed={isFavorited}
         aria-label={label}
         title={label}
-        className={`flex items-center justify-center rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 ${
+        className={`flex items-center justify-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-600 focus-visible:ring-offset-2 ${
           isFavorited
-            ? 'bg-white text-rose-500 shadow-md shadow-rose-500/20'
-            : 'bg-white/90 text-slate-400 hover:text-rose-500'
+            ? 'bg-white text-danger-600 shadow-raised'
+            : 'bg-white/90 text-ink-500 hover:text-danger-600'
         } ${className}`}
       >
         {isFavorited ? <FaHeart size={iconSize} /> : <FaRegHeart size={iconSize} />}
