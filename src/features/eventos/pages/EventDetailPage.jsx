@@ -35,18 +35,18 @@ import { buildMapsUrl, formatEventAddress, getAttendanceSummary } from '../utils
 import { PANEL_PATHS } from '../../ong/panel/panelPaths'
 
 const SUMMARY_TONES = {
-  neutral: 'text-slate-600',
-  few: 'text-amber-600',
-  full: 'text-rose-600',
+  neutral: 'text-ink-600',
+  few: 'text-accent-600',
+  full: 'text-danger-600',
 }
 
 function InfoRow({ icon: Icon, children }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-brand-50 text-brand-600">
         <Icon size={14} />
       </span>
-      <div className="min-w-0 pt-1.5 text-sm text-slate-600">{children}</div>
+      <div className="min-w-0 pt-1.5 text-sm text-ink-600">{children}</div>
     </div>
   )
 }
@@ -55,9 +55,9 @@ function OrganizerCard({ organizer }) {
   return (
     <Link
       to={`/ong/${organizer.id}`}
-      className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-emerald-950/5"
+      className="group flex items-center gap-3 rounded-card border border-line bg-white p-3.5 shadow-sm transition-all duration-300 hover:shadow-md hover:"
     >
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-700 text-sm font-black text-white">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-control bg-brand-600 text-sm font-black text-white">
         {organizer.photoUrl ? (
           <img src={organizer.photoUrl} alt={organizer.name} className="h-full w-full object-cover" />
         ) : (
@@ -65,15 +65,15 @@ function OrganizerCard({ organizer }) {
         )}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Organizado por</p>
-        <p className="truncate text-sm font-bold text-emerald-950">{organizer.name}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-500">Organizado por</p>
+        <p className="truncate text-sm font-bold text-brand-950">{organizer.name}</p>
         {organizer.isVerified && (
           <div className="mt-1">
             <VerifiedBadge size="sm" />
           </div>
         )}
       </div>
-      <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-emerald-700">
+      <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-brand-600">
         Ver perfil
         <FaArrowRight size={10} className="transition-transform duration-300 group-hover:translate-x-0.5" />
       </span>
@@ -128,7 +128,7 @@ function EventDetailPage() {
     <div className="mx-auto max-w-6xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
       <Link
         to="/eventos"
-        className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-emerald-800 transition-colors duration-300 hover:text-emerald-600"
+        className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-brand-700 transition-colors duration-300 hover:text-brand-600"
       >
         <FaArrowLeft size={12} />
         Todos os eventos
@@ -137,7 +137,7 @@ function EventDetailPage() {
       {/* Só a ONG dona e o admin sabem que a moderação editou o evento */}
       {(isOwner || isAdmin) && <ModeratedNote moderatedAt={event.moderatedAt} size="md" className="mb-6" />}
 
-      <div className="relative h-56 overflow-hidden rounded-3xl shadow-lg shadow-emerald-950/10 sm:h-80">
+      <div className="relative h-56 overflow-hidden rounded-card shadow-lg sm:h-80">
         <EventCover event={event} />
         <div className="absolute left-5 top-5">
           <CalendarDateBadge date={event.date} size="lg" />
@@ -153,30 +153,30 @@ function EventDetailPage() {
                 {categoria.label}
               </span>
               {event.isPast && (
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                <span className="rounded-full bg-sand px-3 py-1 text-xs font-bold text-ink-500">
                   Evento encerrado
                 </span>
               )}
             </div>
-            <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">{event.title}</h1>
+            <h1 className="text-3xl font-black tracking-tight text-brand-950 sm:text-4xl">{event.title}</h1>
           </header>
 
           <section>
-            <h2 className="text-lg font-extrabold tracking-tight text-emerald-950">Sobre o evento</h2>
-            <p className="mt-2 whitespace-pre-line break-words leading-relaxed text-slate-600">{event.description}</p>
+            <h2 className="text-lg font-extrabold tracking-tight text-brand-950">Sobre o evento</h2>
+            <p className="mt-2 whitespace-pre-line break-words leading-relaxed text-ink-600">{event.description}</p>
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="text-lg font-extrabold tracking-tight text-emerald-950">Local</h2>
-            <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-              <p className="font-bold text-emerald-950">{event.location.venue}</p>
-              <p className="mt-1 text-sm text-slate-600">{address}</p>
-              {event.location.cep && <p className="mt-0.5 text-sm text-slate-400">CEP {event.location.cep}</p>}
+            <h2 className="text-lg font-extrabold tracking-tight text-brand-950">Local</h2>
+            <div className="rounded-card border border-line bg-white p-5 shadow-sm">
+              <p className="font-bold text-brand-950">{event.location.venue}</p>
+              <p className="mt-1 text-sm text-ink-600">{address}</p>
+              {event.location.cep && <p className="mt-0.5 text-sm text-ink-500">CEP {event.location.cep}</p>}
               <a
                 href={buildMapsUrl(event.location)}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-800 hover:text-white"
+                className="mt-4 inline-flex items-center gap-2 rounded-control bg-brand-50 px-4 py-2 text-sm font-bold text-brand-700 transition-all duration-300 hover:bg-brand-700 hover:text-white"
               >
                 <FaMapLocationDot size={14} />
                 Abrir no Google Maps
@@ -186,9 +186,9 @@ function EventDetailPage() {
         </div>
 
         <aside className="flex flex-col gap-4 lg:sticky lg:top-28">
-          <div className="flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-5 shadow-lg shadow-emerald-950/5">
+          <div className="flex flex-col gap-4 rounded-card border border-line bg-white p-5 shadow-lg ">
             <InfoRow icon={FaCalendarDays}>
-              <span className="block font-semibold text-emerald-950 first-letter:uppercase">{formatLongDate(event.date)}</span>
+              <span className="block font-semibold text-brand-950 first-letter:uppercase">{formatLongDate(event.date)}</span>
             </InfoRow>
             <InfoRow icon={FaClock}>{formatTimeRange(event.startTime, event.endTime)}</InfoRow>
             <InfoRow icon={FaLocationDot}>
@@ -210,7 +210,7 @@ function EventDetailPage() {
               <Link
                 to={ADMIN_PATHS.eventEdit(event.id)}
                 state={{ from: location.pathname }}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white py-3.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+                className="flex w-full items-center justify-center gap-2 rounded-card border border-brand-200 bg-white py-3.5 text-sm font-bold text-brand-700 transition-all duration-300 hover:bg-brand-50"
               >
                 <FaPen size={12} />
                 Editar evento
@@ -236,7 +236,7 @@ function EventDetailPage() {
               <div className="grid grid-cols-2 gap-2">
                 <Link
                   to={PANEL_PATHS.eventEdit(event.id)}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 py-3 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+                  className="flex items-center justify-center gap-2 rounded-card border border-brand-200 py-3 text-sm font-bold text-brand-700 transition-all duration-300 hover:bg-brand-50"
                 >
                   <FaPen size={12} />
                   Editar evento
@@ -244,7 +244,7 @@ function EventDetailPage() {
                 <button
                   type="button"
                   onClick={() => setIsDeleteOpen(true)}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-rose-200 py-3 text-sm font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50"
+                  className="flex items-center justify-center gap-2 rounded-card border border-danger-600/30 py-3 text-sm font-bold text-danger-600 transition-all duration-300 hover:bg-danger-50"
                 >
                   <FaTrashCan size={12} />
                   Excluir

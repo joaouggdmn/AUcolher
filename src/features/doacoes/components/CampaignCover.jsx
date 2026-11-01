@@ -13,7 +13,7 @@ function CampaignCover({ campaign, className = '' }) {
     <div
       role="img"
       aria-label={campaign.title}
-      className={`flex h-full w-full items-center justify-center bg-gradient-to-br from-emerald-700 via-emerald-800 to-emerald-950 text-emerald-100/30 ${className}`}
+      className={`flex h-full w-full items-center justify-center bg-brand-800 text-brand-100/30 ${className}`}
     >
       <CategoriaIcon size={56} />
     </div>

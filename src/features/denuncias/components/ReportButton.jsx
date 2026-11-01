@@ -14,14 +14,14 @@ const LABELS = { ANIMAL: 'Denunciar anúncio', USER: 'Denunciar perfil' }
 
 const VARIANT_CLASSES = {
   // Ao lado das redes sociais, no cabeçalho do perfil
-  pill: 'flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 text-xs font-bold text-slate-500 transition-all duration-300 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600',
+  pill: 'flex h-10 items-center gap-2 rounded-full border border-line px-4 text-xs font-bold text-ink-500 transition-all duration-300 hover:border-danger-600/30 hover:bg-danger-50 hover:text-danger-600',
   // Discreto, embaixo do botão de interesse do anúncio
-  link: 'flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold text-slate-400 transition-colors duration-300 hover:text-rose-600',
+  link: 'flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold text-ink-500 transition-colors duration-300 hover:text-danger-600',
 }
 
 const UNDER_REVIEW_CLASSES = {
-  pill: 'flex h-10 items-center gap-2 rounded-full bg-slate-100 px-4 text-xs font-bold text-slate-500',
-  link: 'flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-slate-400',
+  pill: 'flex h-10 items-center gap-2 rounded-full bg-sand px-4 text-xs font-bold text-ink-500',
+  link: 'flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-ink-500',
 }
 
 // "Denunciar" de um anúncio (`targetType` ANIMAL, `target` = animal) ou de um

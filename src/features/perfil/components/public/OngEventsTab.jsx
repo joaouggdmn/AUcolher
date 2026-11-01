@@ -22,10 +22,10 @@ function OngEventsTab({ events, isLoading, isError, ongName, isOwnProfile }) {
   if (isError || events.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 py-10 text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
           <FaCalendarDays size={18} />
         </span>
-        <p className="text-sm font-semibold text-slate-600">
+        <p className="text-sm font-semibold text-ink-600">
           {isError
             ? 'Não foi possível carregar os eventos agora. Tente novamente em instantes.'
             : `${ongName} não tem eventos agendados no momento.`}
@@ -33,7 +33,7 @@ function OngEventsTab({ events, isLoading, isError, ongName, isOwnProfile }) {
         {isOwnProfile && !isError && (
           <Link
             to={PANEL_PATHS.eventNew}
-            className="mt-3 flex items-center gap-2 rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+            className="mt-3 flex items-center gap-2 rounded-control bg-brand-700 px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
           >
             <FaPlus size={12} />
             Criar evento

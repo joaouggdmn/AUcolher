@@ -114,13 +114,13 @@ function AnimaisListPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:pt-28">
       <header className="mb-8 flex flex-col gap-2 sm:mb-10">
-        <span className="text-sm font-semibold uppercase tracking-wide text-amber-600">
+        <span className="text-sm font-semibold uppercase tracking-wide text-accent-600">
           {isLoading ? 'Buscando animais...' : `${totalElements} ${totalElements === 1 ? 'animal encontrado' : 'animais encontrados'}`}
         </span>
-        <h1 className="text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">
+        <h1 className="text-3xl font-black tracking-tight text-brand-950 sm:text-4xl">
           Encontre seu novo melhor amigo
         </h1>
-        <p className="max-w-xl text-slate-600">
+        <p className="max-w-xl text-ink-600">
           Todos esses pets estão esperando por um lar cheio de amor. Use os filtros para encontrar o match perfeito.
         </p>
       </header>
@@ -135,12 +135,12 @@ function AnimaisListPage() {
             <button
               type="button"
               onClick={() => setIsDrawerOpen(true)}
-              className="relative flex h-12 shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-bold text-emerald-900 shadow-sm transition-all duration-300 hover:border-emerald-300 lg:hidden"
+              className="relative flex h-12 shrink-0 items-center gap-2 rounded-card border border-line bg-white px-4 text-sm font-bold text-brand-800 shadow-sm transition-all duration-300 hover:border-brand-200 lg:hidden"
             >
               <FaFilter size={14} />
               Filtros
               {activeFiltersCount > 0 && (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-xs font-black text-emerald-950">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-400 text-xs font-black text-brand-950">
                   {activeFiltersCount}
                 </span>
               )}
@@ -148,13 +148,13 @@ function AnimaisListPage() {
           </div>
 
           {isError ? (
-            <div className="rounded-3xl border border-slate-100 bg-white p-10 text-center shadow-sm">
-              <p className="font-bold text-emerald-950">Não foi possível carregar os animais</p>
-              <p className="mt-1 text-sm text-slate-500">{getErrorMessage(error)}</p>
+            <div className="rounded-card border border-line bg-white p-10 text-center shadow-sm">
+              <p className="font-bold text-brand-950">Não foi possível carregar os animais</p>
+              <p className="mt-1 text-sm text-ink-500">{getErrorMessage(error)}</p>
               <button
                 type="button"
                 onClick={() => refetch()}
-                className="mt-5 rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+                className="mt-5 rounded-control bg-brand-700 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-brand-800"
               >
                 Tentar de novo
               </button>
@@ -167,7 +167,7 @@ function AnimaisListPage() {
                 <ShowMoreButton onClick={() => fetchNextPage()} remainingCount={totalElements - animals.length} />
               )}
               {isFetchingNextPage && (
-                <p className="mt-10 text-center text-sm font-semibold text-slate-400">Carregando mais animais...</p>
+                <p className="mt-10 text-center text-sm font-semibold text-ink-500">Carregando mais animais...</p>
               )}
             </>
           )}

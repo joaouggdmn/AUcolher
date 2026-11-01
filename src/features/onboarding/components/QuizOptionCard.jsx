@@ -9,31 +9,31 @@ function QuizOptionCard({ label, description, icon: Icon, isSelected, onClick })
       type="button"
       onClick={onClick}
       aria-pressed={isSelected}
-      className={`group relative flex flex-col items-center gap-3 rounded-2xl border-2 p-6 text-center transition-all duration-300 ${
+      className={`group relative flex flex-col items-center gap-3 rounded-card border-2 p-6 text-center transition-all duration-300 ${
         isSelected
-          ? 'border-amber-400 bg-emerald-50 shadow-md shadow-emerald-900/5'
-          : 'border-slate-200 bg-white hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-900/5'
+          ? 'border-accent-400 bg-brand-50 shadow-md '
+          : 'border-line bg-white hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg hover:'
       }`}
     >
       {isSelected && (
-        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-emerald-950">
+        <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-accent-400 text-brand-950">
           <FaCheck size={10} />
         </span>
       )}
 
       <span
         className={`flex h-14 w-14 items-center justify-center rounded-full text-2xl transition-colors duration-300 ${
-          isSelected ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100'
+          isSelected ? 'bg-brand-700 text-white' : 'bg-brand-50 text-brand-600 group-hover:bg-brand-100'
         }`}
       >
         {Icon && <Icon size={24} />}
       </span>
 
       <div>
-        <span className={`block text-sm font-bold ${isSelected ? 'text-emerald-950' : 'text-slate-700'}`}>
+        <span className={`block text-sm font-bold ${isSelected ? 'text-brand-950' : 'text-ink-700'}`}>
           {label}
         </span>
-        {description && <span className="mt-0.5 block text-[11px] font-medium text-slate-400">{description}</span>}
+        {description && <span className="mt-0.5 block text-[11px] font-medium text-ink-500">{description}</span>}
       </div>
     </button>
   )
