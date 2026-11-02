@@ -1,9 +1,9 @@
 import { FaArrowLeft, FaArrowRight, FaFloppyDisk, FaPaw } from 'react-icons/fa6'
 
 const PRIMARY_BUTTON =
-  'flex items-center gap-2 whitespace-nowrap rounded-full bg-emerald-800 px-5 py-3 sm:px-7 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40'
+  'flex items-center gap-2 whitespace-nowrap rounded-lg bg-emerald-800 px-5 py-3 sm:px-7 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40'
 const SECONDARY_BUTTON =
-  'flex items-center gap-2 whitespace-nowrap rounded-full border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40'
+  'flex items-center gap-2 whitespace-nowrap rounded-lg border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40'
 
 // No cadastro só a última etapa salva. Na edição o anúncio já está completo,
 // então "Salvar alterações" aparece em todas as etapas
@@ -32,7 +32,7 @@ function CreateAnimalFormNav({ isFirstStep, isLastStep, isStepValid, isFormValid
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-bold text-slate-500 transition-all duration-300 hover:bg-slate-50"
+          className="flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-bold text-slate-500 transition-all duration-300 hover:bg-slate-50"
         >
           <FaArrowLeft size={13} />
           Voltar

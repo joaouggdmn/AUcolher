@@ -18,7 +18,7 @@ const PANEL_ID = 'ong-showcase-panel'
 const MAX_ITEMS = 2
 
 const TEXT_LINK =
-  'group inline-flex items-center gap-1.5 rounded-full text-sm font-bold text-emerald-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2'
+  'group inline-flex items-center gap-1.5 rounded-lg text-sm font-bold text-emerald-800 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2'
 
 function ArrowLink({ to, state, children, className = '' }) {
   return (
@@ -154,7 +154,7 @@ function OngShowcaseSection({ persona }) {
             id={PANEL_ID}
             role="tabpanel"
             aria-label={selected.name}
-            className="mt-6 grid grid-cols-1 gap-6 rounded-[2rem] bg-white p-4 shadow-sm shadow-emerald-950/5 ring-1 ring-slate-200/60 motion-safe:animate-[fade-slide-in_0.25s_ease-out_both] sm:p-6 lg:grid-cols-12 lg:gap-8 lg:p-8"
+            className="mt-6 grid grid-cols-1 gap-6 rounded-4xl bg-white p-4 shadow-sm shadow-emerald-950/5 ring-1 ring-slate-200/60 motion-safe:animate-[fade-slide-in_0.25s_ease-out_both] sm:p-6 lg:grid-cols-12 lg:gap-8 lg:p-8"
           >
             <div className="lg:col-span-5">
               <OngCard ong={selected} />

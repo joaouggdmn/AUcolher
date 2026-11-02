@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaPaperPlane } from 'react-icons/fa6'
-import { LuSparkles } from 'react-icons/lu'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
 import { useConcludeAdoption } from '../../../core/hooks/useConcludeAdoption'
 import { useSentRequests } from '../../../core/hooks/useSentRequests'
@@ -9,6 +8,7 @@ import { getErrorMessage } from '../../../core/utils/apiError'
 import ConfirmAdoptionModal from '../components/ConfirmAdoptionModal'
 import SentRequestCard from '../components/SentRequestCard'
 import { animalDisplayName } from '../utils/requestAnimal'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 function Section({ title, requests, onGoToChat, onCancel }) {
   if (requests.length === 0) return null
@@ -63,10 +63,7 @@ function MyInterestsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
       <header className="mb-8">
-        <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-100 px-4 py-1.5 text-sm font-semibold text-amber-700">
-          <LuSparkles size={15} />
-          Meus interesses
-        </span>
+        <Eyebrow>Meus interesses</Eyebrow>
         <h1 className="mt-3 text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">Os pets que você pediu</h1>
         <p className="mt-1 text-slate-600">
           Acompanhe cada pedido de adoção: a resposta do doador, a conversa e a entrega.
@@ -87,13 +84,13 @@ function MyInterestsPage() {
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               to="/aumatch"
-              className="rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+              className="rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
             >
               Ir para o AUmatch
             </Link>
             <Link
               to="/animais"
-              className="rounded-full border border-emerald-200 px-6 py-2.5 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-emerald-50"
+              className="rounded-lg border border-emerald-200 px-6 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
             >
               Ver animais
             </Link>

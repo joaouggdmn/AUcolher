@@ -43,7 +43,7 @@ function HeroSosBanner({ campaign, onDonate }) {
             <button
               type="button"
               onClick={() => onDonate(campaign)}
-              className="group flex w-fit items-center gap-2 rounded-full bg-amber-400 px-7 py-3.5 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
+              className="group flex w-fit items-center gap-2 rounded-lg bg-amber-400 px-7 py-3.5 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
             >
               <FaHandHoldingHeart size={16} />
               Ajudar agora
@@ -51,7 +51,7 @@ function HeroSosBanner({ campaign, onDonate }) {
           )}
           <Link
             to={`/campanhas/${campaign.id}`}
-            className="group flex w-fit items-center gap-2 rounded-full border border-white/20 px-6 py-3.5 font-bold text-white transition-all duration-300 hover:bg-white/10"
+            className="group flex w-fit items-center gap-2 rounded-lg border border-white/20 px-6 py-3.5 font-bold text-white transition-all duration-300 hover:bg-white/10"
           >
             {isOwner ? 'Gerenciar campanha' : 'Ver detalhes'}
             <FaArrowRight size={13} className="transition-transform duration-300 group-hover:translate-x-1" />

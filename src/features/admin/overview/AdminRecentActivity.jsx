@@ -19,7 +19,7 @@ const ACTIVITY_META = {
   },
   ADOPTION_CONCLUDED: {
     icon: FaHouseChimney,
-    className: 'bg-emerald-700 text-white',
+    className: 'bg-emerald-800 text-white',
     describe: ({ title, detail }) => ({
       title: `${title ?? 'Um animal'} ganhou um novo lar`,
       subtitle: detail ? `Adotado por ${detail}` : 'Adoção concluída',

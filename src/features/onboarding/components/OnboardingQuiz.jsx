@@ -1,8 +1,8 @@
-import { LuSparkles } from 'react-icons/lu'
 import { FaXmark, FaArrowRight } from 'react-icons/fa6'
 import QuizProgressBar from './QuizProgressBar'
 import QuizQuestionCard from './QuizQuestionCard'
 import { useOnboardingQuiz } from '../hooks/useOnboardingQuiz'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 function OnboardingQuiz({ isOpen, onClose, onComplete }) {
   const {
@@ -42,10 +42,7 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
         </button>
 
         <div className="flex flex-col gap-4 pr-6">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-300/60 bg-amber-100 px-3.5 py-1 text-xs font-semibold text-amber-700">
-            <LuSparkles size={13} />
-            Vamos personalizar seus matches
-          </span>
+          <Eyebrow size="sm">Vamos personalizar seus matches</Eyebrow>
 
           <QuizProgressBar currentStep={currentStep} totalSteps={totalSteps} onBack={handleBack} />
         </div>
@@ -66,7 +63,7 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
             type="button"
             onClick={handleNext}
             disabled={!isCurrentAnswered}
-            className="group flex items-center justify-center gap-2 rounded-full bg-emerald-800 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40"
+            className="group flex items-center justify-center gap-2 rounded-lg bg-emerald-800 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40"
           >
             Continuar
             <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -74,7 +71,7 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
         )}
 
         {isLastStep && submitError && (
-          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          <p role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
             {submitError}
           </p>
         )}
@@ -84,7 +81,7 @@ function OnboardingQuiz({ isOpen, onClose, onComplete }) {
             type="button"
             onClick={handleSubmit}
             disabled={!isCurrentAnswered || isSubmitting}
-            className="group flex items-center justify-center gap-2 rounded-full bg-emerald-800 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40"
+            className="group flex items-center justify-center gap-2 rounded-lg bg-emerald-800 py-3.5 font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 disabled:pointer-events-none disabled:opacity-40"
           >
             {isSubmitting ? 'Preparando seus matches...' : 'Concluir e ver meus Matches'}
             {!isSubmitting && <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />}

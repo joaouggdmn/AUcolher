@@ -1,6 +1,5 @@
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { FaArrowLeft } from 'react-icons/fa6'
-import { LuSparkles } from 'react-icons/lu'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { isSameId } from '../../../core/utils/ids'
@@ -12,6 +11,7 @@ import AnimalFormWizard from '../components/create/AnimalFormWizard'
 import { useAnimal } from '../hooks/useAnimais'
 import { useAnimalForm } from '../hooks/useAnimalForm'
 import { MY_ANIMALS_PATH } from '../utils/myAnimalsPaths'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 const BACK = { backTo: MY_ANIMALS_PATH, backLabel: 'Voltar para Meus animais' }
 
@@ -30,10 +30,7 @@ function PageFrame({ title, children }) {
         Meus animais
       </Link>
       <div className="mb-8 flex flex-col items-center gap-1.5 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-100 px-4 py-1.5 text-sm font-semibold text-amber-700">
-          <LuSparkles size={15} />
-          Editar anúncio
-        </span>
+        <Eyebrow>Editar anúncio</Eyebrow>
         <h1 className="text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl">{title}</h1>
       </div>
       {children}

@@ -15,7 +15,7 @@ function DonationProgress({ raised, goal, size = 'md', theme = 'light', showAmou
     <div className="flex flex-col gap-2">
       <div className={`w-full overflow-hidden rounded-full ${isDark ? 'bg-white/20' : 'bg-slate-200'} ${HEIGHTS[size]}`}>
         <div
-          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700 ease-out"
+          className="h-full rounded-full bg-amber-400 transition-all duration-700 ease-out"
           style={{ width: `${barWidth}%` }}
         />
       </div>

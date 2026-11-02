@@ -11,7 +11,7 @@ function VerifiedBadge({ size = 'md' }) {
   return (
     <span
       title="ONG cadastrada com CNPJ na AUcolher"
-      className={`inline-flex w-fit items-center rounded-full bg-gradient-to-r from-amber-400 to-amber-500 font-extrabold text-emerald-950 shadow-md shadow-amber-500/30 ${styles.wrapper}`}
+      className={`inline-flex w-fit items-center rounded-full bg-amber-400 font-extrabold text-emerald-950 shadow-md shadow-amber-500/30 ${styles.wrapper}`}
     >
       <FaShieldHalved size={styles.icon} />
       Instituição Verificada

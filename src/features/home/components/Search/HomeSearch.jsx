@@ -21,7 +21,7 @@ function HomeSearch({ labelledBy, className = '' }) {
       role="search"
       aria-labelledby={labelledBy}
       onSubmit={handleSubmit}
-      className={`flex w-full items-center gap-2 rounded-full bg-white p-1.5 pl-5 shadow-lg shadow-emerald-950/5 ring-1 ring-slate-200 transition-shadow duration-300 focus-within:ring-2 focus-within:ring-emerald-700 ${className}`}
+      className={`flex w-full items-center gap-2 rounded-xl bg-white p-1.5 pl-5 shadow-lg shadow-emerald-950/5 ring-1 ring-slate-200 transition-shadow duration-300 focus-within:ring-2 focus-within:ring-emerald-700 ${className}`}
     >
       <FaMagnifyingGlass aria-hidden="true" className="shrink-0 text-slate-400" size={16} />
 
@@ -39,7 +39,7 @@ function HomeSearch({ labelledBy, className = '' }) {
 
       <button
         type="submit"
-        className="shrink-0 rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+        className="shrink-0 rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
       >
         Buscar
       </button>

@@ -1,23 +1,13 @@
-import { LuSparkles } from 'react-icons/lu'
+import BrandWord from '../../../../core/components/ui/BrandWord'
+import Eyebrow from '../../../../core/components/ui/Eyebrow'
 import ActionLink, { ActionSkeleton } from '../shared/ActionLink'
 import { getPersonaActions } from '../../data/personaActions'
 import { quizQuestions } from '../../../onboarding/data/quizQuestions'
 import { plural } from '../../utils/homePets'
 
-// "AU" + "migo" nas cores do logo. emerald-600 e amber-600 só passam no
-// contraste por serem texto grande e em negrito — não reaproveitar em corpo
-function AUmigo() {
-  return (
-    <>
-      <span className="text-emerald-600">AU</span>
-      <span className="text-amber-600">migo</span>
-    </>
-  )
-}
-
 const PERSON_TITLE = (
   <>
-    Adote o <AUmigo /> que combina com a sua rotina.
+    Adote o <BrandWord suffix="migo" /> que combina com a sua rotina.
   </>
 )
 
@@ -39,7 +29,7 @@ function getCopy({ kind, firstName, quizProgress }, { ranked, eligibleCount }) {
       eyebrow: `Seus matches estão prontos${greeting}`,
       title: (
         <>
-          Seu próximo <AUmigo /> pode estar a um swipe.
+          Seu próximo <BrandWord suffix="migo" /> pode estar a um swipe.
         </>
       ),
       subtitle: top
@@ -68,7 +58,7 @@ function getCopy({ kind, firstName, quizProgress }, { ranked, eligibleCount }) {
 
   // visitor e loading: enquanto a sessão carrega, título e texto já nascem
   // como os do visitante (a maioria) e só o eyebrow e os botões viram skeleton.
-  // O visitante fica sem eyebrow: o selo é a saudação de quem está logado
+  // O visitante fica sem eyebrow: a frase é a saudação de quem está logado
   return {
     eyebrow: null,
     title: PERSON_TITLE,
@@ -113,14 +103,9 @@ function HeroCopy({ persona, deck }) {
   return (
     <>
       {kind === 'loading' && (
-        <div aria-hidden="true" className="h-8 w-64 rounded-full bg-slate-200/70 motion-safe:animate-pulse" />
+        <div aria-hidden="true" className="h-5 w-64 rounded-full bg-slate-200/70 motion-safe:animate-pulse" />
       )}
-      {copy.eyebrow && (
-        <p className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-800">
-          <LuSparkles aria-hidden="true" size={15} className="shrink-0" />
-          {copy.eyebrow}
-        </p>
-      )}
+      {copy.eyebrow && <Eyebrow>{copy.eyebrow}</Eyebrow>}
 
       <h1
         id="home-hero-title"

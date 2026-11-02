@@ -26,7 +26,7 @@ function PetSwipeCard({
   if (!isFront) {
     return (
       <div
-        className={`pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem] shadow-lg shadow-emerald-950/10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`pointer-events-none absolute inset-0 overflow-hidden rounded-4xl shadow-lg shadow-emerald-950/10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
           isNgo ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
         } ${STACK_TRANSFORM[stackIndex]}`}
         style={{ zIndex: 30 - stackIndex }}
@@ -40,7 +40,7 @@ function PetSwipeCard({
 
   return (
     <div
-      className={`absolute inset-0 z-30 flex cursor-grab touch-none select-none flex-col overflow-hidden rounded-[2rem] shadow-xl shadow-emerald-950/20 hover:shadow-2xl hover:shadow-emerald-950/30 active:cursor-grabbing ${
+      className={`absolute inset-0 z-30 flex cursor-grab touch-none select-none flex-col overflow-hidden rounded-4xl shadow-xl shadow-emerald-950/20 hover:shadow-2xl hover:shadow-emerald-950/30 active:cursor-grabbing ${
         isNgo ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
       }`}
       style={{
@@ -108,10 +108,10 @@ function PetSwipeCard({
               type="button"
               onClick={onExplainMatch}
               aria-label={`Match de ${pet.matchScore}%: ver por que deu match`}
-              className="flex items-center gap-1.5 rounded-full bg-emerald-800/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg shadow-emerald-950/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+              className="flex items-center gap-1.5 rounded-full bg-emerald-800/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg shadow-emerald-950/30 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
             >
               <LuSparkles size={12} className="text-amber-300" />
-              {pet.matchScore}% match
+              {pet.matchScore}%
               <LuLightbulb size={13} className="text-amber-300" />
             </button>
           )}

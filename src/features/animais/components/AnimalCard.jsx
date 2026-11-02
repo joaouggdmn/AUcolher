@@ -94,7 +94,7 @@ function AnimalCard({ animal }) {
           <button
             type="button"
             disabled
-            className="mt-auto flex cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-gray-200 py-2.5 text-sm font-bold text-gray-500"
+            className="mt-auto flex cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 py-2.5 text-sm font-bold text-slate-500"
           >
             <FaPaw size={12} />
             Seu Pet

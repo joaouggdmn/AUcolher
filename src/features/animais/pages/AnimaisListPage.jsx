@@ -8,6 +8,7 @@ import AnimalsGrid from '../components/AnimalsGrid'
 import ShowMoreButton from '../../../core/components/ui/ShowMoreButton'
 import CreateEntityCta from '../../../core/components/ui/CreateEntityCta'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+import LoadErrorState from '../../../core/components/ui/LoadErrorState'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { PANEL_PATHS } from '../../ong/panel/panelPaths'
@@ -148,17 +149,11 @@ function AnimaisListPage() {
           </div>
 
           {isError ? (
-            <div className="rounded-3xl border border-slate-100 bg-white p-10 text-center shadow-sm">
-              <p className="font-bold text-emerald-950">Não foi possível carregar os animais</p>
-              <p className="mt-1 text-sm text-slate-500">{getErrorMessage(error)}</p>
-              <button
-                type="button"
-                onClick={() => refetch()}
-                className="mt-5 rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
-              >
-                Tentar de novo
-              </button>
-            </div>
+            <LoadErrorState
+              title="Não foi possível carregar os animais"
+              message={getErrorMessage(error)}
+              onRetry={() => refetch()}
+            />
           ) : (
             <>
               <AnimalsGrid animais={animals} isLoading={isLoading} onClearFilters={handleClearFilters} />

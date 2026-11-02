@@ -4,6 +4,7 @@ import { authRoutes } from './authRoutes'
 import { protectedRoutes } from './protectedRoutes'
 import NotFoundPage from '../core/components/NotFoundPage' // ajuste se mover para core/
 import RootErrorPage from '../core/components/RootErrorPage'
+import PublicLayout from '../core/components/layout/PublicLayout'
 import ScrollToTop from '../core/components/layout/ScrollToTop'
 
 export const router = createBrowserRouter([
@@ -25,10 +26,10 @@ export const router = createBrowserRouter([
       ...protectedRoutes,
       ...publicRoutes,
 
-      // Curinga: qualquer path não encontrado cai aqui
+      // Curinga: qualquer path não encontrado cai aqui, com a navbar e o rodapé
       {
-        path: '*',
-        element: <NotFoundPage />,
+        element: <PublicLayout />,
+        children: [{ path: '*', element: <NotFoundPage /> }],
       },
     ],
   },

@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { FaBullhorn, FaHeart, FaPlus } from 'react-icons/fa6'
-import { LuSparkles } from 'react-icons/lu'
 import SuccessToast from '../../../core/components/ui/SuccessToast'
 import AdoptedAnimalsTab from '../components/mine/AdoptedAnimalsTab'
 import ListedAnimalsTab from '../components/mine/ListedAnimalsTab'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 const TABS = [
   { key: 'anunciados', label: 'Anunciados por mim', icon: FaBullhorn },
@@ -34,16 +34,13 @@ function MyAnimalsPage() {
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-24 sm:px-6 lg:pt-28">
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-100 px-4 py-1.5 text-sm font-semibold text-amber-700">
-            <LuSparkles size={15} />
-            Meus animais
-          </span>
+          <Eyebrow>Meus animais</Eyebrow>
           <h1 className="mt-3 text-3xl font-black tracking-tight text-emerald-950 sm:text-4xl">Seus anúncios e suas adoções</h1>
           <p className="mt-1 text-slate-600">Gerencie os animais que você anunciou e acompanhe os que você adotou.</p>
         </div>
         <Link
           to="/animais/criar"
-          className="flex w-fit shrink-0 items-center gap-2 rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="flex w-fit shrink-0 items-center gap-2 rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           <FaPlus size={12} />
           Cadastrar animal
@@ -62,7 +59,7 @@ function MyAnimalsPage() {
               aria-selected={isActive}
               aria-controls="my-animals-panel"
               onClick={() => selectTab(key)}
-              className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ${
+              className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold transition-all duration-300 ${
                 isActive
                   ? 'bg-emerald-800 text-white shadow-lg shadow-emerald-900/20'
                   : 'border border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:text-emerald-800'

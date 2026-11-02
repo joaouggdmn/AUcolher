@@ -65,7 +65,7 @@ function DeleteAccountSection() {
       <button
         type="button"
         onClick={open}
-        className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-full border border-rose-200 bg-white px-5 text-sm font-bold text-rose-600 transition-all duration-300 hover:border-rose-300 hover:bg-rose-50"
+        className="mt-5 flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rose-200 bg-white px-5 text-sm font-bold text-rose-600 transition-all duration-300 hover:border-rose-300 hover:bg-rose-50"
       >
         <FaTrashCan size={12} />
         Excluir minha conta

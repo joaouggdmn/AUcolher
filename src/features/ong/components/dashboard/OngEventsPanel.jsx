@@ -20,7 +20,7 @@ const SUMMARY_TONES = {
 }
 
 const ACTION_CLASSES =
-  'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300'
+  'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition-all duration-300'
 
 // Passado fica só como histórico: dá para ver quem confirmou, mas não editar
 // nem excluir (o backend recusaria)

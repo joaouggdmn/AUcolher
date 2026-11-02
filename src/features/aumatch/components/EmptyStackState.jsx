@@ -6,7 +6,7 @@ import { LuSparkles } from 'react-icons/lu'
 // O texto e o botão principal mudam de acordo.
 function EmptyStackState({ onReset, hasActiveFilters, onClearFilters }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-[2rem] border-2 border-dashed border-emerald-200 bg-white/60 p-8 text-center">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-4xl border-2 border-dashed border-emerald-200 bg-white/60 p-8 text-center">
       <span className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
         <LuSparkles size={26} />
       </span>
@@ -26,7 +26,7 @@ function EmptyStackState({ onReset, hasActiveFilters, onClearFilters }) {
         <button
           type="button"
           onClick={onClearFilters}
-          className="mt-2 flex items-center gap-2 rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-2 flex items-center gap-2 rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           <FaXmark size={13} />
           Limpar preferências
@@ -35,7 +35,7 @@ function EmptyStackState({ onReset, hasActiveFilters, onClearFilters }) {
         <button
           type="button"
           onClick={onReset}
-          className="mt-2 flex items-center gap-2 rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-2 flex items-center gap-2 rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           <FaArrowRotateLeft size={13} />
           Recomeçar

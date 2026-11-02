@@ -11,7 +11,7 @@ function PillToggleGroup({ options, value, onChange }) {
             onClick={() => onChange(opt.value)}
             className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 ${
               isActive
-                ? 'border-emerald-700 bg-emerald-700 text-white shadow-sm'
+                ? 'border-emerald-800 bg-emerald-800 text-white shadow-sm'
                 : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300'
             }`}
           >

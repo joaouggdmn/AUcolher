@@ -59,7 +59,7 @@ function CoverImageInput({
             <button
               type="button"
               onClick={openPicker}
-              className="flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-2 text-xs font-bold text-emerald-900 shadow-sm transition-colors duration-300 hover:bg-white"
+              className="flex items-center gap-1.5 rounded-lg bg-white/95 px-3.5 py-2 text-xs font-bold text-emerald-900 shadow-sm transition-colors duration-300 hover:bg-white"
             >
               <FaRotate size={11} />
               Trocar
@@ -67,7 +67,7 @@ function CoverImageInput({
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-2 text-xs font-bold text-rose-600 shadow-sm transition-colors duration-300 hover:bg-white"
+              className="flex items-center gap-1.5 rounded-lg bg-white/95 px-3.5 py-2 text-xs font-bold text-rose-600 shadow-sm transition-colors duration-300 hover:bg-white"
             >
               <FaTrashCan size={11} />
               Remover

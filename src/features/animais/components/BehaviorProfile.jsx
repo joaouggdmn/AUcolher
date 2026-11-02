@@ -9,7 +9,7 @@ function BehaviorProfile({ animal }) {
   return (
     <div className="rounded-2xl bg-emerald-50/60 p-5 sm:p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-700">
+        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-800">
           <LuBrainCircuit size={14} />
           Comportamento e estilo de vida
         </h3>

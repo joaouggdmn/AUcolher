@@ -14,7 +14,7 @@ function ContactListItem({ contact, isSelected, onClick }) {
         isSelected ? "bg-emerald-50" : "hover:bg-slate-50"
       }`}
     >
-      <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-700 text-sm font-black text-white">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-800 text-sm font-black text-white">
         {contact.photoUrl ? (
           <img
             src={contact.photoUrl}

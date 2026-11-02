@@ -5,7 +5,7 @@ function LevelIndicator({ icon: Icon, label, value }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-white">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-800 text-white">
         <Icon size={14} />
       </span>
       <div className="min-w-0 flex-1">

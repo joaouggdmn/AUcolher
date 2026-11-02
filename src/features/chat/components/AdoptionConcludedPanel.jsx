@@ -44,9 +44,9 @@ function AdoptionConcludedPanel({ contact }) {
   }
 
   return (
-    <div className="shrink-0 border-t bg-white px-4 py-4 sm:px-6">
+    <div className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
       <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-emerald-950 shadow-md shadow-amber-500/30">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-400 text-emerald-950 shadow-md shadow-amber-500/30">
           <FaHeart size={17} />
         </span>
         <div className="min-w-0">
@@ -70,7 +70,7 @@ function AdoptionConcludedPanel({ contact }) {
             <button
               type="button"
               onClick={openForm}
-              className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors duration-300 hover:bg-emerald-50"
+              className="flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors duration-300 hover:bg-emerald-50"
             >
               <FaPen size={10} />
               Editar
