@@ -32,13 +32,13 @@ function AumatchCardMockup({ pet, backPhotos, showMarkers = true, className = 'w
         {backPhotos.map((photo, index) => (
           <div
             key={photo}
-            className={`absolute inset-0 overflow-hidden rounded-[2rem] bg-emerald-900 shadow-lg shadow-emerald-950/10 ${BACK_CARD_STYLES[index]}`}
+            className={`absolute inset-0 overflow-hidden rounded-4xl bg-emerald-900 shadow-lg shadow-emerald-950/10 ${BACK_CARD_STYLES[index]}`}
           >
             <PetPhoto src={photo} width={480} className="h-full w-full" />
           </div>
         ))}
 
-        <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-emerald-900 shadow-2xl shadow-emerald-950/25 ring-2 ring-amber-400">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-4xl bg-emerald-900 shadow-2xl shadow-emerald-950/25 ring-2 ring-amber-400">
           <PetPhoto src={pet.photoUrl} width={640} eager className="absolute inset-0 h-full w-full" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
 
@@ -46,7 +46,7 @@ function AumatchCardMockup({ pet, backPhotos, showMarkers = true, className = 'w
 
           <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-emerald-800/90 px-3 py-1.5 text-xs font-extrabold text-white shadow-lg shadow-emerald-950/30 backdrop-blur-sm">
             <LuSparkles size={12} className="text-amber-300" />
-            <span className="tabular-nums">{pet.matchScore}% match</span>
+            <span className="tabular-nums">{pet.matchScore}%</span>
             <LuLightbulb size={13} className="text-amber-300" />
           </span>
 
@@ -82,7 +82,7 @@ function AumatchCardMockup({ pet, backPhotos, showMarkers = true, className = 'w
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-rose-400 shadow-lg shadow-emerald-950/15 ring-1 ring-black/5">
           <FaXmark size={20} />
         </span>
-        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-emerald-950 shadow-lg shadow-amber-500/30">
+        <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-amber-400 text-emerald-950 shadow-lg shadow-amber-500/30">
           <FaHeart size={19} />
           {showMarkers && <Marker number={3} className="-right-3 -top-3" />}
         </span>

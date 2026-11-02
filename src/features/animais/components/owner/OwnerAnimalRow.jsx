@@ -5,7 +5,7 @@ import { LISTING_STATUS_META } from '../../utils/listingStatus'
 import ModeratedNote from '../../../../core/components/ui/ModeratedNote'
 
 export const ACTION_CLASSES =
-  'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300 disabled:cursor-wait disabled:opacity-60'
+  'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition-all duration-300 disabled:cursor-wait disabled:opacity-60'
 
 function speciesLabel(species) {
   return SPECIES_OPTIONS.find((option) => option.value === species)?.label ?? 'Animal'
@@ -98,7 +98,7 @@ function OwnerAnimalRow({
               type="button"
               onClick={() => onChangeStatus(animal, 'AVAILABLE')}
               disabled={isBusy}
-              className={`${ACTION_CLASSES} border-emerald-200 text-emerald-700 hover:bg-emerald-50`}
+              className={`${ACTION_CLASSES} border-emerald-200 text-emerald-800 hover:bg-emerald-50`}
             >
               {pendingStatus === 'AVAILABLE' ? <Spinner /> : <FaEye size={11} />}
               Colocar no ar

@@ -14,7 +14,7 @@ import { PANEL_PATHS } from '../../panel/panelPaths'
 import ModeratedNote from '../../../../core/components/ui/ModeratedNote'
 
 const ACTION_CLASSES =
-  'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold transition-all duration-300'
+  'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition-all duration-300'
 
 // Encerrada fica só como histórico: dá para excluir, mas não editar nem
 // encerrar de novo (o backend recusaria)

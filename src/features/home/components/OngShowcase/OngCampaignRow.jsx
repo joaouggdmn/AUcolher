@@ -1,4 +1,4 @@
-import { FaHeart } from 'react-icons/fa6'
+import { FaHandHoldingHeart } from 'react-icons/fa6'
 import { formatCurrency } from '../../../../core/utils/currency'
 
 function OngCampaignRow({ campaign, onDonate }) {
@@ -36,9 +36,9 @@ function OngCampaignRow({ campaign, onDonate }) {
         type="button"
         onClick={() => onDonate(campaign)}
         aria-label={`Doar para ${title}`}
-        className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-emerald-800 px-4 text-sm font-bold text-white transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+        className="flex h-10 shrink-0 items-center gap-2 rounded-lg bg-emerald-800 px-4 text-sm font-bold text-white transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
       >
-        <FaHeart aria-hidden="true" size={12} className="text-rose-300" />
+        <FaHandHoldingHeart aria-hidden="true" size={14} />
         Doar
       </button>
     </li>

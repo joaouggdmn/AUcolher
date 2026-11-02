@@ -8,9 +8,9 @@ import { canEdit, canRemove, EVENT_STATUS_META, eventStatus, hasPublicPage } fro
 import { ADMIN_PATHS } from '../panel/adminPaths'
 
 const ACTION_CLASSES =
-  'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
+  'flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
 const REMOVE_CLASSES =
-  'flex items-center gap-1.5 rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
+  'flex items-center gap-1.5 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
 
 const SUMMARY_TONES = {
   neutral: 'text-slate-500',

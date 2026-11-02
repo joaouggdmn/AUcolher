@@ -6,7 +6,7 @@ function ChatSidebar({ contacts, selectedContactId, onSelectContact }) {
 
   return (
     <aside
-      className={`h-full w-full shrink-0 flex-col border-r bg-white md:flex md:w-80 lg:w-96 ${
+      className={`h-full w-full shrink-0 flex-col border-r border-slate-200 bg-white md:flex md:w-80 lg:w-96 ${
         isConversationOpen ? 'hidden md:flex' : 'flex'
       }`}
     >

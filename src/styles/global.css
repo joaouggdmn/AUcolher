@@ -8,6 +8,15 @@
    segunda família tipográfica */
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Cantos mais retos no site todo: mudar estes valores ajusta de uma vez
+     todos os rounded-xl (botões e inputs), rounded-2xl e rounded-3xl (cards e
+     modais) e rounded-4xl (blocos grandes). rounded-full fica só para o que é
+     redondo de verdade: avatar, contador, ícone decorativo e spinner */
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.625rem;
+  --radius-3xl: 0.75rem;
+  --radius-4xl: 1rem;
 }
 
 /* Customizações globais. Dentro de @layer base: fora de camada, esta regra
@@ -24,7 +33,7 @@ html {
 }
 
 body {
-  @apply bg-white text-gray-900 font-sans;
+  @apply bg-white text-slate-900 font-sans;
 }
 
 @keyframes float {
@@ -47,19 +56,6 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 18px 4px rgba(217, 119, 6, 0.35);
-  }
-}
-
-.animate-glow {
-  animation: glow 2.5s ease-in-out infinite;
 }
 
 @keyframes fade-slide-in {

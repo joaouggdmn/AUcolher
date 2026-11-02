@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { FiMenu } from 'react-icons/fi'
+import BrandWord from '../ui/BrandWord'
 import SuccessToast from '../ui/SuccessToast'
 import PanelNav from './PanelNav'
 
@@ -48,7 +49,7 @@ function PanelShell({ title, nav, context }) {
     // cabeçalho do celular nem a rolagem própria da área principal
     <div className="flex h-screen overflow-hidden bg-slate-50 lg:[--fixed-left-offset:16rem] print:block print:h-auto print:overflow-visible print:bg-white">
       <aside className="hidden w-64 shrink-0 lg:flex print:hidden">
-        <PanelNav {...nav} />
+        <PanelNav {...nav} title={title} />
       </aside>
 
       <div className={`fixed inset-0 z-[60] lg:hidden print:hidden ${isDrawerOpen ? '' : 'pointer-events-none'}`} inert={!isDrawerOpen}>
@@ -63,11 +64,12 @@ function PanelShell({ title, nav, context }) {
           role="dialog"
           aria-modal="true"
           aria-label="Menu do painel"
-          className={`absolute inset-y-0 left-0 flex w-[min(18rem,calc(100vw-3rem))] shadow-2xl shadow-emerald-950/30 transition-transform duration-300 ease-out ${
-            isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+          className={`absolute inset-y-0 left-0 flex w-[min(18rem,calc(100vw-3rem))] transition-transform duration-300 ease-out ${
+            // Sombra só aberta: fechada, ela vazaria como uma faixa na borda da tela
+            isDrawerOpen ? 'translate-x-0 shadow-2xl shadow-emerald-950/30' : '-translate-x-full'
           }`}
         >
-          <PanelNav {...nav} onClose={closeDrawer} onNavigate={closeDrawer} closeButtonRef={closeButtonRef} />
+          <PanelNav {...nav} title={title} onClose={closeDrawer} onNavigate={closeDrawer} closeButtonRef={closeButtonRef} />
         </aside>
       </div>
 
@@ -83,8 +85,7 @@ function PanelShell({ title, nav, context }) {
             <FiMenu size={21} />
           </button>
           <Link to={nav.homePath} className="text-lg font-black tracking-tight">
-            <span className="text-emerald-950">AU</span>
-            <span className="text-amber-500">colher</span>
+            <BrandWord />
           </Link>
           <span className="text-sm font-semibold text-slate-400">{title}</span>
         </header>

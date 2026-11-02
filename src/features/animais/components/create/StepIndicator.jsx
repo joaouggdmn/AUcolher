@@ -18,7 +18,7 @@ function StepIndicator({ stepIndex, onSelect }) {
               <span
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black transition-all duration-300 ${
                   isDone
-                    ? 'bg-emerald-700 text-white'
+                    ? 'bg-emerald-800 text-white'
                     : isActive
                     ? 'bg-amber-400 text-emerald-950 ring-4 ring-amber-100'
                     : `bg-slate-100 text-slate-400 ${onSelect ? 'group-hover:bg-emerald-50 group-hover:text-emerald-700' : ''}`

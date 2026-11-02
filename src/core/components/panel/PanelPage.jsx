@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { FaArrowRight } from 'react-icons/fa6'
 
 const ACTION_CLASSES =
-  'flex items-center gap-2 rounded-full bg-emerald-800 px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900'
+  'flex items-center gap-2 rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900'
 
 // Moldura de cada seção do painel: título, descrição e botões no topo. Cada
 // ação é um link (`to`) ou um botão (`onClick`), e nenhuma sai na impressão.

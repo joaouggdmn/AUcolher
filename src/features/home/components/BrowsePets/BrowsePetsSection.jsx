@@ -63,7 +63,7 @@ function BrowsePetsSection({ persona }) {
 
           <Link
             to="/animais"
-            className="group inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-full lg:self-auto bg-emerald-800 px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/15 transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+            className="group inline-flex h-12 shrink-0 items-center gap-2 self-start rounded-lg lg:self-auto bg-emerald-800 px-6 text-sm font-bold text-white shadow-lg shadow-emerald-900/15 transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
           >
             {availableCount > 0 ? `Ver todos os ${availableCount} animais` : 'Ver todos os animais'}
             <FaArrowRight
@@ -100,9 +100,13 @@ function BrowsePetsSection({ persona }) {
                 <li key={pet.id} className="w-[78%] shrink-0 snap-start sm:w-auto">
                   {isMatchedList ? (
                     <div className="relative h-full pt-4">
-                      <span className="absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white ring-4 ring-white">
+                      <span
+                        title="Compatibilidade calculada pelo AUmatch"
+                        className="absolute left-1/2 top-0 z-20 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-emerald-800 px-3 py-1 text-xs font-extrabold text-white ring-4 ring-white"
+                      >
                         <LuSparkles aria-hidden="true" size={11} className="text-amber-300" />
-                        {pet.matchScore}% match
+                        {pet.matchScore}%
+                        <span className="sr-only"> de compatibilidade</span>
                       </span>
                       <PetCard pet={pet} />
                     </div>

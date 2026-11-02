@@ -7,7 +7,7 @@ function UserAvatarMenu({
   user,
   percentage,
   onLogout,
-  isScrolled,
+  isDark,
   onOpenChange,
 }) {
   const [isOpen, setIsOpenState] = useState(false);
@@ -27,10 +27,10 @@ function UserAvatarMenu({
     onLogout();
   };
 
-  const trackColor = isScrolled
+  const trackColor = isDark
     ? "rgba(255,255,255,0.25)"
     : "rgba(6,78,59,0.15)";
-  const gapBgClass = isScrolled ? "bg-emerald-800" : "bg-white";
+  const gapBgClass = isDark ? "bg-emerald-800" : "bg-white";
 
   return (
     <div className="relative isolate">
@@ -49,7 +49,7 @@ function UserAvatarMenu({
       >
         <span
           className={`absolute inset-[3px] flex items-center justify-center overflow-hidden rounded-full text-sm font-black transition-colors duration-300 ${gapBgClass} ${
-            user?.photoUrl ? "" : isScrolled ? "text-white" : "text-emerald-900"
+            user?.photoUrl ? "" : isDark ? "text-white" : "text-emerald-900"
           }`}
         >
           {user?.photoUrl ? (
@@ -104,7 +104,7 @@ function UserAvatarMenu({
                 </div>
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700 ease-out"
+                    className="h-full rounded-full bg-amber-400 transition-all duration-700 ease-out"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>

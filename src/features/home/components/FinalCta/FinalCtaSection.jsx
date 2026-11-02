@@ -10,6 +10,7 @@ import {
   FaPaw,
   FaUsers,
 } from 'react-icons/fa6'
+import BrandWord from '../../../../core/components/ui/BrandWord'
 import ActionLink from '../shared/ActionLink'
 import HomeReveal from '../shared/HomeReveal'
 import { useRankedPets } from '../../hooks/useRankedPets'
@@ -100,7 +101,11 @@ function getCopy({ kind, quizProgress }, eligibleCount) {
 
   return {
     eyebrow: 'Seu match começa aqui',
-    title: `${questionCount} perguntas separam você do seu AUmigo.`,
+    title: (
+      <>
+        {questionCount} perguntas separam você do seu <BrandWord suffix="migo" tone="dark" />.
+      </>
+    ),
     subtitle:
       'Responda o quiz e veja os pets ordenados pela compatibilidade com a sua rotina.',
   }
@@ -200,7 +205,7 @@ function FinalCtaSection({ persona }) {
     <section id="atalhos" aria-labelledby="final-title" className="scroll-mt-28 bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         <HomeReveal>
-          <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-emerald-900 p-6 shadow-2xl shadow-emerald-950/20 sm:p-12 lg:p-14">
+          <div className="relative isolate overflow-hidden rounded-4xl bg-emerald-900 p-6 shadow-2xl shadow-emerald-950/20 sm:p-12 lg:p-14">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
               <div className="absolute inset-0 opacity-[0.06]" style={DOT_PATTERN} />
               <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-amber-400/20 blur-[100px]" />
@@ -230,7 +235,7 @@ function FinalCtaSection({ persona }) {
                       {actions.secondary && <ActionLink action={actions.secondary} variant="outlineDark" />}
                     </>
                   ) : (
-                    <div aria-hidden="true" className="h-12 w-64 rounded-full bg-white/10 motion-safe:animate-pulse sm:h-14" />
+                    <div aria-hidden="true" className="h-12 w-64 rounded-lg bg-white/10 motion-safe:animate-pulse sm:h-14" />
                   )}
                 </div>
               </div>

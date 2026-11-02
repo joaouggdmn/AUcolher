@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
 import { PANEL_PATHS } from '../../../features/ong/panel/panelPaths'
+import BrandWord from '../ui/BrandWord'
 
 // Links principais só aparecem aqui no mobile — no desktop eles já estão
 // centralizados na navbar
@@ -117,14 +118,14 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
         role="dialog"
         aria-modal="true"
         aria-label="Meu espaço"
-        className={`absolute inset-y-0 left-0 flex w-[min(20rem,calc(100vw-3rem))] flex-col bg-white shadow-2xl shadow-emerald-950/20 transition-transform duration-300 ease-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`absolute inset-y-0 left-0 flex w-[min(20rem,calc(100vw-3rem))] flex-col bg-white transition-transform duration-300 ease-out ${
+          // Sombra só aberta: fechada, ela vazaria como uma faixa na borda da tela
+          isOpen ? 'translate-x-0 shadow-2xl shadow-emerald-950/20' : '-translate-x-full'
         }`}
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <Link to="/" onClick={onClose} className="text-xl font-black tracking-tight">
-            <span className="text-emerald-900">AU</span>
-            <span className="text-amber-500">colher</span>
+            <BrandWord />
           </Link>
 
           <button
@@ -162,7 +163,7 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
                   {count > 0 && (
                     <span
                       aria-hidden="true"
-                      className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-bold text-white"
+                      className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[11px] font-bold text-white"
                     >
                       {formatBadge(count)}
                     </span>
@@ -183,14 +184,24 @@ function PlatformSidebar({ isOpen, onClose, panelLink, userType, totalFavoritos,
                     onClick={onClose}
                     className={({ isActive }) =>
                       link.isPremium
-                        ? 'my-1 flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-2.5 text-sm font-extrabold text-emerald-950 shadow-sm'
+                        ? `flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-extrabold transition-colors duration-200 ${
+                            isActive ? 'bg-amber-50' : 'hover:bg-amber-50'
+                          }`
                         : `block rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors duration-200 ${
                             isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
                           }`
                     }
                   >
-                    {link.isPremium && <LuSparkles size={16} />}
-                    {link.label}
+                    {link.isPremium ? (
+                      <>
+                        <LuSparkles size={16} className="text-amber-500" />
+                        <span>
+                          <BrandWord suffix="match" />
+                        </span>
+                      </>
+                    ) : (
+                      link.label
+                    )}
                   </NavLink>
                 </li>
               ))}

@@ -50,7 +50,7 @@ function MatchPreferencesPanel({
           <button
             type="button"
             onClick={onOpenQuiz}
-            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-3 text-sm font-extrabold text-emerald-950 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400"
+            className="flex items-center justify-center gap-2 rounded-xl bg-amber-400 py-3 text-sm font-extrabold text-emerald-950 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
           >
             {hasCompletedQuiz ? <FaArrowRotateRight size={13} /> : <LuSparkles size={14} />}
             {hasCompletedQuiz ? 'Ajustar meu perfil' : 'Responder o quiz'}
@@ -101,7 +101,7 @@ function MatchPreferencesPanel({
         <button
           type="button"
           onClick={onClear}
-          className="mt-5 flex items-center justify-center gap-2 rounded-full border border-rose-300/30 bg-rose-500/15 py-2.5 text-sm font-bold text-rose-200 transition-all duration-300 hover:bg-rose-500/25"
+          className="mt-5 flex items-center justify-center gap-2 rounded-lg border border-rose-300/30 bg-rose-500/15 py-2.5 text-sm font-bold text-rose-200 transition-all duration-300 hover:bg-rose-500/25"
         >
           <FaXmark size={13} />
           Limpar preferências

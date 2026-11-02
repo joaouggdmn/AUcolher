@@ -70,7 +70,7 @@ function PublicProfilePage() {
         <p className="mt-2 text-slate-500">Essa conta pode ter sido removida ou o link está incorreto.</p>
         <Link
           to="/animais"
-          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-6 inline-block rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           Ver animais para adoção
         </Link>
@@ -92,7 +92,7 @@ function PublicProfilePage() {
         <p className="mt-2 text-slate-500">Esta conta foi suspensa pela moderação do AUcolher.</p>
         <Link
           to="/animais"
-          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-6 inline-block rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           Ver animais para adoção
         </Link>
@@ -146,7 +146,7 @@ function PublicProfilePage() {
           </p>
           <Link
             to="/perfil"
-            className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-emerald-800 px-4 py-2 text-xs font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+            className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-emerald-800 px-4 py-2 text-xs font-bold text-white transition-all duration-300 hover:bg-emerald-900"
           >
             <FaUserPen size={12} />
             Editar perfil
@@ -165,7 +165,7 @@ function PublicProfilePage() {
                 <Link
                   to={ADMIN_PATHS.userEdit(profile.id)}
                   state={{ from: location.pathname }}
-                  className="flex h-10 items-center gap-2 rounded-full border border-emerald-200 px-4 text-xs font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
+                  className="flex h-10 items-center gap-2 rounded-lg border border-emerald-200 px-4 text-xs font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
                 >
                   <FaPen size={10} />
                   Editar conta

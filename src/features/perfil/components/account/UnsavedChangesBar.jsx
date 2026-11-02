@@ -36,7 +36,7 @@ function UnsavedChangesBar({ formId, onDiscard, isSaving = false, errorMessage =
             type="button"
             onClick={onDiscard}
             disabled={isSaving}
-            className="rounded-full px-4 py-2 text-sm font-bold text-emerald-100 transition-colors duration-300 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg px-4 py-2 text-sm font-bold text-emerald-100 transition-colors duration-300 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Descartar
           </button>
@@ -44,7 +44,7 @@ function UnsavedChangesBar({ formId, onDiscard, isSaving = false, errorMessage =
             type="submit"
             form={formId}
             disabled={isSaving}
-            className="flex items-center gap-2 rounded-full bg-amber-400 px-5 py-2 text-sm font-bold text-emerald-950 transition-all duration-300 hover:bg-amber-300 disabled:cursor-wait disabled:opacity-70"
+            className="flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-2 text-sm font-bold text-emerald-950 transition-all duration-300 hover:bg-amber-300 disabled:cursor-wait disabled:opacity-70"
           >
             {isSaving ? (
               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-emerald-950/30 border-t-emerald-950" />

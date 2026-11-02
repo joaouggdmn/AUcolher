@@ -13,8 +13,8 @@ function FiltersDrawer({ isOpen, onClose, resultsCount, ...panelProps }) {
       />
 
       <div
-        className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-white transition-transform duration-300 ease-in-out lg:hidden ${
+          isOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full'
         }`}
         role="dialog"
         aria-modal="true"
@@ -40,7 +40,7 @@ function FiltersDrawer({ isOpen, onClose, resultsCount, ...panelProps }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-full bg-emerald-800 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:bg-emerald-900"
+            className="w-full rounded-lg bg-emerald-800 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:bg-emerald-900"
           >
             Ver {resultsCount} {resultsCount === 1 ? 'animal' : 'animais'}
           </button>

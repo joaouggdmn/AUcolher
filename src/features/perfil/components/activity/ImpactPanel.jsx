@@ -5,8 +5,8 @@ import ActivityEmptyState from './ActivityEmptyState'
 
 const TIMELINE_META = {
   DOACAO: { icon: FaHandHoldingHeart, className: 'bg-amber-400 text-emerald-950' },
-  ADOCAO_RECEBIDA: { icon: FaHouseChimney, className: 'bg-emerald-700 text-white' },
-  ADOCAO_DOADA: { icon: FaPaw, className: 'bg-emerald-700 text-white' },
+  ADOCAO_RECEBIDA: { icon: FaHouseChimney, className: 'bg-emerald-800 text-white' },
+  ADOCAO_DOADA: { icon: FaPaw, className: 'bg-emerald-800 text-white' },
 }
 
 function ImpactTile({ value, label, tone = 'emerald' }) {

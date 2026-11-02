@@ -15,7 +15,7 @@ function ListingUnavailable() {
       </p>
       <Link
         to="/animais"
-        className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+        className="mt-6 inline-block rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
       >
         Ver outros animais
       </Link>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FaArrowLeft } from 'react-icons/fa6'
+import BrandWord from '../../../core/components/ui/BrandWord'
 import { useChatContacts } from '../../../core/hooks/useChatContacts'
 import ChatSidebar from '../components/ChatSidebar'
 import ChatConversationPanel from '../components/ChatConversationPanel'
@@ -20,8 +21,8 @@ function ChatPage() {
   return (
     // h-screen (não h-full): ancorado direto na viewport, não depende de
     // nenhum ancestral ter altura explícita propagada corretamente
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-gray-50">
-      <header className="flex h-16 shrink-0 items-center border-b bg-white px-4">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-50">
+      <header className="flex h-16 shrink-0 items-center border-b border-slate-200 bg-white px-4">
         <button
           type="button"
           onClick={() => navigate(-1)}
@@ -32,8 +33,7 @@ function ChatPage() {
         </button>
 
         <span className="text-lg font-black leading-none tracking-tight">
-          <span className="text-emerald-950">AU</span>
-          <span className="text-amber-500">colher</span>
+          <BrandWord />
         </span>
         <span className="ml-2 hidden text-sm font-semibold text-slate-400 sm:inline">Chat</span>
       </header>
@@ -46,7 +46,7 @@ function ChatPage() {
         />
 
         <section
-          className={`h-full w-full flex-col overflow-hidden bg-[#f5f3ef] md:flex md:w-auto md:flex-1 ${
+          className={`h-full w-full flex-col overflow-hidden bg-stone-100 md:flex md:w-auto md:flex-1 ${
             selectedContact ? 'flex' : 'hidden md:flex'
           }`}
         >
