@@ -43,7 +43,7 @@ function OngDetails({ profile }) {
       <div className="flex flex-col gap-6">
         {profile.isVerified && (
           <div className="flex gap-3 rounded-3xl border border-amber-200 bg-amber-50 p-5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-emerald-950 shadow-md shadow-amber-500/30">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400 text-emerald-950 shadow-md shadow-amber-500/30">
               <FaShieldHalved size={16} />
             </span>
             <div>

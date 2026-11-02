@@ -1,5 +1,6 @@
 import { FaCircleCheck } from 'react-icons/fa6'
-import { LuSparkles, LuCircle } from 'react-icons/lu'
+import { LuCircle } from 'react-icons/lu'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 function ProfileCompletionBar({
   checklist,
@@ -10,10 +11,7 @@ function ProfileCompletionBar({
     <div className="rounded-3xl bg-gradient-to-br from-emerald-800 to-emerald-900 p-6 text-white shadow-lg shadow-emerald-900/20 sm:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold text-amber-300">
-            <LuSparkles size={13} />
-            Completude do perfil
-          </span>
+          <Eyebrow tone="dark" size="sm">Completude do perfil</Eyebrow>
           <p className="mt-2 max-w-md text-sm text-emerald-100/80">{description}</p>
         </div>
         <span className="text-4xl font-black text-amber-300">{percentage}%</span>
@@ -21,7 +19,7 @@ function ProfileCompletionBar({
 
       <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-white/15">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700 ease-out"
+          className="h-full rounded-full bg-amber-400 transition-all duration-700 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>

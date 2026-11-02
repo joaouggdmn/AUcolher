@@ -39,7 +39,7 @@ function CopyPixCode({ code }) {
           type="button"
           onClick={handleCopy}
           className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all duration-300 ${
-            isCopied ? 'bg-emerald-700 text-white' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-800 hover:text-white'
+            isCopied ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-900 hover:text-white'
           }`}
         >
           {isCopied ? <FaCheck size={12} /> : <FaRegCopy size={12} />}

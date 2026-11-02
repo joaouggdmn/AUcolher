@@ -51,7 +51,7 @@ function AdminPanelLayout() {
       title="Administração"
       nav={{
         homePath: ADMIN_PATHS.overview,
-        identity: { name: user?.name, photoUrl: user?.photoUrl, caption: 'Administração' },
+        identity: { name: user?.name, photoUrl: user?.photoUrl },
         groups: NAV_GROUPS,
         stats: { reports: countPendingCases(reports) },
         footerLinks: [{ to: '/', label: 'Voltar ao site', icon: FaArrowLeft }],

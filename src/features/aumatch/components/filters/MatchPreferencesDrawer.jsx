@@ -16,8 +16,8 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
       />
 
       <div
-        className={`fixed inset-y-0 right-0 z-50 flex w-full lg:hidden max-w-sm flex-col border-l border-white/15 bg-emerald-950/90 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed inset-y-0 right-0 z-50 flex w-full lg:hidden max-w-sm flex-col border-l border-white/15 bg-emerald-950/90 backdrop-blur-xl transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full'
         }`}
         role="dialog"
         aria-modal="true"
@@ -43,7 +43,7 @@ function MatchPreferencesDrawer({ isOpen, onClose, resultsCount, ...panelProps }
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 py-3 text-sm font-extrabold text-emerald-950 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:from-amber-300 hover:to-amber-400"
+            className="w-full rounded-lg bg-amber-400 py-3 text-sm font-extrabold text-emerald-950 shadow-lg shadow-amber-500/25 transition-all duration-300 hover:bg-amber-300"
           >
             Ver {resultsCount} {resultsCount === 1 ? 'pet' : 'pets'}
           </button>

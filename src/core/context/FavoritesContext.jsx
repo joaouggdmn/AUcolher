@@ -18,7 +18,12 @@ export function FavoritesProvider({ children }) {
   const queryClient = useQueryClient()
   const idsKey = favoriteKeys.ids(userId)
 
-  const { data: favoritos = [] } = useQuery({
+  const {
+    data: favoritos = [],
+    isLoading: isLoadingFavoritos,
+    error: favoritosError,
+    refetch: refetchFavoritos,
+  } = useQuery({
     queryKey: idsKey,
     queryFn: async () => (await listFavoriteIds()).map(String),
     // O admin não favorita: nada a buscar para ele
@@ -57,7 +62,17 @@ export function FavoritesProvider({ children }) {
   }
 
   return (
-    <FavoritesContext.Provider value={{ favoritos, isFavorito, toggleFavorito, totalFavoritos: favoritos.length }}>
+    <FavoritesContext.Provider
+      value={{
+        favoritos,
+        isFavorito,
+        toggleFavorito,
+        totalFavoritos: favoritos.length,
+        isLoadingFavoritos,
+        favoritosError,
+        refetchFavoritos,
+      }}
+    >
       {children}
     </FavoritesContext.Provider>
   )

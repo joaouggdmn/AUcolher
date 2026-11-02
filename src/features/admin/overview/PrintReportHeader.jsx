@@ -1,3 +1,4 @@
+import BrandWord from '../../../core/components/ui/BrandWord'
 import { useAuth } from '../../../core/context/AuthContext'
 import { usePrintTimestamp } from '../../../core/hooks/usePrintTimestamp'
 import { CHART_MONTHS } from '../../ong/utils/panelCharts'
@@ -16,8 +17,7 @@ function PrintReportHeader() {
     <div className="mb-6 flex items-end justify-between gap-4 border-b-2 border-emerald-900 pb-3">
       <div>
         <p className="text-2xl font-black tracking-tight">
-          <span className="text-emerald-950">AU</span>
-          <span className="text-amber-500">colher</span>
+          <BrandWord />
         </p>
         <p className="text-sm font-bold text-emerald-950">Relatório da plataforma · Visão geral</p>
       </div>

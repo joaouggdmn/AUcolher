@@ -45,7 +45,7 @@ function AdoptedAnimalCard({ request, onGoToChat, children }) {
         <button
           type="button"
           onClick={() => onGoToChat(request.id)}
-          className="mt-auto flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 py-2.5 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-emerald-50"
+          className="mt-auto flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
         >
           <FaComments size={13} />
           Ver a conversa

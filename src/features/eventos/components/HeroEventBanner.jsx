@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { FaArrowRight, FaCalendarDays } from 'react-icons/fa6'
-import { LuSparkles } from 'react-icons/lu'
 import CalendarDateBadge from './CalendarDateBadge'
 import { formatLongDate, formatTimeRange } from '../utils/dateHelpers'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 // Destaque da vitrine: o próximo evento da agenda (a lista já vem por data)
 function HeroEventBanner({ event }) {
@@ -37,10 +37,7 @@ function HeroEventBanner({ event }) {
 
       <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col gap-4 lg:max-w-xl">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-400 px-3.5 py-1.5 text-xs font-extrabold text-emerald-950">
-            <LuSparkles size={13} />
-            PRÓXIMO EVENTO
-          </span>
+          <Eyebrow tone="dark" size="sm">PRÓXIMO EVENTO</Eyebrow>
 
           <h2 className="text-2xl font-black tracking-tight leading-tight text-white sm:text-3xl lg:text-4xl">
             {event.title}
@@ -57,7 +54,7 @@ function HeroEventBanner({ event }) {
 
           <Link
             to={`/eventos/${event.id}`}
-            className="group mt-2 flex w-fit items-center gap-2 rounded-full bg-amber-400 px-6 py-3 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
+            className="group mt-2 flex w-fit items-center gap-2 rounded-lg bg-amber-400 px-6 py-3 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
           >
             Ver detalhes
             <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />

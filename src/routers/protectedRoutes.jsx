@@ -61,7 +61,7 @@ export const protectedRoutes = [
               { path: 'meus-interesses', element: <MyInterestsPage /> },
               { path: 'favoritos', element: <FavoritosPage /> },
               { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
-              { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliacoes" /> },
+              { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliações" /> },
             ],
           },
           { path: 'animais/editar/:id', element: <EditAnimalPage /> },

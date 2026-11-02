@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa6";
 import { useAuth } from "../../../core/context/AuthContext";
 import { getErrorMessage } from "../../../core/utils/apiError";
+import LoadErrorState from "../../../core/components/ui/LoadErrorState";
 import Spinner from "../../../core/components/ui/Spinner";
 import { useAdoptionRequests } from "../../../core/context/AdoptionRequestContext";
 import { useSentRequests } from "../../../core/hooks/useSentRequests";
@@ -46,7 +47,7 @@ function AnimalDetailsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const { data: animal, isLoading, error } = useAnimal(id);
+  const { data: animal, isLoading, error, refetch } = useAnimal(id);
   const { createRequest } = useAdoptionRequests();
   const { sentRequests } = useSentRequests();
   const removeAnimal = useRemoveAnimal();
@@ -70,11 +71,12 @@ function AnimalDetailsPage() {
   // abaixo; qualquer outro erro é de conexão/servidor e merece outra mensagem
   if (error && error.response?.status !== 404) {
     return (
-      <div className="mx-auto max-w-3xl px-4 pb-16 pt-32 text-center">
-        <h1 className="text-2xl font-extrabold tracking-tight text-emerald-950">
-          Não foi possível carregar este animal
-        </h1>
-        <p className="mt-2 text-slate-500">{getErrorMessage(error)}</p>
+      <div className="mx-auto max-w-3xl px-4 pb-16 pt-32">
+        <LoadErrorState
+          title="Não foi possível carregar este animal"
+          message={getErrorMessage(error)}
+          onRetry={() => refetch()}
+        />
       </div>
     );
   }
@@ -90,7 +92,7 @@ function AnimalDetailsPage() {
         </p>
         <Link
           to="/animais"
-          className="mt-6 inline-block rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+          className="mt-6 inline-block rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
         >
           Ver outros animais
         </Link>
@@ -205,11 +207,7 @@ function AnimalDetailsPage() {
               to={`/perfil/publico/${animal.ownerId}`}
               className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-emerald-950/5"
             >
-              <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden bg-emerald-700 text-sm font-black text-white ${
-                  isNgo ? "rounded-xl" : "rounded-full"
-                }`}
-              >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-800 text-sm font-black text-white">
                 {animal.ownerPhotoUrl ? (
                   <img
                     src={animal.ownerPhotoUrl}
@@ -311,7 +309,7 @@ function AnimalDetailsPage() {
                 </p>
                 <Link
                   to="/animais"
-                  className="mt-3 inline-block rounded-full bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+                  className="mt-3 inline-block rounded-lg bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
                 >
                   Ver outros animais
                 </Link>
@@ -335,14 +333,14 @@ function AnimalDetailsPage() {
                       <button
                         type="button"
                         onClick={() => navigate("/chat", { state: { requestId: myRequest.id } })}
-                        className="rounded-full bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+                        className="rounded-lg bg-emerald-800 px-5 py-2 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
                       >
                         Ir para o chat
                       </button>
                     )}
                     <Link
                       to="/meus-interesses"
-                      className="rounded-full border border-emerald-200 px-5 py-2 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-white"
+                      className="rounded-lg border border-emerald-200 px-5 py-2 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-white"
                     >
                       Acompanhar em Meus interesses
                     </Link>
@@ -357,7 +355,7 @@ function AnimalDetailsPage() {
                   type="button"
                   onClick={handleInterestClick}
                   disabled={isSending}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 py-4 text-base font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:from-amber-300 hover:to-amber-400 hover:shadow-amber-500/40 disabled:pointer-events-none disabled:opacity-60"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-400 py-4 text-base font-extrabold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300 hover:shadow-amber-500/40 disabled:pointer-events-none disabled:opacity-60"
                 >
                   <FaHeart size={16} />
                   {isSending ? "Enviando..." : "Enviar Pedido de Interesse"}

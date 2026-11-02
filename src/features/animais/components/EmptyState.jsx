@@ -17,7 +17,7 @@ function EmptyState({ onClearFilters }) {
       <button
         type="button"
         onClick={onClearFilters}
-        className="mt-2 rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+        className="mt-2 rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
       >
         Limpar filtros
       </button>

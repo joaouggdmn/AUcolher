@@ -82,7 +82,7 @@ function UserProfilePage() {
         {user?.id != null && (
           <Link
             to={`/perfil/publico/${user.id}`}
-            className="flex shrink-0 items-center justify-center gap-2 self-start rounded-full border border-emerald-200 bg-white px-5 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50 sm:self-auto"
+            className="flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-emerald-200 bg-white px-5 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50 sm:self-auto"
           >
             <FaEye size={14} />
             Meu perfil público

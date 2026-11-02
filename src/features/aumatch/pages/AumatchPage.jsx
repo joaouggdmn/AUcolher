@@ -24,6 +24,7 @@ import { matchDeckKeys, useAumatchDeck } from '../hooks/useAumatchDeck'
 import OnboardingQuiz from '../../onboarding/components/OnboardingQuiz'
 import { hasCompletedLifestyleQuiz } from '../../onboarding/utils/quizStatus'
 import AuthRequiredModal from '../../../core/components/ui/AuthRequiredModal'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 // A coluna de filtros do desktop lembra se ficou aberta. Sem storage
 // (aba anônima, bloqueio), só começa guardada
@@ -46,7 +47,7 @@ function savePanelOpen(isOpen) {
 // Cartão que ocupa o lugar do deck enquanto ele carrega ou recalcula
 function DeckStatusCard({ children }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4 rounded-4xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm">
       {children}
     </div>
   )
@@ -240,7 +241,7 @@ function AumatchPage() {
           <button
             type="button"
             onClick={() => refetch()}
-            className="flex items-center gap-2 rounded-full bg-amber-400 px-6 py-2.5 text-sm font-bold text-emerald-950 transition-all duration-300 hover:bg-amber-300"
+            className="flex items-center gap-2 rounded-lg bg-amber-400 px-6 py-2.5 text-sm font-bold text-emerald-950 transition-all duration-300 hover:bg-amber-300"
           >
             <FaArrowRotateRight size={13} />
             Tentar de novo
@@ -286,10 +287,7 @@ function AumatchPage() {
             isPanelOpen ? 'lg:left-0 lg:translate-x-0 lg:items-start lg:text-left' : ''
           }`}
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
-            <LuSparkles size={15} />
-            AUmatch
-          </span>
+          <Eyebrow tone="dark">AUmatch</Eyebrow>
           <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
             Arraste para encontrar seu match
           </h1>
@@ -307,7 +305,7 @@ function AumatchPage() {
             type="button"
             onClick={handleTogglePreferences}
             aria-expanded={isPanelOpen}
-            className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-colors duration-300 hover:bg-white/15"
+            className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-colors duration-300 hover:bg-white/15"
           >
             {isPanelOpen ? (
               <>
@@ -362,7 +360,7 @@ function AumatchPage() {
       <MatchToast pet={matchedPet} />
       {likeError && (
         <div role="alert" className="fixed inset-x-0 top-24 z-[110] flex justify-center px-4">
-          <p className="flex items-center gap-3 rounded-full bg-rose-600 px-5 py-3 text-sm font-bold text-white shadow-2xl">
+          <p className="flex items-center gap-3 rounded-xl bg-rose-600 px-5 py-3 text-sm font-bold text-white shadow-2xl">
             {likeError}
             <button type="button" onClick={() => setLikeError(null)} className="font-black" aria-label="Fechar aviso">
               ×

@@ -77,7 +77,7 @@ function SentRequestCard({ request, onGoToChat, onCancel }) {
               <button
                 type="button"
                 onClick={() => onGoToChat(request.id)}
-                className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 py-2.5 text-sm font-bold text-emerald-700 transition-all duration-300 hover:bg-emerald-50"
+                className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 py-2.5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50"
               >
                 <FaComments size={13} />
                 {status === 'AWAITING_DELIVERY' ? 'Confirmar chegada no chat' : 'Ir para o chat'}

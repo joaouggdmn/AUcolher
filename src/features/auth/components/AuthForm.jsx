@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import BrandWord from '../../../core/components/ui/BrandWord'
 import AumatchCardMockup from '../../home/components/shared/AumatchCardMockup'
 
 // Pet de exemplo do card, diferente da Brisa do hero da home. As fotos não
@@ -43,8 +44,7 @@ function AuthForm({ heading, subheading, wide = false, children }) {
 
         {/* Logo */}
         <Link to="/" className="relative z-10 flex items-center text-2xl font-black tracking-tight">
-          <span className="text-white">AU</span>
-          <span className="text-amber-400">colher</span>
+          <BrandWord tone="dark" />
         </Link>
 
         {/* Conteúdo institucional */}
@@ -87,8 +87,7 @@ function AuthForm({ heading, subheading, wide = false, children }) {
             to="/"
             className="mb-8 flex items-center justify-center text-2xl font-black tracking-tight lg:hidden"
           >
-            <span className="text-emerald-950">AU</span>
-            <span className="text-amber-500">colher</span>
+            <BrandWord />
           </Link>
 
           {/* Card com glassmorphism sutil no mobile (fundo stone-50);

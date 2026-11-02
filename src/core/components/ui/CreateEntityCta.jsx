@@ -32,7 +32,7 @@ function CreateEntityCta({ icon: Icon, title, description, buttonLabel, targetPa
       <button
         type="button"
         onClick={handleClick}
-        className="group flex items-center gap-2 rounded-full bg-amber-400 px-7 py-3 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
+        className="group flex items-center gap-2 rounded-lg bg-amber-400 px-7 py-3 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
       >
         {buttonLabel}
         <FaArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />

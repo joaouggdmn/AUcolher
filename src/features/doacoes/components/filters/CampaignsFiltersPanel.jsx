@@ -32,7 +32,7 @@ function CampaignsFiltersPanel({ filters, onToggleCategoria, onToggleStatus, onC
         <button
           type="button"
           onClick={onClear}
-          className="mt-5 flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 py-2.5 text-sm font-bold text-red-600 transition-all duration-300 hover:bg-red-100"
+          className="mt-5 flex items-center justify-center gap-2 rounded-lg border border-rose-200 bg-rose-50 py-2.5 text-sm font-bold text-rose-600 transition-all duration-300 hover:bg-rose-100"
         >
           <FaXmark size={13} />
           Limpar todos os filtros

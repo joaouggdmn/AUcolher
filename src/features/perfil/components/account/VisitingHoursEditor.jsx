@@ -159,7 +159,7 @@ function VisitingHoursEditor({ value, onChange }) {
             <button
               type="button"
               onClick={() => setSlots([...slots, EMPTY_SLOT])}
-              className="flex items-center justify-center gap-2 self-start rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50"
+              className="flex items-center justify-center gap-2 self-start rounded-lg border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50"
             >
               <FaPlus size={12} />
               Adicionar horário

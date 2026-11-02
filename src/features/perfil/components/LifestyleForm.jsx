@@ -32,7 +32,7 @@ function LifestyleForm({ values, onChange }) {
         return (
           <div key={section.key} className="rounded-2xl border border-slate-100 bg-slate-50/60 p-5 sm:p-6">
             <div className="mb-5 flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-white">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-800 text-white">
                 <SectionIcon size={15} />
               </span>
               <div>

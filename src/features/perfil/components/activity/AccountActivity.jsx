@@ -165,7 +165,7 @@ function AccountActivity({ user }) {
                 <Link
                   key={to}
                   to={to}
-                  className="flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50"
+                  className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-4 py-2 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50"
                 >
                   <ActionIcon size={11} />
                   {label}

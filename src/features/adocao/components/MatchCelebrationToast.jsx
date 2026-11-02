@@ -24,7 +24,7 @@ function MatchCelebrationToast({ request, onClose, onGoToChat }) {
           <button
             type="button"
             onClick={handleGoToChat}
-            className="mt-2 flex items-center gap-1.5 rounded-full bg-amber-400 px-3.5 py-1.5 text-xs font-extrabold text-emerald-950 transition-all duration-300 hover:bg-amber-300"
+            className="mt-2 flex items-center gap-1.5 rounded-lg bg-amber-400 px-3.5 py-1.5 text-xs font-extrabold text-emerald-950 transition-all duration-300 hover:bg-amber-300"
           >
             <FaComments size={12} />
             Ir para o chat

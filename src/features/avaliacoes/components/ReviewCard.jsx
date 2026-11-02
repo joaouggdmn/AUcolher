@@ -15,7 +15,7 @@ function ReviewCard({ review }) {
   return (
     <article className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
       <div className="flex items-start gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-700 text-sm font-black text-white">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-800 text-sm font-black text-white">
           {review.authorPhotoUrl ? (
             <img src={review.authorPhotoUrl} alt={review.authorName} className="h-full w-full object-cover" />
           ) : (

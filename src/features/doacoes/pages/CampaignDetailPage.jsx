@@ -61,7 +61,7 @@ function OngCard({ ong }) {
       to={`/ong/${ong.id}`}
       className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-emerald-950/5"
     >
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-700 text-sm font-black text-white">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-800 text-sm font-black text-white">
         {ong.photoUrl ? (
           <img src={ong.photoUrl} alt={ong.name} className="h-full w-full object-cover" />
         ) : (

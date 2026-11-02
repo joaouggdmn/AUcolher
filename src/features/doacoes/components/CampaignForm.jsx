@@ -207,14 +207,14 @@ function CampaignForm({
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Link
           to={cancelTo}
-          className="flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-slate-500 transition-colors duration-300 hover:bg-slate-100"
+          className="flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold text-slate-500 transition-colors duration-300 hover:bg-slate-100"
         >
           Cancelar
         </Link>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center justify-center gap-2 rounded-full bg-emerald-800 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:bg-emerald-900 disabled:cursor-wait disabled:opacity-70"
+          className="flex items-center justify-center gap-2 rounded-lg bg-emerald-800 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/20 transition-all duration-300 hover:bg-emerald-900 disabled:cursor-wait disabled:opacity-70"
         >
           {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
           {isSubmitting ? 'Salvando...' : submitLabel}

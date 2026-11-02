@@ -9,9 +9,9 @@ const TYPE_META = {
 }
 
 const ACTION_CLASSES =
-  'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
+  'flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
 const BAN_CLASSES =
-  'flex items-center gap-1.5 rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
+  'flex items-center gap-1.5 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50'
 
 function memberSince(createdAt) {
   if (!createdAt) return null

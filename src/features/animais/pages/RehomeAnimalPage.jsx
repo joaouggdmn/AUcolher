@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { FaArrowLeft } from 'react-icons/fa6'
-import { LuSparkles } from 'react-icons/lu'
 import { useAdoptionRequests } from '../../../core/context/AdoptionRequestContext'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage, validationError } from '../../../core/utils/apiError'
@@ -16,6 +15,7 @@ import PanelNotice from '../../ong/panel/PanelNotice'
 import AnimalFormWizard from '../components/create/AnimalFormWizard'
 import { useAnimalForm } from '../hooks/useAnimalForm'
 import { MY_ANIMALS_ADOPTED_PATH } from '../utils/myAnimalsPaths'
+import Eyebrow from '../../../core/components/ui/Eyebrow'
 
 const BACK = { backTo: MY_ANIMALS_ADOPTED_PATH, backLabel: 'Voltar para Adotados por mim' }
 
@@ -30,10 +30,7 @@ function PageFrame({ title, subtitle, children }) {
         Meus animais
       </Link>
       <div className="mb-8 flex flex-col items-center gap-1.5 text-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-100 px-4 py-1.5 text-sm font-semibold text-amber-700">
-          <LuSparkles size={15} />
-          Republicar anúncio
-        </span>
+        <Eyebrow>Republicar anúncio</Eyebrow>
         <h1 className="text-2xl font-black tracking-tight text-emerald-950 sm:text-3xl">{title}</h1>
         {subtitle && <p className="max-w-lg text-sm text-slate-500">{subtitle}</p>}
       </div>

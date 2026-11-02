@@ -10,7 +10,7 @@ import { useEventAttendance } from '../hooks/useEventAttendance'
 
 const SIZES = {
   // Pílula da vitrine da home, no mesmo formato do botão "Doar"
-  sm: 'h-10 rounded-full px-4 text-sm',
+  sm: 'h-10 rounded-lg px-4 text-sm',
   md: 'rounded-xl py-2.5 text-sm',
   lg: 'rounded-2xl py-4 text-base',
 }
@@ -102,7 +102,7 @@ function AttendanceButton({ event, size = 'md', idleLabel = 'Confirmar presença
         title={isConfirmed ? 'Clique para cancelar sua presença' : undefined}
         className={`flex items-center justify-center gap-2 font-bold transition-all duration-300 disabled:cursor-wait disabled:opacity-80 ${sizeClasses} ${
           isConfirmed
-            ? 'bg-emerald-700 text-white hover:bg-emerald-800'
+            ? 'bg-emerald-800 text-white hover:bg-emerald-900'
             : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-800 hover:text-white'
         } ${className}`}
       >

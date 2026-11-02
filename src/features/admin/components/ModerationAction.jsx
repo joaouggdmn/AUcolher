@@ -13,9 +13,9 @@ const APPEARANCES = {
   // Ao lado das redes sociais, no cabeçalho do perfil (como o "Denunciar")
   pill: {
     danger:
-      'flex h-10 items-center gap-2 rounded-full border border-rose-200 px-4 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50',
+      'flex h-10 items-center gap-2 rounded-lg border border-rose-200 px-4 text-xs font-bold text-rose-600 transition-all duration-300 hover:bg-rose-50',
     default:
-      'flex h-10 items-center gap-2 rounded-full border border-emerald-200 px-4 text-xs font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50',
+      'flex h-10 items-center gap-2 rounded-lg border border-emerald-200 px-4 text-xs font-bold text-emerald-800 transition-all duration-300 hover:bg-emerald-50',
   },
 }
 
