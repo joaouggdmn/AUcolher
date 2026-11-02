@@ -5,7 +5,7 @@ import { getReasonLabel } from '../../denuncias/utils/reportRules'
 import { RESOLUTION_META } from '../utils/reportCases'
 
 const LINK_CLASSES =
-  'flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
+  'flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:bg-slate-50'
 
 const ACTION_VARIANTS = {
   default: 'border border-slate-200 text-slate-600 hover:bg-slate-50',
@@ -23,24 +23,17 @@ function profilePath(id, userType) {
   return userType === 'ONG' ? `/ong/${id}` : `/perfil/publico/${id}`
 }
 
-// Pessoa: foto redonda. ONG e anúncio: quadrada, como no resto do site
+// Pessoa e ONG: foto redonda. Anúncio: quadrada, como no resto do site
 function TargetThumb({ reportCase }) {
   const { target } = reportCase
-  const isUser = reportCase.targetType === 'USER'
 
-  if (isUser && target.userType !== 'ONG') {
+  if (reportCase.targetType === 'USER') {
     return <Avatar name={target.name} photoUrl={target.photoUrl} className="h-14 w-14 text-lg" />
   }
   return (
-    <span
-      className={`flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl text-lg font-black ${
-        isUser ? 'bg-emerald-700 text-white' : 'bg-emerald-50 text-emerald-600'
-      }`}
-    >
+    <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-50 text-lg font-black text-emerald-600">
       {target.photoUrl ? (
         <img src={target.photoUrl} alt={target.name} className="h-full w-full object-cover" />
-      ) : isUser ? (
-        target.name?.charAt(0).toUpperCase()
       ) : (
         <FaPaw size={18} />
       )}
@@ -141,7 +134,7 @@ function ReportCaseCard({ reportCase, actions = [] }) {
               key={label}
               type="button"
               onClick={onClick}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition-all duration-300 ${ACTION_VARIANTS[variant]}`}
+              className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold transition-all duration-300 ${ACTION_VARIANTS[variant]}`}
             >
               {Icon && <Icon size={11} />}
               {label}

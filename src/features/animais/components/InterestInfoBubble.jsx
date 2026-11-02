@@ -4,7 +4,7 @@ function InterestInfoBubble() {
   return (
     <div className="relative rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
       <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 animate-wiggle items-center justify-center rounded-full bg-emerald-700 text-white">
+        <span className="flex h-9 w-9 shrink-0 animate-wiggle items-center justify-center rounded-full bg-emerald-800 text-white">
           <FaComments size={15} />
         </span>
         <div>

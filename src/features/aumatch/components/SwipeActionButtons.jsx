@@ -29,7 +29,7 @@ function SwipeActionButtons({ onPass, onLike, onInfo, isTopOng, disabled }) {
         onClick={onLike}
         disabled={disabled}
         aria-label="Curtir"
-        className={`flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-emerald-950 shadow-xl shadow-amber-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-105 disabled:pointer-events-none disabled:opacity-40 ${
+        className={`flex h-16 w-16 items-center justify-center rounded-full bg-amber-400 text-emerald-950 shadow-xl shadow-amber-500/30 transition-all duration-300 hover:-translate-y-1 hover:scale-105 disabled:pointer-events-none disabled:opacity-40 ${
           isTopOng ? 'hover:shadow-[0_0_28px_6px_rgba(217,119,6,0.5)]' : 'hover:shadow-amber-500/50'
         }`}
       >

@@ -15,7 +15,7 @@ function ProfileTabs({ tabs }) {
               key={tab.key}
               type="button"
               onClick={() => setActiveKey(tab.key)}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all duration-300 ${
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition-all duration-300 ${
                 isActive
                   ? 'bg-emerald-800 text-white shadow-md shadow-emerald-900/20'
                   : 'text-slate-500 hover:bg-slate-50 hover:text-emerald-800'

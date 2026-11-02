@@ -37,7 +37,7 @@ function OngCampaignsTab({ campaigns, isLoading, isError, ongName, isOwnProfile 
         {isOwnProfile && !isError && (
           <Link
             to={PANEL_PATHS.campaignNew}
-            className="mt-3 flex items-center gap-2 rounded-full bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+            className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
           >
             <FaPlus size={12} />
             Criar campanha

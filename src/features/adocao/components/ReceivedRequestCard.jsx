@@ -71,7 +71,8 @@ function ReceivedRequestCard({
           className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-800 px-3 py-1.5 text-xs font-extrabold text-white shadow-sm"
         >
           <LuSparkles size={12} className="text-amber-300" />
-          {matchScore}% Match
+          {matchScore}%
+          <span className="sr-only"> de compatibilidade</span>
         </span>
       </Link>
 
@@ -138,7 +139,7 @@ function ReceivedRequestCard({
                 type="button"
                 onClick={() => onAccept(request.id)}
                 disabled={isProcessing}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-700 to-emerald-800 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-emerald-900/30 disabled:pointer-events-none disabled:opacity-40"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-emerald-800 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-900/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-900 hover:shadow-emerald-900/30 disabled:pointer-events-none disabled:opacity-40"
               >
                 <FaCircleCheck size={13} />
                 Aceitar
@@ -151,7 +152,7 @@ function ReceivedRequestCard({
               <button
                 type="button"
                 onClick={() => onRequestDelivery(request)}
-                className={`${STACKED_ACTION} border-transparent bg-gradient-to-r from-amber-400 to-amber-500 text-emerald-950 shadow-md shadow-amber-500/30 hover:from-amber-300 hover:to-amber-400`}
+                className={`${STACKED_ACTION} border-transparent bg-amber-400 text-emerald-950 shadow-md shadow-amber-500/30 hover:bg-amber-300`}
               >
                 <FaHandHoldingHeart size={13} />
                 Confirmar entrega
@@ -159,7 +160,7 @@ function ReceivedRequestCard({
               <button
                 type="button"
                 onClick={() => onGoToChat(request)}
-                className={`${STACKED_ACTION} border-emerald-200 text-emerald-700 hover:bg-emerald-50`}
+                className={`${STACKED_ACTION} border-emerald-200 text-emerald-800 hover:bg-emerald-50`}
               >
                 <FaComments size={13} />
                 Ir para o chat
@@ -176,7 +177,7 @@ function ReceivedRequestCard({
               <button
                 type="button"
                 onClick={() => onGoToChat(request)}
-                className={`${STACKED_ACTION} border-emerald-200 text-emerald-700 hover:bg-emerald-50`}
+                className={`${STACKED_ACTION} border-emerald-200 text-emerald-800 hover:bg-emerald-50`}
               >
                 <FaComments size={13} />
                 Ir para o chat

@@ -14,7 +14,7 @@ function ParticipantRow({ participant }) {
 
   return (
     <li className="flex items-center gap-3 py-3">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-700 text-sm font-black text-white">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-800 text-sm font-black text-white">
         {user.photoUrl ? (
           <img src={user.photoUrl} alt="" className="h-full w-full object-cover" />
         ) : (

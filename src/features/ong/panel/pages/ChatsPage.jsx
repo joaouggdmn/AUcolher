@@ -23,7 +23,7 @@ function ChatsPage() {
     <div className="flex h-[calc(100dvh-3.5rem)] overflow-hidden bg-white lg:h-dvh">
       <ChatSidebar contacts={contacts} selectedContactId={selectedContact?.id ?? null} onSelectContact={selectContact} />
       <section
-        className={`h-full w-full flex-col overflow-hidden bg-[#f5f3ef] md:flex md:w-auto md:flex-1 ${
+        className={`h-full w-full flex-col overflow-hidden bg-stone-100 md:flex md:w-auto md:flex-1 ${
           selectedContact ? 'flex' : 'hidden md:flex'
         }`}
       >

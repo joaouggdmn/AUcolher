@@ -44,7 +44,7 @@ const TIMELINE_META = {
   },
   ADOCAO: {
     icon: FaHouseChimney,
-    className: 'bg-emerald-700 text-white',
+    className: 'bg-emerald-800 text-white',
     describe: ({ request }) => ({
       title: `${request.animal.name ?? 'Um animal'} ganhou um novo lar`,
       subtitle: `Adotado por ${request.adopter.name}`,

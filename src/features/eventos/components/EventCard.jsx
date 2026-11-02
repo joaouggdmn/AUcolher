@@ -60,48 +60,55 @@ function EventCard({ event, layout = 'grid' }) {
           {categoria.label}
         </span>
 
-        <div>
-          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">
-            <Link to={`/eventos/${event.id}`} className="transition-colors duration-300 hover:text-emerald-700">
-              {event.title}
-            </Link>
-          </h3>
-          <p className="mt-1 text-sm text-slate-500">{formatTimeRange(event.startTime, event.endTime)}</p>
-        </div>
-
-        <div className="flex items-center gap-1.5 text-sm text-slate-500">
-          <FaLocationDot size={13} className="shrink-0 text-emerald-600" />
-          <span className="truncate">
-            {event.location.venue}, {event.location.city}
-          </span>
-        </div>
-
-        <p className="flex items-center gap-1.5 text-sm text-slate-600">
-          Organizado por
-          <Link
-            to={`/ong/${event.organizer.id}`}
-            className="flex items-center gap-1 font-semibold text-emerald-800 transition-colors duration-300 hover:text-emerald-600"
-          >
-            {event.organizer.name}
-            {event.organizer.isVerified && (
-              <FaShieldHalved size={11} className="shrink-0 text-amber-500" title="Instituição verificada" />
-            )}
+        <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">
+          <Link to={`/eventos/${event.id}`} className="transition-colors duration-300 hover:text-emerald-700">
+            {event.title}
           </Link>
-        </p>
+        </h3>
 
-        <p className={`flex items-center gap-1.5 text-xs font-semibold ${SUMMARY_TONES[summary.tone]}`}>
-          <FaUserGroup size={12} className="shrink-0" />
-          {summary.label}
-        </p>
+        {/* mt-auto prende tudo depois do título no pé do card, e o nome da ONG
+            sempre reserva duas linhas: assim os cards de uma mesma fileira
+            ficam alinhados, seja qual for o tamanho do título ou do nome */}
+        <div className="mt-auto flex flex-col gap-3">
+          <p className="text-sm text-slate-500">{formatTimeRange(event.startTime, event.endTime)}</p>
 
-        <div className="relative mt-auto flex items-center gap-2">
-          <AttendanceButton event={event} className="flex-1" />
+          <div className="flex items-center gap-1.5 text-sm text-slate-500">
+            <FaLocationDot size={13} className="shrink-0 text-emerald-600" />
+            <span className="truncate">
+              {event.location.venue}, {event.location.city}
+            </span>
+          </div>
 
-          <SaveToCalendarMenu
-            event={event}
-            isOpen={isCalendarMenuOpen}
-            onToggle={setIsCalendarMenuOpen}
-          />
+          <div>
+            <p className="text-xs text-slate-500">Organizado por</p>
+            <Link
+              to={`/ong/${event.organizer.id}`}
+              title={event.organizer.name}
+              className={`mt-0.5 flex items-start gap-1.5 text-sm font-semibold text-emerald-800 transition-colors duration-300 hover:text-emerald-600 ${
+                isList ? '' : 'sm:min-h-10'
+              }`}
+            >
+              {event.organizer.isVerified && (
+                <FaShieldHalved size={12} className="mt-1 shrink-0 text-amber-500" title="Instituição verificada" />
+              )}
+              <span className="line-clamp-2">{event.organizer.name}</span>
+            </Link>
+          </div>
+
+          <p className={`flex items-center gap-1.5 text-xs font-semibold ${SUMMARY_TONES[summary.tone]}`}>
+            <FaUserGroup size={12} className="shrink-0" />
+            {summary.label}
+          </p>
+
+          <div className="relative flex items-center gap-2">
+            <AttendanceButton event={event} className="flex-1" />
+
+            <SaveToCalendarMenu
+              event={event}
+              isOpen={isCalendarMenuOpen}
+              onToggle={setIsCalendarMenuOpen}
+            />
+          </div>
         </div>
       </div>
     </div>

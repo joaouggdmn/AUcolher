@@ -24,7 +24,7 @@ const DEADLINE_TONES = {
 // Botão do rodapé: doar (padrão), gerenciar (a própria ONG) ou só ver (encerrada)
 function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
   const linkClass =
-    'mt-auto flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-bold transition-all duration-300'
+    'flex items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-bold transition-all duration-300'
 
   if (isOwner) {
     return (
@@ -49,7 +49,7 @@ function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
     <button
       type="button"
       onClick={() => onDonate(campaign)}
-      className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-emerald-800 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+      className="flex items-center justify-center gap-2 rounded-xl border border-transparent bg-emerald-800 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
     >
       <FaHandHoldingHeart size={14} />
       Fazer doação
@@ -91,54 +91,61 @@ function CampaignCard({ campaign, onDonate }) {
         </span>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/30 to-transparent" />
+
+        {/* Sobre a foto, e não acima do título: assim esses selos não
+            deslocam as linhas do card em relação aos vizinhos */}
+        {(campaign.isGoalReached || campaign.isClosed) && (
+          <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+            {campaign.isGoalReached && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
+                <FaCircleCheck size={10} />
+                Meta atingida!
+              </span>
+            )}
+            {campaign.isClosed && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">
+                <FaLock size={9} />
+                Encerrada
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-5">
-        <div>
-          {(campaign.isGoalReached || campaign.isClosed) && (
-            <div className="mb-2 flex flex-wrap gap-1.5">
-              {campaign.isGoalReached && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
-                  <FaCircleCheck size={10} />
-                  Meta atingida!
-                </span>
-              )}
-              {campaign.isClosed && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">
-                  <FaLock size={9} />
-                  Encerrada
-                </span>
-              )}
-            </div>
-          )}
+        <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">
+          <Link to={`/campanhas/${campaign.id}`} className="transition-colors duration-300 hover:text-emerald-700">
+            {campaign.title}
+          </Link>
+        </h3>
 
-          <h3 className="text-lg font-extrabold tracking-tight text-emerald-950">
-            <Link to={`/campanhas/${campaign.id}`} className="transition-colors duration-300 hover:text-emerald-700">
-              {campaign.title}
-            </Link>
-          </h3>
+        {/* mt-auto prende tudo depois do título no pé do card, e o nome da ONG
+            sempre reserva duas linhas: assim os cards de uma mesma fileira
+            ficam alinhados, seja qual for o tamanho do título ou do nome */}
+        <div className="mt-auto flex flex-col gap-4">
           <Link
             to={`/ong/${campaign.ong.id}`}
-            className="mt-1 inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors duration-300 hover:text-emerald-700"
+            title={campaign.ong.name}
+            className="flex items-start gap-1.5 text-sm text-slate-500 transition-colors duration-300 hover:text-emerald-700 sm:min-h-10"
           >
             {campaign.ong.isVerified && (
-              <FaShieldHalved size={12} className="shrink-0 text-amber-500" title="Instituição verificada" />
+              <FaShieldHalved size={12} className="mt-1 shrink-0 text-amber-500" title="Instituição verificada" />
             )}
-            {campaign.ong.name}
+            <span className="line-clamp-2">{campaign.ong.name}</span>
           </Link>
+
+          <DonationProgress raised={campaign.raisedAmount} goal={campaign.goalAmount} />
+
+          <div className="flex flex-col gap-1 text-xs font-semibold">
+            <span className="text-slate-500">{formatDonationsCount(campaign.donationsCount, { invite: !isOwner && !isAdminAccount(user) })}</span>
+            <span className={`flex items-center gap-1 ${DEADLINE_TONES[deadline.tone]}`}>
+              <FaClock size={10} />
+              {deadline.label}
+            </span>
+          </div>
+
+          <CardAction campaign={campaign} isOwner={isOwner} isAdmin={isAdminAccount(user)} onDonate={onDonate} />
         </div>
-
-        <DonationProgress raised={campaign.raisedAmount} goal={campaign.goalAmount} />
-
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs font-semibold">
-          <span className="whitespace-nowrap text-slate-500">{formatDonationsCount(campaign.donationsCount, { invite: !isOwner && !isAdminAccount(user) })}</span>
-          <span className={`flex items-center gap-1 whitespace-nowrap ${DEADLINE_TONES[deadline.tone]}`}>
-            <FaClock size={10} />
-            {deadline.label}
-          </span>
-        </div>
-
-        <CardAction campaign={campaign} isOwner={isOwner} isAdmin={isAdminAccount(user)} onDonate={onDonate} />
       </div>
     </div>
   )

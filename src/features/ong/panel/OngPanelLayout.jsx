@@ -58,7 +58,7 @@ function OngPanelLayout() {
       context={{ dashboard }}
       nav={{
         homePath: PANEL_PATHS.overview,
-        identity: { name: user?.name, photoUrl: user?.photoUrl, isVerified: user?.isVerified, caption: 'Painel da ONG' },
+        identity: { name: user?.name, photoUrl: user?.photoUrl, isVerified: user?.isVerified },
         groups: NAV_GROUPS,
         stats: dashboard.stats,
         footerLinks: [

@@ -29,7 +29,7 @@ const SIGNALS = [
     key: 'like',
     title: 'Curtir envia seu interesse',
     replica: (
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-emerald-950 shadow-md shadow-amber-500/30">
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-400 text-emerald-950 shadow-md shadow-amber-500/30">
         <FaHeart size={13} />
       </span>
     ),
@@ -54,7 +54,7 @@ function StepBadge({ step }) {
       <span
         className={`flex h-14 w-14 items-center justify-center rounded-full ${
           step.isMatchAction
-            ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-emerald-950'
+            ? 'bg-amber-400 text-emerald-950'
             : 'bg-gradient-to-br from-emerald-600 to-emerald-800 text-white'
         }`}
       >

@@ -89,11 +89,7 @@ function PublicProfileHeader({ profile, stats, action }) {
       <div className="px-5 pb-6 sm:px-8 sm:pb-8">
         <div className="flex items-end justify-between gap-4">
           <div className="relative -mt-14 shrink-0 sm:-mt-16">
-            <span
-              className={`flex h-28 w-28 items-center justify-center overflow-hidden bg-emerald-700 text-4xl font-black text-white shadow-xl shadow-emerald-950/20 ring-4 ring-white sm:h-32 sm:w-32 ${
-                isOng ? 'rounded-3xl' : 'rounded-full'
-              }`}
-            >
+            <span className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-emerald-800 text-4xl font-black text-white shadow-xl shadow-emerald-950/20 ring-4 ring-white sm:h-32 sm:w-32">
               {profile.photoUrl ? (
                 <img src={profile.photoUrl} alt={profile.name} className="h-full w-full object-cover" />
               ) : (

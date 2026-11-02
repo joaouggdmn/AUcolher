@@ -75,13 +75,13 @@ function AccessSection({ emailHint }) {
 
         <MockResetLinkBox result={sent?.mockResult} />
 
-        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600">{error}</p>}
+        {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-600">{error}</p>}
 
         <button
           type="button"
           onClick={handleRequestLink}
           disabled={isSending}
-          className="flex min-h-11 items-center justify-center gap-2 self-start rounded-full border border-emerald-200 bg-white px-5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex min-h-11 items-center justify-center gap-2 self-start rounded-lg border border-emerald-200 bg-white px-5 text-sm font-bold text-emerald-800 transition-all duration-300 hover:border-emerald-300 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSending ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-700" />

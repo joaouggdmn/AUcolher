@@ -20,7 +20,7 @@ function EmptyState() {
 
       <Link
         to="/animais"
-        className="mt-2 flex items-center gap-2 rounded-full bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
+        className="mt-2 flex items-center gap-2 rounded-lg bg-emerald-800 px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-emerald-900"
       >
         <FaMagnifyingGlass size={13} />
         Explorar Animais

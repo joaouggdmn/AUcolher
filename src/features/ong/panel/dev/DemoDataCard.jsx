@@ -74,7 +74,7 @@ function DemoDataCard() {
           <button
             type="button"
             onClick={() => setPendingAction('remove')}
-            className="rounded-full border border-amber-300 bg-white px-4 py-2 text-sm font-bold text-amber-900 transition-colors duration-300 hover:bg-amber-100"
+            className="rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-bold text-amber-900 transition-colors duration-300 hover:bg-amber-100"
           >
             Apagar dados de teste
           </button>
@@ -82,7 +82,7 @@ function DemoDataCard() {
         <button
           type="button"
           onClick={() => setPendingAction('generate')}
-          className="rounded-full bg-amber-500 px-4 py-2 text-sm font-bold text-emerald-950 transition-colors duration-300 hover:bg-amber-400"
+          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-bold text-emerald-950 transition-colors duration-300 hover:bg-amber-400"
         >
           {isActive ? 'Gerar de novo' : 'Gerar dados de teste'}
         </button>
