@@ -2,9 +2,7 @@
 
 ## Contexto
 
-O parceiro implementa o backend a partir dos contratos desta pasta. O front deixa a chamada de cada API já escrita, atrás de uma flag `VITE_USE_MOCK_*`:
-- **até a entrega**, a flag fica ligada e um mock no `localStorage` responde no lugar, com os mesmos DTOs, então o site funciona inteiro;
-- **na entrega**, o front põe a flag em `false` no `.env` e passa a usar a API.
+O parceiro implementa o backend a partir dos contratos desta pasta. Até a entrega de cada módulo, o front usava um mock no `localStorage`, atrás de uma flag `VITE_USE_MOCK_*`. **Hoje não há mais mock nem flag:** todos os módulos entregues usam só a API.
 
 ### O sistema cai se uma rota ainda não existir?
 
@@ -13,7 +11,7 @@ Não.
 - **Rota que ainda não existe:**
   - com login, o Spring responde 404;
   - sem login, responde 401, e o `auth:unauthorized` chama `logout()`, que sem sessão não faz nada.
-- **O mock ligado até a entrega evita até isso.** Desligar a flag antes da hora deixaria só aquele módulo vazio ou com erro.
+- **O efeito fica no módulo:** só aquela parte da tela fica vazia ou com erro.
 
 ### O que falta
 
@@ -30,11 +28,11 @@ Não.
 **Frontend:**
 - ~~o chat (parte 2)~~: feito, o front usa só a API e o mock saiu do código (`api-chat.md` §6). ~~Excluir conta~~ (parte 3): feito, o front usa só a API e o mock saiu do código (`../contratos-prontos/api-exclusao-conta.md` §7);
 - conectar o Mercado Pago (`api-mercado-pago-ongs.md` §9);
-- a cada entrega do parceiro: desligar a flag e testar. ~~Campanhas~~: feito, o front usa só a API e o mock saiu do código (`api-campanhas-doacoes.md` §9);
+- a cada entrega do parceiro: testar a tela contra a rota. ~~Campanhas~~: feito, o front usa só a API e o mock saiu do código (`api-campanhas-doacoes.md` §9);
 - pendências pequenas:
   - `/minhas-avaliacoes` ainda é `PlaceholderPage`;
   - "Salvar no calendário" para Outlook e iCal só faz `console.log`. Dá para gerar o `.ics` no próprio navegador;
-- ~~faxina dos mocks cuja flag já estava desligada~~: feito. Eventos, admin, moderação, reabandono, denúncias e campanhas já saíram do código.
+- ~~faxina dos mocks cuja flag já estava desligada~~: feito. Eventos, admin, moderação, reabandono, denúncias, campanhas, senha, exclusão de conta e chat já saíram do código.
 
 **Geral:**
 - publicar a API, o banco e o front, e fazer o teste de ponta a ponta;
@@ -128,12 +126,11 @@ Trio **fachada / api / mock**, como em eventos (`features/eventos/services/event
 
 - **Lint e build:** `npm run lint` e `npm run build` a cada bloco.
 - **Chat:**
-  - conversão das mensagens antigas;
   - polling entre duas abas e duas contas;
   - o badge zera ao abrir;
   - as mensagens de sistema aparecem ao confirmar a entrega e ao concluir;
   - o envio é recusado em `AWAITING_DELIVERY`.
-- **Com a flag desligada antes da entrega** (`VITE_USE_MOCK_CHAT=false`): o badge fica em 0, a conversa mostra o erro e o resto do site segue normal.
+- **Sem a API no ar:** o badge fica em 0, a conversa mostra o erro e o resto do site segue normal.
 - **Excluir conta** (feito, contra a API):
   - senha errada → "Senha incorreta.";
   - conta sem senha → `EXCLUIR`;
