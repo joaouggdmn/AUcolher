@@ -1,7 +1,7 @@
 # AUcolher — Contrato da API: chat dos pedidos de adoção
 
-> Migração **011**. Hoje, sem a API, o chat roda num mock do navegador (`localStorage`): cada navegador tem a sua conversa, então as duas partes **não se veem**.
-> Este contrato leva o chat para o banco. Ele segue o padrão do resto da API: rotas, campos e enums em inglês, erros no `ErrorResponseDTO` com a frase pronta em `message`.
+> Migração **011**. **Implementado**, no back e no front: as conversas ficam no banco e as duas partes se veem.
+> Este contrato segue o padrão do resto da API: rotas, campos e enums em inglês, erros no `ErrorResponseDTO` com a frase pronta em `message`.
 > **Decisão:** as mensagens novas chegam por **polling** (o front pergunta de tempos em tempos), sem WebSocket. É REST comum no Spring, e o modal do PIX já usa o mesmo padrão.
 
 ## 1. Regras de negócio
@@ -11,13 +11,13 @@
   - o **dono** do animal (`animals.owner_id`), pessoa ou ONG.
 - Só as duas partes leem e escrevem. O admin não acessa o chat (403).
 - **Quando a conversa existe.** A partir do aceite do dono (`ACCEPTED`). Depois disso ela continua visível, mesmo travada:
-  - em `AWAITING_DELIVERY` e `CONCLUDED`;
+  - em `AWAITING_DELIVERY`, `CONCLUDED`, `RETURNED` e `REHOMED` (os dois últimos vêm depois da conclusão e recebem os avisos da tabela abaixo);
   - em `CANCELLED`, **se** o pedido foi cancelado depois de aceito (`cancelled_from_status` = `ACCEPTED` ou `AWAITING_DELIVERY`).
   - Pedido `PENDING`, `REJECTED` ou cancelado ainda pendente **não tem conversa** (404).
   - É a mesma regra que o front já usa em `core/hooks/useChatContacts.js`.
 - **Quem pode mandar mensagem.** Só em `ACCEPTED`. Em qualquer outro status a conversa é **somente leitura**: o histórico aparece, o campo de texto some.
   - `AWAITING_DELIVERY`: o dono confirmou a entrega e o chat trava (regras §3.1, passo 3).
-  - `CONCLUDED` e `CANCELLED`: encerrada.
+  - `CONCLUDED`, `RETURNED`, `REHOMED` e `CANCELLED`: encerrada.
   - Banimento e anúncio removido pela moderação já cancelam o pedido (`../contratos-prontos/api-denuncias-moderacao.md`), então a conversa trava sozinha, sem regra extra.
 - **Mensagem de pessoa.** Só texto, de **1 a 1000 caracteres** depois de aparar os espaços das pontas. Quebras de linha no meio valem. Sem anexos nem imagens.
 - **Mensagens de sistema.** São os avisos centralizados no meio da conversa ("O doador confirmou a entrega de Rex...").
@@ -35,10 +35,11 @@
 | `ANIMAL_REHOMED` | adotante republica (`CONCLUDED → REHOMED`) | "{adotante} anunciou {animal} para uma nova adoção." |
 
   - O adotante que cancela um pedido ainda `PENDING` **não** gera mensagem: não havia conversa.
+  - Corrigir um retorno já registrado (`RETURNED → RETURNED`) **não** gera outra mensagem.
+  - "Desisti de doar" (`REHOMED → CONCLUDED`) não tem evento próprio: o aviso `ANIMAL_REHOMED` continua no histórico, e o cabeçalho volta para "Adoção Concluída".
   - Os cancelamentos feitos pelo sistema (`ANIMAL_ADOPTED`, `ANIMAL_UNAVAILABLE`, `ACCOUNT_BANNED`, `LISTING_REMOVED`) também **não** geram mensagem. O front já mostra o motivo na faixa de "Conversa encerrada", a partir do `cancelReason` do pedido.
 - **Não lidas.** Cada parte guarda até qual mensagem já leu (`last_read_message_id`).
   - Conta como não lida toda mensagem com `id` maior que esse valor e que **não** foi escrita pela própria pessoa. Mensagens de sistema contam para as duas partes.
-  - É a mesma conta que o front faz hoje em `countUnreadMessages` (`core/utils/chatReadState.js`).
   - A marca de leitura só anda para frente.
 
 ## 2. Formatos (DTOs)
@@ -141,7 +142,7 @@ O mesmo `ErrorResponseDTO` de hoje: `{ "status": 400, "error": "...", "message":
 | texto vazio ou só espaços | "Escreva uma mensagem." |
 | mais de 1000 caracteres | "A mensagem pode ter no máximo 1000 caracteres." |
 | pedido em `AWAITING_DELIVERY` | "A entrega já foi confirmada: o chat está fechado para novas mensagens." |
-| pedido `CONCLUDED` | "Esta adoção foi concluída: o chat está fechado para novas mensagens." |
+| pedido `CONCLUDED`, `RETURNED` ou `REHOMED` | "Esta adoção foi concluída: o chat está fechado para novas mensagens." |
 | pedido `CANCELLED` | "Este pedido foi cancelado: o chat está fechado para novas mensagens." |
 
 No `PUT /read`, `lastMessageId` ausente ou negativo → 400 "Informe a última mensagem lida.".
@@ -195,17 +196,17 @@ No `PUT /read`, `lastMessageId` ausente ou negativo → 400 "Informe a última m
    LEFT JOIN chat_reads cr  ON cr.request_id = r.id AND cr.user_id = :me
    LEFT JOIN chat_messages m ON m.request_id = r.id
    WHERE (r.adopter_id = :me OR a.owner_id = :me)
-     AND (r.status IN ('ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED')
+     AND (r.status IN ('ACCEPTED', 'AWAITING_DELIVERY', 'CONCLUDED', 'RETURNED', 'REHOMED')
           OR (r.status = 'CANCELLED' AND r.cancelled_from_status IN ('ACCEPTED', 'AWAITING_DELIVERY')))
    GROUP BY r.id;
    ```
 8. **Custo do polling**: cada `GET ...?after=` é uma busca pelo índice `(request_id, id)`. Com poucos usuários, 3 s não pesa. Se pesar, basta aumentar o intervalo no front, sem mudar o contrato.
-9. **Dados antigos**: as mensagens que estão hoje no `localStorage` são de teste e **não** são migradas.
-10. **Exclusão de conta** (já implementada, `../contratos-prontos/api-exclusao-conta.md`): o `AccountDeletionService` precisa passar a apagar os `chat_reads` da conta. As mensagens ficam, com o autor "Conta excluída".
+9. **Dados antigos**: as mensagens que ficaram no `localStorage` de cada navegador eram de teste e **não** são migradas.
+10. **Exclusão de conta** (já implementada, `../contratos-prontos/api-exclusao-conta.md`): o `AccountDeletionService` apaga os `chat_reads` da conta. As mensagens ficam, com o autor "Conta excluída".
 
 ## 5. SQL (rascunho de migração, PostgreSQL)
 
-Número: **`011_chat.sql`** (ver `README.md` §3). A CHECK de `system_event` já nasce com os 6 eventos da §1.
+Número: **`011_chat.sql`** (ver `README.md` §3). A CHECK de `system_event` já nasce com os 7 eventos da §1.
 
 ```sql
 -- ============================================================
@@ -282,17 +283,16 @@ COMMIT;
 
 ## 6. O que muda no front
 
-> ✅ **Front pronto**, atrás de `VITE_USE_MOCK_CHAT` (ligada por padrão). Quando as rotas existirem: `VITE_USE_MOCK_CHAT=false` no `.env`.
+> ✅ **Implementado.** O front usa só a API: o mock, o seed no navegador e a flag `VITE_USE_MOCK_CHAT` saíram do código.
 
-- **Serviços** (`features/chat/services/`): o trio de sempre.
+- **Serviços** (`features/chat/services/`):
   - `chatApi.js` chama as 4 rotas da §3;
-  - `chatMock.js` responde no lugar, com os mesmos DTOs, no `localStorage` (`aucolher_mock_chat`). Na primeira vez, ele converte as conversas do formato antigo;
   - `chatService.js` é a fachada: converte o DTO para o modelo da tela (`senderId: 'system'` quando `type = SYSTEM`, `timestamp` = `createdAt`) e monta o texto em português de cada `systemEvent`.
 - **Polling** (§3.1), com react-query:
   - `useChatMessages`: o histórico e depois `?after=` a cada 3 s, só com a aba visível. O envio entra na lista na hora;
   - `useChatUnread`: `GET /chats/summary` a cada 20 s (badge da sidebar e painel da ONG).
 - **Leitura:** a conversa aberta chama `PUT /chats/{id}/read` com a última mensagem que apareceu na tela.
-- **Mensagens de sistema:** o front não escreve mais nenhuma. Depois de uma troca de status, ele só recarrega a conversa; quem cria o aviso é o backend. No mock, o `recordStatusEvent` faz esse papel.
-- **Retorno e repasse:** no mock, a linha "voltou para quem doou" / "anunciou para uma nova adoção" sai do próprio pedido. Com a API, ela chega como `ANIMAL_RETURNED` / `ANIMAL_REHOMED`.
+- **Mensagens de sistema:** o front não escreve nenhuma. Depois de uma troca de status, ele só recarrega a conversa; quem cria o aviso é o backend.
+- **Status do pedido:** um aviso novo no polling, ou um envio recusado, recarrega os pedidos na hora. Assim o campo de texto fecha sem esperar os 30 s da lista.
 - **Campo de texto:** `maxLength={1000}`, e o `message` da API aparece se o envio for recusado.
-- **Sem as rotas e com a flag desligada:** o badge fica em 0 e a conversa mostra "Não foi possível carregar as mensagens."; o resto do site segue normal.
+- **Conversas de demonstração:** estão em `docs/seed-banco-completo.sql`, com os mesmos ids dos pedidos do seed.

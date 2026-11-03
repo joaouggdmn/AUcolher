@@ -391,10 +391,9 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 
 ## 12. Nota técnica: API real vs. mock
 
-- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha.
-- **Ainda num servidor falso no `localStorage`**, atrás de uma flag `VITE_USE_MOCK_*` (ligada por padrão) e com o adaptador da API já escrito: chat (`VITE_USE_MOCK_CHAT`).
+- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha, chat.
 - **Ainda não existe em lugar nenhum:** a conexão de cada ONG com o próprio Mercado Pago (seção 10.3).
-- **O que falta no backend, em ordem:** `entrega-final/README.md`. Quando um módulo chega na API, o front apaga o mock e a flag dele e passa a usar só a API, como foi feito com campanhas, com a exclusão de conta e com a senha.
+- **O que falta no backend, em ordem:** `entrega-final/README.md`. Quando um módulo chega na API, o front apaga o mock e a flag dele e passa a usar só a API, como foi feito com campanhas, com a exclusão de conta, com a senha e com o chat.
 
 ## 13. Backlog técnico conhecido (não implementar agora — só registro)
 

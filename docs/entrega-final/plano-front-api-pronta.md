@@ -24,11 +24,11 @@ Não.
 | 1 | ~~Campanhas e doações, mais a parte delas no admin~~ | 007 | ✅ feito: só API, mock removido |
 | 2 | Conta Mercado Pago por ONG | 009 | a fazer |
 | 3 | ~~Senha (recuperar e alterar pelo link, derrubar sessões, `hasPassword`)~~ | 010 | ✅ feito: só API, mock removido |
-| 4 | Chat (6 mensagens de sistema) | 011 | parte 2 deste plano |
+| 4 | ~~Chat (7 mensagens de sistema)~~ | 011 | ✅ feito: só API, mock removido |
 | 5 | ~~Excluir conta~~ | 013 | ✅ feito: só API, mock removido |
 
 **Frontend:**
-- o chat (parte 2). ~~Excluir conta~~ (parte 3): feito, o front usa só a API e o mock saiu do código (`../contratos-prontos/api-exclusao-conta.md` §7);
+- ~~o chat (parte 2)~~: feito, o front usa só a API e o mock saiu do código (`api-chat.md` §6). ~~Excluir conta~~ (parte 3): feito, o front usa só a API e o mock saiu do código (`../contratos-prontos/api-exclusao-conta.md` §7);
 - conectar o Mercado Pago (`api-mercado-pago-ongs.md` §9);
 - a cada entrega do parceiro: desligar a flag e testar. ~~Campanhas~~: feito, o front usa só a API e o mock saiu do código (`api-campanhas-doacoes.md` §9);
 - pendências pequenas:
@@ -63,6 +63,8 @@ docs/
 - **`plano-backend-restante.md` saiu:** o `README.md` desta pasta é o mapa.
 
 ## Parte 2: chat pronto para a API
+
+> ✅ **Concluída.** As rotas existem (migração 011), e o front usa só a API: o mock, a flag e o seed no navegador saíram do código. O que segue é o registro de como a parte foi planejada.
 
 Trio **fachada / api / mock**, como em eventos (`features/eventos/services/eventoService.js`), seguindo `api-chat.md` §2, §3, §3.1 e §6.
 
