@@ -2,7 +2,7 @@
 
 > Implementa a regra de negócio §2.1. Migração **010**.
 > - Não existe "trocar senha" com a senha atual (sem `PUT /api/users/me/password`). Toda alteração passa pelo link de redefinição por e-mail. Em "Minha conta", o botão "Alterar senha" só pede esse link para o e-mail da conta.
-> - O front já está pronto: `features/auth/services/passwordService.js` chama as rotas abaixo, e o mock responde enquanto `VITE_USE_MOCK_SENHA` estiver ligada (padrão).
+> - ✅ **Implementado.** O front usa só a API: `features/auth/services/passwordService.js` chama as rotas abaixo, e o mock e a flag saíram do código.
 
 ## 1. Regras de negócio
 
@@ -182,7 +182,7 @@ COMMIT;
 
 ## 8. O que muda no front
 
-> ✅ Já feito no front, atrás de `VITE_USE_MOCK_SENHA`. Quando as rotas existirem: `VITE_USE_MOCK_SENHA=false`.
+> ✅ Feito: o front usa só a API.
 
 **Serviço** (`features/auth/services/passwordService.js`)
 - `requestPasswordReset`, `checkResetToken` e `resetPassword`.

@@ -1,16 +1,3 @@
-// Módulos sem endpoint no Spring Boot rodam contra um "servidor falso" no
-// localStorage (regras-de-negocios.md §12). O padrão é o mock; com
-// VITE_USE_MOCK_CHAT=false (ou outra flag abaixo) no .env o mesmo código
-// chama a API real. Eventos, campanhas e doações, denúncias, o painel do
-// admin, o retorno/repasse de adoções e a exclusão de conta já vêm sempre da API
-// Recuperar senha (docs/entrega-final/api-senha.md): sem as rotas da
-// migração 010, os links de "Esqueci minha senha" e do "Alterar senha" de
-// Minha conta ficam num servidor falso
-export const USE_MOCK_SENHA = import.meta.env.VITE_USE_MOCK_SENHA !== 'false'
-// Chat dos pedidos (docs/entrega-final/api-chat.md): sem as rotas da migração
-// 011, as conversas ficam num servidor falso no localStorage
-export const USE_MOCK_CHAT = import.meta.env.VITE_USE_MOCK_CHAT !== 'false'
-
 // Listas públicas mudam pouco: 30 s evita refazer a busca a cada navegação
 export const EVENTOS_STALE_TIME = 30_000
 export const CAMPANHAS_STALE_TIME = 30_000

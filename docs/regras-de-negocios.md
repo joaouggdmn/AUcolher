@@ -50,7 +50,7 @@ Frontend em React (Vite), backend em Spring Boot + PostgreSQL (o banco em uso fi
 
 Contratos: `entrega-final/api-senha.md` e `contratos-prontos/api-exclusao-conta.md`.
 
-**Situação:** a senha ainda roda no mock do front (`VITE_USE_MOCK_SENHA`), e a API dela vem com a migração 010. A exclusão de conta já está na API (migração 013).
+**Situação:** a senha (migração 010) e a exclusão de conta (migração 013) já estão na API.
 
 **Alterar senha**
 - Em "Minha conta", card "Acesso": e-mail e senha aparecem só para ver, a senha mascarada (o banco guarda o hash).
@@ -389,14 +389,11 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 - **Decisão atual**: a central de notificações foi removida do sistema. A sidebar de navegação (acessível pelo ícone de menu na navbar) já cobre os alertas mais importantes do dia a dia via badges numéricos: interesses recebidos pendentes e mensagens de chat não lidas.
 - Eventos que antes gerariam notificação e hoje **não têm nenhum canal de aviso**: animal favoritado foi adotado por outra pessoa, nova avaliação recebida, denúncia julgada. Se algum desses precisar de visibilidade no futuro, considerar um badge dedicado na sidebar em vez de reintroduzir uma central separada.
 
-## 12. Nota técnica: API real vs. mock
+## 12. Nota técnica: o que já está na API
 
-- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta.
-- **Ainda num servidor falso no `localStorage`**, cada um atrás de uma flag `VITE_USE_MOCK_*` (ligada por padrão) e com o adaptador da API já escrito:
-  - recuperar e alterar senha (`VITE_USE_MOCK_SENHA`);
-  - chat (`VITE_USE_MOCK_CHAT`).
+- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha, chat.
 - **Ainda não existe em lugar nenhum:** a conexão de cada ONG com o próprio Mercado Pago (seção 10.3).
-- **O que falta no backend, em ordem:** `entrega-final/README.md`. Quando um módulo chega na API, o front apaga o mock e a flag dele e passa a usar só a API, como foi feito com campanhas e com a exclusão de conta.
+- **O que falta no backend, em ordem:** `entrega-final/README.md`. O front não tem mais mock: todo módulo pronto usa só a API.
 
 ## 13. Backlog técnico conhecido (não implementar agora — só registro)
 

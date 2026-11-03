@@ -19,22 +19,10 @@ import { useConcludeAdoption } from "../../../core/hooks/useConcludeAdoption";
 import { queryKeys } from "../../../core/services/queryKeys";
 import { getErrorMessage } from "../../../core/utils/apiError";
 import { CHAT_MESSAGE_MAX_LENGTH } from "../../../core/utils/constants";
-import {
-  RETURN_SYSTEM_EVENTS,
-  SHOWS_RETURN_LINE_FROM_REQUEST,
-  markRead,
-  systemMessageText,
-} from "../services/chatService";
+import { RETURN_SYSTEM_EVENTS, markRead, systemMessageText } from "../services/chatService";
 import ConfirmAdoptionModal from "../../adocao/components/ConfirmAdoptionModal";
 import ReportButton from "../../denuncias/components/ReportButton";
 import AdoptionConcludedPanel from "./AdoptionConcludedPanel";
-
-// Linha de sistema do retorno ou do repasse (regras §3.3). No mock ela sai
-// do próprio pedido; com a API, chega como ANIMAL_RETURNED / ANIMAL_REHOMED
-function returnSystemMessage(contact) {
-  const systemEvent = contact.returnInfo?.type === "RETURNED" ? "ANIMAL_RETURNED" : "ANIMAL_REHOMED";
-  return systemMessageText({ systemEvent }, contact);
-}
 
 // Por que a conversa foi encerrada, do ponto de vista de quem está lendo
 function closedConversationMessage(contact) {
@@ -87,9 +75,10 @@ function ChatConversationPanel({ contact, onBack }) {
   const lastMarkedRef = useRef(null);
   const lastMessageId = messages.at(-1)?.id;
 
+  // O status também: ele troca o rodapé, que pode cobrir o aviso que acabou de chegar
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+  }, [messages.length, contact.status]);
 
   // Conversa aberta = tudo o que apareceu na tela foi visto; zera o
   // contador dela no badge da sidebar. Melhor esforço: se falhar, o badge
@@ -135,7 +124,7 @@ function ChatConversationPanel({ contact, onBack }) {
       } else if (confirmModalMode === "decline-delivery") {
         await declineDelivery(target);
       } else {
-        await cancelAdoption({ ...target, byOwner: contact.isOwnerView, fromStatus: contact.status });
+        await cancelAdoption(target);
       }
       setConfirmModalMode(null);
     } catch (error) {
@@ -269,7 +258,7 @@ function ChatConversationPanel({ contact, onBack }) {
           messages.map((message) => {
             // Mensagem de sistema (entrega, adoção, desistência) — bolha
             // centralizada, visualmente distinta das mensagens normais. O
-            // retorno e o repasse ficam em azul, como a linha do mock
+            // retorno e o repasse ficam em azul
             if (message.senderId === "system") {
               const isReturn = RETURN_SYSTEM_EVENTS.includes(message.systemEvent);
               return (
@@ -315,18 +304,6 @@ function ChatConversationPanel({ contact, onBack }) {
               </div>
             );
           })
-        )}
-        {SHOWS_RETURN_LINE_FROM_REQUEST && hasReturn && contact.returnInfo && (
-          <div className="flex justify-center">
-            <div className="flex max-w-[85%] items-center gap-2 rounded-2xl bg-sky-50 px-4 py-2 text-center text-xs font-bold text-sky-700 shadow-sm sm:max-w-[70%]">
-              {contact.status === "RETURNED" ? (
-                <FaRotateLeft size={11} className="shrink-0 text-sky-500" />
-              ) : (
-                <FaBullhorn size={11} className="shrink-0 text-sky-500" />
-              )}
-              {returnSystemMessage(contact)}
-            </div>
-          </div>
         )}
         <div ref={bottomRef} />
       </div>

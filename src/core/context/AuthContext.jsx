@@ -6,6 +6,7 @@ import {
 } from '../../features/aumatch/services/aumatchService'
 import {
   ACCOUNT_SUSPENDED_FLAG_KEY,
+  LEGACY_MOCK_CHAT_STORAGE_KEY,
   SESSION_EXPIRED_FLAG_KEY,
   TOKEN_STORAGE_KEY,
   TOKEN_TYPE_STORAGE_KEY,
@@ -45,6 +46,8 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    localStorage.removeItem(LEGACY_MOCK_CHAT_STORAGE_KEY)
+
     const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY)
     const storedUser = localStorage.getItem(USER_STORAGE_KEY)
 

@@ -1,15 +1,7 @@
-import { USE_MOCK_CHAT } from '../../../core/utils/constants'
 import * as chatApi from './chatApi'
-import * as chatMock from './chatMock'
 
 // Fachada do chat: os hooks só conhecem estas funções e o modelo da tela.
-// Quem fala com o "servidor" é o adaptador — API real ou mock, os dois com as
-// mesmas funções e os mesmos DTOs (docs/entrega-final/api-chat.md)
-const adapter = USE_MOCK_CHAT ? chatMock : chatApi
-
-// No mock, a linha de retorno/repasse da conversa sai do próprio pedido; com
-// a API, ela chega como mensagem de sistema (ANIMAL_RETURNED / ANIMAL_REHOMED)
-export const SHOWS_RETURN_LINE_FROM_REQUEST = USE_MOCK_CHAT
+// Quem fala com o servidor é o chatApi (docs/entrega-final/api-chat.md)
 
 export const RETURN_SYSTEM_EVENTS = ['ANIMAL_RETURNED', 'ANIMAL_REHOMED']
 
@@ -28,8 +20,7 @@ export function toFrontendMessage(dto) {
 }
 
 // O backend guarda o código do aviso; a frase em português é montada aqui,
-// com o nome do animal e, no repasse, de quem republicou. Aviso sem código
-// (conversas antigas do mock) já vem com o texto pronto
+// com o nome do animal e, no repasse, de quem republicou
 export function systemMessageText(message, contact) {
   const animal = contact?.animalName ?? 'o animal'
   switch (message.systemEvent) {
@@ -63,7 +54,7 @@ export function withSystemText(message, contact) {
 
 // DTO do resumo (api-chat.md §2.4), com a última mensagem já no modelo da tela
 export async function getSummary() {
-  const summary = await adapter.getSummary()
+  const summary = await chatApi.getSummary()
   return summary.conversations.map((conversation) => ({
     requestId: conversation.requestId,
     unreadCount: conversation.unreadCount,
@@ -72,19 +63,13 @@ export async function getSummary() {
 }
 
 export async function listMessages(requestId, after) {
-  return (await adapter.listMessages(requestId, after)).map(toFrontendMessage)
+  return (await chatApi.listMessages(requestId, after)).map(toFrontendMessage)
 }
 
 export async function sendMessage(requestId, text) {
-  return toFrontendMessage(await adapter.sendMessage(requestId, text))
+  return toFrontendMessage(await chatApi.sendMessage(requestId, text))
 }
 
 export function markRead(requestId, lastMessageId) {
-  return adapter.markRead(requestId, lastMessageId)
-}
-
-// Depois de uma troca de status que deu certo: com a API, o backend já criou
-// o aviso na mesma transação; no mock, é aqui que ele entra na conversa
-export function recordStatusEvent(requestId, systemEvent) {
-  if (USE_MOCK_CHAT) chatMock.recordSystemEvent(requestId, systemEvent)
+  return chatApi.markRead(requestId, lastMessageId)
 }

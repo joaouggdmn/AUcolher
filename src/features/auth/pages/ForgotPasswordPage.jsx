@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom'
 import { FaArrowLeft, FaEnvelope, FaEnvelopeCircleCheck } from 'react-icons/fa6'
 import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
-import MockResetLinkBox from '../components/MockResetLinkBox'
 import { getErrorMessage } from '../../../core/utils/apiError'
 import { requestPasswordReset } from '../services/passwordService'
 import { FORGOT_PASSWORD_NEUTRAL_MESSAGE } from '../utils/passwordRules'
@@ -18,8 +17,7 @@ function ForgotPasswordPage() {
   const [email, setEmail] = useState(location.state?.email ?? '')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState(null)
-  // { mockResult } depois de enviar; mockResult só existe no modo mock
-  const [sent, setSent] = useState(null)
+  const [sent, setSent] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -27,8 +25,8 @@ function ForgotPasswordPage() {
     setError(null)
 
     try {
-      const mockResult = await requestPasswordReset(email.trim())
-      setSent({ mockResult })
+      await requestPasswordReset(email.trim())
+      setSent(true)
     } catch (err) {
       setError(getErrorMessage(err, 'Não foi possível enviar o pedido. Tente novamente.'))
     } finally {
@@ -63,8 +61,6 @@ function ForgotPasswordPage() {
             </div>
           </div>
 
-          <MockResetLinkBox result={sent.mockResult} />
-
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link to="/login" className={BACK_LINK_CLASSES}>
               <FaArrowLeft size={12} />
@@ -72,7 +68,7 @@ function ForgotPasswordPage() {
             </Link>
             <button
               type="button"
-              onClick={() => setSent(null)}
+              onClick={() => setSent(false)}
               className="text-sm font-semibold text-slate-500 transition-colors hover:text-emerald-800"
             >
               Usar outro e-mail

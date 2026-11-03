@@ -5,7 +5,6 @@ import AuthForm from '../components/AuthForm'
 import AuthInput from '../components/AuthInput'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../core/utils/apiError'
-import { USE_MOCK_SENHA } from '../../../core/utils/constants'
 import { checkResetToken, resetPassword } from '../services/passwordService'
 import { INVALID_RESET_LINK_MESSAGE, PASSWORD_MIN_LENGTH, validateNewPassword } from '../utils/passwordRules'
 
@@ -168,13 +167,6 @@ function ResetPasswordPage() {
 
           {submitError && (
             <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-600">{submitError}</p>
-          )}
-
-          {USE_MOCK_SENHA && (
-            <p className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs font-medium text-amber-800">
-              Modo de teste: o link é conferido e marcado como usado, mas a senha nova ainda não é gravada. Continue
-              entrando com a senha de antes.
-            </p>
           )}
 
           <button type="submit" disabled={isSubmitting} className={`mt-1 ${PRIMARY_BUTTON_CLASSES}`}>

@@ -3,7 +3,6 @@ import { FaEnvelope, FaEnvelopeCircleCheck, FaKey } from 'react-icons/fa6'
 import FormField from '../../../../core/components/ui/FormField'
 import { useAuth } from '../../../../core/context/AuthContext'
 import { getErrorMessage } from '../../../../core/utils/apiError'
-import MockResetLinkBox from '../../../auth/components/MockResetLinkBox'
 import { requestPasswordReset } from '../../../auth/services/passwordService'
 import ProfileSection from '../ProfileSection'
 
@@ -21,8 +20,7 @@ function AccessSection({ emailHint }) {
 
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState(null)
-  // { mockResult } depois de enviar; mockResult só existe no modo mock
-  const [sent, setSent] = useState(null)
+  const [sent, setSent] = useState(false)
 
   const handleRequestLink = async () => {
     if (isSending || !user?.email) return
@@ -30,8 +28,8 @@ function AccessSection({ emailHint }) {
     setError(null)
 
     try {
-      const mockResult = await requestPasswordReset(user.email)
-      setSent({ mockResult })
+      await requestPasswordReset(user.email)
+      setSent(true)
     } catch (err) {
       setError(getErrorMessage(err, 'Não foi possível enviar o link. Tente novamente.'))
     } finally {
@@ -72,8 +70,6 @@ function AccessSection({ emailHint }) {
               : 'Para criar uma senha, enviamos um link para o seu e-mail.'}
           </p>
         )}
-
-        <MockResetLinkBox result={sent?.mockResult} />
 
         {error && <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-600">{error}</p>}
 
