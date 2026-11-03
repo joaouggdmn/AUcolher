@@ -2,7 +2,7 @@
 
 Esta pasta é o pacote para o parceiro de backend: tudo o que ainda falta implementar na API e no banco, um contrato por módulo. O que já está pronto fica em `../contratos-prontos/`, só como referência.
 
-**Como o front espera cada entrega:** a chamada da API de cada módulo já está escrita no front, atrás de uma flag `VITE_USE_MOCK_*`. Enquanto a rota não existe, a flag fica ligada e um "servidor falso" no `localStorage` responde no lugar, com os mesmos DTOs. Quando o módulo é entregue, o front apaga o mock e a flag e passa a usar só a API, como já foi feito com campanhas e com a exclusão de conta. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos.**
+**Como o front espera cada entrega:** o front usa só a API, sem mocks nem flags `VITE_USE_MOCK_*`. Enquanto a rota de um módulo não existe, aquela parte da tela fica vazia ou mostra um erro, e o resto do site segue normal. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos.**
 
 Os contratos seguem sempre o mesmo padrão:
 - regras → DTOs → endpoints → notas de Spring → SQL → o que muda no front;
@@ -178,4 +178,4 @@ erDiagram
 - [ ] Regras no `SecurityConfig`: rotas fixas antes das genéricas, e rotas públicas só onde o contrato manda.
 - [ ] Mensagens de erro **iguais** às dos contratos, porque o front mostra o `message` direto.
 - [ ] Testes de unidade das regras (no padrão do `AdoptionRequestServiceTest`) e um teste HTTP de ponta a ponta num banco descartável.
-- [ ] Avisar o front quando a rota estiver no ar, para o mock e a flag do módulo saírem do código.
+- [ ] Avisar o front quando a rota estiver no ar, para testar a tela contra ela.
