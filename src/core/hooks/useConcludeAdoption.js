@@ -1,9 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useAdoptionRequests } from '../context/AdoptionRequestContext'
 import { queryKeys } from '../services/queryKeys'
-import { recordStatusEvent } from '../../features/chat/services/chatService'
-
-const CONVERSATION_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
 
 // Orquestra as mudanças de status que também deixam um registro no chat,
 // num único ponto — evita duplicar essa sequência nos vários lugares que
@@ -17,41 +14,36 @@ const CONVERSATION_STATUSES = ['ACCEPTED', 'AWAITING_DELIVERY']
 //   aceito e o chat reabre para combinar a entrega
 //   Desistência (qualquer uma das partes): cancela e registra quem desistiu
 // Todas rejeitam com o erro da API — quem chama mostra a mensagem. O aviso
-// no chat é criado pelo backend na mesma transação (api-chat.md §1); no mock,
-// o recordStatusEvent faz esse papel. Depois, a conversa e o badge recarregam
+// no chat é criado pelo backend na mesma transação (api-chat.md §1); aqui, a
+// conversa e o badge só recarregam
 export function useConcludeAdoption() {
   const { requestDeliveryConfirmation, concludeRequest, declineDelivery: declineDeliveryRequest, cancelRequest } =
     useAdoptionRequests()
   const queryClient = useQueryClient()
 
-  function afterStatusChange(requestId, systemEvent) {
-    recordStatusEvent(requestId, systemEvent)
+  function afterStatusChange(requestId) {
     queryClient.invalidateQueries({ queryKey: queryKeys.chat.messages(requestId) })
     queryClient.invalidateQueries({ queryKey: [...queryKeys.chat.all, 'summary'] })
   }
 
   async function requestDelivery({ requestId }) {
     await requestDeliveryConfirmation(requestId)
-    afterStatusChange(requestId, 'DELIVERY_REQUESTED')
+    afterStatusChange(requestId)
   }
 
   async function concludeAdoption({ requestId }) {
     await concludeRequest(requestId)
-    afterStatusChange(requestId, 'ADOPTION_CONCLUDED')
+    afterStatusChange(requestId)
   }
 
   async function declineDelivery({ requestId }) {
     await declineDeliveryRequest(requestId)
-    afterStatusChange(requestId, 'DELIVERY_DECLINED')
+    afterStatusChange(requestId)
   }
 
-  // Só um pedido que já tinha conversa (aceito ou aguardando entrega) ganha
-  // o aviso: cancelar um pedido pendente não fala nada no chat
-  async function cancelAdoption({ requestId, byOwner, fromStatus }) {
+  async function cancelAdoption({ requestId }) {
     await cancelRequest(requestId)
-    if (CONVERSATION_STATUSES.includes(fromStatus)) {
-      afterStatusChange(requestId, byOwner ? 'OWNER_WITHDREW' : 'ADOPTER_WITHDREW')
-    }
+    afterStatusChange(requestId)
   }
 
   return { requestDelivery, concludeAdoption, declineDelivery, cancelAdoption }

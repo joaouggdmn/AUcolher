@@ -3,11 +3,8 @@ import { router } from './routers'
 import { AuthProvider } from './core/context/AuthContext'
 import { AdoptionRequestProvider } from './core/context/AdoptionRequestContext'
 import { FavoritesProvider } from './core/context/FavoritesContext'
-import { useMockStorageSync } from './core/hooks/useMockStorageSync'
 
 function App() {
-  useMockStorageSync()
-
   return (
     <AuthProvider>
       <AdoptionRequestProvider>

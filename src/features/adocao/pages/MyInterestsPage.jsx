@@ -50,7 +50,7 @@ function MyInterestsPage() {
     setIsCancelling(true)
     setCancelError(null)
     try {
-      await cancelAdoption({ requestId: cancelling.id, byOwner: false, fromStatus: cancelling.status })
+      await cancelAdoption({ requestId: cancelling.id })
       setCancelling(null)
       setSuccessMessage(`Seu pedido para ${animalName} foi cancelado.`)
     } catch (error) {
