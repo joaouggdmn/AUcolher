@@ -16,7 +16,7 @@ Os contratos seguem sempre o mesmo padrão:
 | `README.md` | Este mapa: situação, ordem, migrações, variáveis de ambiente, riscos e checklist |
 | `api-campanhas-doacoes.md` | Campanhas e doações por PIX, mais a parte delas no admin e na moderação (**implementado**, menos o PIX real) |
 | `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG e webhook |
-| `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões |
+| `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões (**implementado**) |
 | `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema |
 | `api-login-google.md` | Entrar com o Google: **já implementado** (back e front); só o fluxo, as variáveis e como criar as credenciais |
 | `plano-front-api-pronta.md` | O plano do front para deixar cada módulo pronto para ligar na API |
@@ -38,16 +38,16 @@ Os contratos seguem sempre o mesmo padrão:
 | Excluir conta | `users.deleted_at` | ✅ pronto | API | `contratos-prontos/api-exclusao-conta.md` |
 | **Campanhas e doações (PIX)** | `campaigns`, `donations` | ✅ pronto, **menos o PIX real** (token único provisório) | API | `api-campanhas-doacoes.md` |
 | **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ❌ falta | a fazer | `api-mercado-pago-ongs.md` |
-| **Senha** | `password_reset_tokens` + `users.password_changed_at` | ❌ falta | mock (`VITE_USE_MOCK_SENHA`) | `api-senha.md` |
+| **Senha** | `password_reset_tokens` + `users.password_changed_at` | ✅ pronto | API | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ❌ falta | mock (`VITE_USE_MOCK_CHAT`) | `api-chat.md` |
 
 ## 3. Ordem sugerida
 
 0. **Teste no sandbox do Mercado Pago** (`api-mercado-pago-ongs.md` §6): OAuth de um vendedor de teste, PIX criado com o token dele e o pagamento confirmado. O resultado decide entre o contrato e o plano B (§6 deste arquivo). **Ainda falta:** não há credenciais de teste.
 1. ~~Campanhas e doações~~ (migração 007): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7). Falta a **conta Mercado Pago** (009): até lá, o PIX usa um token único provisório.
-2. **Senha** (010).
+2. ~~Senha~~ (010): **feito** (`api-senha.md`).
 3. **Chat** (011).
-4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Quando a 009, a 010 e a 011 chegarem, a exclusão precisa apagar também a conta Mercado Pago, os links de senha e as marcas de leitura do chat (§1 do contrato).
+4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Os links de senha (010) já são apagados. Quando a 009 e a 011 chegarem, a exclusão precisa apagar também a conta Mercado Pago e as marcas de leitura do chat (§1 do contrato).
 
 **Opcional:** o e-mail de aviso "senha alterada" (`api-senha.md` §1).
 
