@@ -75,9 +75,10 @@ function ChatConversationPanel({ contact, onBack }) {
   const lastMarkedRef = useRef(null);
   const lastMessageId = messages.at(-1)?.id;
 
+  // O status também: ele troca o rodapé, que pode cobrir o aviso que acabou de chegar
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+  }, [messages.length, contact.status]);
 
   // Conversa aberta = tudo o que apareceu na tela foi visto; zera o
   // contador dela no badge da sidebar. Melhor esforço: se falhar, o badge
