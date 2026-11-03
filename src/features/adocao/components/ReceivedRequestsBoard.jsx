@@ -75,7 +75,7 @@ function ReceivedRequestsBoard({ onGoToChat, onNotify }) {
         await requestDelivery({ requestId: request.id })
         notify(`Pedido enviado! Assim que ${animalName} chegar até o adotante, ele confirma por lá.`)
       } else {
-        await cancelAdoption({ requestId: request.id, byOwner: true, fromStatus: request.status })
+        await cancelAdoption({ requestId: request.id })
         notify(`Você desistiu da adoção de ${animalName}.`)
       }
       setConfirming(null)

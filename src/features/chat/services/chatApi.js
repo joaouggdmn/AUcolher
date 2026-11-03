@@ -1,7 +1,6 @@
 import api from '../../../core/services/api'
 
-// Adaptador real: é o contrato de docs/entrega-final/api-chat.md §3 em código.
-// chatMock.js tem as mesmas funções e devolve os mesmos DTOs. A conversa é o
+// O contrato de docs/entrega-final/api-chat.md §3 em código. A conversa é o
 // próprio pedido de adoção: `requestId` é o id do pedido
 
 // Todas as conversas da conta logada, com as não lidas e a última mensagem

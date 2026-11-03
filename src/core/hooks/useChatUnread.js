@@ -9,9 +9,8 @@ import * as chatService from '../../features/chat/services/chatService'
 const NO_CONVERSATIONS = []
 
 // Não lidas e última mensagem de cada conversa, do GET /chats/summary
-// (api-chat.md §2.4), a cada 20 s. O total soma só as conversas que estão nos
-// contatos da conta: no mock, o resumo traz as conversas de todas as contas
-// que já usaram este navegador
+// (api-chat.md §2.4), a cada 20 s. Cruza com os contatos, que têm o nome do
+// animal e da outra parte usados no texto dos avisos
 export function useChatUnread() {
   const { user } = useAuth()
   const { contacts } = useChatContacts()
