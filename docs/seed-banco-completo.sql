@@ -7,14 +7,13 @@
 --     e-mails fictícios @teste.com; bios, equipes e animais ilustrativos);
 --   - 12 pessoas fictícias do sul de SC, Florianópolis, Joinville e Chapecó;
 --   - 49 animais, 22 pedidos de adoção em todos os status, avaliações,
---     favoritos, perfis do AUmatch, 11 eventos com presenças e 3 denúncias.
+--     favoritos, perfis do AUmatch, 11 eventos com presenças, 3 denúncias e
+--     12 conversas de chat.
 --
 -- Senha de TODAS as contas novas (ONGs e pessoas): 123456
 --
 --   psql -U postgres -h localhost -d aucolher_db -f docs/seed-banco-completo.sql
 --
--- Campanhas e chat ainda não têm tabela: ficam nos mocks do front
--- (seedCampanhas.js e seedChat.js), com os mesmos ids deste arquivo.
 -- ============================================================
 
 \set ON_ERROR_STOP on
@@ -25,7 +24,7 @@ BEGIN;
 CREATE TEMP TABLE keep_admin ON COMMIT DROP AS
     SELECT * FROM users WHERE user_type = 'ADMIN' ORDER BY id LIMIT 1;
 
-TRUNCATE TABLE reports, event_attendances, events, adoption_reviews, favorites,
+TRUNCATE TABLE chat_reads, chat_messages, reports, event_attendances, events, adoption_reviews, favorites,
                animal_photos, match_profiles, ngo_visiting_hours, ngo_team,
                adoption_requests, animals, users
     RESTART IDENTITY CASCADE;
@@ -409,6 +408,136 @@ VALUES (2, 10, 'USER', 19, 'Vitor Pagani', NULL, 'PERSON', 'Criciúma', 'SC', 'F
 INSERT INTO reports (id, reporter_id, target_type, target_id, target_name, target_photo_url, target_species, target_owner_id, target_owner_name, target_owner_user_type, reason, description, status, resolution, resolved_by, created_at, resolved_at)
 VALUES (3, 12, 'ANIMAL', 45, 'Tambor', 'https://images.unsplash.com/photo-1452857297128-d9c29adba80b?auto=format&fit=crop&w=1200&q=80', 'OTHER', 14, 'Beatriz Cardoso', 'PERSON', 'IMPROPER_CONTENT', 'A foto parece de banco de imagens.', 'RESOLVED', 'DISMISSED', 1, NOW() - INTERVAL '6 days 0 hours', NOW() - INTERVAL '4 days 0 hours');
 
+-- Conversas do chat: os pedidos que já passaram do aceite. Ids na ordem das
+-- datas, como no banco: as conversas se intercalam. Os avisos de sistema entram
+-- onde a API os criaria (api-chat.md §1)
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (1, 2, 2, 'USER', 'Lucas, o Frajola é seu! Quando você pode buscar?', NULL, NOW() - INTERVAL '66 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (2, 2, 9, 'USER', 'Pode ser na quinta à tarde?', NULL, NOW() - INTERVAL '65 days 23 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (3, 2, NULL, 'SYSTEM', NULL, 'DELIVERY_REQUESTED', NOW() - INTERVAL '61 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (4, 2, NULL, 'SYSTEM', NULL, 'ADOPTION_CONCLUDED', NOW() - INTERVAL '60 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (5, 3, 2, 'USER', 'Oi, Fernanda! Pedido do Laranja aceito. Vamos combinar a entrega?', NULL, NOW() - INTERVAL '55 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (6, 3, 10, 'USER', 'Vamos! Moro em Içara, posso buscar aí em Criciúma.', NULL, NOW() - INTERVAL '54 days 21 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (7, 3, NULL, 'SYSTEM', NULL, 'DELIVERY_REQUESTED', NOW() - INTERVAL '51 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (8, 3, NULL, 'SYSTEM', NULL, 'ADOPTION_CONCLUDED', NOW() - INTERVAL '50 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (9, 1, 2, 'USER', 'Oi, Mariana! Aceitamos seu pedido para o Caramelo. Podemos marcar uma visita na sede no sábado?', NULL, NOW() - INTERVAL '46 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (10, 1, 8, 'USER', 'Oba! Sábado às 10h fica bom para mim.', NULL, NOW() - INTERVAL '45 days 22 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (11, 1, 2, 'USER', 'Perfeito. Traga um documento com foto e comprovante de residência.', NULL, NOW() - INTERVAL '44 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (12, 1, NULL, 'SYSTEM', NULL, 'DELIVERY_REQUESTED', NOW() - INTERVAL '41 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (13, 1, NULL, 'SYSTEM', NULL, 'ADOPTION_CONCLUDED', NOW() - INTERVAL '40 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (14, 5, 15, 'USER', 'Oi, Juliana! A Mel é sua. Você pode vir buscar em Cocal do Sul?', NULL, NOW() - INTERVAL '24 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (15, 5, 12, 'USER', 'Posso sim! Domingo depois do almoço?', NULL, NOW() - INTERVAL '23 days 22 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (16, 21, 6, 'USER', 'Gabriel, aceitamos seu pedido para a Duquesa.', NULL, NOW() - INTERVAL '22 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (17, 5, NULL, 'SYSTEM', NULL, 'DELIVERY_REQUESTED', NOW() - INTERVAL '21 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (18, 21, 13, 'USER', 'Obrigado! Ela vai viajar bem até Araranguá?', NULL, NOW() - INTERVAL '21 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (19, 5, NULL, 'SYSTEM', NULL, 'ADOPTION_CONCLUDED', NOW() - INTERVAL '20 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (20, 4, 4, 'USER', 'Larissa, aceitamos seu pedido! A Luna vai adorar correr com você.', NULL, NOW() - INTERVAL '19 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (21, 4, 16, 'USER', 'Que notícia boa! Posso buscar no sábado de manhã?', NULL, NOW() - INTERVAL '18 days 23 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (22, 21, 6, 'USER', 'Gabriel, conversamos aqui e achamos que a viagem e a mudança de clima seriam demais para ela. Sentimos muito.', NULL, NOW() - INTERVAL '18 days 4 hours 48 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (23, 21, NULL, 'SYSTEM', NULL, 'OWNER_WITHDREW', NOW() - INTERVAL '18 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (24, 4, NULL, 'SYSTEM', NULL, 'DELIVERY_REQUESTED', NOW() - INTERVAL '16 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (25, 4, NULL, 'SYSTEM', NULL, 'ADOPTION_CONCLUDED', NOW() - INTERVAL '15 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (26, 14, 3, 'USER', 'Juliana, aceitamos seu pedido para o Faísca!', NULL, NOW() - INTERVAL '12 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (27, 3, 10, 'USER', 'Infelizmente o Laranja e a minha cachorra não se acertaram. Posso levar ele de volta?', NULL, NOW() - INTERVAL '11 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (28, 14, 12, 'USER', 'Obrigada! Só preciso confirmar com o condomínio se aceitam cachorro de porte médio.', NULL, NOW() - INTERVAL '11 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (29, 3, 2, 'USER', 'Claro, Fernanda. Obrigado por avisar com cuidado. Traga ele amanhã.', NULL, NOW() - INTERVAL '10 days 12 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (30, 3, NULL, 'SYSTEM', NULL, 'ANIMAL_RETURNED', NOW() - INTERVAL '10 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (31, 10, 2, 'USER', 'Beatriz, a Jade é sua! Vamos combinar a entrega?', NULL, NOW() - INTERVAL '10 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (32, 10, 14, 'USER', 'Eba! Pode ser lá em Forquilhinha? Não tenho carro.', NULL, NOW() - INTERVAL '9 days 21 hours 36 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (33, 10, 2, 'USER', 'Pode sim, um voluntário leva até você.', NULL, NOW() - INTERVAL '9 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (34, 14, 12, 'USER', 'Infelizmente o condomínio não aceitou. Vou ter que desistir, sinto muito.', NULL, NOW() - INTERVAL '7 days 4 hours 48 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (35, 14, NULL, 'SYSTEM', NULL, 'ADOPTER_WITHDREW', NOW() - INTERVAL '7 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (36, 18, 11, 'USER', 'Oi, Mariana! A Salsicha é sua se você quiser. Você mora perto do centro?', NULL, NOW() - INTERVAL '6 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (37, 18, 8, 'USER', 'Moro no Michel. Posso buscar quando for melhor para você.', NULL, NOW() - INTERVAL '5 days 19 hours 12 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (38, 2, NULL, 'SYSTEM', NULL, 'ANIMAL_REHOMED', NOW() - INTERVAL '5 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (39, 9, 2, 'USER', 'Oi, Gabriel! Aceitamos seu pedido para a Pantera. Ela é desconfiada no começo, tudo bem para você?', NULL, NOW() - INTERVAL '5 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (40, 9, 13, 'USER', 'Tudo bem! Moro num sítio em Araranguá, ela vai ter bastante espaço.', NULL, NOW() - INTERVAL '4 days 19 hours 12 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (41, 9, 2, 'USER', 'Que ótimo. Podemos fazer uma visita de adaptação na semana que vem?', NULL, NOW() - INTERVAL '4 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (42, 11, 3, 'USER', 'Oi, Thiago! O Marley foi aprovado para você. Ele ainda puxa um pouco na guia, ok?', NULL, NOW() - INTERVAL '4 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (43, 11, 15, 'USER', 'Sem problemas, vou fazer adestramento com ele.', NULL, NOW() - INTERVAL '3 days 12 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (44, 15, 6, 'USER', 'Oi, Pedro! Pedido do Chocolate aceito. Você pode vir ao abrigo no sábado à tarde?', NULL, NOW() - INTERVAL '2 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (45, 15, 17, 'USER', 'Posso sim. Levo meus filhos para conhecerem ele?', NULL, NOW() - INTERVAL '1 days 12 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (46, 10, NULL, 'SYSTEM', NULL, 'DELIVERY_REQUESTED', NOW() - INTERVAL '1 days 0 hours');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (47, 18, 11, 'USER', 'Pode ser no sábado de manhã? Separo a caminha e a ração dela.', NULL, NOW() - INTERVAL '0 days 9 hours 36 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (48, 9, 13, 'USER', 'Pode ser na terça? Consigo sair mais cedo do trabalho.', NULL, NOW() - INTERVAL '0 days 7 hours 12 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (49, 11, 15, 'USER', 'Posso visitar ele amanhã à tarde?', NULL, NOW() - INTERVAL '0 days 4 hours 48 minutes');
+INSERT INTO chat_messages (id, request_id, sender_id, type, text, system_event, created_at)
+VALUES (50, 15, 6, 'USER', 'Pode e deve! É bom ver como ele reage com as crianças.', NULL, NOW() - INTERVAL '0 days 2 hours 24 minutes');
+
+-- Até onde cada parte leu. Quem tem a última mensagem por ler vê o badge do chat
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (1, 8, 13, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (1, 2, 13, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (2, 9, 38, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (2, 2, 38, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (3, 10, 30, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (3, 2, 30, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (4, 16, 25, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (4, 4, 25, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (5, 12, 19, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (5, 15, 19, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (9, 13, 48, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (9, 2, 41, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (10, 14, 46, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (10, 2, 46, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (11, 15, 49, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (11, 3, 43, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (14, 12, 35, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (14, 3, 35, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (15, 17, 45, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (15, 6, 50, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (18, 8, 37, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (18, 11, 47, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (21, 13, 23, NOW());
+INSERT INTO chat_reads (request_id, user_id, last_read_message_id, read_at) VALUES (21, 6, 23, NOW());
+
 -- Sequências depois dos ids fixos
 SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT MAX(id) FROM users));
 SELECT setval(pg_get_serial_sequence('animals', 'id'), (SELECT MAX(id) FROM animals));
@@ -417,5 +546,6 @@ SELECT setval(pg_get_serial_sequence('adoption_reviews', 'id'), (SELECT MAX(id) 
 SELECT setval(pg_get_serial_sequence('favorites', 'id'), (SELECT MAX(id) FROM favorites));
 SELECT setval(pg_get_serial_sequence('events', 'id'), (SELECT MAX(id) FROM events));
 SELECT setval(pg_get_serial_sequence('reports', 'id'), (SELECT MAX(id) FROM reports));
+SELECT setval(pg_get_serial_sequence('chat_messages', 'id'), (SELECT MAX(id) FROM chat_messages));
 
 COMMIT;
