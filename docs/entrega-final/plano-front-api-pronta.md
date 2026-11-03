@@ -23,7 +23,7 @@ Não.
 |---|---|---|---|
 | 1 | ~~Campanhas e doações, mais a parte delas no admin~~ | 007 | ✅ feito: só API, mock removido |
 | 2 | Conta Mercado Pago por ONG | 009 | a fazer |
-| 3 | Senha (recuperar e alterar pelo link, derrubar sessões, `hasPassword`) | 010 | mock, adaptador da API pronto |
+| 3 | ~~Senha (recuperar e alterar pelo link, derrubar sessões, `hasPassword`)~~ | 010 | ✅ feito: só API, mock removido |
 | 4 | Chat (6 mensagens de sistema) | 011 | parte 2 deste plano |
 | 5 | ~~Excluir conta~~ | 013 | ✅ feito: só API, mock removido |
 
