@@ -79,10 +79,9 @@ export function toFrontendProfile(backendUser) {
     coverUrl: backendUser.coverUrl ?? null,
     bio: backendUser.bio ?? "",
     isVerified: backendUser.isVerified ?? false,
-    // Conta do Google sem senha: "Criar senha" em vez de "Alterar senha".
-    // A API ainda não manda o campo (migração 010); sem ele, vale o jeito como
-    // a conta nasceu: a criada pelo Google não tem senha
-    hasPassword: backendUser.hasPassword ?? backendUser.provider !== "GOOGLE",
+    // Conta sem senha: "Criar senha" em vez de "Alterar senha". O perfil público
+    // não traz o campo, e ele só importa na conta logada
+    hasPassword: backendUser.hasPassword ?? true,
     // Perfil de ONG — socialLinks/address no formato do perfil público
     cnpj: backendUser.cnpj ?? null,
     socialLinks: {
