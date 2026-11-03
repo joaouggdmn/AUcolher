@@ -4,13 +4,13 @@ import { toFrontendMatchProfile } from '../../aumatch/services/aumatchService'
 import { buildAdopterSnapshot } from '../utils/buildAdopterSnapshot'
 import { computeProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 
-// Fachada dos pedidos de adoção: as telas só conhecem estas funções e o
-// formato de pedido que já usavam quando tudo era localStorage — o resto do
-// app (painel da ONG, Minha conta, chat) muda pouco. Contrato em docs/contratos-prontos/api-adocao.md
+// Fachada dos pedidos de adoção: as telas (painel da ONG, Minha conta, chat) só
+// conhecem estas funções e o modelo do front, não os DTOs da API. Contrato em
+// docs/contratos-prontos/api-adocao.md
 
 // ---------- conversão DTO → modelo ----------
 
-// Avaliação dentro do pedido, no formato antigo do localStorage
+// Avaliação dentro do pedido, no modelo do front
 function toFrontendReview(dto) {
   if (!dto) return null
   return {

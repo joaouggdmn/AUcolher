@@ -122,9 +122,8 @@ Crie um arquivo `.env` com o endereço da API: VITE_API_URL=http://localhost:808
 
 ## Limitações conhecidas
 
-- **O chat ainda não usa a API:** as mensagens ficam no navegador (`localStorage`), por pedido de adoção, e são sincronizadas entre abas pelo evento `storage`.
 - **Não há geolocalização:** a busca por local é por cidade e UF, por decisão do projeto.
-- **Campanhas e doações** ainda são simuladas no front-end.
+- **Doações por PIX** ainda usam um token de teste único do Mercado Pago: a conexão de cada ONG com a própria conta não foi feita.
 
 ## Equipe
 

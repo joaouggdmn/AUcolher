@@ -23,11 +23,10 @@
   - perfil do AUmatch;
   - favoritos;
   - presenças confirmadas em eventos de outras ONGs.
-- **Quando existirem**, também entram nessa lista:
-  - a conta Mercado Pago vinculada (009);
+- **Também entram nessa lista:**
   - os links de recuperação de senha (010);
   - as marcas de leitura do chat (011).
-  - Hoje essas tabelas ainda não existem. Quem implementar essas migrações acrescenta a limpeza em `AccountDeletionService`.
+  - A conta Mercado Pago vinculada (009) entra quando a conexão for implementada: quem fizer isso acrescenta a limpeza em `AccountDeletionService`.
 - **O que continua, como histórico das outras pessoas,** com o autor exibido como "Conta excluída":
   - pedidos concluídos, devolvidos ou repassados, e as avaliações escritas;
   - mensagens de chat;

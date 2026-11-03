@@ -2,7 +2,7 @@
 
 Esta pasta é o pacote para o parceiro de backend: tudo o que ainda falta implementar na API e no banco, um contrato por módulo. O que já está pronto fica em `../contratos-prontos/`, só como referência.
 
-**Como o front espera cada entrega:** a chamada da API de cada módulo já está escrita no front, atrás de uma flag `VITE_USE_MOCK_*`. Enquanto a rota não existe, a flag fica ligada e um "servidor falso" no `localStorage` responde no lugar, com os mesmos DTOs. Quando o módulo é entregue, o front apaga o mock e a flag e passa a usar só a API, como já foi feito com campanhas e com a exclusão de conta. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos.**
+**Como o front espera cada entrega:** o front usa só a API, sem mocks nem flags `VITE_USE_MOCK_*`. Enquanto a rota de um módulo não existe, aquela parte da tela fica vazia ou mostra um erro, e o resto do site segue normal. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos.**
 
 Os contratos seguem sempre o mesmo padrão:
 - regras → DTOs → endpoints → notas de Spring → SQL → o que muda no front;
@@ -16,8 +16,8 @@ Os contratos seguem sempre o mesmo padrão:
 | `README.md` | Este mapa: situação, ordem, migrações, variáveis de ambiente, riscos e checklist |
 | `api-campanhas-doacoes.md` | Campanhas e doações por PIX, mais a parte delas no admin e na moderação (**implementado**, menos o PIX real) |
 | `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG e webhook |
-| `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões |
-| `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema |
+| `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões (**implementado**) |
+| `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema (**implementado**) |
 | `api-login-google.md` | Entrar com o Google: **já implementado** (back e front); só o fluxo, as variáveis e como criar as credenciais |
 | `plano-front-api-pronta.md` | O plano do front para deixar cada módulo pronto para ligar na API |
 
@@ -38,22 +38,22 @@ Os contratos seguem sempre o mesmo padrão:
 | Excluir conta | `users.deleted_at` | ✅ pronto | API | `contratos-prontos/api-exclusao-conta.md` |
 | **Campanhas e doações (PIX)** | `campaigns`, `donations` | ✅ pronto, **menos o PIX real** (token único provisório) | API | `api-campanhas-doacoes.md` |
 | **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ❌ falta | a fazer | `api-mercado-pago-ongs.md` |
-| **Senha** | `password_reset_tokens` + `users.password_changed_at` | ❌ falta | mock (`VITE_USE_MOCK_SENHA`) | `api-senha.md` |
-| **Chat** | `chat_messages`, `chat_reads` | ❌ falta | mock (`VITE_USE_MOCK_CHAT`) | `api-chat.md` |
+| **Senha** | `password_reset_tokens` + `users.password_changed_at` | ✅ pronto | API | `api-senha.md` |
+| **Chat** | `chat_messages`, `chat_reads` | ✅ pronto | API | `api-chat.md` |
 
 ## 3. Ordem sugerida
 
 0. **Teste no sandbox do Mercado Pago** (`api-mercado-pago-ongs.md` §6): OAuth de um vendedor de teste, PIX criado com o token dele e o pagamento confirmado. O resultado decide entre o contrato e o plano B (§6 deste arquivo). **Ainda falta:** não há credenciais de teste.
 1. ~~Campanhas e doações~~ (migração 007): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7). Falta a **conta Mercado Pago** (009): até lá, o PIX usa um token único provisório.
-2. **Senha** (010).
-3. **Chat** (011).
-4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Quando a 009, a 010 e a 011 chegarem, a exclusão precisa apagar também a conta Mercado Pago, os links de senha e as marcas de leitura do chat (§1 do contrato).
+2. ~~Senha~~ (010): **feito** (`api-senha.md`).
+3. ~~Chat~~ (011): **feito** (`api-chat.md`).
+4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Os links de senha (010) e as marcas de leitura do chat (011) já são apagados. Quando a 009 chegar, a exclusão precisa apagar também a conta Mercado Pago (§1 do contrato).
 
 **Opcional:** o e-mail de aviso "senha alterada" (`api-senha.md` §1).
 
 ## 4. Migrações
 
-**Já existem no backend** (`sql/migrations/`): 001 a 008 e 012 a 017. A mais nova é a **013** (exclusão de conta).
+**Já existem no backend** (`sql/migrations/`): 001 a 008 e 011 a 017. A mais nova é a **013** (exclusão de conta).
 
 **Onde estão aplicadas:**
 - **Aiven:** é o banco em uso (`backend/docs/guia-banco-aiven.md`). A 013 precisa ser aplicada nele antes de subir a API nova.
@@ -65,11 +65,10 @@ Os contratos seguem sempre o mesmo padrão:
 |---|---|---|---|
 | 009 | `009_mercado_pago_accounts.sql` | `mercado_pago_accounts` | `api-mercado-pago-ongs.md` §8 |
 | 010 | `010_password_security.sql` | `users.password_changed_at`, `password_reset_tokens` | `api-senha.md` §7 |
-| 011 | `011_chat.sql` | `chat_messages`, `chat_reads` | `api-chat.md` §5 |
 
 **Dependências que exigem cuidado:**
 - **A 009 vem depois da 007:** `mercado_pago_accounts` não depende de `campaigns`, mas a regra "sem conta conectada não há campanha" precisa das duas.
-- **A CHECK de `chat_messages.system_event`** já nasce com os 6 eventos, incluindo `ANIMAL_RETURNED` e `ANIMAL_REHOMED` (a devolução, migração 012, já existe).
+- **A CHECK de `chat_messages.system_event`** já nasce com os 7 eventos, incluindo `ANIMAL_RETURNED` e `ANIMAL_REHOMED` (a devolução, migração 012, já existe).
 - **A CHECK de `adoption_requests.cancel_reason` não deve ser recriada.** A 014 já aceita `ACCOUNT_DELETED`, `ACCOUNT_BANNED` e `LISTING_REMOVED`. Recriá-la com menos valores quebraria a moderação.
 
 **Padrão das migrações:**
@@ -134,8 +133,8 @@ Os contratos seguem sempre o mesmo padrão:
 | `donations` | doações via PIX |
 | ✱ `mercado_pago_accounts` | conta Mercado Pago de cada ONG (tokens criptografados) |
 | ✱ `password_reset_tokens` | links de redefinição de senha (só o hash) |
-| ✱ `chat_messages` | mensagens do chat de cada pedido (pessoa ou sistema) |
-| ✱ `chat_reads` | até onde cada parte leu cada conversa |
+| `chat_messages` | mensagens do chat de cada pedido (pessoa ou sistema) |
+| `chat_reads` | até onde cada parte leu cada conversa |
 
 ```mermaid
 erDiagram
@@ -179,4 +178,4 @@ erDiagram
 - [ ] Regras no `SecurityConfig`: rotas fixas antes das genéricas, e rotas públicas só onde o contrato manda.
 - [ ] Mensagens de erro **iguais** às dos contratos, porque o front mostra o `message` direto.
 - [ ] Testes de unidade das regras (no padrão do `AdoptionRequestServiceTest`) e um teste HTTP de ponta a ponta num banco descartável.
-- [ ] Avisar o front quando a rota estiver no ar, para o mock e a flag do módulo saírem do código.
+- [ ] Avisar o front quando a rota estiver no ar, para testar a tela contra ela.
