@@ -15,7 +15,7 @@ Os contratos seguem sempre o mesmo padrão:
 |---|---|
 | `README.md` | Este mapa: situação, ordem, migrações, variáveis de ambiente, riscos e checklist |
 | `api-campanhas-doacoes.md` | Campanhas e doações por PIX, mais a parte delas no admin e na moderação (**implementado**, menos o PIX real) |
-| `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG e webhook |
+| `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG e webhook (**conexão implementada**; falta ligar o PIX e o webhook) |
 | `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões (**implementado**) |
 | `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema (**implementado**) |
 | `api-login-google.md` | Entrar com o Google: **já implementado** (back e front); só o fluxo, as variáveis e como criar as credenciais |
@@ -37,38 +37,29 @@ Os contratos seguem sempre o mesmo padrão:
 | Denúncias e moderação | `reports` | ✅ pronto (remoção de campanha inclusa) | API | `contratos-prontos/api-denuncias-moderacao.md` |
 | Excluir conta | `users.deleted_at` | ✅ pronto | API | `contratos-prontos/api-exclusao-conta.md` |
 | **Campanhas e doações (PIX)** | `campaigns`, `donations` | ✅ pronto, **menos o PIX real** (token único provisório) | API | `api-campanhas-doacoes.md` |
-| **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ❌ falta | a fazer | `api-mercado-pago-ongs.md` |
+| **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | 🟡 conexão da conta pronta; **as doações ainda não a usam** | a fazer | `api-mercado-pago-ongs.md` |
 | **Senha** | `password_reset_tokens` + `users.password_changed_at` | ✅ pronto | API | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ✅ pronto | API | `api-chat.md` |
 
 ## 3. Ordem sugerida
 
 0. **Teste no sandbox do Mercado Pago** (`api-mercado-pago-ongs.md` §6): OAuth de um vendedor de teste, PIX criado com o token dele e o pagamento confirmado. O resultado decide entre o contrato e o plano B (§6 deste arquivo). **Ainda falta:** não há credenciais de teste.
-1. ~~Campanhas e doações~~ (migração 007): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7). Falta a **conta Mercado Pago** (009): até lá, o PIX usa um token único provisório.
+1. ~~Campanhas e doações~~ (migração 007): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7). A **conta Mercado Pago** (009) já conecta pela API. Falta ligar o PIX e o webhook à conta de cada ONG e criar a tela de conexão no front: até lá, o PIX usa um token único provisório.
 2. ~~Senha~~ (010): **feito** (`api-senha.md`).
 3. ~~Chat~~ (011): **feito** (`api-chat.md`).
-4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Os links de senha (010) e as marcas de leitura do chat (011) já são apagados. Quando a 009 chegar, a exclusão precisa apagar também a conta Mercado Pago (§1 do contrato).
+4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Os links de senha (010), as marcas de leitura do chat (011) e a conta Mercado Pago (009) também são apagados.
 
 **Opcional:** o e-mail de aviso "senha alterada" (`api-senha.md` §1).
 
 ## 4. Migrações
 
-**Já existem no backend** (`sql/migrations/`): 001 a 008 e 011 a 017. A mais nova é a **013** (exclusão de conta).
+**Já existem no backend** (`sql/migrations/`): todas, da 001 à 017. Não falta nenhuma.
 
 **Onde estão aplicadas:**
-- **Aiven:** é o banco em uso (`backend/docs/guia-banco-aiven.md`). A 013 precisa ser aplicada nele antes de subir a API nova.
-- **`aucolher_db` local:** ficou para trás. Não tem a 007 (campanhas) nem a 013, então a API atual não sobe nele.
+- **Aiven:** é o banco em uso (`backend/docs/guia-banco-aiven.md`). Tem todas: a estrutura é igual à do `sql/schema.sql` (conferido em 03/11/2026).
+- **`aucolher_db` local:** ficou para trás. Não tem a 007 (campanhas), a 009 (Mercado Pago), a 010 (senha), a 011 (chat) nem a 013 (exclusão de conta), então a API atual não sobe nele.
 
-**Faltam:**
-
-| Nº | Arquivo | Conteúdo | SQL em |
-|---|---|---|---|
-| 009 | `009_mercado_pago_accounts.sql` | `mercado_pago_accounts` | `api-mercado-pago-ongs.md` §8 |
-| 010 | `010_password_security.sql` | `users.password_changed_at`, `password_reset_tokens` | `api-senha.md` §7 |
-
-**Dependências que exigem cuidado:**
-- **A 009 vem depois da 007:** `mercado_pago_accounts` não depende de `campaigns`, mas a regra "sem conta conectada não há campanha" precisa das duas.
-- **A CHECK de `chat_messages.system_event`** já nasce com os 7 eventos, incluindo `ANIMAL_RETURNED` e `ANIMAL_REHOMED` (a devolução, migração 012, já existe).
+**Cuidado em migrações novas:**
 - **A CHECK de `adoption_requests.cancel_reason` não deve ser recriada.** A 014 já aceita `ACCOUNT_DELETED`, `ACCOUNT_BANNED` e `LISTING_REMOVED`. Recriá-la com menos valores quebraria a moderação.
 
 **Padrão das migrações:**
@@ -89,18 +80,20 @@ Os contratos seguem sempre o mesmo padrão:
 | `FRONTEND_URL` | Montar o link de redefinição de senha, a volta do OAuth do Mercado Pago e a volta do login com o Google (este já em uso: `app.frontend-url`) | `http://localhost:5173` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Entrar com o Google, já em uso (`api-login-google.md` §6) | — |
 | `MAIL_USERNAME` | Conta Gmail do projeto | `aucolher.app@gmail.com` |
-| `MAIL_PASSWORD` | **Senha de app** do Gmail (não é a senha da conta) | `abcd efgh ijkl mnop` |
+| `MAIL_PASSWORD` | **Senha de app** do Gmail, com 16 letras e sem espaços (não é a senha da conta) | `abcdefghijklmnop` |
 | `MP_CLIENT_ID` | ID da aplicação do AUcolher no Mercado Pago | `1234567890123456` |
 | `MP_CLIENT_SECRET` | Secret da aplicação | — |
 | `MP_REDIRECT_URI` | URL de retorno do OAuth, **igual** à cadastrada na aplicação do Mercado Pago | `https://api.../api/mercado-pago/oauth/callback` |
 | `MP_WEBHOOK_SECRET` | Assinatura secreta dos webhooks (painel do Mercado Pago → Webhooks), já em uso pelas campanhas | — |
-| `MP_DEV_ACCESS_TOKEN` | Já em uso, **provisório**: o token de teste único que todas as ONGs usam até a 009. Sai quando cada ONG conectar a própria conta | — |
+| `MP_DEV_ACCESS_TOKEN` | Já em uso, **provisório**: o token de teste único que todas as ONGs usam até as doações passarem para a conta de cada ONG. Sai quando isso acontecer | — |
 | `MP_TOKEN_ENCRYPTION_KEY` | Chave AES de 32 bytes em Base64 para criptografar os tokens das ONGs | `openssl rand -base64 32` |
+| `MP_STATE_SECRET` | Assina o `state` do OAuth. Opcional: sem ela, usa a chave do JWT | `openssl rand -base64 32` |
 | `MP_TEST_TOKEN` | `true` em desenvolvimento: o OAuth gera credenciais de teste | `true` |
 
 **Regras:**
 - nada disso vai para o Git;
 - sem `MAIL_*`, o link de senha sai **no log** da API;
+- se o Gmail recusar o envio, a tela continua dizendo que enviou: o erro só aparece no log da API (`Falha ao enviar o e-mail`);
 - sem `MP_*`, a conexão do Mercado Pago responde 503 "Pagamentos indisponíveis no momento." e o resto do sistema funciona.
 
 ## 6. Riscos
@@ -113,11 +106,11 @@ Os contratos seguem sempre o mesmo padrão:
 
 ## 7. O banco depois de tudo
 
-18 tabelas. ✱ = ainda não existe.
+18 tabelas, todas já criadas.
 
 | Tabela | Para quê |
 |---|---|
-| `users` | contas (pessoa, ONG, admin); ganha `password_changed_at` (010); `deleted_at` (013) já existe |
+| `users` | contas (pessoa, ONG, admin), com `password_changed_at` (010) e `deleted_at` (013) |
 | `ngo_team` | equipe do perfil da ONG |
 | `ngo_visiting_hours` | horário de visitas da ONG |
 | `animals` | anúncios |
@@ -131,8 +124,8 @@ Os contratos seguem sempre o mesmo padrão:
 | `reports` | denúncias de anúncios e perfis |
 | `campaigns` | campanhas de doação |
 | `donations` | doações via PIX |
-| ✱ `mercado_pago_accounts` | conta Mercado Pago de cada ONG (tokens criptografados) |
-| ✱ `password_reset_tokens` | links de redefinição de senha (só o hash) |
+| `mercado_pago_accounts` | conta Mercado Pago de cada ONG (tokens criptografados) |
+| `password_reset_tokens` | links de redefinição de senha (só o hash) |
 | `chat_messages` | mensagens do chat de cada pedido (pessoa ou sistema) |
 | `chat_reads` | até onde cada parte leu cada conversa |
 
