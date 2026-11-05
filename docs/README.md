@@ -8,6 +8,7 @@
 | `planos-front/` | Planos do front já executados (campanhas e eventos, home, painel do admin) | Histórico |
 | `planos-front/plano-refinamentos-visuais.md` | **Entregue (17/10):** refinamentos visuais e de fluxo (travessões, home, animais, eventos, campanhas, AUmatch, minha conta, chat) | Você |
 | `planos-front/plano-refinamentos-2.md` | **Entregue (17/10):** "Seja o primeiro" só para quem participa, atalhos da ONG na sidebar, foto no banner de evento, painel do AUmatch que abre e fecha | Você |
+| `planos-front/plano-mercado-pago.md` | **Em andamento (04/11):** o que falta para as doações caírem na conta de cada ONG. A parte do back e as credenciais estão em `docs/plano-mercado-pago.md`, no backend | Você e o parceiro |
 | `regras-de-negocios.md` | As regras de negócio do sistema inteiro | Todos |
 | `script_banco_aucolher.sql` | Cópia do `sql/schema.sql` do backend | Banco local |
 | `seed-*.sql` / `remover-*.sql` | Dados de teste (animais e pedidos) e a limpeza deles | Banco local |
