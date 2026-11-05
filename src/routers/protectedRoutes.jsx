@@ -5,7 +5,6 @@ import AdminRoute from '../core/guards/AdminRoute'
 import PessoaRoute from '../core/guards/PessoaRoute'
 import ParticipantRoute from '../core/guards/ParticipantRoute'
 import UserLayout from '../core/components/layout/UserLayout'
-import PlaceholderPage from '../core/components/PlaceholderPage'
 import UserProfilePage from '../features/perfil/pages/UserProfilePage'
 import CreateAnimalPage from '../features/animais/pages/CreateAnimalPage'
 import EditAnimalPage from '../features/animais/pages/EditAnimalPage'
@@ -61,7 +60,6 @@ export const protectedRoutes = [
               { path: 'meus-interesses', element: <MyInterestsPage /> },
               { path: 'favoritos', element: <FavoritosPage /> },
               { path: 'interesses-recebidos', element: <ReceivedRequestsPage /> },
-              { path: 'minhas-avaliacoes', element: <PlaceholderPage title="Minhas avaliações" /> },
             ],
           },
           { path: 'animais/editar/:id', element: <EditAnimalPage /> },

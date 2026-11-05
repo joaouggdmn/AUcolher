@@ -405,7 +405,6 @@ Gaps encontrados na exploração do código atual, guardados aqui para referênc
 - ~~Bug de identidade no chat~~ e ~~página do adotante~~: resolvidos com os pedidos na API.
 - Avaliações não podem ser denunciadas, e as de contas banidas continuam aparecendo.
 - As telas vazias do admin (dashboard, aprovação de ONGs, denúncias, estatísticas) já foram substituídas pelo painel do admin. Ainda sobram:
-  - `/minhas-avaliacoes`, que é só uma `PlaceholderPage`;
   - cerca de 20 arquivos vazios sem uso, por exemplo `MyReviewsPage.jsx`, `ChatWindow.jsx`, `OngProfilePage.jsx`, `core/components/ui/Button.jsx` e `Input.jsx`.
 
 ## 14. Perguntas em aberto (alinhar com o parceiro de backend)
