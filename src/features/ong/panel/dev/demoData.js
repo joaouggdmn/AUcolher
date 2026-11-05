@@ -31,7 +31,7 @@ export function isDemoDataActive(userId) {
 }
 
 // Reaproveita os animais de testes anteriores. Adotado é definitivo na API,
-// então só serve de novo para quem termina adotado; fora do ar é reativado
+// então não serve de novo; fora do ar é reativado
 async function ensureDemoAnimals(user, onProgress) {
   const seed = readSeed(user.id)
   const savedIds = { ...seed.animals }
@@ -41,14 +41,11 @@ async function ensureDemoAnimals(user, onProgress) {
   for (const [index, { key, finalStatus, form, photos }] of DEMO_ANIMALS.entries()) {
     onProgress(`Cadastrando animais (${index + 1} de ${DEMO_ANIMALS.length})...`)
     let animal = mine.get(String(savedIds[key]))
-    if (animal?.status === 'ADOPTED' && finalStatus !== 'ADOPTED') animal = null
+    if (animal?.status === 'ADOPTED') animal = null
     if (!animal) animal = await createAnimal(form, photos)
 
     if (finalStatus === 'INACTIVE' && animal.status !== 'INACTIVE') {
       animal = await changeAnimalStatus(animal.id, 'INACTIVE')
-    } else if (finalStatus === 'ADOPTED' && animal.status !== 'ADOPTED') {
-      // Sem pedido de demonstração, o adotado é marcado direto pelo dono
-      animal = await changeAnimalStatus(animal.id, 'ADOPTED')
     } else if (finalStatus === 'AVAILABLE' && animal.status === 'INACTIVE') {
       animal = await changeAnimalStatus(animal.id, 'AVAILABLE')
     }

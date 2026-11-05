@@ -25,8 +25,8 @@ const BASE_FORM = {
   apartmentFriendly: true,
 }
 
-// `finalStatus`: como cada um termina. O gerador marca os adotados direto
-// (PATCH /animals/{id}/status), já que não há pedidos de demonstração
+// `finalStatus`: como cada um termina. Nenhum termina adotado: isso só vem da
+// conclusão de um pedido, e não há pedidos de demonstração
 export const DEMO_ANIMALS = [
   {
     key: 'thor',
@@ -74,18 +74,18 @@ export const DEMO_ANIMALS = [
   },
   {
     key: 'pipoca',
-    finalStatus: 'ADOPTED',
+    finalStatus: 'AVAILABLE',
     photos: [unsplash('photo-1583512603805-3cc6b41f3edb')],
     form: {
       ...BASE_FORM, name: 'Pipoca', species: 'DOG', breed: 'Buldogue francês', sex: 'FEMALE', ageValue: 2, ageUnit: 'YEARS',
       size: 'SMALL', temperament: 'PLAYFUL', goodWithCats: true,
       summary: 'Pequena, sapeca e muito sociável.',
-      story: 'A Pipoca chegou com uma lesão na pata que precisou de cirurgia, paga com uma campanha da ONG. Recuperada, virou a alegria do abrigo até encontrar a família dela.',
+      story: 'A Pipoca chegou com uma lesão na pata que precisou de cirurgia, paga com uma campanha da ONG. Recuperada, virou a alegria do abrigo e agora espera a família dela.',
     },
   },
   {
     key: 'frida',
-    finalStatus: 'ADOPTED',
+    finalStatus: 'AVAILABLE',
     photos: [unsplash('photo-1592194996308-7b43878e84a6')],
     form: {
       ...BASE_FORM, name: 'Frida', species: 'CAT', sex: 'FEMALE', ageValue: 3, ageUnit: 'YEARS', size: 'MEDIUM',
@@ -179,7 +179,7 @@ const CAMPAIGN_TEMPLATES = [
   {
     title: 'Cirurgia da Pipoca', category: 'HEALTH', isUrgent: false, goalAmount: 2500, close: true,
     deadlineIn: null, coverUrl: unsplash('photo-1583512603805-3cc6b41f3edb'),
-    description: 'A Pipoca precisou operar a pata traseira. A cirurgia deu certo, a campanha foi encerrada e ela já foi adotada.',
+    description: 'A Pipoca precisou operar a pata traseira. A cirurgia deu certo, a campanha foi encerrada e ela já está pronta para a adoção.',
   },
 ]
 
