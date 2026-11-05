@@ -4,7 +4,6 @@ import ColumnChart from '../../../../core/components/charts/ColumnChart'
 import PanelPage from '../../../../core/components/panel/PanelPage'
 import AnimalStatusChart from '../../components/dashboard/charts/AnimalStatusChart'
 import { adoptionFunnel, CHART_MONTHS, monthlyDonationColumns } from '../../utils/panelCharts'
-import DemoDataCard from '../dev/DemoDataCard'
 import AttentionList from '../overview/AttentionList'
 import OverviewTiles from '../overview/OverviewTiles'
 import RecentActivity from '../overview/RecentActivity'
@@ -25,9 +24,6 @@ function OverviewPage() {
       framed={false}
     >
       <div className="flex flex-col gap-6">
-        {/* Ferramenta de desenvolvimento: no build de produção vira código morto */}
-        {import.meta.env.DEV && <DemoDataCard />}
-
         <OverviewTiles
           stats={stats}
           loading={{

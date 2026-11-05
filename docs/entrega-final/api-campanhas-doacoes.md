@@ -295,4 +295,3 @@ COMMIT;
 - Campanhas e doações vêm sempre da API. Saíram o `doacoesMock.js`, o `seedCampanhas.js`, a flag `VITE_USE_MOCK_CAMPANHAS` e o botão "Simular pagamento": no sandbox, o PIX do backend é aprovado sozinho (`first_name` "APRO").
 - Saiu a mistura com o mock no admin (`campaignAdminStats.js`): o admin lê as campanhas de `/api/admin/campaigns` e os blocos do `stats` direto da API. O card "Dados de teste" do admin, que só criava campanhas falsas, também saiu.
 - A home e o perfil público leem a ONG da campanha pelo id da API (`useOngShowcase`).
-- Os "Dados de teste" do painel da ONG criam 4 campanhas pela API (uma já encerrada), sem doações.

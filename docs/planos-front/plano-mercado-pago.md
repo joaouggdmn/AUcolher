@@ -40,7 +40,7 @@ Mesma tabela do doc do back. `main` não muda até o Gate B passar. **Os PRs do 
 | **Gate B. OAuth real** | João + Claude | ONG conecta conta de teste, doa, Pix aprovado, webhook recebido | 1 h |
 | **F1. Dados no front** | Claude | Serviços, hook, `acceptingDonations` | 0,5 dia |
 | **F2. Conectar a conta** | Claude | Card no painel de campanhas e retorno `?mp=` | 0,5 dia |
-| **F3. Bloqueios** | Claude | Formulário, botões de doar e dados de teste | 0,5 dia |
+| **F3. Bloqueios** | Claude | Formulário e botões de doar | 0,5 dia |
 | **T2. Ponta a ponta** | João + Claude | Roteiro completo em sandbox no navegador | 2 h |
 | **T3. Pix real de R$ 5** | **João paga** | Comprovante do crédito na conta | 1 h |
 | **D1. Fechamento** | Claude | Docs atualizados e roteiro da banca | 0,5 dia |
@@ -98,7 +98,6 @@ Novo card (`features/ong/components/dashboard/MercadoPagoCard.jsx`) no topo de `
   - `features/home/components/OngShowcase/OngCampaignRow.jsx`;
   - `features/doacoes/components/HeroSosBanner.jsx`.
 - **Dona da campanha** (`OwnerActions`, em `CampaignDetailPage`): se não estiver recebendo, avisar para conectar a conta no painel.
-- **Dados de teste** (`features/ong/panel/dev/DemoDataCard.jsx`): bloquear sem conta conectada, porque a API passa a responder 400.
 
 ### Efeito que vocês vão ver
 
