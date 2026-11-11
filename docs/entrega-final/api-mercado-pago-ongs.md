@@ -130,7 +130,7 @@ Aqui ficam os detalhes das chamadas.
 ```http
 POST https://api.mercadopago.com/v1/orders
 Authorization: Bearer {access_token da ONG}
-X-Idempotency-Key: donation-259
+X-Idempotency-Key: 3f6c2a1e-8d4b-4c1a-9a7e-2b5d0c9e7f10
 Content-Type: application/json
 ```
 
@@ -140,27 +140,34 @@ Content-Type: application/json
   "processing_mode": "automatic",
   "total_amount": "50.00",
   "external_reference": "donation-259",
-  "payer": { "email": "email-do-doador@exemplo.com" },
+  "payer": { "email": "email-do-doador@exemplo.com", "first_name": "Maria" },
   "transactions": {
     "payments": [
-      { "amount": "50.00", "payment_method": { "id": "pix", "type": "bank_transfer" } }
+      {
+        "amount": "50.00",
+        "payment_method": { "id": "pix", "type": "bank_transfer" },
+        "expiration_time": "PT30M"
+      }
     ]
   }
 }
 ```
 
+- `X-Idempotency-Key` é um UUID novo a cada doação, não o id dela: o id se repete entre bancos diferentes (local e Aiven) que usam a mesma conta Mercado Pago, e o Mercado Pago devolveria a order antiga para a mesma chave. Quem liga a order à doação é o `external_reference` (`donation-{id}`).
+- Com `MP_SANDBOX=true` (só com credenciais de teste), o pagador vai como `test@testuser.com` com `first_name` `APRO`, que aprova o PIX sozinho.
+- Order sem o "copia e cola" é recusada: o doador não teria como pagar.
 - Sem `marketplace_fee`.
 - Da resposta saem `id` (vai para `donations.mp_order_id`) e o "copia e cola" (`qr_code`), além de `qr_code_base64` e `ticket_url`, que vão para o `pix` do DTO da doação.
 - **Conferir no sandbox:** o caminho exato desses campos na resposta da Orders API e se dá para definir a expiração em 30 minutos na order. Se não der, vale a regra da nossa API: a doação vence em 30 minutos e é cancelada.
 
 ### 5.2 Webhook (`POST /api/webhooks/mercadopago`)
 
-1. **A notificação.** No painel da aplicação do AUcolher no Mercado Pago (Suas integrações → Webhooks), aponte para essa URL, com o evento de **orders**. O Mercado Pago manda `?data.id={id da order}&type=order`, mais os cabeçalhos `x-signature` e `x-request-id`.
+1. **A notificação.** No painel da aplicação do AUcolher no Mercado Pago (Suas integrações → Webhooks), aponte para essa URL, com o evento de **orders**. O Mercado Pago manda `?data.id={id da order}&type=order`, mais os cabeçalhos `x-signature` e `x-request-id`. A API não filtra pelo `type`; sem `data.id` na URL, ela lê o `data.id` do corpo.
 2. **Validar a assinatura antes de tudo:**
    - o `x-signature` vem como `ts=1742505638683,v1=ced36ab6...`;
-   - monte o texto `id:{data.id};request-id:{x-request-id};ts:{ts};`, com o `data.id` em minúsculas se for alfanumérico;
+   - monte o texto `id:{data.id};request-id:{x-request-id};ts:{ts};`, com o `data.id` da URL em minúsculas se for alfanumérico. A parte que não veio na notificação sai do texto, como manda a documentação do Mercado Pago;
    - calcule o HMAC-SHA256 com `MP_WEBHOOK_SECRET` e compare com o `v1` em tempo constante;
-   - assinatura inválida → 401.
+   - assinatura inválida → 401; sem `MP_WEBHOOK_SECRET` configurado → 503.
 3. **Localizar a doação** por `donations.mp_order_id = data.id`. Se não existir, responde 200 e ignora: pode ser uma order de outro sistema.
 4. **Consultar a order:** `GET https://api.mercadopago.com/v1/orders/{id}`, com o token de `donations.ngo_id`.
 5. **Se a order estiver paga**, aprovar de forma atômica, como já está no contrato:
@@ -171,6 +178,9 @@ Content-Type: application/json
    ```
 
 6. **Responder 200 rápido.** O Mercado Pago repete a notificação quando não recebe 2xx.
+   - Consulta recusada com **401**: o acesso foi revogado. A conta vira `NEEDS_RECONNECT` e o webhook responde 200. O mesmo vale para a criação do PIX e para o `GET /donations/{id}`. Um 400 não muda a conta: é order mal formada, não acesso revogado.
+   - Outra recusa 4xx: responde 200, repetir não resolveria.
+   - Falha de rede, 429 ou 5xx: responde 502, para o Mercado Pago repetir.
 
 **Situação da order → doação** (conferir os nomes exatos no sandbox):
 
