@@ -161,7 +161,7 @@ O `PUT` substitui todos os campos e é recusado (400) se a campanha estiver ence
 ## 6. Fluxo do PIX e notas de implementação
 
 1. O modal manda `POST /api/campaigns/{id}/donations { amount }`.
-2. O backend grava a doação `PENDING` (`expires_at = agora + 30 min`, `ngo_id` = ONG dona) e cria a order no Mercado Pago **com o token da ONG** (`api-mercado-pago-ongs.md` §5.1), com o header `X-Idempotency-Key` = id da doação. Guarda o `mp_order_id`.
+2. O backend grava a doação `PENDING` (`expires_at = agora + 30 min`, `ngo_id` = ONG dona) e cria a order no Mercado Pago **com o token da ONG** (`api-mercado-pago-ongs.md` §5.1), com o header `X-Idempotency-Key` = um UUID novo por doação e `external_reference` = `donation-{id}`. Guarda o `mp_order_id`.
 3. A resposta traz o `pix`. O modal mostra o QR, o "copia e cola" e a contagem regressiva, e faz `GET /api/donations/{id}` a cada 3 s.
 4. Aprovação chega por **dois caminhos**: o webhook ou o próprio `GET /donations/{id}`, que consulta a order (com o token de `donations.ngo_id`) enquanto estiver `PENDING`. O segundo é o que funciona em `localhost`, onde o webhook não chega sem túnel.
 5. **Aprovação atômica**, para webhook e polling nunca somarem duas vezes:
