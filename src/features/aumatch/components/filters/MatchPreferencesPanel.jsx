@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { FaChevronDown, FaLocationDot, FaXmark, FaArrowRotateRight, FaPaperPlane, FaArrowRight } from 'react-icons/fa6'
 import { LuSparkles } from 'react-icons/lu'
+import ProfileCompletionHint from '../../../../core/components/ui/ProfileCompletionHint'
 
 // Seção em versão escura: o painel é translúcido sobre o emerald-950, então
 // os componentes claros de filtro da listagem (FilterSection/CheckboxOption)
@@ -87,6 +88,7 @@ function MatchPreferencesPanel({
 
       {showInterestsLink && (
         <PanelSection title="Meus interesses" icon={FaPaperPlane}>
+          <ProfileCompletionHint tone="dark" lead="Quem recebe suas curtidas vê o seu perfil." />
           <Link
             to="/meus-interesses"
             className="group flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-sm font-bold text-white transition-colors duration-300 hover:bg-white/10"

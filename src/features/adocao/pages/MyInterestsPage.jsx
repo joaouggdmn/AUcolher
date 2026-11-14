@@ -9,6 +9,7 @@ import ConfirmAdoptionModal from '../components/ConfirmAdoptionModal'
 import SentRequestCard from '../components/SentRequestCard'
 import { animalDisplayName } from '../utils/requestAnimal'
 import Eyebrow from '../../../core/components/ui/Eyebrow'
+import ProfileCompletionHint from '../../../core/components/ui/ProfileCompletionHint'
 
 function Section({ title, requests, onGoToChat, onCancel }) {
   if (requests.length === 0) return null
@@ -68,6 +69,7 @@ function MyInterestsPage() {
         <p className="mt-1 text-slate-600">
           Acompanhe cada pedido de adoção: a resposta do doador, a conversa e a entrega.
         </p>
+        <ProfileCompletionHint lead="Quem recebe seus pedidos vê o seu perfil." className="mt-4 max-w-2xl" />
       </header>
 
       {sentRequests.length === 0 ? (
