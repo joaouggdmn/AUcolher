@@ -27,6 +27,7 @@ import AuthRequiredModal from "../../../core/components/ui/AuthRequiredModal";
 import SuccessToast from "../../../core/components/ui/SuccessToast";
 import ModerationNotice from "../../../core/components/ui/ModerationNotice";
 import ModeratedNote from "../../../core/components/ui/ModeratedNote";
+import ProfileCompletionHint from "../../../core/components/ui/ProfileCompletionHint";
 import { ADMIN_PATHS } from "../../admin/panel/adminPaths";
 import PhotoGallery from "../components/PhotoGallery";
 import HealthBadges from "../components/HealthBadges";
@@ -366,6 +367,8 @@ function AnimalDetailsPage() {
                     {requestError}
                   </p>
                 )}
+
+                <ProfileCompletionHint lead="O protetor vê seu perfil junto com o pedido." />
               </>
             )}
           </div>
