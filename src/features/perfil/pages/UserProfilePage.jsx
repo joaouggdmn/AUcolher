@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FaEye, FaUser, FaBuildingNgo, FaCalendarCheck, FaCalendarDays, FaPlus } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 import { getYearFromIsoDate } from '../../../core/utils/formatDate'
@@ -11,11 +12,13 @@ import ModeratedNote from '../../../core/components/ui/ModeratedNote'
 const TAG_CLASSES = 'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide'
 
 // O campo fica no formulário logo abaixo: rola até ele e já deixa digitando
-function focusFoundedYearField() {
-  const input = document.getElementById(FOUNDED_YEAR_FIELD_ID)
+function focusField(fieldId) {
+  const input = document.getElementById(fieldId)
   input?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   input?.focus({ preventScroll: true })
 }
+
+const focusFoundedYearField = () => focusField(FOUNDED_YEAR_FIELD_ID)
 
 // Pessoa: "Membro desde [ano]" (data de criação da conta). ONG: "Fundada em
 // [ano]" — ou, enquanto não informou, o atalho para preencher. No perfil
@@ -59,8 +62,24 @@ function AccountDateTag({ user, isOng }) {
 // institucional. Os dois formulários separam "Perfil público" de "Dados da conta"
 function UserProfilePage() {
   const { user } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
   const isOng = user?.userType === 'ONG'
   const AccountForm = isOng ? OngAccountForm : PersonAccountForm
+  const fieldToFocus = location.state?.focusField
+
+  // Vindo do aviso de perfil incompleto: já abre no campo que falta. Depois
+  // limpa o state, para não rolar de novo ao voltar para esta página
+  useEffect(() => {
+    if (!fieldToFocus) return undefined
+    // Limpa só depois de focar: limpar antes desmontaria o efeito e
+    // cancelaria o frame com o foco
+    const frame = requestAnimationFrame(() => {
+      focusField(fieldToFocus)
+      navigate(location.pathname, { replace: true, state: null })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [fieldToFocus, location.pathname, navigate])
 
   return (
     // pb-32: espaço para a barra fixa de "alterações não salvas"
