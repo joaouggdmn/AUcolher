@@ -32,15 +32,20 @@ function OngCampaignRow({ campaign, onDonate }) {
         </p>
       </div>
 
-      <button
-        type="button"
-        onClick={() => onDonate(campaign)}
-        aria-label={`Doar para ${title}`}
-        className="flex h-10 shrink-0 items-center gap-2 rounded-lg bg-emerald-800 px-4 text-sm font-bold text-white transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
-      >
-        <FaHandHoldingHeart aria-hidden="true" size={14} />
-        Doar
-      </button>
+      {/* Sem a conta do Mercado Pago da ONG conectada, não há para onde mandar o PIX */}
+      {campaign.acceptingDonations ? (
+        <button
+          type="button"
+          onClick={() => onDonate(campaign)}
+          aria-label={`Doar para ${title}`}
+          className="flex h-10 shrink-0 items-center gap-2 rounded-lg bg-emerald-800 px-4 text-sm font-bold text-white transition-colors duration-300 hover:bg-emerald-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2"
+        >
+          <FaHandHoldingHeart aria-hidden="true" size={14} />
+          Doar
+        </button>
+      ) : (
+        <p className="w-28 shrink-0 text-center text-xs font-semibold text-slate-400">Doações indisponíveis no momento</p>
+      )}
     </li>
   )
 }

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   FaArrowLeft,
   FaArrowRight,
+  FaBan,
   FaCircleCheck,
   FaClock,
   FaHandHoldingHeart,
@@ -95,9 +96,19 @@ function OngCard({ ong }) {
 function OwnerActions({ campaign, onCloseCampaign, onDelete }) {
   return (
     <div className="flex flex-col gap-2">
-      <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-800">
-        Esta campanha é da sua ONG. As doações entram no total assim que o PIX é confirmado.
-      </p>
+      {campaign.isClosed || campaign.acceptingDonations ? (
+        <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-800">
+          Esta campanha é da sua ONG. As doações entram no total assim que o PIX é confirmado.
+        </p>
+      ) : (
+        <p className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-800">
+          Esta campanha não está recebendo doações.{' '}
+          <Link to={PANEL_PATHS.campaigns} className="font-bold underline underline-offset-2 hover:text-amber-950">
+            Conecte a conta do Mercado Pago da ONG no painel
+          </Link>
+          .
+        </p>
+      )}
       {!campaign.isClosed && (
         <Link
           to={PANEL_PATHS.campaignEdit(campaign.id)}
@@ -142,6 +153,16 @@ function MainAction({ campaign, isOwner, onDonate, ownerActions, adminAction }) 
       <p className="flex items-center justify-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-500">
         <FaLock size={12} />
         Campanha encerrada: não recebe mais doações.
+      </p>
+    )
+  }
+
+  // Ativa, mas a ONG está sem a conta do Mercado Pago conectada
+  if (!campaign.acceptingDonations) {
+    return (
+      <p className="flex items-center justify-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-500">
+        <FaBan size={12} />
+        Doações indisponíveis no momento.
       </p>
     )
   }
