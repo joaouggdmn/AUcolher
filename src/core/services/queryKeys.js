@@ -25,6 +25,11 @@ export const queryKeys = {
     mine: (userId) => ['doacoes', 'mine', String(userId)],
     received: (userId) => ['doacoes', 'received', String(userId)],
   },
+  // Conta do Mercado Pago da ONG logada (leva o userId)
+  mercadoPago: {
+    all: ['mercado-pago'],
+    account: (userId) => ['mercado-pago', 'account', String(userId)],
+  },
   // Pedidos de adoção: os enviados e os recebidos são da conta logada (levam o
   // userId); as avaliações de um perfil são públicas
   adocao: {

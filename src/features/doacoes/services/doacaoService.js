@@ -30,6 +30,9 @@ export function toFrontendCampaign(dto) {
     deadline: dto.deadline ?? null,
     status: dto.status,
     isClosed: dto.status === 'CLOSED',
+    // A API decide: ativa e com a conta do Mercado Pago da ONG conectada.
+    // Sem o campo, não bloqueia (quem recusa de verdade é o backend)
+    acceptingDonations: dto.acceptingDonations !== false,
     createdAt: dto.createdAt ?? null,
     closedAt: dto.closedAt ?? null,
     // Última edição feita pelo admin (o dono vê "Editado pela moderação")
@@ -147,4 +150,32 @@ export async function listMyDonations() {
 export async function listReceivedDonations() {
   const dtos = await doacoesApi.listReceivedDonations()
   return dtos.map(toFrontendDonation)
+}
+
+// ---------- operações: conta do Mercado Pago ----------
+
+export function toFrontendMercadoPagoAccount(dto) {
+  return {
+    // Só true em CONNECTED: é o que libera campanhas e doações
+    isConnected: Boolean(dto?.connected),
+    // O Mercado Pago recusou o token (revogado ou expirado): falta reconectar
+    needsReconnect: dto?.status === 'NEEDS_RECONNECT',
+    // false com as contas de teste do sandbox
+    isLiveMode: dto?.liveMode ?? null,
+    connectedAt: dto?.connectedAt ?? null,
+  }
+}
+
+export async function getMercadoPagoAccount() {
+  return toFrontendMercadoPagoAccount(await doacoesApi.getMercadoPagoAccount())
+}
+
+// Devolve só o link: quem chama leva o navegador até o Mercado Pago
+export async function connectMercadoPago() {
+  const { authorizationUrl } = await doacoesApi.connectMercadoPago()
+  return authorizationUrl
+}
+
+export async function disconnectMercadoPago() {
+  await doacoesApi.disconnectMercadoPago()
 }
