@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaTriangleExclamation, FaHandHoldingHeart, FaArrowRight } from 'react-icons/fa6'
+import { FaTriangleExclamation, FaHandHoldingHeart, FaArrowRight, FaBan } from 'react-icons/fa6'
 import { useAuth } from '../../../core/context/AuthContext'
 import DonationProgress from './DonationProgress'
 import { isAdminAccount, isCampaignOwner } from '../utils/campaignDisplay'
@@ -39,16 +39,24 @@ function HeroSosBanner({ campaign, onDonate }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          {!isOwner && !isAdminAccount(user) && (
-            <button
-              type="button"
-              onClick={() => onDonate(campaign)}
-              className="group flex w-fit items-center gap-2 rounded-lg bg-amber-400 px-7 py-3.5 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
-            >
-              <FaHandHoldingHeart size={16} />
-              Ajudar agora
-            </button>
-          )}
+          {!isOwner &&
+            !isAdminAccount(user) &&
+            // Sem a conta do Mercado Pago da ONG conectada, não há para onde mandar o PIX
+            (campaign.acceptingDonations ? (
+              <button
+                type="button"
+                onClick={() => onDonate(campaign)}
+                className="group flex w-fit items-center gap-2 rounded-lg bg-amber-400 px-7 py-3.5 font-bold text-emerald-950 shadow-lg shadow-amber-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-300"
+              >
+                <FaHandHoldingHeart size={16} />
+                Ajudar agora
+              </button>
+            ) : (
+              <p className="flex w-fit items-center gap-2 rounded-lg bg-white/10 px-6 py-3.5 text-sm font-semibold text-emerald-100/80">
+                <FaBan size={13} />
+                Doações indisponíveis no momento
+              </p>
+            ))}
           <Link
             to={`/campanhas/${campaign.id}`}
             className="group flex w-fit items-center gap-2 rounded-lg border border-white/20 px-6 py-3.5 font-bold text-white transition-all duration-300 hover:bg-white/10"

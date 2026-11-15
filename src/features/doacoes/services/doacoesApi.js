@@ -66,3 +66,24 @@ export async function listReceivedDonations() {
   const { data } = await api.get('/donations/received')
   return data
 }
+
+// ---------- conta do Mercado Pago da ONG ----------
+// Contrato: docs/entrega-final/api-mercado-pago-ongs.md. O dinheiro dos PIX
+// cai na conta conectada; nenhuma resposta traz token
+
+// { connected, status, mpUserId, liveMode, connectedAt }; sem conta, status null
+export async function getMercadoPagoAccount() {
+  const { data } = await api.get('/ngo/mercado-pago')
+  return data
+}
+
+// Também serve para reconectar: devolve o link de autorização do Mercado Pago
+export async function connectMercadoPago() {
+  const { data } = await api.post('/ngo/mercado-pago/connect')
+  return data
+}
+
+// Recusado (400) enquanto houver PIX pendente nas campanhas da ONG
+export async function disconnectMercadoPago() {
+  await api.delete('/ngo/mercado-pago')
+}
