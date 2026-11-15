@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import {
   FaArrowRight,
+  FaBan,
   FaCircleCheck,
   FaClock,
   FaGear,
@@ -42,6 +43,16 @@ function CardAction({ campaign, isOwner, isAdmin, onDonate }) {
         Ver campanha
         <FaArrowRight size={11} />
       </Link>
+    )
+  }
+
+  // Ativa, mas a ONG está sem a conta do Mercado Pago conectada
+  if (!campaign.acceptingDonations) {
+    return (
+      <p className={`${linkClass} border-slate-200 bg-slate-50 text-slate-400`}>
+        <FaBan size={12} />
+        Doações indisponíveis no momento
+      </p>
     )
   }
 
