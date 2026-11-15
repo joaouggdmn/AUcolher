@@ -7,12 +7,15 @@ import LoadErrorState from '../../../../core/components/ui/LoadErrorState'
 import Spinner from '../../../../core/components/ui/Spinner'
 import CampaignForm from '../../../doacoes/components/CampaignForm'
 import { useCampaign, useCreateCampaign, useMyCampaigns, useUpdateCampaign } from '../../../doacoes/hooks/useCampanhas'
+import { useMercadoPagoAccount } from '../../../doacoes/hooks/useMercadoPagoAccount'
+import MercadoPagoCard from '../../components/dashboard/MercadoPagoCard'
 import { findOtherUrgentCampaign } from '../../../doacoes/utils/campanhaRules'
 import { isCampaignOwner } from '../../../doacoes/utils/campaignDisplay'
 import { buildCampaignForm, buildNewCampaignForm } from '../../../doacoes/utils/campaignForm'
 import PanelFormPage from '../PanelFormPage'
 import PanelNotice from '../PanelNotice'
 import { PANEL_PATHS } from '../panelPaths'
+import { useOngPanel } from '../useOngPanel'
 
 const BACK = { backTo: PANEL_PATHS.campaigns, backLabel: 'Voltar para campanhas' }
 const NO_CAMPAIGNS = []
@@ -135,10 +138,29 @@ function EditCampaignLoader({ id }) {
   return <EditCampaignForm key={campaign.id} campaign={campaign} />
 }
 
+// Campanha nova só com a conta do Mercado Pago conectada (o backend recusa
+// sem ela): antes disso, o card de conectar fica no lugar do formulário
+function NewCampaignGate() {
+  const { notify } = useOngPanel()
+  const account = useMercadoPagoAccount()
+
+  if (account.data?.isConnected) return <NewCampaignForm />
+
+  return (
+    <PanelFormPage
+      title="Criar campanha"
+      description="As doações das campanhas caem na conta do Mercado Pago da ONG. Conecte a conta para publicar a primeira."
+      {...BACK}
+    >
+      {account.isLoading ? <Spinner /> : <MercadoPagoCard onNotify={notify} />}
+    </PanelFormPage>
+  )
+}
+
 // /ong/painel/campanhas/nova e /ong/painel/campanhas/:id/editar
 function CampaignFormPage() {
   const { id } = useParams()
-  return id ? <EditCampaignLoader id={id} /> : <NewCampaignForm />
+  return id ? <EditCampaignLoader id={id} /> : <NewCampaignGate />
 }
 
 export default CampaignFormPage
