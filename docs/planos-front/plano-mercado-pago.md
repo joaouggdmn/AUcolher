@@ -4,6 +4,14 @@
 >
 > Contrato: `docs/entrega-final/api-mercado-pago-ongs.md` (§9 é o front) e `api-campanhas-doacoes.md`.
 
+> **Situação em 16/11/2026: concluído.**
+> - F1 a F3 estão no `main` (PR #44): serviços e hook, cartão do Mercado Pago no painel com o retorno `?mp=`, e os bloqueios de campanha e doação.
+> - **Mudança em relação à F2:** "cancelada", "já vinculada" e "erro" aparecem em vermelho dentro do cartão, não no toast verde de sucesso.
+> - **O T2 foi feito com PIX real**, não em sandbox: conectar, doar com a janela aberta e com a janela fechada. O que ficou sem testar está no plano do back, §9.
+> - O roteiro da banca está em `docs/entrega-final/roteiro-banca-mercado-pago.md`.
+>
+> As seções 2 a 5 descrevem o ponto de partida, em 04/11.
+
 ## 1. Objetivo e decisões
 
 O dinheiro das doações deve cair direto na conta Mercado Pago de cada ONG (regras §10.3 e texto do TCC). Para isso, a ONG precisa de uma tela para conectar a conta, e o site precisa respeitar quem não está recebendo doações.
@@ -101,7 +109,7 @@ Novo card (`features/ong/components/dashboard/MercadoPagoCard.jsx`) no topo de `
 
 ### Efeito que vocês vão ver
 
-Ao sair o provisório do back, **todas as campanhas atuais ficam "Doações indisponíveis"** até a ONG conectar a conta. É a regra do contrato. Para a banca, conectem 1 ou 2 ONGs com as contas de teste vendedoras.
+Ao sair o provisório do back, **todas as campanhas atuais ficam "Doações indisponíveis"** até a ONG conectar a conta. É a regra do contrato. Para a banca, conectem 1 ou 2 ONGs com as contas de teste vendedoras. (Na prática, não há sandbox de PIX: a Apacri ficou conectada à conta real do João. Ver o roteiro da banca.)
 
 ## 5. Verificação
 
