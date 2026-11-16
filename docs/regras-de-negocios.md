@@ -367,11 +367,12 @@ Perfil mais completo que o de usuário comum:
 
 ### 10.3 Conta Mercado Pago de cada ONG
 
-> **Ainda não implementado** (migração 009, `entrega-final/api-mercado-pago-ongs.md`). Hoje a API trata toda ONG como conectada e gera o PIX com um token de teste único (`MP_DEV_ACCESS_TOKEN`).
+> **Implementado e testado com PIX real** em 15 e 16/11/2026 (migração 009, `entrega-final/api-mercado-pago-ongs.md`).
 
 Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na conta da ONG**, e a plataforma nunca guarda doações.
 
-- **Vincular a conta.** No painel da ONG há o botão "Conectar Mercado Pago". Ele leva ao login do Mercado Pago (OAuth, fluxo de código de autorização com o escopo `offline_access`) e volta para o painel.
+- **Vincular a conta.** No painel da ONG (Campanhas) há o botão "Conectar Mercado Pago". Ele leva ao login do Mercado Pago (OAuth, fluxo de código de autorização com o escopo `offline_access`) e volta para o painel.
+- **Requisitos da conta.** A conta precisa ter uma **chave Pix** cadastrada; sem ela, o Mercado Pago recusa o PIX. Uma conta do Mercado Pago só pode ficar ligada a **uma** ONG ("Esta conta do Mercado Pago já está vinculada a outra ONG.").
 - **Credenciais da ONG.** O backend guarda o `access_token` e o `refresh_token` da ONG:
   - **criptografados** no banco;
   - nunca vão para o navegador;
@@ -380,8 +381,8 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 - **Conexão perdida.** Se a ONG desconectar a conta, ou a renovação falhar, as campanhas ativas continuam visíveis com "Doações indisponíveis no momento". O painel avisa a ONG para reconectar. Os PIX já gerados seguem válidos.
 - **Criar o PIX.** O backend cria a order (`POST /v1/orders`, método `pix`) com o **token da ONG dona da campanha**. Assim o pagamento pertence à conta dela.
 - **Comissão.** A plataforma não cobra (`marketplace_fee` = 0, ou ausente). Só a tarifa do Mercado Pago é descontada, na conta da ONG.
-- **Confirmação.** Igual ao plano original: webhook com assinatura validada, mais consulta enquanto o PIX estiver pendente. A aprovação continua atômica (soma uma vez só).
-- **A validar antes de implementar:** criar um PIX com o token OAuth de uma conta de teste de vendedor no sandbox. A documentação brasileira de split não cita o PIX explicitamente. **Plano B**, se não funcionar: voltar à conta única da plataforma, com repasse às ONGs registrado no painel.
+- **Confirmação.** Três caminhos, todos consultando a order no Mercado Pago: a janela do PIX pergunta a cada 3 s enquanto está aberta; o webhook, com assinatura validada, avisa na hora; e uma consulta periódica, de 1 em 1 minuto, confirma quem fechou a janela antes de pagar. A aprovação continua atômica (soma uma vez só).
+- **Validado em 15 e 16/11/2026** com PIX real: o PIX criado com o token OAuth da ONG funciona, então o **plano B** (conta única da plataforma, com repasse registrado no painel) não foi necessário. Não existe sandbox de PIX para este fluxo: os testes usam PIX real de valor baixo.
 
 ## 11. Notificações (removidas)
 
@@ -391,8 +392,7 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 
 ## 12. Nota técnica: o que já está na API
 
-- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações (o PIX ainda com um token de teste único), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha, chat.
-- **Ainda não existe em lugar nenhum:** a conexão de cada ONG com o próprio Mercado Pago (seção 10.3).
+- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações por PIX real, a conexão de cada ONG com o próprio Mercado Pago (seção 10.3), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha, chat.
 - **O que falta no backend, em ordem:** `entrega-final/README.md`. O front não tem mais mock: todo módulo pronto usa só a API.
 
 ## 13. Backlog técnico conhecido (não implementar agora — só registro)

@@ -8,7 +8,7 @@
 
 > **Situação (27/10/2026): implementado no backend**, na branch `feature/campanhas-doacoes` do `api-aucolher`. A base é o código do Pedro, completado com as regras de segurança, a §7 e os testes.
 > - **Pronto:** todas as rotas da §5 e da §7.1, as regras da §1, a migração 007 (§8) e os blocos do `stats` (§7.4). Foi testado de ponta a ponta no Aiven: 50 casos, com as mensagens desta tabela.
-> - **Falta (o PIX real):** a conta Mercado Pago de cada ONG (migração 009, `api-mercado-pago-ongs.md`) ainda não existe. Por enquanto, toda ONG conta como conectada (`acceptingDonations: true`), e o PIX usa um único token de teste (`MP_DEV_ACCESS_TOKEN`). Sem ele, doar responde 400 "Esta ONG não está recebendo doações no momento.". Os campos da Orders API e o webhook ainda precisam ser conferidos no sandbox.
+> - **PIX real (16/11/2026): pronto.** Cada ONG conecta a própria conta Mercado Pago (migração 009, `api-mercado-pago-ongs.md`) e o PIX sai com o token dela. Sem conta conectada, `acceptingDonations` é `false` e doar responde 400 "Esta ONG não está recebendo doações no momento.". Testado com PIX real; o que o teste confirmou está em `api-mercado-pago-ongs.md` §5.1 a §5.3.
 > - **A §7.5** (exclusão da conta da ONG) também está pronta, com a migração 013 (`../contratos-prontos/api-exclusao-conta.md`).
 > - **Front:** ligado na API desde a branch `feature/campanhas-api` (§9).
 > - **Campos a mais na resposta da campanha:** ela também traz `removed`, `removedByModeration`, `moderatedAt` e `ngo.active`, como os eventos. São os campos do `AdminCampaign` da §7.1.
@@ -163,7 +163,7 @@ O `PUT` substitui todos os campos e é recusado (400) se a campanha estiver ence
 1. O modal manda `POST /api/campaigns/{id}/donations { amount }`.
 2. O backend grava a doação `PENDING` (`expires_at = agora + 30 min`, `ngo_id` = ONG dona) e cria a order no Mercado Pago **com o token da ONG** (`api-mercado-pago-ongs.md` §5.1), com o header `X-Idempotency-Key` = um UUID novo por doação e `external_reference` = `donation-{id}`. Guarda o `mp_order_id`.
 3. A resposta traz o `pix`. O modal mostra o QR, o "copia e cola" e a contagem regressiva, e faz `GET /api/donations/{id}` a cada 3 s.
-4. Aprovação chega por **dois caminhos**: o webhook ou o próprio `GET /donations/{id}`, que consulta a order (com o token de `donations.ngo_id`) enquanto estiver `PENDING`. O segundo é o que funciona em `localhost`, onde o webhook não chega sem túnel.
+4. Aprovação chega por **três caminhos**, todos consultando a order com o token de `donations.ngo_id`: o webhook; o próprio `GET /donations/{id}`, enquanto estiver `PENDING`; e a consulta periódica de 1 em 1 minuto (`api-mercado-pago-ongs.md` §5.3), para quem fecha a janela antes de pagar. Em `localhost` sem túnel, o webhook não chega, e os outros dois cobrem.
 5. **Aprovação atômica**, para webhook e polling nunca somarem duas vezes:
    ```sql
    UPDATE donations SET status = 'APPROVED', approved_at = now()
@@ -176,7 +176,7 @@ O `PUT` substitui todos os campos e é recusado (400) se a campanha estiver ence
    .requestMatchers(HttpMethod.GET, "/api/campaigns", "/api/campaigns/*").permitAll()
    .requestMatchers(HttpMethod.POST, "/api/webhooks/mercadopago").permitAll()
    ```
-7. **Sandbox do Mercado Pago**: com `payer.first_name = "APRO"`, o PIX de teste é aprovado automaticamente.
+7. **Sem sandbox de PIX**: com uma conta real conectada, até a "credencial de teste" da aplicação gera cobrança real, e o pagador de teste (`first_name` "APRO", `MP_SANDBOX=true`) é recusado ou sai em nome falso. Teste com PIX real de valor baixo (`api-mercado-pago-ongs.md` §5.1).
 
 ## 7. Admin e moderação de campanhas
 
@@ -292,6 +292,6 @@ COMMIT;
 
 ## 9. O que mudou no front (feito)
 
-- Campanhas e doações vêm sempre da API. Saíram o `doacoesMock.js`, o `seedCampanhas.js`, a flag `VITE_USE_MOCK_CAMPANHAS` e o botão "Simular pagamento": no sandbox, o PIX do backend é aprovado sozinho (`first_name` "APRO").
+- Campanhas e doações vêm sempre da API. Saíram o `doacoesMock.js`, o `seedCampanhas.js`, a flag `VITE_USE_MOCK_CAMPANHAS` e o botão "Simular pagamento": o pagamento é sempre um PIX de verdade.
 - Saiu a mistura com o mock no admin (`campaignAdminStats.js`): o admin lê as campanhas de `/api/admin/campaigns` e os blocos do `stats` direto da API. O card "Dados de teste" do admin, que só criava campanhas falsas, também saiu.
 - A home e o perfil público leem a ONG da campanha pelo id da API (`useOngShowcase`).

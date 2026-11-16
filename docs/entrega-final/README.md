@@ -14,8 +14,9 @@ Os contratos seguem sempre o mesmo padrão:
 | Arquivo | O que tem |
 |---|---|
 | `README.md` | Este mapa: situação, ordem, migrações, variáveis de ambiente, riscos e checklist |
-| `api-campanhas-doacoes.md` | Campanhas e doações por PIX, mais a parte delas no admin e na moderação (**implementado**, menos o PIX real) |
-| `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG e webhook (**conexão implementada**; falta ligar o PIX e o webhook) |
+| `api-campanhas-doacoes.md` | Campanhas e doações por PIX, mais a parte delas no admin e na moderação (**implementado**) |
+| `api-mercado-pago-ongs.md` | Conexão da conta Mercado Pago de cada ONG (OAuth), PIX com o token da ONG, webhook e consulta periódica (**implementado e testado com PIX real**) |
+| `roteiro-banca-mercado-pago.md` | Roteiro da demonstração das doações na banca, com checklist, perguntas prováveis e plano de contingência |
 | `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões (**implementado**) |
 | `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema (**implementado**) |
 | `api-login-google.md` | Entrar com o Google: **já implementado** (back e front); só o fluxo, as variáveis e como criar as credenciais |
@@ -36,15 +37,15 @@ Os contratos seguem sempre o mesmo padrão:
 | Painel do admin | — | ✅ pronto (campanhas e números de doação inclusos) | API | `contratos-prontos/api-admin.md` |
 | Denúncias e moderação | `reports` | ✅ pronto (remoção de campanha inclusa) | API | `contratos-prontos/api-denuncias-moderacao.md` |
 | Excluir conta | `users.deleted_at` | ✅ pronto | API | `contratos-prontos/api-exclusao-conta.md` |
-| **Campanhas e doações (PIX)** | `campaigns`, `donations` | ✅ pronto, **menos o PIX real** (token único provisório) | API | `api-campanhas-doacoes.md` |
-| **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | 🟡 conexão da conta pronta; **as doações ainda não a usam** | a fazer | `api-mercado-pago-ongs.md` |
+| **Campanhas e doações (PIX)** | `campaigns`, `donations` | ✅ pronto, com PIX real (testado em 15 e 16/11/2026) | API | `api-campanhas-doacoes.md` |
+| **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ✅ pronto: o PIX sai com o token da ONG e cai na conta dela | API | `api-mercado-pago-ongs.md` |
 | **Senha** | `password_reset_tokens` + `users.password_changed_at` | ✅ pronto | API | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ✅ pronto | API | `api-chat.md` |
 
 ## 3. Ordem sugerida
 
-0. **Teste no sandbox do Mercado Pago** (`api-mercado-pago-ongs.md` §6): OAuth de um vendedor de teste, PIX criado com o token dele e o pagamento confirmado. O resultado decide entre o contrato e o plano B (§6 deste arquivo). **Ainda falta:** não há credenciais de teste.
-1. ~~Campanhas e doações~~ (migração 007): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7). A **conta Mercado Pago** (009) já conecta pela API. Falta ligar o PIX e o webhook à conta de cada ONG e criar a tela de conexão no front: até lá, o PIX usa um token único provisório.
+0. ~~Teste do Mercado Pago~~: **feito em 15 e 16/11/2026**, com PIX real e a conta do João conectada como ONG. O contrato valeu; o plano B (§6) não foi necessário. O que o teste confirmou está em `api-mercado-pago-ongs.md` §5.1 a §5.3.
+1. ~~Campanhas e doações~~ (migração 007) e ~~conta Mercado Pago~~ (009): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7), a tela de conexão no painel da ONG e o PIX com o token de cada ONG.
 2. ~~Senha~~ (010): **feito** (`api-senha.md`).
 3. ~~Chat~~ (011): **feito** (`api-chat.md`).
 4. ~~Excluir conta~~ (migração 013): **feito** (`contratos-prontos/api-exclusao-conta.md`). Os links de senha (010), as marcas de leitura do chat (011) e a conta Mercado Pago (009) também são apagados.
@@ -84,11 +85,12 @@ Os contratos seguem sempre o mesmo padrão:
 | `MP_CLIENT_ID` | ID da aplicação do AUcolher no Mercado Pago | `1234567890123456` |
 | `MP_CLIENT_SECRET` | Secret da aplicação | — |
 | `MP_REDIRECT_URI` | URL de retorno do OAuth, **igual** à cadastrada na aplicação do Mercado Pago | `https://api.../api/mercado-pago/oauth/callback` |
-| `MP_WEBHOOK_SECRET` | Assinatura secreta dos webhooks (painel do Mercado Pago → Webhooks), já em uso pelas campanhas | — |
-| `MP_DEV_ACCESS_TOKEN` | Já em uso, **provisório**: o token de teste único que todas as ONGs usam até as doações passarem para a conta de cada ONG. Sai quando isso acontecer | — |
+| `MP_WEBHOOK_SECRET` | Assinatura secreta dos webhooks, do modo **Produção** (Configuração de webhooks), copiada depois do último Salvar | — |
 | `MP_TOKEN_ENCRYPTION_KEY` | Chave AES de 32 bytes em Base64 para criptografar os tokens das ONGs | `openssl rand -base64 32` |
 | `MP_STATE_SECRET` | Assina o `state` do OAuth. Opcional: sem ela, usa a chave do JWT | `openssl rand -base64 32` |
-| `MP_TEST_TOKEN` | `true` em desenvolvimento: o OAuth gera credenciais de teste | `true` |
+| `MP_TEST_TOKEN` | Deixar `false`: com `true` o OAuth entrega um token `TEST-`, que a criação do PIX recusa (401) | `false` |
+| `MP_SANDBOX` | Deixar `false` com conta real: com `true` o pagador vai como "APRO" e a cobrança continua real | `false` |
+| `DONATION_RECONCILE_DELAY_MS` | Intervalo da consulta periódica dos PIX pendentes | `60000` |
 
 **Regras:**
 - nada disso vai para o Git;
@@ -100,8 +102,10 @@ Os contratos seguem sempre o mesmo padrão:
 
 | Risco | O que fazer |
 |---|---|
-| O PIX criado com o token OAuth da ONG não funciona, ou o pagamento não pode ser confirmado | O teste no sandbox decide. Se falhar, **plano B**: conta única da plataforma, com repasse às ONGs registrado no painel (regras §10.3). Avisar o front |
-| O Mercado Pago não aceita `localhost` como URL de retorno do OAuth | Testar com a API publicada ou com um túnel (ngrok). Enquanto isso, a API segue com o token único provisório (`MP_DEV_ACCESS_TOKEN`) |
+| ~~O PIX criado com o token OAuth da ONG não funciona~~ | **Resolvido:** funcionou com PIX real em 15/11/2026. O plano B (conta única da plataforma) não foi necessário |
+| ~~O Mercado Pago não aceita `localhost` como URL de retorno do OAuth~~ | **Resolvido** com um túnel (ngrok, domínio fixo). Publicado, o site só troca as URLs |
+| O webhook passa a recusar as notificações (401) depois de alguém clicar em Salvar no painel, que pode trocar o segredo | Copiar o segredo de novo para `MP_WEBHOOK_SECRET` e reiniciar. Até lá, a consulta periódica aprova os PIX pagos em até 1 minuto |
+| A conta da ONG não tem chave Pix | O PIX falha com 402 `processing_error`. O cartão de conectar já avisa que a conta precisa de chave Pix |
 | O e-mail do Gmail cai no spam | Assunto e texto simples, remetente com nome ("AUcolher"). A página de recuperação já avisa para olhar o spam |
 
 ## 7. O banco depois de tudo
