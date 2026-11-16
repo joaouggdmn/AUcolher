@@ -154,7 +154,12 @@ Content-Type: application/json
 ```
 
 - `X-Idempotency-Key` é um UUID novo a cada doação, não o id dela: o id se repete entre bancos diferentes (local e Aiven) que usam a mesma conta Mercado Pago, e o Mercado Pago devolveria a order antiga para a mesma chave. Quem liga a order à doação é o `external_reference` (`donation-{id}`).
-- Com `MP_SANDBOX=true` (só com credenciais de teste), o pagador vai como `test@testuser.com` com `first_name` `APRO`, que aprova o PIX sozinho.
+- Com `MP_SANDBOX=true` (só com contas de teste), o pagador vai como `test_payer@example.com` com `first_name` `APRO`, como no guia de teste do PIX das orders. **Com uma conta real conectada, use `MP_SANDBOX=false`:** a cobrança continua real e sairia em nome desse pagador falso.
+- **O que o teste de 15/11/2026 confirmou** (conta real do João conectada como ONG, `MP_SANDBOX=false`): a ONG conecta pelo OAuth; a order sai com o token dela; o PIX real de R$ 5 foi pago e a doação ficou `APPROVED` 7 s depois, pelo polling do `GET /donations/{id}`. Os erros pelo caminho e as causas:
+  - `MP_TEST_TOKEN=true` dá um token `TEST-`, e o `POST /v1/orders` responde 401: use `false`;
+  - pagador de teste (`test@testuser.com`) com conta real: 402 `invalid_users_involved`;
+  - conta sem **chave Pix** cadastrada: 402 `processing_error`. A ONG precisa ter chave Pix (o card de conectar já avisa);
+  - a "credencial de teste" da aplicação (Credenciais → Teste) também gera PIX **real** na conta dona da aplicação: não há sandbox de PIX com ela.
 - Order sem o "copia e cola" é recusada: o doador não teria como pagar.
 - Sem `marketplace_fee`.
 - Da resposta saem `id` (vai para `donations.mp_order_id`) e o "copia e cola" (`qr_code`), além de `qr_code_base64` e `ticket_url`, que vão para o `pix` do DTO da doação.
