@@ -195,6 +195,14 @@ Content-Type: application/json
 | aguardando pagamento (`action_required` / `waiting_transfer`) | continua `PENDING` |
 | expirada ou cancelada | `EXPIRED` / `CANCELLED` (só se ainda estiver `PENDING`) |
 
+**O que o teste real confirmou (15 e 16/11/2026):**
+- As notificações reais chegam com `?data.external_reference=...&data.id=...&type=order` e são assinadas como acima, com a assinatura secreta do modo **Produção** (Configuração de webhooks). A cada **Salvar** no painel, o segredo mostrado pode mudar: copie depois do último Salvar e reinicie a API.
+- O **"Simular notificação"** do painel assina de outro jeito: a simulação recebe 401 mesmo com o segredo certo. Valide com uma notificação real (criar uma doação já gera a `order.action_required`).
+
+### 5.3 Consulta periódica (B3)
+
+O polling do `GET /donations/{id}` só roda com a janela do PIX aberta. Para quem fecha a janela e paga depois, sem depender do webhook, a API confere sozinha a cada minuto (`app.donations.reconcile-delay-ms`, padrão 60000) as doações `PENDING` com order, inclusive as que venceram há até 10 minutos, e aprova as pagas com o mesmo `UPDATE` atômico. Falha do Mercado Pago fica para a rodada seguinte; 401 marca a conta como `NEEDS_RECONNECT`, como no polling.
+
 ## 6. Teste no sandbox (fazer antes de implementar)
 
 Tem que funcionar **antes** de implementar campanhas e esta conexão. Passos:
