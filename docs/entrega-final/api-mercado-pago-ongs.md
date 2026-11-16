@@ -154,7 +154,12 @@ Content-Type: application/json
 ```
 
 - `X-Idempotency-Key` é um UUID novo a cada doação, não o id dela: o id se repete entre bancos diferentes (local e Aiven) que usam a mesma conta Mercado Pago, e o Mercado Pago devolveria a order antiga para a mesma chave. Quem liga a order à doação é o `external_reference` (`donation-{id}`).
-- Com `MP_SANDBOX=true` (só com credenciais de teste), o pagador vai como `test@testuser.com` com `first_name` `APRO`, que aprova o PIX sozinho.
+- Com `MP_SANDBOX=true` (só com contas de teste), o pagador vai como `test_payer@example.com` com `first_name` `APRO`, como no guia de teste do PIX das orders. **Com uma conta real conectada, use `MP_SANDBOX=false`:** a cobrança continua real e sairia em nome desse pagador falso.
+- **O que o teste de 15/11/2026 confirmou** (conta real do João conectada como ONG, `MP_SANDBOX=false`): a ONG conecta pelo OAuth; a order sai com o token dela; o PIX real de R$ 5 foi pago e a doação ficou `APPROVED` 7 s depois, pelo polling do `GET /donations/{id}`. Os erros pelo caminho e as causas:
+  - `MP_TEST_TOKEN=true` dá um token `TEST-`, e o `POST /v1/orders` responde 401: use `false`;
+  - pagador de teste (`test@testuser.com`) com conta real: 402 `invalid_users_involved`;
+  - conta sem **chave Pix** cadastrada: 402 `processing_error`. A ONG precisa ter chave Pix (o card de conectar já avisa);
+  - a "credencial de teste" da aplicação (Credenciais → Teste) também gera PIX **real** na conta dona da aplicação: não há sandbox de PIX com ela.
 - Order sem o "copia e cola" é recusada: o doador não teria como pagar.
 - Sem `marketplace_fee`.
 - Da resposta saem `id` (vai para `donations.mp_order_id`) e o "copia e cola" (`qr_code`), além de `qr_code_base64` e `ticket_url`, que vão para o `pix` do DTO da doação.
@@ -189,6 +194,14 @@ Content-Type: application/json
 | paga (`processed` / `accredited`) | `APPROVED` |
 | aguardando pagamento (`action_required` / `waiting_transfer`) | continua `PENDING` |
 | expirada ou cancelada | `EXPIRED` / `CANCELLED` (só se ainda estiver `PENDING`) |
+
+**O que o teste real confirmou (15 e 16/11/2026):**
+- As notificações reais chegam com `?data.external_reference=...&data.id=...&type=order` e são assinadas como acima, com a assinatura secreta do modo **Produção** (Configuração de webhooks). A cada **Salvar** no painel, o segredo mostrado pode mudar: copie depois do último Salvar e reinicie a API.
+- O **"Simular notificação"** do painel assina de outro jeito: a simulação recebe 401 mesmo com o segredo certo. Valide com uma notificação real (criar uma doação já gera a `order.action_required`).
+
+### 5.3 Consulta periódica (B3)
+
+O polling do `GET /donations/{id}` só roda com a janela do PIX aberta. Para quem fecha a janela e paga depois, sem depender do webhook, a API confere sozinha a cada minuto (`app.donations.reconcile-delay-ms`, padrão 60000) as doações `PENDING` com order, inclusive as que venceram há até 10 minutos, e aprova as pagas com o mesmo `UPDATE` atômico. Falha do Mercado Pago fica para a rodada seguinte; 401 marca a conta como `NEEDS_RECONNECT`, como no polling.
 
 ## 6. Teste no sandbox (fazer antes de implementar)
 
