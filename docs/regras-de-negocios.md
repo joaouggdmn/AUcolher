@@ -393,7 +393,7 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 ## 12. Nota técnica: o que já está na API
 
 - **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações por PIX real, a conexão de cada ONG com o próprio Mercado Pago (seção 10.3), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha, chat.
-- **O que falta no backend, em ordem:** `entrega-final/README.md`. O front não tem mais mock: todo módulo pronto usa só a API.
+- **O que falta no backend:** nada. A situação de cada módulo, as migrações e as variáveis de ambiente estão em `entrega-final/README.md`. O front não tem mais mock: todo módulo usa só a API.
 
 ## 13. Backlog técnico conhecido (não implementar agora — só registro)
 

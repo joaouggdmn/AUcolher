@@ -24,8 +24,10 @@ A hipótese central do TCC é que adotar com base em compatibilidade comportamen
 - **Avaliações** — depois da adoção, adotante e dono avaliam um ao outro; o perfil público mostra média e distribuição das notas.
 - **Retorno e repasse** — o dono registra a devolução de um animal, ou o adotante republica o anúncio. Os dois casos alimentam a taxa de reabandono.
 - **Eventos das ONGs** — com confirmação de presença e limite de vagas.
-- **Autenticação** — e-mail e senha ou **login com Google (OAuth2)**, com JWT e rotas protegidas por perfil: pessoa, ONG e administrador.
-- **Denúncias e painel do administrador** — estatísticas, moderação (banir, reativar, editar e remover anúncios, contas e eventos) e a taxa de reabandono.
+- **Campanhas e doações por Pix** — cada ONG conecta a própria conta do **Mercado Pago** (OAuth) e o dinheiro das doações cai direto nela, sem passar pela plataforma e sem comissão. O doador paga pelo QR Code ou pelo "copia e cola", e a doação se confirma sozinha. Testado com Pix real.
+- **Perfil público da ONG** — banner, equipe, horário de visitas, redes sociais e as abas de animais, campanhas, eventos e avaliações.
+- **Autenticação** — e-mail e senha ou **login com Google (OAuth2)**, com JWT e rotas protegidas por perfil: pessoa, ONG e administrador. A senha é recuperada ou trocada por um link enviado ao e-mail, e a própria pessoa pode excluir a conta.
+- **Denúncias e painel do administrador** — estatísticas, moderação (banir, reativar, editar e remover anúncios, contas, eventos e campanhas) e a taxa de reabandono.
 
 ## Como o AUmatch funciona
 
@@ -54,34 +56,42 @@ Quando uma adoção é concluída, a API **congela** o score de compatibilidade 
 
 | Camada | Tecnologia |
 | --- | --- |
-| Base | React 18 · Vite · React Router v6 · Tailwind CSS v4 |
-| Dados e formulários | Axios · TanStack React Query · React Hook Form · Zod |
-| Estado | Context API |
+| Base | React 19 · Vite 8 · React Router 7 · Tailwind CSS 4 |
+| Dados | Axios · TanStack React Query 5 |
+| Estado | Context API (sessão, favoritos e pedidos de adoção) |
+| Outros | qrcode.react (QR Code do Pix) · react-icons |
 
 **Back-end** ([api-aucolher](https://github.com/joaouggdmn/api-aucolher))
 
 | Camada | Tecnologia |
 | --- | --- |
-| Base | Java 17 · Spring Boot 3.3 · Spring Data JPA |
-| Segurança | Spring Security · OAuth2 Client (Google) · JWT (JJWT) |
+| Base | Java 17 · Spring Boot 3.3 · Spring Data JPA · Bean Validation |
+| Segurança | Spring Security · OAuth2 Client (Google) · JWT (JJWT) · BCrypt |
 | Banco de dados | PostgreSQL |
+| Integrações | Mercado Pago (OAuth e Orders API, para o Pix) · Spring Mail (e-mail de senha) |
 | Testes | JUnit 5 · Mockito · MockMvc |
 
 ## Arquitetura do front-end
 
-O código é organizado por **features** (*feature-sliced*), com uma regra fixa: a camada `core/` **nunca importa** de `features/`.
+O código é organizado por **features** (*feature-sliced*): cada funcionalidade tem a sua pasta, com páginas, componentes, hooks e serviços. O que várias telas usam fica em `core/`.
 
 ```
 src/
-├── core/                # componentes e hooks compartilhados, sem regra de domínio
-│   ├── components/
-│   └── hooks/           # ex.: useProfileCompletion, useReceivedRequests
+├── core/
+│   ├── components/      # layout (navbar, sidebar, rodapé) e componentes de interface
+│   ├── context/         # AuthContext, FavoritesContext, AdoptionRequestContext
+│   ├── guards/          # PrivateRoute, GuestRoute, PessoaRoute, OngRoute, ParticipantRoute, AdminRoute
+│   ├── hooks/           # ex.: useProfileCompletion, useReceivedRequests
+│   └── services/        # api.js (Axios com o token), queryKeys e APIs públicas (IBGE, ViaCEP, BrasilAPI)
 ├── features/
-│   ├── auth/            # login, cadastro, AuthContext
-│   ├── animais/         # anúncios, vitrine e pedidos de adoção
+│   ├── auth/            # login, cadastro e senha
+│   ├── animais/         # anúncios e vitrine
 │   ├── aumatch/         # swipe, quiz e cálculo de compatibilidade
-│   └── ...              # chat, eventos, perfil, admin etc.
-└── routes/              # PrivateRoute, GuestRoute, OngRoute, AdminRoute
+│   ├── adocao/          # pedidos de adoção
+│   ├── doacoes/         # campanhas, Pix e conta do Mercado Pago
+│   ├── ong/             # painel e perfil da ONG
+│   └── ...              # chat, eventos, avaliações, denúncias, admin etc.
+└── routers/             # rotas públicas, de autenticação e protegidas
 ```
 
 Decisões de projeto:
@@ -96,7 +106,7 @@ Os detalhes do back-end, como endpoints e regras, estão no README do [api-aucol
 
 ## Como rodar
 
-Requer Node.js 20 ou superior, Java 17 e PostgreSQL.
+Requer Node.js 20.19 ou superior (exigência do Vite 8), Java 17, Maven e PostgreSQL.
 
 ### 1. Back-end
 
@@ -107,7 +117,11 @@ psql -U postgres -h localhost -f sql/schema.sql   # cria o banco aucolher_db e a
 mvn spring-boot:run                               # sobe em http://localhost:8080
 ```
 
-Defina as variáveis de ambiente antes de subir: `JWT_SECRET`, `ADMIN_EMAIL` e `ADMIN_PASSWORD` (a conta de administrador é criada a partir delas), e `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` se for usar o login com Google. A tabela completa está no README do back-end. O login com Google está explicado em `docs/entrega-final/api-login-google.md`.
+Sem nenhuma variável, a API sobe contra o PostgreSQL local com os valores padrão e uma chave JWT aleatória a cada execução. Defina `JWT_SECRET` para os tokens sobreviverem a um reinício.
+
+- **Administrador:** não há cadastro público; a conta `ADMIN` é inserida direto no banco.
+- **Dados de teste:** `docs/seed-banco-completo.sql`, deste repositório, cria ONGs, pessoas, animais, pedidos, eventos e conversas. Ele **apaga** os dados do banco antes; a senha das contas de teste está no cabeçalho do arquivo.
+- **Login com Google, e-mail de senha e doações:** cada um precisa das suas variáveis. A tabela completa e o passo a passo do Mercado Pago (túnel HTTPS, webhook, chave Pix) estão no README do back-end. O login com Google está explicado em `docs/entrega-final/api-login-google.md`.
 
 ### 2. Front-end
 
@@ -118,12 +132,19 @@ npm install
 npm run dev                                       # http://localhost:5173
 ```
 
-Crie um arquivo `.env` com o endereço da API: VITE_API_URL=http://localhost:8080
+O endereço da API vem do `.env`, na raiz do projeto. Sem o arquivo, o padrão é este:
+
+```
+VITE_API_URL=http://localhost:8080/api
+```
 
 ## Limitações conhecidas
 
 - **Não há geolocalização:** a busca por local é por cidade e UF, por decisão do projeto.
-- **Doações por PIX** ainda usam um token de teste único do Mercado Pago: a conexão de cada ONG com a própria conta não foi feita.
+- **O site ainda não está publicado.** Roda localmente, com o banco na nuvem (Aiven). Para o Mercado Pago alcançar a API (retorno do OAuth e webhook), é usado um túnel HTTPS (ngrok).
+- **Não há sandbox de Pix** para doações na conta da ONG: até a credencial de teste do Mercado Pago gera cobrança real. Os testes foram feitos com Pix real de R$ 5.
+- **Estorno** feito pela ONG no Mercado Pago não muda a doação no AUcolher.
+- **Chat por *polling*** (nova consulta a cada 3 s), não em tempo real. **Imagens** ficam dentro do JSON, como data URL, e não num serviço de arquivos.
 
 ## Equipe
 
