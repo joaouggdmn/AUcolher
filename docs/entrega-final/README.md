@@ -1,8 +1,8 @@
-# AUcolher — O que falta no backend
+# AUcolher — Entrega final do backend
 
-Esta pasta é o pacote para o parceiro de backend: tudo o que ainda falta implementar na API e no banco, um contrato por módulo. O que já está pronto fica em `../contratos-prontos/`, só como referência.
+Esta pasta foi o pacote para o parceiro de backend: um contrato por módulo que ainda faltava na API e no banco. **Hoje todos estão implementados** (seção 2), e os contratos ficam como referência de nomes, formatos e mensagens. Os módulos que ficaram prontos antes estão em `../contratos-prontos/`.
 
-**Como o front espera cada entrega:** o front usa só a API, sem mocks nem flags `VITE_USE_MOCK_*`. Enquanto a rota de um módulo não existe, aquela parte da tela fica vazia ou mostra um erro, e o resto do site segue normal. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos.**
+**Como o front espera cada módulo:** o front usa só a API, sem mocks nem flags `VITE_USE_MOCK_*`. Se a rota de um módulo não responde, aquela parte da tela fica vazia ou mostra um erro, e o resto do site segue normal. Por isso **nomes, formatos, códigos de status e mensagens precisam bater exatamente com os contratos**, inclusive em mudanças futuras.
 
 Os contratos seguem sempre o mesmo padrão:
 - regras → DTOs → endpoints → notas de Spring → SQL → o que muda no front;
@@ -42,7 +42,7 @@ Os contratos seguem sempre o mesmo padrão:
 | **Senha** | `password_reset_tokens` + `users.password_changed_at` | ✅ pronto | API | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ✅ pronto | API | `api-chat.md` |
 
-## 3. Ordem sugerida
+## 3. Ordem de entrega (concluída)
 
 0. ~~Teste do Mercado Pago~~: **feito em 15 e 16/11/2026**, com PIX real e a conta do João conectada como ONG. O contrato valeu; o plano B (§6) não foi necessário. O que o teste confirmou está em `api-mercado-pago-ongs.md` §5.1 a §5.3.
 1. ~~Campanhas e doações~~ (migração 007) e ~~conta Mercado Pago~~ (009): **feito**, com a parte do admin e da moderação (`api-campanhas-doacoes.md` §7), a tela de conexão no painel da ONG e o PIX com o token de cada ONG.
@@ -58,7 +58,7 @@ Os contratos seguem sempre o mesmo padrão:
 
 **Onde estão aplicadas:**
 - **Aiven:** é o banco em uso (`backend/docs/guia-banco-aiven.md`). Tem todas: a estrutura é igual à do `sql/schema.sql` (conferido em 03/11/2026).
-- **`aucolher_db` local:** ficou para trás. Não tem a 007 (campanhas), a 009 (Mercado Pago), a 010 (senha), a 011 (chat) nem a 013 (exclusão de conta), então a API atual não sobe nele.
+- **`aucolher_db` local:** também tem todas. Foi nivelado com o Aiven em 09/11/2026 (007, 009, 013, 010 e 011, nessa ordem) e tem as 18 tabelas (conferido em 16/11/2026), então a API atual sobe nele.
 
 **Cuidado em migrações novas:**
 - **A CHECK de `adoption_requests.cancel_reason` não deve ser recriada.** A 014 já aceita `ACCOUNT_DELETED`, `ACCOUNT_BANNED` e `LISTING_REMOVED`. Recriá-la com menos valores quebraria a moderação.
