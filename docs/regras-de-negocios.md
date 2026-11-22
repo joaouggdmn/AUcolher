@@ -54,7 +54,7 @@ Contratos: `entrega-final/api-senha.md` e `contratos-prontos/api-exclusao-conta.
 
 **Alterar senha**
 - Em "Minha conta", card "Acesso": e-mail e senha aparecem só para ver, a senha mascarada (o banco guarda o hash).
-- O botão "Alterar senha" envia o mesmo link do "Esqueci minha senha" para o e-mail da conta. Não há formulário com a senha atual: quem acessa o e-mail prova que é dono da conta. Nova senha com no mínimo 6 caracteres, como no cadastro.
+- O botão "Alterar senha" envia o mesmo link do "Esqueci minha senha" para o e-mail da conta. Não há formulário com a senha atual: quem acessa o e-mail prova que é dono da conta. Nova senha com no mínimo 6 caracteres, como no cadastro, e diferente da atual (se for igual, a API recusa e o link continua valendo).
 - Conta criada pelo Google (`provider = GOOGLE`, sem senha): o botão vira "Criar senha", com o mesmo link. Depois disso a conta entra das duas formas.
 
 **Recuperar senha**

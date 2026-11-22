@@ -8,6 +8,7 @@
 
 **Senha**
 - Mínimo de **6 caracteres**, como no cadastro.
+- A nova senha precisa ser **diferente da atual**. A recusa não consome o link: a pessoa tenta de novo com outra senha. Conta só do Google (`password` nulo) não passa por essa checagem, porque está criando a primeira senha.
 
 **Alterar senha** (logado, em "Minha conta" → card "Acesso")
 - A senha aparece só mascarada (`••••••••`): o banco guarda o hash, não a senha.
@@ -76,6 +77,7 @@ O token é gerado com 32 bytes aleatórios (`SecureRandom`) e vai no link em Bas
 | Rota | Quando | `message` |
 |---|---|---|
 | POST `/reset` | nova senha com menos de 6 caracteres | "A nova senha deve ter no mínimo 6 caracteres." |
+| POST `/reset` | nova senha igual à atual (o link continua valendo) | "A nova senha deve ser diferente da atual." |
 | POST `/forgot` | e-mail vazio ou mal formado | "Informe um e-mail válido." |
 | POST `/reset/check`, POST `/reset` | token inexistente, vencido ou já usado | "Este link é inválido ou expirou. Peça um novo." |
 
