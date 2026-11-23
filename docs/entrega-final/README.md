@@ -58,7 +58,7 @@ Os contratos seguem sempre o mesmo padrão:
 
 **Onde estão aplicadas:**
 - **`aucolher_db` local:** é o banco em uso desde 23/11/2026. Tem todas, e os dados foram copiados do Aiven nesse dia (dump restaurado; as 18 tabelas conferidas, com as mesmas contagens).
-- **Aiven:** tem todas também (`backend/docs/guia-banco-aiven.md`). Ficou como cópia de segurança de 23/11/2026: o que for cadastrado depois no banco local não aparece nele.
+- **Aiven:** não é mais usado. O script `run-aiven.ps1`, o modelo `.env.aiven.example` e o guia de conexão saíram do backend em 23/11/2026. Uma cópia dos dados desse dia (`pg_dump`) ficou em `C:\AUCOLHER-GIT\backups-banco\`.
 
 **Cuidado em migrações novas:**
 - **A CHECK de `adoption_requests.cancel_reason` não deve ser recriada.** A 014 já aceita `ACCOUNT_DELETED`, `ACCOUNT_BANNED` e `LISTING_REMOVED`. Recriá-la com menos valores quebraria a moderação.

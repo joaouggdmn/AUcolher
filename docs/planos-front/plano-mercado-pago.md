@@ -4,6 +4,8 @@
 >
 > Contrato: `docs/entrega-final/api-mercado-pago-ongs.md` (§9 é o front) e `api-campanhas-doacoes.md`.
 
+> **Nota de 23/11/2026:** o projeto deixou de usar o banco do Aiven. Onde este plano fala em `.env.aiven`, hoje vale o `.env` da pasta do backend.
+
 > **Situação em 16/11/2026: concluído.**
 > - F1 a F3 estão no `main` (PR #44): serviços e hook, cartão do Mercado Pago no painel com o retorno `?mp=`, e os bloqueios de campanha e doação.
 > - **Mudança em relação à F2:** "cancelada", "já vinculada" e "erro" aparecem em vermelho dentro do cartão, não no toast verde de sucesso.
