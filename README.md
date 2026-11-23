@@ -141,7 +141,7 @@ VITE_API_URL=http://localhost:8080/api
 ## Limitações conhecidas
 
 - **Não há geolocalização:** a busca por local é por cidade e UF, por decisão do projeto.
-- **O site ainda não está publicado.** Roda localmente, com o banco na nuvem (Aiven). Para o Mercado Pago alcançar a API (retorno do OAuth e webhook), é usado um túnel HTTPS (ngrok).
+- **O site ainda não está publicado.** Roda localmente, com o banco PostgreSQL também local (até 23/11/2026 o banco ficava na nuvem, no Aiven). Para o Mercado Pago alcançar a API (retorno do OAuth e webhook), é usado um túnel HTTPS (ngrok).
 - **Não há sandbox de Pix** para doações na conta da ONG: até a credencial de teste do Mercado Pago gera cobrança real. Os testes foram feitos com Pix real de R$ 5.
 - **Estorno** feito pela ONG no Mercado Pago não muda a doação no AUcolher.
 - **Chat por *polling*** (nova consulta a cada 3 s), não em tempo real. **Imagens** ficam dentro do JSON, como data URL, e não num serviço de arquivos.
