@@ -10,6 +10,7 @@
 - [ ] **Front no ar:** `npm run dev`.
 - [ ] **Túnel no ar:** `ngrok http --domain=utopia-radial-purple.ngrok-free.dev 8080`. Ele é necessário para conectar uma ONG e para o webhook. Sem o túnel, a doação ainda confirma pela janela do PIX e pela consulta de 1 em 1 minuto.
 - [ ] **`.env`** do back com `MP_SANDBOX=false` e `MP_TEST_TOKEN=false`.
+- [ ] **`GEMINI_API_KEY`** no `.env` do back, para o balão do assistente responder (sem ela, ele mostra "indisponível").
 - [ ] **ONG conectada:** a Apacri, em Painel → Campanhas, mostra o cartão verde "Conta do Mercado Pago conectada" e tem pelo menos uma campanha ativa.
 - [ ] **ONG sem conta,** por exemplo a SOS Vira-lata, para mostrar o bloqueio.
 - [ ] **Doador:** uma conta de pessoa logada em outra janela, com e-mail **diferente** do da conta do Mercado Pago que recebe.

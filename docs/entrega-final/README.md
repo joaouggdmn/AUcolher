@@ -20,6 +20,7 @@ Os contratos seguem sempre o mesmo padrão:
 | `api-senha.md` | Recuperar e alterar a senha pelo link do e-mail, derrubando as sessões (**implementado**) |
 | `api-chat.md` | Chat dos pedidos de adoção no banco, com polling e mensagens de sistema (**implementado**) |
 | `api-login-google.md` | Entrar com o Google: **já implementado** (back e front); só o fluxo, as variáveis e como criar as credenciais |
+| `api-assistente.md` | Assistente de suporte com IA (Google Gemini): o balão do site, a rota pública, o limite e a privacidade (**implementado**) |
 | `plano-front-api-pronta.md` | O plano do front para deixar cada módulo pronto para ligar na API |
 
 ## 2. Onde estamos
@@ -41,6 +42,7 @@ Os contratos seguem sempre o mesmo padrão:
 | **Conta Mercado Pago da ONG** | `mercado_pago_accounts` | ✅ pronto: o PIX sai com o token da ONG e cai na conta dela | API | `api-mercado-pago-ongs.md` |
 | **Senha** | `password_reset_tokens` + `users.password_changed_at` | ✅ pronto | API | `api-senha.md` |
 | **Chat** | `chat_messages`, `chat_reads` | ✅ pronto | API | `api-chat.md` |
+| **Assistente de suporte (IA)** | — (a conversa fica no navegador) | ✅ pronto | API | `api-assistente.md` |
 
 ## 3. Ordem de entrega (concluída)
 
@@ -87,6 +89,7 @@ Os contratos seguem sempre o mesmo padrão:
 | `MP_REDIRECT_URI` | URL de retorno do OAuth, **igual** à cadastrada na aplicação do Mercado Pago | `https://api.../api/mercado-pago/oauth/callback` |
 | `MP_WEBHOOK_SECRET` | Assinatura secreta dos webhooks, do modo **Produção** (Configuração de webhooks), copiada depois do último Salvar | — |
 | `MP_TOKEN_ENCRYPTION_KEY` | Chave AES de 32 bytes em Base64 para criptografar os tokens das ONGs | `openssl rand -base64 32` |
+| `GEMINI_API_KEY` | Chave do Google AI Studio para o assistente de suporte (`api-assistente.md` §4). Sem ela, o assistente responde 503 | — |
 | `MP_STATE_SECRET` | Assina o `state` do OAuth. Opcional: sem ela, usa a chave do JWT | `openssl rand -base64 32` |
 | `MP_TEST_TOKEN` | Deixar `false`: com `true` o OAuth entrega um token `TEST-`, que a criação do PIX recusa (401) | `false` |
 | `MP_SANDBOX` | Deixar `false` com conta real: com `true` o pagador vai como "APRO" e a cobrança continua real | `false` |
