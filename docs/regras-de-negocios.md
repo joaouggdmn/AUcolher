@@ -12,7 +12,7 @@ Três papéis de usuário:
 - **ONG** — tudo que o usuário comum faz, mais um perfil institucional mais completo e a possibilidade de criar eventos e campanhas de doação.
 - **Admin** — modera a plataforma, julga denúncias e acompanha métricas gerais (painel próprio em `/admin`).
 
-Frontend em React (Vite), backend em Spring Boot + PostgreSQL (o banco em uso fica no Aiven). Quase tudo já está na API. O que ainda falta está na seção 12 e em `entrega-final/README.md`.
+Frontend em React (Vite), backend em Spring Boot + PostgreSQL (o banco em uso é o local; até 23/11/2026 ficava no Aiven). Quase tudo já está na API. O que ainda falta está na seção 12 e em `entrega-final/README.md`.
 
 ## 2. Usuários e papéis
 

@@ -5,10 +5,11 @@
 ## 1. Antes (uns 30 minutos antes)
 
 - [ ] **Internet** testada no lugar da apresentação (Wi-Fi ou roteador do celular).
-- [ ] **API no ar:** `.\run-aiven.ps1` no back. **Só uma API** apontando para o Aiven, porque o plano gratuito tem poucas conexões.
+- [ ] **PostgreSQL local ligado** (serviço `postgresql-x64-18` no Windows). O banco é o `aucolher_db` local; não depende da rede.
+- [ ] **API no ar:** botão **Run** do IntelliJ (ou `mvn spring-boot:run`) no back, **sem** o `run-aiven.ps1`. A run configuration não pode ter `DB_URL` do Aiven.
 - [ ] **Front no ar:** `npm run dev`.
 - [ ] **Túnel no ar:** `ngrok http --domain=utopia-radial-purple.ngrok-free.dev 8080`. Ele é necessário para conectar uma ONG e para o webhook. Sem o túnel, a doação ainda confirma pela janela do PIX e pela consulta de 1 em 1 minuto.
-- [ ] **`.env.aiven`** com `MP_SANDBOX=false` e `MP_TEST_TOKEN=false`.
+- [ ] **`.env`** do back com `MP_SANDBOX=false` e `MP_TEST_TOKEN=false`.
 - [ ] **ONG conectada:** a Apacri, em Painel → Campanhas, mostra o cartão verde "Conta do Mercado Pago conectada" e tem pelo menos uma campanha ativa.
 - [ ] **ONG sem conta,** por exemplo a SOS Vira-lata, para mostrar o bloqueio.
 - [ ] **Doador:** uma conta de pessoa logada em outra janela, com e-mail **diferente** do da conta do Mercado Pago que recebe.

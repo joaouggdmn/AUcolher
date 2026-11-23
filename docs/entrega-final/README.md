@@ -57,8 +57,8 @@ Os contratos seguem sempre o mesmo padrão:
 **Já existem no backend** (`sql/migrations/`): todas, da 001 à 017. Não falta nenhuma.
 
 **Onde estão aplicadas:**
-- **Aiven:** é o banco em uso (`backend/docs/guia-banco-aiven.md`). Tem todas: a estrutura é igual à do `sql/schema.sql` (conferido em 03/11/2026).
-- **`aucolher_db` local:** também tem todas. Foi nivelado com o Aiven em 09/11/2026 (007, 009, 013, 010 e 011, nessa ordem) e tem as 18 tabelas (conferido em 16/11/2026), então a API atual sobe nele.
+- **`aucolher_db` local:** é o banco em uso desde 23/11/2026. Tem todas, e os dados foram copiados do Aiven nesse dia (dump restaurado; as 18 tabelas conferidas, com as mesmas contagens).
+- **Aiven:** tem todas também (`backend/docs/guia-banco-aiven.md`). Ficou como cópia de segurança de 23/11/2026: o que for cadastrado depois no banco local não aparece nele.
 
 **Cuidado em migrações novas:**
 - **A CHECK de `adoption_requests.cancel_reason` não deve ser recriada.** A 014 já aceita `ACCOUNT_DELETED`, `ACCOUNT_BANNED` e `LISTING_REMOVED`. Recriá-la com menos valores quebraria a moderação.
