@@ -423,10 +423,12 @@ Gaps encontrados na exploração do código atual, guardados aqui para referênc
 - **Só responde.** Não lê nem altera nada no banco: explica onde a pessoa faz cada coisa. Assuntos fora do AUcolher recebem uma recusa educada, e ele não inventa regra: na dúvida, indica a tela certa ou a ONG.
 - **Quem usa:** todo mundo, inclusive visitante. O balão some no chat, no AUmatch, no painel do admin e na volta do login com o Google.
 - **Onde fica o conhecimento:** numa instrução de sistema no backend (`support/assistente-prompt.md`), resumida destas regras. Mudou uma regra importante aqui, atualize lá também.
+- **Como ele indica as telas:** pelo nome que aparece no site e pelo menu em que ela fica ("menu lateral → Meus interesses"), nunca por caminhos técnicos como `/aumatch`.
 - **Privacidade:**
   - o front nunca fala com o Google: a chamada passa pela API, e a chave fica no `.env` do back;
   - a API não manda ao Gemini nenhum dado da conta;
   - o painel avisa para não enviar dados pessoais. No plano gratuito do Gemini, o Google pode usar as perguntas e respostas para melhorar os produtos.
 - **Conversa só no navegador** (`sessionStorage`): some ao fechar a aba ou ao limpar. Cada pergunta leva as falas anteriores, e a API usa as últimas 20.
 - **Limite:** 10 mensagens por minuto e 60 por dia, por conta logada ou, para visitante, por IP (429 depois disso).
+- **Google sobrecarregado:** a API tenta de novo e, se preciso, usa um modelo reserva antes de desistir.
 - **Sem chave ou com o Gemini fora do ar:** o balão continua aparecendo e mostra "O assistente está indisponível no momento. Tente de novo mais tarde." (503).

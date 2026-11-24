@@ -60,7 +60,7 @@
 | 400 | "Escreva uma pergunta." | `message` vazio ou só espaços |
 | 400 | "A pergunta pode ter até 500 caracteres." | Mais de 500 caracteres |
 | 429 | "Você enviou muitas mensagens em pouco tempo. Aguarde um pouco e tente de novo." | Passou do limite |
-| 503 | "O assistente está indisponível no momento. Tente de novo mais tarde." | Sem `GEMINI_API_KEY`, ou o Gemini fora do ar, sem cota ou sem resposta a tempo |
+| 503 | "O assistente está indisponível no momento. Tente de novo mais tarde." | Sem `GEMINI_API_KEY`, ou o Gemini fora do ar, sem cota ou sem resposta mesmo depois das novas tentativas (§4) |
 
 Se o Gemini responder sem texto (resposta bloqueada ou cortada), a API devolve 200 com "Não consegui responder agora. Pode reformular a pergunta?".
 
@@ -72,11 +72,14 @@ Se o Gemini responder sem texto (resposta bloqueada ou cortada), a API devolve 2
 | Variável | Para quê | Padrão |
 |---|---|---|
 | `GEMINI_API_KEY` | Chave do Google AI Studio | — (sem ela, 503) |
-| `GEMINI_MODEL` | Modelo | `gemini-3.6-flash` |
-| `GEMINI_THINKING_LEVEL` | Raciocínio do modelo; os tokens dele contam como saída | `LOW` |
+| `GEMINI_MODEL` | Modelo (o leve responde em 1 a 2 s) | `gemini-3.5-flash-lite` |
+| `GEMINI_FALLBACK_MODEL` | Modelo reserva, quando o principal está sobrecarregado ou não responde a tempo; vazio = sem reserva | `gemini-3.6-flash` |
+| `GEMINI_THINKING_LEVEL` | Raciocínio do modelo; os tokens dele contam como saída e deixam a resposta lenta | `MINIMAL` |
 | `GEMINI_MAX_OUTPUT_TOKENS` | Limite da resposta, raciocínio incluído | `1024` |
 
-- **Logs:** só o código HTTP quando o Gemini falha. Nunca a chave nem o texto das mensagens.
+- **Novas tentativas:** quando o Google responde 503 ("high demand", sobrecarga passageira), 429 ou não responde em 20 s, a API tenta de novo o modelo principal e, se ainda falhar, o reserva. Sem resposta a tempo, ela vai direto para o reserva. Erro de configuração (400, 401, 403, 404) não é repetido.
+- **Por que o modelo leve:** em 23/11/2026, o `gemini-3.6-flash` levou de 16 s a mais de 60 s por resposta, e o `gemini-3.5-flash-lite`, de 1 a 3 s.
+- **Logs:** só o código HTTP e o modelo quando o Gemini falha. Nunca a chave nem o texto das mensagens.
 - **Testes:** `GeminiClientTest` (servidor falso no lugar do Google), `SupportChatServiceTest`, `SupportRateLimiterTest` e `SupportChatControllerTest`.
 
 ## 5. O que muda no front
