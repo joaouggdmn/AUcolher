@@ -48,7 +48,10 @@ function PanelShell({ title, nav, context }) {
     // Na impressão (PDF) sai só o conteúdo, em altura livre: sem barra lateral,
     // cabeçalho do celular nem a rolagem própria da área principal
     <div className="flex h-screen overflow-hidden bg-slate-50 lg:[--fixed-left-offset:16rem] print:block print:h-auto print:overflow-visible print:bg-white">
-      <aside className="hidden w-64 shrink-0 lg:flex print:hidden">
+      {/* relative (aqui e no main): os textos sr-only (position: absolute) das
+          páginas se posicionam dentro deles. Sem isso iam até a página inteira,
+          escapavam do overflow e deixavam um espaço vazio rolável abaixo do painel */}
+      <aside className="relative hidden w-64 shrink-0 lg:flex print:hidden">
         <PanelNav {...nav} title={title} />
       </aside>
 
@@ -90,7 +93,7 @@ function PanelShell({ title, nav, context }) {
           <span className="text-sm font-semibold text-slate-400">{title}</span>
         </header>
 
-        <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto print:overflow-visible">
+        <main ref={mainRef} className="relative min-h-0 flex-1 overflow-y-auto print:overflow-visible">
           {/* key força remontagem a cada seção, disparando a animação de entrada.
               Só opacidade: um transform aqui prenderia os modais `fixed` das páginas */}
           <div key={location.pathname} className="animate-fade-in">
