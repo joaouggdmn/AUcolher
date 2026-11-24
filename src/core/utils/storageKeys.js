@@ -12,3 +12,6 @@ export const SESSION_EXPIRED_FLAG_KEY = 'aucolher_session_expired'
 // sessionStorage: a página de onde a pessoa foi entrar com o Google (o
 // state do router se perde na ida e volta ao Google)
 export const GOOGLE_LOGIN_RETURN_KEY = 'aucolher_google_login_return'
+// sessionStorage: a conversa com o assistente de suporte (não vai para o banco;
+// some ao fechar a aba)
+export const ASSISTANT_CONVERSATION_KEY = 'aucolher_assistant_conversation'

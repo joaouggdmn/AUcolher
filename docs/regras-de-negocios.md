@@ -392,7 +392,7 @@ Substitui a antiga "conta única da plataforma": **o dinheiro cai direto na cont
 
 ## 12. Nota técnica: o que já está na API
 
-- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações por PIX real, a conexão de cada ONG com o próprio Mercado Pago (seção 10.3), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha, chat.
+- **Já na API (Spring Boot + PostgreSQL):** login e cadastro (inclusive admin e Google), animais, favoritos, AUmatch, pedidos de adoção e avaliações, devolução e repasse, eventos e presenças, campanhas e doações por PIX real, a conexão de cada ONG com o próprio Mercado Pago (seção 10.3), perfil público e banner da ONG, painel do admin, denúncias e moderação, exclusão de conta, recuperar e alterar senha, chat e o assistente de suporte com IA (seção 15).
 - **O que falta no backend:** nada. A situação de cada módulo, as migrações e as variáveis de ambiente estão em `entrega-final/README.md`. O front não tem mais mock: todo módulo usa só a API.
 
 ## 13. Backlog técnico conhecido (não implementar agora — só registro)
@@ -414,3 +414,21 @@ Gaps encontrados na exploração do código atual, guardados aqui para referênc
 - ~~Endpoints `/api/admin/*` e `/api/reports`~~: implementados (`contratos-prontos/api-admin.md` e `contratos-prontos/api-denuncias-moderacao.md`), inclusive a parte de campanhas (migração 007).
 - ~~Se e quando o histórico de status do animal entra no modelo~~: resolvido. A taxa de reabandono usa os status `RETURNED` / `REHOMED` do pedido e o score congelado na conclusão (seção 3.3), sem tabela de histórico do animal.
 - ~~Novos itens para o parceiro de backend, sem contrato~~: os contratos do que falta estão em **`docs/entrega-final/`**, com o mapa no `README.md` dela.
+
+## 15. Assistente de suporte (IA)
+
+> Contrato em `entrega-final/api-assistente.md`. Implementado em 24/11/2026, sem migração.
+
+- **O que é:** um balão no canto inferior direito que tira dúvidas sobre o uso do AUcolher (adoção, AUmatch, pedidos, eventos, campanhas e doações, cadastro de ONG, conta, senha e denúncias), com o **Google Gemini**.
+- **Só responde.** Não lê nem altera nada no banco: explica onde a pessoa faz cada coisa. Assuntos fora do AUcolher recebem uma recusa educada, e ele não inventa regra: na dúvida, indica a tela certa ou a ONG.
+- **Quem usa:** todo mundo, inclusive visitante. O balão some no chat, no AUmatch, no painel do admin e na volta do login com o Google.
+- **Onde fica o conhecimento:** numa instrução de sistema no backend (`support/assistente-prompt.md`), resumida destas regras. Mudou uma regra importante aqui, atualize lá também.
+- **Como ele indica as telas:** pelo nome que aparece no site e pelo menu em que ela fica ("menu lateral → Meus interesses"), nunca por caminhos técnicos como `/aumatch`.
+- **Privacidade:**
+  - o front nunca fala com o Google: a chamada passa pela API, e a chave fica no `.env` do back;
+  - a API não manda ao Gemini nenhum dado da conta;
+  - o painel avisa para não enviar dados pessoais. No plano gratuito do Gemini, o Google pode usar as perguntas e respostas para melhorar os produtos.
+- **Conversa só no navegador** (`sessionStorage`): some ao fechar a aba ou ao limpar. Cada pergunta leva as falas anteriores, e a API usa as últimas 20.
+- **Limite:** 10 mensagens por minuto e 60 por dia, por conta logada ou, para visitante, por IP (429 depois disso).
+- **Google sobrecarregado:** a API tenta de novo e, se preciso, usa um modelo reserva antes de desistir.
+- **Sem chave ou com o Gemini fora do ar:** o balão continua aparecendo e mostra "O assistente está indisponível no momento. Tente de novo mais tarde." (503).

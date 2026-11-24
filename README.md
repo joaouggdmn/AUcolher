@@ -28,6 +28,7 @@ A hipótese central do TCC é que adotar com base em compatibilidade comportamen
 - **Perfil público da ONG** — banner, equipe, horário de visitas, redes sociais e as abas de animais, campanhas, eventos e avaliações.
 - **Autenticação** — e-mail e senha ou **login com Google (OAuth2)**, com JWT e rotas protegidas por perfil: pessoa, ONG e administrador. A senha é recuperada ou trocada por um link enviado ao e-mail, e a própria pessoa pode excluir a conta.
 - **Denúncias e painel do administrador** — estatísticas, moderação (banir, reativar, editar e remover anúncios, contas, eventos e campanhas) e a taxa de reabandono.
+- **Assistente de suporte com IA** — um balão em todas as telas tira dúvidas sobre o uso da plataforma com o **Google Gemini**, chamado só pelo back-end. Ele só responde (não age na conta), avisa para não enviar dados pessoais e tem limite de mensagens. A conversa fica no navegador, sem tabela no banco.
 
 ## Como o AUmatch funciona
 
@@ -68,7 +69,7 @@ Quando uma adoção é concluída, a API **congela** o score de compatibilidade 
 | Base | Java 17 · Spring Boot 3.3 · Spring Data JPA · Bean Validation |
 | Segurança | Spring Security · OAuth2 Client (Google) · JWT (JJWT) · BCrypt |
 | Banco de dados | PostgreSQL |
-| Integrações | Mercado Pago (OAuth e Orders API, para o Pix) · Spring Mail (e-mail de senha) |
+| Integrações | Mercado Pago (OAuth e Orders API, para o Pix) · Spring Mail (e-mail de senha) · Google Gemini (assistente de suporte) |
 | Testes | JUnit 5 · Mockito · MockMvc |
 
 ## Arquitetura do front-end
@@ -121,7 +122,7 @@ Sem nenhuma variável, a API sobe contra o PostgreSQL local com os valores padr�
 
 - **Administrador:** não há cadastro público; a conta `ADMIN` é inserida direto no banco.
 - **Dados de teste:** `docs/seed-banco-completo.sql`, deste repositório, cria ONGs, pessoas, animais, pedidos, eventos e conversas. Ele **apaga** os dados do banco antes; a senha das contas de teste está no cabeçalho do arquivo.
-- **Login com Google, e-mail de senha e doações:** cada um precisa das suas variáveis. A tabela completa e o passo a passo do Mercado Pago (túnel HTTPS, webhook, chave Pix) estão no README do back-end. O login com Google está explicado em `docs/entrega-final/api-login-google.md`.
+- **Login com Google, e-mail de senha, doações e assistente:** cada um precisa das suas variáveis (o assistente, de `GEMINI_API_KEY`). A tabela completa e o passo a passo do Mercado Pago (túnel HTTPS, webhook, chave Pix) estão no README do back-end. O login com Google está explicado em `docs/entrega-final/api-login-google.md`.
 
 ### 2. Front-end
 

@@ -6,6 +6,7 @@ import NotFoundPage from '../core/components/NotFoundPage' // ajuste se mover pa
 import RootErrorPage from '../core/components/RootErrorPage'
 import PublicLayout from '../core/components/layout/PublicLayout'
 import ScrollToTop from '../core/components/layout/ScrollToTop'
+import SupportWidget from '../features/assistente/components/SupportWidget'
 
 export const router = createBrowserRouter([
   {
@@ -13,11 +14,14 @@ export const router = createBrowserRouter([
     // errorElement no nível raiz captura qualquer erro não tratado
     // em qualquer rota da aplicação
     errorElement: <RootErrorPage />,
-    // Toda página nova abre no topo (ScrollToTop explica as exceções)
+    // Toda página nova abre no topo (ScrollToTop explica as exceções). O balão
+    // do assistente de suporte fica aqui para aparecer em todas as telas
+    // (ele mesmo se esconde onde atrapalha)
     element: (
       <>
         <ScrollToTop />
         <Outlet />
+        <SupportWidget />
       </>
     ),
     children: [
