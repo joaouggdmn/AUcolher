@@ -1,4 +1,4 @@
-// Regras e textos da senha (docs/entrega-final/api-senha.md §1 e §3): os
+// Regras e textos da senha: os
 // formulários validam antes de enviar, e a API recusa com as mesmas mensagens
 export const PASSWORD_MIN_LENGTH = 6
 

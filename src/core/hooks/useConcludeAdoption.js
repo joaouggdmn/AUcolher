@@ -14,7 +14,7 @@ import { queryKeys } from '../services/queryKeys'
 //   aceito e o chat reabre para combinar a entrega
 //   Desistência (qualquer uma das partes): cancela e registra quem desistiu
 // Todas rejeitam com o erro da API — quem chama mostra a mensagem. O aviso
-// no chat é criado pelo backend na mesma transação (api-chat.md §1); aqui, a
+// no chat é criado pelo backend na mesma transação; aqui, a
 // conversa e o badge só recarregam
 export function useConcludeAdoption() {
   const { requestDeliveryConfirmation, concludeRequest, declineDelivery: declineDeliveryRequest, cancelRequest } =

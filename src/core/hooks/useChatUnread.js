@@ -8,8 +8,8 @@ import * as chatService from '../../features/chat/services/chatService'
 
 const NO_CONVERSATIONS = []
 
-// Não lidas e última mensagem de cada conversa, do GET /chats/summary
-// (api-chat.md §2.4), a cada 20 s. Cruza com os contatos, que têm o nome do
+// Não lidas e última mensagem de cada conversa, do GET /chats/summary,
+// a cada 20 s. Cruza com os contatos, que têm o nome do
 // animal e da outra parte usados no texto dos avisos
 export function useChatUnread() {
   const { user } = useAuth()

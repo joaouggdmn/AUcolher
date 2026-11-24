@@ -10,7 +10,7 @@ import { FORGOT_PASSWORD_NEUTRAL_MESSAGE } from '../utils/passwordRules'
 const BACK_LINK_CLASSES =
   'inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 transition-colors hover:text-emerald-900'
 
-// "Esqueci minha senha" (api-senha.md §1): a resposta é sempre a mesma,
+// "Esqueci minha senha": a resposta é sempre a mesma,
 // exista conta ou não, para não revelar quais e-mails estão cadastrados
 function ForgotPasswordPage() {
   const location = useLocation()

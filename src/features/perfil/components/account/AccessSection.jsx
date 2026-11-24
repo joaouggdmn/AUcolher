@@ -10,7 +10,7 @@ import ProfileSection from '../ProfileSection'
 const MASKED_PASSWORD = '••••••••'
 
 // "Acesso" de pessoa e ONG: e-mail e senha, os dois só para ver. Trocar a
-// senha é pelo mesmo link do "Esqueci minha senha" (api-senha.md §8), enviado
+// senha é pelo mesmo link do "Esqueci minha senha", enviado
 // ao e-mail da conta — quem tem acesso ao e-mail prova que é dono da conta.
 // Fica dentro do AccountFormShell, mas o estado é próprio: pedir o link não
 // conta como alteração não salva do perfil

@@ -1,7 +1,7 @@
 import api from '../../../core/services/api'
 
-// Adaptador da API: é o contrato de docs/entrega-final/api-campanhas-doacoes.md
-// em código. O Mercado Pago nunca é chamado daqui: o backend cria o PIX e
+// Adaptador da API: campanhas e doações.
+// O Mercado Pago nunca é chamado daqui: o backend cria o PIX e
 // consulta o pagamento
 
 // ---------- campanhas ----------
@@ -68,7 +68,7 @@ export async function listReceivedDonations() {
 }
 
 // ---------- conta do Mercado Pago da ONG ----------
-// Contrato: docs/entrega-final/api-mercado-pago-ongs.md. O dinheiro dos PIX
+// O dinheiro dos PIX
 // cai na conta conectada; nenhuma resposta traz token
 
 // { connected, status, mpUserId, liveMode, connectedAt }; sem conta, status null

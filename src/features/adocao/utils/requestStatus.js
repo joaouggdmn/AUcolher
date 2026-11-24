@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fa6'
 
 // Adoções que aconteceram: a concluída e as que depois voltaram ao doador ou
-// foram repassadas pelo adotante (regras §3.3). Avaliações, contagem de
+// foram repassadas pelo adotante. Avaliações, contagem de
 // adoções e o histórico tratam as três igual
 export const ADOPTION_HAPPENED_STATUSES = ['CONCLUDED', 'RETURNED', 'REHOMED']
 export const RETURN_STATUSES = ['RETURNED', 'REHOMED']
@@ -90,7 +90,7 @@ export function isReturnReasonValid({ reason, note }) {
 }
 
 // Adoção feita por ONG é resgate: não tem retorno nem repasse e fica fora
-// da taxa de reabandono (regras §3.3)
+// da taxa de reabandono
 export function canHaveReturn(request) {
   return !request.adopter?.isOng
 }
@@ -112,7 +112,7 @@ export function ownerReturnRequestFor(animal, requests) {
 }
 
 // Por que um pedido enviado foi cancelado. ACCOUNT_BANNED e LISTING_REMOVED
-// vêm da moderação (regras §8)
+// vêm da moderação
 const CANCEL_DESCRIPTIONS = {
   ADOPTER_WITHDREW: () => 'Você cancelou este pedido.',
   OWNER_WITHDREW: () => 'O doador desistiu da adoção.',

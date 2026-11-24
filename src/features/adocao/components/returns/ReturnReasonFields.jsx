@@ -1,6 +1,6 @@
 import { RETURN_NOTE_MAX_LENGTH, RETURN_REASON_OPTIONS } from '../../utils/requestStatus'
 
-// Motivo + observação do retorno e do repasse (regras §3.3). A observação é
+// Motivo + observação do retorno e do repasse. A observação é
 // opcional, menos no "Outro motivo"
 function ReturnReasonFields({ reason, note, onChange, idPrefix = 'return' }) {
   const noteRequired = reason === 'OTHER'

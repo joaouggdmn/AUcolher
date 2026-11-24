@@ -21,7 +21,7 @@ export async function getPublicProfile(id) {
   }
 }
 
-// Exclui a conta logada (docs/contratos-prontos/api-exclusao-conta.md): `{ password }`
+// Exclui a conta logada: `{ password }`
 // para conta com senha, `{ confirmation: 'EXCLUIR' }` para conta sem senha.
 // POST, e não DELETE, porque leva corpo. Não dá para desfazer
 export async function deleteMyAccount(body) {

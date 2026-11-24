@@ -1,6 +1,6 @@
 import api from '../../../core/services/api'
 
-// Adaptador da API: é o contrato de docs/contratos-prontos/api-eventos.md §3 em código
+// Adaptador da API dos eventos
 
 export async function listEvents({ ngoId } = {}) {
   const { data } = await api.get('/events', { params: { ngoId: ngoId ?? undefined } })

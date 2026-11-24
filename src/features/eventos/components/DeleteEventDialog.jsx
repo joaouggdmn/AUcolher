@@ -3,8 +3,8 @@ import { getErrorMessage } from '../../../core/utils/apiError'
 import ConfirmDialog from '../../../core/components/ui/ConfirmDialog'
 import { useDeleteEvent } from '../hooks/useEventos'
 
-// Excluir sempre é permitido, mas o efeito depende de quem já confirmou
-// (regras §10): sem confirmados o evento some de vez; com confirmados ele
+// Excluir sempre é permitido, mas o efeito depende de quem já confirmou:
+// sem confirmados o evento some de vez; com confirmados ele
 // vira CANCELLED e continua em Minha conta de quem ia participar.
 // `onDeleted(message)` recebe o texto do toast
 function DeleteEventDialog({ event, onClose, onDeleted }) {

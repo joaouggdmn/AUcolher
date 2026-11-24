@@ -8,7 +8,7 @@ import { deleteMyAccount } from '../../services/userService'
 
 const CONFIRMATION_WORD = 'EXCLUIR'
 
-// "Zona de perigo" no fim de Minha conta (contratos-prontos/api-exclusao-conta.md §7), para
+// "Zona de perigo" no fim de Minha conta, para
 // pessoa e ONG. Fica dentro do AccountFormShell, mas o estado é próprio: nada
 // aqui conta como alteração não salva do perfil. Conta com senha confirma com
 // a senha; conta do Google sem senha digita EXCLUIR. O admin não exclui a

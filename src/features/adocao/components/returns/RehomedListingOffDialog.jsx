@@ -3,7 +3,7 @@ import { FaCircleQuestion } from 'react-icons/fa6'
 
 // Tirar do ar um anúncio republicado: na API é só INACTIVE, e o repasse
 // continua valendo. Se a pessoa desistiu de doar e ficou com o animal, o
-// certo é desfazer o repasse (regras §3.3) — então a tela pergunta
+// certo é desfazer o repasse — então a tela pergunta
 function RehomedListingOffDialog({ animalName, isProcessing, error, onKeptAnimal, onJustHide, onCancel }) {
   const handleCancel = () => {
     if (!isProcessing) onCancel()

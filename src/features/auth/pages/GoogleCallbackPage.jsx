@@ -18,7 +18,7 @@ function takeReturnPath() {
   }
 }
 
-// Volta do Google (docs/entrega-final/api-login-google.md §4):
+// Volta do Google:
 // /login/google?code=... troca o código pela sessão; ?error=suspended|failed
 // volta ao login com o aviso. Fica fora do GuestRoute: é esta página que
 // decide o destino depois de abrir a sessão

@@ -5,8 +5,7 @@ import { buildAdopterSnapshot } from '../utils/buildAdopterSnapshot'
 import { computeProfileCompletion } from '../../../core/hooks/useProfileCompletion'
 
 // Fachada dos pedidos de adoção: as telas (painel da ONG, Minha conta, chat) só
-// conhecem estas funções e o modelo do front, não os DTOs da API. Contrato em
-// docs/contratos-prontos/api-adocao.md
+// conhecem estas funções e o modelo do front, não os DTOs da API
 
 // ---------- conversão DTO → modelo ----------
 

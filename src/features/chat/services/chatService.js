@@ -1,7 +1,7 @@
 import * as chatApi from './chatApi'
 
 // Fachada do chat: os hooks só conhecem estas funções e o modelo da tela.
-// Quem fala com o servidor é o chatApi (docs/entrega-final/api-chat.md)
+// Quem fala com o servidor é o chatApi
 
 export const RETURN_SYSTEM_EVENTS = ['ANIMAL_RETURNED', 'ANIMAL_REHOMED']
 
@@ -52,7 +52,7 @@ export function withSystemText(message, contact) {
 
 // ---------- chamadas ----------
 
-// DTO do resumo (api-chat.md §2.4), com a última mensagem já no modelo da tela
+// DTO do resumo, com a última mensagem já no modelo da tela
 export async function getSummary() {
   const summary = await chatApi.getSummary()
   return summary.conversations.map((conversation) => ({

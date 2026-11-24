@@ -1,4 +1,4 @@
-// Regras das denúncias (regras-de-negocios.md §8), as mesmas que o backend
+// Regras das denúncias, as mesmas que o backend
 // aplica no POST /api/reports
 
 // O que pode ser denunciado: o anúncio de um animal ou o perfil de uma conta

@@ -1,6 +1,6 @@
 import api from '../../../core/services/api'
 
-// Adaptador da API: é o contrato de docs/contratos-prontos/api-denuncias-moderacao.md §1 em código
+// Adaptador da API das denúncias
 
 // POST /api/reports — { targetType, targetId, reason, description }. O
 // backend monta a cópia do alvo a partir do banco

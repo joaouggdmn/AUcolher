@@ -1,7 +1,7 @@
 import api from '../../../core/services/api'
 
-// Adaptador da API: é o contrato de docs/contratos-prontos/api-admin.md em
-// código. Todas as rotas exigem a conta ADMIN (o backend já restringe
+// Adaptador da API: rotas do painel admin.
+// Todas as rotas exigem a conta ADMIN (o backend já restringe
 // /api/admin/** a ROLE_ADMIN)
 
 export async function getStats() {
@@ -29,7 +29,7 @@ export async function listEvents() {
   return data
 }
 
-// ---------- denúncias (docs/contratos-prontos/api-denuncias-moderacao.md §1.4) ----------
+// ---------- denúncias ----------
 
 export async function listReports() {
   const { data } = await api.get('/admin/reports')
@@ -48,7 +48,7 @@ export async function banReportedAccount(reportId) {
   return data
 }
 
-// ---------- moderação direta (docs/contratos-prontos/api-denuncias-moderacao.md §2) ----------
+// ---------- moderação direta ----------
 
 // Banir (active: false) ou reativar (true) uma conta
 export async function setUserStatus(userId, active) {
@@ -56,7 +56,7 @@ export async function setUserStatus(userId, active) {
   return data
 }
 
-// Remover conteúdo (docs/contratos-prontos/api-denuncias-moderacao.md §3). O anúncio também resolve as
+// Remover conteúdo. O anúncio também resolve as
 // denúncias pendentes contra ele
 export async function removeAnimal(animalId) {
   await api.delete(`/admin/animals/${animalId}`)

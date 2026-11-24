@@ -1,6 +1,6 @@
 import api from '../../../core/services/api'
 
-// Recuperar senha (docs/entrega-final/api-senha.md §3). Trocar a senha logado
+// Recuperar senha. Trocar a senha logado
 // também passa por aqui: "Alterar senha" de Minha conta pede o mesmo link de
 // redefinição para o e-mail da conta
 

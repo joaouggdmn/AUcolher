@@ -14,7 +14,7 @@ function GoogleLogo() {
   )
 }
 
-// "Continuar com Google" (docs/entrega-final/api-login-google.md), no login e
+// "Continuar com Google", no login e
 // na aba Pessoa do cadastro: o Google só cria conta de pessoa. A ida e a volta
 // pelo Google recarregam o site, então a página de origem fica no
 // sessionStorage para a /login/google voltar a ela

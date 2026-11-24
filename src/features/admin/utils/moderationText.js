@@ -1,5 +1,5 @@
 // Textos das confirmações de moderação, iguais em Usuários e em Denúncias:
-// quem decide precisa ver o efeito antes de confirmar (regras §8)
+// quem decide precisa ver o efeito antes de confirmar
 
 export function banDescription(name, userType) {
   const content = userType === 'ONG' ? 'os anúncios, as campanhas e os eventos' : 'os anúncios'

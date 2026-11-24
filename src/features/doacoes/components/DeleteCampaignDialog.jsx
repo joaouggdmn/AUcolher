@@ -3,7 +3,7 @@ import { getErrorMessage } from '../../../core/utils/apiError'
 import ConfirmDialog from '../../../core/components/ui/ConfirmDialog'
 import { useDeleteCampaign } from '../hooks/useCampanhas'
 
-// Excluir sempre é permitido, mas o efeito depende das doações (plano §1):
+// Excluir sempre é permitido, mas o efeito depende das doações:
 // sem doações confirmadas a campanha some de vez; com doações ela sai de
 // todas as telas, mas continua no histórico de quem doou e nas doações
 // recebidas da ONG. `onDeleted(message)` recebe o texto do toast

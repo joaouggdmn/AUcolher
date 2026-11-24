@@ -8,7 +8,6 @@ function buildRegisterEndpoint(userType) {
 }
 
 // Backend usa NGO | PERSON; o frontend trabalha com PESSOA | ONG | ADMIN
-// (docs/regras-de-negocios.md, seção 2)
 function normalizeUserType(apiUserType) {
   if (apiUserType === "NGO") return "ONG";
   return apiUserType === "ADMIN" ? "ADMIN" : "PESSOA";
@@ -142,7 +141,6 @@ export async function loginRequest({ email, password }) {
 }
 
 // Fim do login com o Google: a API voltou ao front com um código de uso único
-// (docs/entrega-final/api-login-google.md §3)
 export async function exchangeGoogleCode(code) {
   const { data } = await api.post("/auth/google/exchange", { code });
   return toSession(data);

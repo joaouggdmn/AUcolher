@@ -20,8 +20,8 @@ function tooLong(value, max) {
   return value != null && value.length > max
 }
 
-// Regras do corpo de POST/PUT /api/events (docs/contratos-prontos/api-eventos.md
-// §2.2), campo a campo, com as chaves do DTO — as mesmas que o backend
+// Regras do corpo de POST/PUT /api/events,
+// campo a campo, com as chaves do DTO — as mesmas que o backend
 // valida. O formulário mostra todas antes de enviar
 export function getEventPayloadErrors(payload, today) {
   const errors = {}

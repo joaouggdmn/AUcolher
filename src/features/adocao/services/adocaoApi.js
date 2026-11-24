@@ -2,7 +2,7 @@ import api from '../../../core/services/api'
 
 // Chamadas à API de pedidos de adoção e avaliações. Recebem e devolvem os
 // DTOs da API sem conversão — quem adapta para o formato das telas é o
-// adocaoService. Contrato em docs/contratos-prontos/api-adocao.md
+// adocaoService
 
 export async function createRequest(animalId) {
   const { data } = await api.post('/adoption-requests', { animalId })
@@ -28,7 +28,7 @@ export async function changeStatus(id, status) {
   return data
 }
 
-// ---------- retorno e repasse (docs/contratos-prontos/api-devolucao-reabandono.md) ----------
+// ---------- retorno e repasse ----------
 
 // Dono: registra (ou corrige) que o animal voltou — { returnDate, reason, note }
 export async function registerReturn(id, body) {

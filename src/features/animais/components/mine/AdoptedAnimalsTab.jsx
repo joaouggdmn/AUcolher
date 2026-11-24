@@ -16,7 +16,7 @@ import AdoptedAnimalCard from './AdoptedAnimalCard'
 // "Meus animais" → Adotados por mim: as adoções que a pessoa concluiu,
 // inclusive as que depois voltaram ao doador ou foram repassadas. Na
 // concluída, "Republicar anúncio"; no repasse, "Desisti de doar" enquanto o
-// anúncio novo não gerou outra adoção (regras §3.3)
+// anúncio novo não gerou outra adoção
 function AdoptedAnimalsTab({ onNotify }) {
   const navigate = useNavigate()
   const { adoptedRequests } = useSentRequests()

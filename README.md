@@ -121,8 +121,8 @@ mvn spring-boot:run                               # sobe em http://localhost:808
 Sem nenhuma variável, a API sobe contra o PostgreSQL local com os valores padrão e uma chave JWT aleatória a cada execução. Defina `JWT_SECRET` para os tokens sobreviverem a um reinício.
 
 - **Administrador:** não há cadastro público; a conta `ADMIN` é inserida direto no banco.
-- **Dados de teste:** `docs/seed-banco-completo.sql`, deste repositório, cria ONGs, pessoas, animais, pedidos, eventos e conversas. Ele **apaga** os dados do banco antes; a senha das contas de teste está no cabeçalho do arquivo.
-- **Login com Google, e-mail de senha, doações e assistente:** cada um precisa das suas variáveis (o assistente, de `GEMINI_API_KEY`). A tabela completa e o passo a passo do Mercado Pago (túnel HTTPS, webhook, chave Pix) estão no README do back-end. O login com Google está explicado em `docs/entrega-final/api-login-google.md`.
+- **Dados de teste:** o banco começa vazio; ONGs e pessoas se cadastram pelo próprio site.
+- **Login com Google, e-mail de senha, doações e assistente:** cada um precisa das suas variáveis (o assistente, de `GEMINI_API_KEY`). A tabela completa, o passo a passo do Mercado Pago (túnel HTTPS, webhook, chave Pix) e como criar as credenciais do Google estão no README do back-end.
 
 ### 2. Front-end
 

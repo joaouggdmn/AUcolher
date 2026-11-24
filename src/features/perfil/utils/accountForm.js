@@ -110,7 +110,7 @@ export function toOngUpdates(form) {
 }
 
 // Corpo do PUT /users/me (ProfileUpdateDTO no backend): espelha as colunas
-// de docs/script_banco_aucolher.sql em camelCase, como o NgoRegistrationDTO.
+// do banco (sql/schema.sql, na API) em camelCase, como o NgoRegistrationDTO.
 // É uma substituição completa — passe o usuário inteiro já com as alterações.
 // O Perfil AUmatch não vai: ele tem rota própria (PUT /match/profile), que o
 // useAccountForm chama quando alguma resposta muda

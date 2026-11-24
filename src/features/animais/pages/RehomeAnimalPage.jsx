@@ -62,7 +62,7 @@ function RehomeForm({ request, draft, reasonFields }) {
 }
 
 // /meus-animais/republicar/:requestId — o adotante anuncia de novo um animal
-// que adotou (regras §3.3). Nasce um anúncio novo em nome dele, cópia do
+// que adotou. Nasce um anúncio novo em nome dele, cópia do
 // original, que ele revisa com o que aprendeu convivendo com o animal; a
 // adoção vira REHOMED e conta na taxa de reabandono
 function RehomeAnimalPage() {

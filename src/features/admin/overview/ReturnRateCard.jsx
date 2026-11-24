@@ -44,7 +44,7 @@ function MeterList({ items, scaleMax }) {
   )
 }
 
-// Taxa de reabandono (regras §3.3): quantas adoções voltaram ao doador ou
+// Taxa de reabandono: quantas adoções voltaram ao doador ou
 // foram repassadas pelo adotante, no geral e por faixa do score do AUmatch
 // congelado na conclusão — a métrica que testa a hipótese do TCC. As faixas
 // usam um tom só (é a mesma medida em três grupos) e a escala vai de 0 a

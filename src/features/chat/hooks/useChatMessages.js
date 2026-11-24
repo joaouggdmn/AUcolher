@@ -15,7 +15,7 @@ function appendNew(current, incoming) {
   return fresh.length ? [...current, ...fresh].sort((a, b) => a.id - b.id) : current;
 }
 
-// Conversa aberta (api-chat.md §3.1): o histórico uma vez e, depois, só as
+// Conversa aberta: o histórico uma vez e, depois, só as
 // mensagens com id maior que a última, a cada 3 s, enquanto a aba está visível
 export function useChatMessages(requestId) {
   const { user } = useAuth();

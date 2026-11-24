@@ -6,7 +6,7 @@ function plural(count, singular, pluralForm) {
   return count === 1 ? singular : pluralForm
 }
 
-// Atalho da Visão geral para julgar (regras §9.1). Só aparece quando há
+// Atalho da Visão geral para julgar. Só aparece quando há
 // casos pendentes; na impressão, vira uma linha do relatório
 function PendingReportsNotice({ reports }) {
   const { pending, pendingTargets } = reports

@@ -9,7 +9,7 @@ function titleOf({ type, date }, viewer) {
   return viewer === 'adopter' ? `Republicado por você em ${when}` : `Repassado pelo adotante em ${when}`
 }
 
-// O que aconteceu depois da adoção (regras §3.3): o animal voltou para quem
+// O que aconteceu depois da adoção: o animal voltou para quem
 // doou (RETURNED) ou o adotante o anunciou de novo (REHOMED), com o motivo e
 // a observação. As duas partes veem; no repasse, o link leva ao anúncio novo.
 // `viewer`: 'owner' (doador) ou 'adopter'
