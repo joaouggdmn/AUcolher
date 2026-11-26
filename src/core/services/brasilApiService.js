@@ -34,13 +34,36 @@ function toKnownUf(uf) {
   return BRAZILIAN_STATES.some((state) => state.value === uf) ? uf : ''
 }
 
+// A BrasilAPI falha de vez em quando (função fria, limite de requisições) e a
+// resposta de erro vem sem cabeçalho CORS: o navegador bloqueia e o fetch
+// estoura. Por isso: tenta a BrasilAPI duas vezes e, se ainda falhar, a
+// Minha Receita — a base de onde a BrasilAPI puxa os dados, com os mesmos
+// campos e CORS liberado
+const CNPJ_LOOKUP_URLS = [
+  (cnpj) => `${BRASIL_API_BASE_URL}/cnpj/v1/${cnpj}`,
+  (cnpj) => `${BRASIL_API_BASE_URL}/cnpj/v1/${cnpj}`,
+  (cnpj) => `https://minhareceita.org/${cnpj}`,
+]
+const CNPJ_REQUEST_TIMEOUT_MS = 8000
+
+async function fetchCnpjData(cnpj) {
+  for (const buildUrl of CNPJ_LOOKUP_URLS) {
+    let response
+    try {
+      response = await fetch(buildUrl(cnpj), { signal: AbortSignal.timeout(CNPJ_REQUEST_TIMEOUT_MS) })
+    } catch {
+      continue // rede, CORS ou tempo esgotado: próxima fonte
+    }
+    // As duas fontes respondem 404 (com CORS) quando o CNPJ não existe
+    if (response.status === 404) throw new Error('cnpj-not-found')
+    if (response.ok) return response.json()
+  }
+  throw new Error('cnpj-lookup-failed')
+}
+
 // cnpj: apenas os 14 dígitos
 export async function fetchCompanyByCnpj(cnpj) {
-  const response = await fetch(`${BRASIL_API_BASE_URL}/cnpj/v1/${cnpj}`)
-  if (response.status === 404) throw new Error('cnpj-not-found')
-  if (!response.ok) throw new Error('cnpj-lookup-failed')
-
-  const data = await response.json()
+  const data = await fetchCnpjData(cnpj)
   const situation = data.descricao_situacao_cadastral?.trim() ?? ''
 
   return {
